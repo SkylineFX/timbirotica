@@ -1,0 +1,25 @@
+{
+  "name": "nuxtpage",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^4.3.0",
+    "@nuxthub/core": "^0.10.4",
+    "drizzle-kit": "^0.31.8",
+    "drizzle-orm": "^0.45.1",
+    "mysql2": "^3.16.1",
+    "nuxt": "^4.2.2",
+    "nuxt-auth-utils": "^0.5.27",
+    "tailwindcss": "^4.1.18",
+    "vue": "^3.5.26",
+    "vue-router": "^4.6.4",
+    "zod": "^4.3.5"
+  }
+}

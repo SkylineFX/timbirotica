@@ -1,0 +1,43 @@
+<script setup lang="ts">
+const { loggedIn, user, fetch: refreshSession } = useUserSession()
+const credentials = reactive({
+  email: '',
+  password: '',
+})
+async function login () {
+  try {
+    await $fetch('/api/login', {
+      method: 'POST',
+      body: credentials,
+    })
+
+    // Refresh the session on client-side and redirect to the home page
+    await refreshSession()
+    if (loggedIn.value) {
+      await navigateTo('/')
+    } else {
+      alert('Login failed: Session not created. Check your NUXT_SESSION_PASSWORD.')
+    }
+  } catch (err: any) {
+    alert(err.data?.message || err.message || 'Bad credentials')
+  }
+}
+</script>
+
+<template>
+  <form @submit.prevent="login">
+    <input
+      v-model="credentials.email"
+      type="email"
+      placeholder="Email"
+    >
+    <input
+      v-model="credentials.password"
+      type="password"
+      placeholder="Password"
+    >
+    <button type="submit">
+      Login
+    </button>
+  </form>
+</template>
