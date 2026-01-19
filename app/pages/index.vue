@@ -14,28 +14,29 @@ async function logout () {
 
 <template>
   <div>
+    <Header />
     <Banner />
     <UContainer class="py-4">
-      <HeroCarousel />
+      <!-- <HeroCarousel /> -->
     </UContainer>
     
     <p v-if="user">Welcome {{ user }}</p>
     <UContainer>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-12">
-          <UCard class="text-center">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2 my-12">
+          <UCard class="text-center rounded-sm">
               <UIcon name="i-heroicons-truck" class="text-4xl text-primary-500 mb-1" />
-              <h3 class="font-bold">Fast Delivery</h3>
-              <p class="text-sm text-gray-500">Shipping within 24 hours</p>
+              <h3 class="font-bold">Livrare rapida</h3>
+              <p class="text-sm text-gray-500">Livrare rapida in Bucuresti</p>
           </UCard>
-          <UCard class="text-center">
+          <UCard class="text-center rounded-sm">
               <UIcon name="i-heroicons-shield-check" class="text-4xl text-primary-500 mb-1" />
-              <h3 class="font-bold">Secure Payment</h3>
-              <p class="text-sm text-gray-500">100% secure payment</p>
+              <h3 class="font-bold">Modalitati de plata</h3>
+              <p class="text-sm text-gray-500">Ramburs la livrare sau cu cardul online</p>
           </UCard>
-          <UCard class="text-center">
+          <UCard class="text-center rounded-sm">
               <UIcon name="i-heroicons-arrow-path" class="text-4xl text-primary-500 mb-1" />
-              <h3 class="font-bold">Easy Returns</h3>
-              <p class="text-sm text-gray-500">30 days return policy</p>
+              <h3 class="font-bold">Consultanta gratuita</h3>
+              <p class="text-sm text-gray-500">Ai o nelamurire? Contacta-ne!</p>
           </UCard>
       </div>
     </UContainer>

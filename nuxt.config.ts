@@ -5,6 +5,6 @@ export default defineNuxtConfig({
   modules: ['@nuxt/ui', 'nuxt-auth-utils', '@nuxthub/core'],
   css: ['~/assets/main.css'],
   hub: {
-    db: 'mysql'
+    db: 'sqlite'
   }
 })  

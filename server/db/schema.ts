@@ -1,10 +1,10 @@
-import { mysqlTable, text, serial, timestamp } from 'drizzle-orm/mysql-core'
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 
-export const users = mysqlTable('users', {
-  id: serial().primaryKey(),
+export const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
   name: text().notNull(),
   email: text().notNull().unique(),
   password: text().notNull(),
   avatar: text().notNull(),
-  createdAt: timestamp().notNull().defaultNow(),
+  createdAt: integer({ mode: 'timestamp' }).notNull(),
 })

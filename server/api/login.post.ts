@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import bcrypt from 'bcryptjs'
 
 const bodySchema = z.object({
   email: z.string().email(),
@@ -16,18 +17,33 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  if (email === 'admin@admin.com' && password === 'iamtheadmin') {
-    // set the user session in the cookie
-    // this server util is auto-imported by the auth-utils module
-    await setUserSession(event, {
-      user: {
-        name: 'John Doe',
-      },
-    })
-    return {}
-  }
-  throw createError({
-    status: 401,
-    message: 'Bad credentials',
+  const db = useDrizzle()
+  const user = await db.query.users.findFirst({
+    where: eq(tables.users.email, email)
   })
+
+  if (!user) {
+    throw createError({
+      status: 401,
+      message: 'Bad credentials',
+    })
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password)
+
+  if (!isPasswordValid) {
+    throw createError({
+      status: 401,
+      message: 'Bad credentials',
+    })
+  }
+
+  // set the user session in the cookie
+  await setUserSession(event, {
+    user: {
+      name: user.name,
+      // Add other info if needed, e.g. id: user.id
+    },
+  })
+  return {}
 })
