@@ -33,7 +33,6 @@ function select(index: number) {
     <UCarousel
       ref="carousel"
       v-slot="{ item }"
-      arrows
       :items="items"
       :prev="{ onClick: onClickPrev }"
       :next="{ onClick: onClickNext }"

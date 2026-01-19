@@ -2,6 +2,7 @@
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 
+const { fetch } = useUserSession()
 const toast = useToast()
 
 const fields: AuthFormField[] = [{
@@ -43,6 +44,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       method: 'POST',
       body: payload.data
     })
+    await fetch()
     toast.add({ title: 'Login successful', color: 'success' })
     await navigateTo('/')
   } catch (err: any) {
