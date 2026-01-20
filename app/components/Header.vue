@@ -102,14 +102,16 @@ const navigation = ref([
   <div>
     <UHeader toggle-side="right" mode="slideover">
       <template #title>
-        <NuxtImg src="/logo.svg" alt="Logo" class="h-6 w-auto" />
+        <NuxtImg src="/logo.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
       </template>
 
       <UInput
-        icon="i-lucide-search"
+        trailing-icon="i-lucide-search"
         size="xl"
         variant="outline"
         placeholder="Cauta produse..."
+        class="hidden sm:inline-flex w-96 ml-4"
+        color="primary"
       />
 
       <template #right>
