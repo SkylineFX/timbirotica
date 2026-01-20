@@ -9,17 +9,17 @@ const fields: AuthFormField[] = [{
   name: 'email',
   type: 'email',
   label: 'Email',
-  placeholder: 'Enter your email',
+  placeholder: 'Introduceti adresa de email',
   required: true
 }, {
   name: 'password',
-  label: 'Password',
+  label: 'Parola',
   type: 'password',
-  placeholder: 'Enter your password',
+  placeholder: 'Introduceti parola',
   required: true
 }, {
   name: 'remember',
-  label: 'Remember me',
+  label: 'Ține-mă minte',
   type: 'checkbox'
 }]
 
@@ -32,8 +32,8 @@ const providers = [{
 }]
 
 const schema = z.object({
-  email: z.email('Invalid email'),
-  password: z.string('Password is required').min(8, 'Must be at least 8 characters')
+  email: z.email('Adresa de email nu este valida'),
+  password: z.string('Parola este obligatorie').min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
 })
 
 type Schema = z.output<typeof schema>
@@ -45,12 +45,12 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       body: payload.data
     })
     await fetch()
-    toast.add({ title: 'Login successful', color: 'success' })
+    toast.add({ title: 'Autentificare reusita', color: 'success' })
     await navigateTo('/')
   } catch (err: any) {
     toast.add({
-      title: 'Login failed',
-      description: err.data?.message || 'Invalid credentials',
+      title: 'Autentificare esuata',
+      description: err.data?.message || 'Datele introduse nu sunt valide',
       color: 'error'
     })
   }
@@ -63,13 +63,19 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="schema"
-        title="Login"
-        description="Enter your credentials to access your account."
+        title="Autentificare"
         icon="i-lucide-user"
         :fields="fields"
         :providers="providers"
         @submit="onSubmit"
-      />
+      >
+        <template #description>
+          Nu aveti un cont? <ULink to="/register" class="text-primary font-medium">Inregistrare</ULink>.
+        </template>
+        <template #password-hint>
+          <ULink to="/forgot-password" class="text-primary font-medium" tabindex="-1">Am uitat parola</ULink>
+        </template>
+      </UAuthForm>
     </UPageCard>
   </div>
 </template>

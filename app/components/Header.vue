@@ -3,6 +3,12 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const route = useRoute()
 const { loggedIn, clear, user } = useUserSession()
+const isCartOpen = ref(false)
+
+async function logout () {
+  await clear()
+  await navigateTo('/login')
+}
 
 const loggedInItems: DropdownMenuItem[][] = [
   [
@@ -27,7 +33,7 @@ const loggedInItems: DropdownMenuItem[][] = [
       label: 'Deconectare',
       color: 'error',
       icon: 'i-lucide-log-out',
-      onSelect: clear
+      onSelect: logout
     }
   ]
 ]
@@ -96,7 +102,7 @@ const navigation = ref([
   <div>
     <UHeader toggle-side="right" mode="slideover">
       <template #title>
-        <AppLogo class="h-6 w-auto" />
+        <NuxtImg src="/logo.svg" alt="Logo" class="h-6 w-auto" />
       </template>
 
       <UInput
@@ -107,15 +113,29 @@ const navigation = ref([
       />
 
       <template #right>
-        <UTooltip text="Cosul meu">
-          <UButton
-            color="neutral"
-            variant="ghost"
-            to="/cart"
-            icon="i-lucide-shopping-cart"
+        <USlideover v-model:open="isCartOpen" side="right" inset title="Cosul meu">
+          <UButton 
+            color="neutral" 
+            variant="ghost" 
+            icon="i-lucide-shopping-cart" 
             aria-label="Cosul meu"
+            @click="isCartOpen = true"
           />
-        </UTooltip>
+
+          <template #body>
+            <UCard>
+              <UList>
+                <UListItem>
+                  <UListItemTitle>Item 1</UListItemTitle>
+                </UListItem>
+              </UList>
+            </UCard>
+          </template>
+
+          <template #footer>
+            <UButton color="primary" variant="solid" to="/checkout" @click="isCartOpen = false">Checkout</UButton>
+          </template>
+        </USlideover>
 
         <UDropdownMenu :items="items" :ui="{ content: 'w-48' }">
           <UButton 
@@ -144,7 +164,7 @@ const navigation = ref([
     </UHeader>
 
     <!-- Desktop menu -->
-    <div class="w-full py-2 bg-black hidden lg:block">
+    <!-- <div class="w-full py-2 bg-black hidden lg:block">
       <UContainer class="flex gap-2">
         <div>
           <USlideover side="left" title="Toate produsele">
@@ -172,7 +192,7 @@ const navigation = ref([
           </USlideover>
         </div>
       </UContainer>
-    </div>
+    </div> -->
 
   </div>
 </template>

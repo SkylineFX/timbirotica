@@ -7,26 +7,26 @@ const toast = useToast()
 const fields: AuthFormField[] = [{
   name: 'name',
   type: 'text',
-  label: 'Name',
-  placeholder: 'Enter your name',
+  label: 'Nume',
+  placeholder: 'Introduceti numele dumneavoastra',
   required: true
 }, {
   name: 'email',
   type: 'email',
   label: 'Email',
-  placeholder: 'Enter your email',
+  placeholder: 'Introduceti adresa de email',
   required: true
 }, {
   name: 'password',
-  label: 'Password',
+  label: 'Parola',
   type: 'password',
-  placeholder: 'Enter your password',
+  placeholder: 'Introduceti parola',
   required: true
 }, {
   name: 'passwordConfirm',
-  label: 'Confirm Password',
+  label: 'Confirmare parola',
   type: 'password',
-  placeholder: 'Confirm your password',
+  placeholder: 'Confirmati parola',
   required: true
 }]
 
@@ -39,10 +39,10 @@ const providers = [{
 }]
 
 const schema = z.object({
-  name: z.string('Name is required').min(3, 'Must be at least 3 characters'),
-  email: z.email('Invalid email'),
-  password: z.string('Password is required').min(8, 'Must be at least 8 characters'),
-  passwordConfirm: z.string('Password confirmation is required').min(8, 'Must be at least 8 characters')
+  name: z.string('Numele este obligatoriu').min(2, 'Numele trebuie sa aiba cel putin 2 caractere'),
+  email: z.email('Adresa de email nu este valida'),
+  password: z.string('Parola este obligatorie').min(8, 'Parola trebuie sa aiba cel putin 8 caractere'),
+  passwordConfirm: z.string('Confirmarea parolei este obligatorie').min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
 })
 
 type Schema = z.output<typeof schema>
@@ -50,7 +50,7 @@ type Schema = z.output<typeof schema>
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
   if (payload.data.password !== payload.data.passwordConfirm) {
     toast.add({
-      title: 'Passwords do not match',
+      title: 'Parolele nu sunt identice',
       color: 'error',
     })
     return
@@ -89,17 +89,18 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="schema"
-        title="Register"
-        description="Enter your credentials to access your account."
+        title="Inregistrare"
+        description="Introduceti datele dumneavoastra pentru a va putea crea contul."
         icon="i-lucide-user"
         :fields="fields"
         :providers="providers"
         @submit="onSubmit"
-      />
+      >
+        <template #description>
+          Ai deja un cont? <ULink to="/login" class="text-primary font-medium">Autentificare</ULink>.
+        </template>
+      </UAuthForm>
     </UPageCard>
-    <p class="text-sm text-center">
-      Already have an account? <NuxtLink to="/login" class="text-primary-500 hover:underline">Login here</NuxtLink>
-    </p>
   </div>
 </template>
 
