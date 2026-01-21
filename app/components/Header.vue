@@ -7,93 +7,62 @@ const isCartOpen = ref(false)
 
 async function logout () {
   await clear()
-  await navigateTo('/login')
+  await navigateTo('/user/login')
 }
 
-const loggedInItems: DropdownMenuItem[][] = [
-  [
-    {
-      label: 'Salut ' + (user.value?.name || 'Client'),
-      disabled: true,
-      class: 'font-bold text-gray-900 dark:text-white'
-    }
-  ],
-  [
-    {
-      label: 'Detalii cont',
-      icon: 'i-lucide-user'
-    },
-    {
-      label: 'Comenzile mele',
-      icon: 'i-lucide-receipt-text'
-    },
-  ],
-  [
-    {
-      label: 'Deconectare',
-      color: 'error',
-      icon: 'i-lucide-log-out',
-      onSelect: logout
-    }
-  ]
-]
-
 const loggedOutItems: DropdownMenuItem[][] = [
-  [
-    {
-      label: 'Autentificare',
-      color: 'success',
-      icon: 'i-lucide-log-in',
-      to: '/login'
-    },
-    {
-      label: 'Inregistrare',
-      icon: 'i-lucide-lock',
-      to: '/register'
-    },
-  ],
+  [{
+    label: 'Autentificare',
+    color: 'success',
+    icon: 'i-lucide-log-in',
+    to: '/user/login'
+  }, {
+    label: 'Inregistrare',
+    icon: 'i-lucide-lock',
+    to: '/user/register'
+  }]
 ]
 
+const loggedInItems = computed(() => [
+  [{
+    label: 'Salut ' + (user.value?.name || 'Client'),
+    disabled: true,
+    class: 'font-bold text-gray-900 dark:text-white'
+  }],
+  [{
+    label: 'Detalii cont',
+    icon: 'i-lucide-user'
+  }, {
+    label: 'Comenzile mele',
+    icon: 'i-lucide-receipt-text'
+  }],
+  [{
+    label: 'Deconectare',
+    color: 'error',
+    icon: 'i-lucide-log-out',
+    onSelect: logout
+  }]
+])
 
-const items = computed(() => {
-  if (loggedIn.value) {
-    return loggedInItems
-  }
-  return loggedOutItems;
-})
+const dropdownItems = computed(() => loggedIn.value ? loggedInItems.value : loggedOutItems)
 
-const navigation = ref([
+const { data: categoryTree } = useFetch('/api/categories/tree')
+const { data: brands } = useFetch('/api/brands')
+
+const navigation = computed(() => [
   {
     label: 'Toate Produsele',
-    to: '#',
-    children: [
-      {
-        label: 'Introduction',
-        to: '#introduction',
-      },
-      {
-        label: 'Installation',
-        to: '#installation'
-      }
-    ]
+    to: '/categorii',
+    children: categoryTree.value || []
   },
   {
     label: 'Producatori',
-    to: '#',
-    children: [
-      {
-        label: 'defineShortcuts',
-        to: '#defineshortcuts'
-      },
-      {
-        label: 'useModal',
-        to: '#usemodal'
-      }
-    ]
+    to: '/producatori',
+    children: brands.value || []
   },
   {
     label: "Contactati-ne",
-    to: "#"
+    to: '/contact'
   }
 ])
 </script>
@@ -139,7 +108,7 @@ const navigation = ref([
           </template>
         </USlideover>
 
-        <UDropdownMenu :items="items" :ui="{ content: 'w-48' }">
+        <UDropdownMenu :items="dropdownItems" :ui="{ content: 'w-48' }">
           <UButton 
             color="neutral"
             variant="ghost"
@@ -166,7 +135,7 @@ const navigation = ref([
     </UHeader>
 
     <!-- Desktop menu -->
-    <!-- <div class="w-full py-2 bg-black hidden lg:block">
+    <!-- <div class="w-full py-2 bg-black hidden sm:block">
       <UContainer class="flex gap-2">
         <div>
           <USlideover side="left" title="Toate produsele">

@@ -2,6 +2,10 @@
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 
+definePageMeta({
+  middleware: 'guest'
+})
+
 const toast = useToast()
 
 const fields: AuthFormField[] = [{
@@ -97,7 +101,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         @submit="onSubmit"
       >
         <template #description>
-          Ai deja un cont? <ULink to="/login" class="text-primary font-medium">Autentificare</ULink>.
+          Ai deja un cont? <ULink to="/user/login" class="text-primary font-medium">Autentificare</ULink>.
         </template>
       </UAuthForm>
     </UPageCard>

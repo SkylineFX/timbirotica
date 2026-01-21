@@ -2,6 +2,10 @@
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 
+definePageMeta({
+  middleware: 'guest'
+})
+
 const { fetch } = useUserSession()
 const toast = useToast()
 
@@ -70,10 +74,10 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         @submit="onSubmit"
       >
         <template #description>
-          Nu aveti un cont? <ULink to="/register" class="text-primary font-medium">Inregistrare</ULink>.
+          Nu aveti un cont? <ULink to="/user/register" class="text-primary font-medium">Inregistrare</ULink>.
         </template>
         <template #password-hint>
-          <ULink to="/forgot-password" class="text-primary font-medium" tabindex="-1">Am uitat parola</ULink>
+          <ULink to="/user/forgot-password" class="text-primary font-medium" tabindex="-1">Am uitat parola</ULink>
         </template>
       </UAuthForm>
     </UPageCard>
