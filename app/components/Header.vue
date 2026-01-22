@@ -69,7 +69,7 @@ const navigation = computed(() => [
 
 <template>
   <div>
-    <UHeader toggle-side="right" mode="slideover">
+    <UHeader toggle-side="left">
       <template #title>
         <NuxtImg src="/logo.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
       </template>
@@ -84,7 +84,18 @@ const navigation = computed(() => [
       />
 
       <template #right>
-        <USlideover v-model:open="isCartOpen" side="right" inset title="Cosul meu">
+        <UDropdownMenu :items="dropdownItems" :ui="{ content: 'w-48' }">
+          <UButton 
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-user"
+            aria-label="Contul meu"
+          >
+            <span class="hidden md:inline">Contul meu</span>
+          </UButton>
+        </UDropdownMenu>
+
+        <USlideover v-model:open="isCartOpen" side="right" title="Cosul meu">
           <UButton 
             color="neutral" 
             variant="ghost" 
@@ -104,20 +115,27 @@ const navigation = computed(() => [
           </template>
 
           <template #footer>
-            <UButton color="primary" variant="solid" to="/checkout" @click="isCartOpen = false">Checkout</UButton>
+            <div class="w-full flex flex-col gap-2">
+              <div class="w-full flex justify-between items-center">
+                <span class="font-semibold text-lg">Subtotal:</span>
+                <span class="font-semibold text-lg">0.00 RON</span>
+              </div>
+              <div class="w-full flex justify-end">
+                <p class="text-xs text-gray-500">Preturile includ TVA</p>
+              </div>
+              <UButton 
+                color="primary" 
+                variant="solid" 
+                to="/checkout" 
+                @click="isCartOpen = false"
+                class="rounded-sm"
+              >
+                Continua spre livrare
+              </UButton>
+            </div>
           </template>
         </USlideover>
 
-        <UDropdownMenu :items="dropdownItems" :ui="{ content: 'w-48' }">
-          <UButton 
-            color="neutral"
-            variant="ghost"
-            icon="i-lucide-user"
-            aria-label="Contul meu"
-          >
-            <span class="hidden md:inline">Contul meu</span>
-          </UButton>
-        </UDropdownMenu>
       </template>
 
       <template #body>
@@ -130,7 +148,7 @@ const navigation = computed(() => [
 
         <USeparator />
 
-        <UNavigationMenu :items="navigation" orientation="vertical" />
+        <UNavigationMenu :items="navigation" orientation="vertical" type="single" />
       </template>
     </UHeader>
 

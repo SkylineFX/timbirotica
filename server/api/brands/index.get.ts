@@ -4,6 +4,6 @@ export default eventHandler(async (event) => {
   return brands.map(brand => ({
     label: brand.name,
     to: `/producatori/${brand.slug}`,
-    // avatar: { src: brand.image }
+    image: brand.image
   }))
 })
