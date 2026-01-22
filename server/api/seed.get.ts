@@ -75,9 +75,69 @@ export default eventHandler(async (event) => {
       }
   }
 
+  // Read Products
+  const productsFile = await fs.promises.readFile(path.resolve('public', 'products.json'), 'utf-8')
+  const productsJson = JSON.parse(productsFile)
+  const insertedProducts = []
+
+  // Insert Products
+  for (const prod of productsJson) {
+      const parentSlug = slugify(prod.category)
+      const subSlug = slugify(prod.subcategory)
+      const productSlug = slugify(prod.name)
+
+      // Find subcategory
+      // We need to ensure we get the subcategory that belongs to the correct parent
+      // First find parent
+      const parent = await useDrizzle().query.categories.findFirst({
+        where: eq(tables.categories.slug, parentSlug)
+      })
+
+      if (!parent) continue;
+
+      const subcategory = await useDrizzle().query.categories.findFirst({
+        where: and(
+            eq(tables.categories.slug, subSlug),
+            eq(tables.categories.parentId, parent.id)
+        )
+      })
+
+      if (subcategory) {
+        // Try to find brand? For now skipping brand link as it is not explicit in JSON
+        // Or we could fuzzy match name endings if really needed, but sticking to basics first.
+        
+        const existingProduct = await useDrizzle().query.products.findFirst({
+            where: eq(tables.products.slug, productSlug)
+        })
+
+        if (!existingProduct) {
+             // Parse price "27.83" -> 27.83
+             // Note: prod.price is already a number in JSON (e.g. 27.83)
+             await useDrizzle().insert(tables.products).values({
+               name: prod.name,
+               slug: productSlug,
+               description: prod.stock_status, // Using stock status as description for now or null
+               price: prod.price,
+               categoryId: subcategory.id,
+               image: prod.image_url,
+               createdAt: new Date()
+               // brandId: ... 
+             })
+             insertedProducts.push(prod.name)
+        } else {
+            // Update image if product exists
+            await useDrizzle().update(tables.products)
+              .set({ image: prod.image_url })
+              .where(eq(tables.products.slug, productSlug))
+              .run()
+        }
+      }
+  }
+
   return {
     message: 'Seeding completed',
     categories: { count: insertedCategories.length, names: insertedCategories },
-    brands: { count: insertedBrands.length, names: insertedBrands }
+    brands: { count: insertedBrands.length, names: insertedBrands },
+    products: { count: insertedProducts.length }
   }
 })

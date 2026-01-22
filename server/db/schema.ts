@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer, type AnySQLiteColumn, real } from 'drizzle-orm/sqlite-core'
+import { relations } from 'drizzle-orm'
 
 export const users = sqliteTable('users', {
   id: integer().primaryKey({ autoIncrement: true }),
@@ -36,3 +37,30 @@ export const products = sqliteTable('products', {
   stock: integer().notNull().default(0),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 })
+
+export const productsRelations = relations(products, ({ one }) => ({
+  category: one(categories, {
+    fields: [products.categoryId],
+    references: [categories.id],
+  }),
+  brand: one(brands, {
+    fields: [products.brandId],
+    references: [brands.id],
+  }),
+}))
+
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+  products: many(products),
+  parent: one(categories, {
+    fields: [categories.parentId],
+    references: [categories.id],
+    relationName: 'categories_parent',
+  }),
+  children: many(categories, {
+    relationName: 'categories_parent',
+  }),
+}))
+
+export const brandsRelations = relations(brands, ({ many }) => ({
+  products: many(products),
+}))
