@@ -34,6 +34,8 @@ export default eventHandler(async (event) => {
     }
   }
 
+  const sortParam = query.sort as string || 'default'
+
   // 1. Get products with pagination
   const products = await useDrizzle().query.products.findMany({
     where,
@@ -42,6 +44,20 @@ export default eventHandler(async (event) => {
     with: {
       brand: true,
       category: true
+    },
+    orderBy: (products, { asc, desc }) => {
+      switch (sortParam) {
+        case 'price-asc':
+          return [asc(products.price)]
+        case 'price-desc':
+          return [desc(products.price)]
+        case 'name-asc':
+          return [asc(products.name)]
+        case 'name-desc':
+          return [desc(products.name)]
+        default:
+          return [desc(products.createdAt)]
+      }
     }
   })
 

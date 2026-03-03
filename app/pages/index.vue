@@ -20,7 +20,7 @@ const navigation = computed(() => [
 <template>
   <div>
     <UContainer class="my-6 flex gap-4">
-      <div class="h-64 lg:h-120 justify-start items-start bg-gray-100 rounded-md overflow-y-auto hidden lg:flex lg:flex-1 lg:flex-col lg:basis-md">
+      <div class="h-64 lg:h-120 justify-start items-start bg-white rounded-md overflow-y-auto hidden lg:flex lg:flex-1 lg:flex-col lg:basis-md">
         <UNavigationMenu :items="navigation" orientation="vertical" type="single" class="w-full"/>
       </div>
       <HeroCarousel />

@@ -53,7 +53,7 @@ const columns: FooterColumn[] = [
 </script>
 
 <template>
-  <div class="border-t border-gray-200 dark:border-gray-800">
+  <div class="bg-white border-t border-gray-200 dark:border-gray-800">
     <UContainer>
       <UFooterColumns :columns="columns" class="py-8">
         <template #right>
