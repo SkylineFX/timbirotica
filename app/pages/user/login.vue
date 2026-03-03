@@ -49,6 +49,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       body: payload.data
     })
     await fetch()
+    await useCart().syncCart()
     toast.add({ title: 'Autentificare reusita', color: 'success' })
     await navigateTo('/')
   } catch (err: any) {

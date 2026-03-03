@@ -41,6 +41,7 @@ export default defineEventHandler(async (event) => {
   // set the user session in the cookie
   await setUserSession(event, {
     user: {
+      id: user.id,
       name: user.name,
       // Add other info if needed, e.g. id: user.id
     },

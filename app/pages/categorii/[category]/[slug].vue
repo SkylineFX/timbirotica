@@ -14,49 +14,89 @@ useSeoMeta({
   title: product.value.name,
   description: product.value.description
 })
+
+const quantity = ref(1)
+
+const stockColor = computed(() => {
+    const status = product.value?.description?.toLowerCase() || ''
+    if (status.includes('limitat')) return 'text-orange-600 dark:text-orange-500'
+    if (status.includes('epuizat') || status.includes('indisponibil')) return 'text-red-600 dark:text-red-500'
+    return 'text-green-600 dark:text-green-500'
+})
+
+const { addToCart } = useCart()
 </script>
 
 <template>
-  <UContainer class="py-12">
+  <UContainer class="py-6">
     <div v-if="product" class="grid grid-cols-1 md:grid-cols-2 gap-12">
-        <!-- Image Section -->
-        <div class="bg-white rounded-lg p-8 flex items-center justify-center border border-gray-200 dark:border-gray-800">
-            <NuxtImg 
-                :src="product.image || ''" 
-                :alt="product.name"
-                class="max-w-full max-h-[500px] object-contain"
-            />
+        <div class="flex items-center justify-center">
+            <ProductCarousel :productImages="product.image ? [product.image] : []"/>
         </div>
 
-        <!-- Details Section -->
-        <div class="flex flex-col gap-6">
-            <div>
-                <UBadge v-if="product.brand" color="neutral" variant="soft" class="mb-2">
+        <div class="flex flex-col">
+            <div v-if="product.brand" class="mb-4">
+                <UBadge color="neutral" variant="soft" size="md">
                     {{ product.brand.name }}
                 </UBadge>
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ product.name }}</h1>
-                <p class="text-sm text-gray-500 mt-1">Cod: {{ product.slug }}</p>
             </div>
 
-            <div class="text-2xl font-bold text-primary">
-                {{ product.price }} RON
+            <!-- Title -->
+            <h1 class="text-xl font-semibold text-gray-900 dark:text-white mb-2 leading-tight">
+                {{ product.name }}
+            </h1>
+            
+            <!-- SKU / Code -->
+            <p class="text-sm text-gray-500 mb-6 font-mono">
+                Cod: {{ product.sku}}
+            </p>
+
+            <!-- Price -->
+            <div class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                {{ product.price }} Lei
             </div>
 
-            <div class="prose dark:prose-invert">
-                <p v-if="product.description">{{ product.description }}</p>
+            <!-- Stock Status -->
+            <div class="flex items-center gap-2 mb-8 font-medium" :class="stockColor">
+                <UIcon name="i-lucide-check-circle-2" class="w-5 h-5" />
+                <span>{{ 'Stoc disponibil' }}</span>
             </div>
 
-            <div class="mt-auto">
-                 <UButton 
+            <!-- Actions -->
+            <div class="flex items-center gap-3 mb-8 w-full max-w-md">
+                <UInput 
+                    type="number" 
+                    v-model="quantity" 
+                    :min="1" 
+                    class="w-24"
+                    size="xl"
+                />
+                <UButton 
                     size="xl" 
-                    block 
+                    block  
+                    class="flex-1"
                     color="primary" 
+                    variant="subtle"
                     icon="i-lucide-shopping-cart"
+                    @click="addToCart(product, quantity)"
                 >
                     Adauga in cos
                 </UButton>
             </div>
+            
+            <!-- Additional Info / Description Placeholders -->
+             <div class="border-t border-gray-200 dark:border-gray-800 pt-6 mt-auto">
+                <h3 class="text-lg font-semibold mb-2">Descriere produs</h3>
+                <div class="prose dark:prose-invert text-sm text-gray-600 dark:text-gray-300">
+                    <p>{{ product.description }}</p>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <div class="mt-12">
+        <h2 class="text-2xl font-bold mb-6">Produse similare</h2>
+        <CategoryCarousel :url="`/api/products?category=${categorySlug}&limit=6`"/>
     </div>
   </UContainer>
 </template>

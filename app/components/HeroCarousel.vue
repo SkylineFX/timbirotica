@@ -13,12 +13,11 @@ const items = [
   <UCarousel
     v-slot="{ item }"
     fade
-    arrows
     dots
     :items="items"
     class="w-full max-w-fit mx-auto"
   >
-    <img :src="item" class="rounded-sm h-64 w-full object-cover">
+    <img :src="item" class="rounded-sm h-64 lg:h-120 w-full object-cover">
   </UCarousel>
 </template>
 

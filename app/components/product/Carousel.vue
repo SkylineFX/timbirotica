@@ -1,12 +1,5 @@
 <script setup lang="ts">
-const items = [
-  'https://picsum.photos/640/640?random=1',
-  'https://picsum.photos/640/640?random=2',
-  'https://picsum.photos/640/640?random=3',
-  'https://picsum.photos/640/640?random=4',
-  'https://picsum.photos/640/640?random=5',
-  'https://picsum.photos/640/640?random=6'
-]
+defineProps<{ productImages: string[] }>()
 
 const carousel = useTemplateRef('carousel')
 const activeIndex = ref(0)
@@ -33,24 +26,25 @@ function select(index: number) {
     <UCarousel
       ref="carousel"
       v-slot="{ item }"
-      :items="items"
+      :items="productImages"
       :prev="{ onClick: onClickPrev }"
       :next="{ onClick: onClickNext }"
       class="w-full max-w-xs mx-auto"
       @select="onSelect"
+      arrows
     >
-      <img :src="item" width="320" height="320" class="rounded-lg">
+      <img :src="item" class="w-full h-full object-contain aspect-square rounded-lg" draggable="false">
     </UCarousel>
 
     <div class="flex gap-1 justify-between pt-4 max-w-xs mx-auto">
       <div
-        v-for="(item, index) in items"
+        v-for="(item, index) in productImages"
         :key="index"
         class="size-11 opacity-25 hover:opacity-100 transition-opacity"
         :class="{ 'opacity-100': activeIndex === index }"
         @click="select(index)"
       >
-        <img :src="item" width="44" height="44" class="rounded-lg">
+        <img :src="item" class="w-full h-full object-cover rounded-lg">
       </div>
     </div>
   </div>

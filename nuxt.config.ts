@@ -11,5 +11,8 @@ export default defineNuxtConfig({
   css: ['~/assets/main.css'],
   hub: {
     db: 'sqlite'
+  },
+  colorMode: {
+    preference: 'light'
   }
 })
