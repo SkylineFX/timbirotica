@@ -8,6 +8,7 @@ const navigation = computed(() => [
     to: '/categorii',
     children: categoryTree.value || [],
     open: true,
+    disabled: true
   },
   {
     label: 'Producatori',
@@ -61,10 +62,10 @@ const navigation = computed(() => [
 
     <UContainer class="my-6">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold">Hartie copiator</h3>
+        <h3 class="text-xl font-bold">Hartie copiator alba</h3>
         <UButton class="text-sm" trailing-icon="i-lucide-arrow-right" label="Mai multe" to="/categorii/hartie-copiator" color="primary" variant="link" />
       </div>
-      <CategoryCarousel url="/api/products?category=hartie-copiator&limit=6" />
+      <CategoryCarousel url="/api/products?category=hartie-copiator-alba&limit=6" />
     </UContainer>
 
     <UContainer class="my-6">

@@ -1,14 +1,10 @@
 TODO:
 
-branduri,sortare,breadcrumbs
+breadcrumbs
 
 api additional structure:
     - create 'recommended products' api endpoint
     - use endpoint for home page recommendations
-
-search functionality:
-    - integrate search in header
-    - create search api endpoint
 
 contact, about pages:
     - create contact form

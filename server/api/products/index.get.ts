@@ -1,16 +1,19 @@
-import { inArray } from "drizzle-orm"
+import { inArray, like, and } from "drizzle-orm"
 
 export default eventHandler(async (event) => {
   const query = getQuery(event)
   console.log('API Query Params:', query)
   const categorySlug = query.category as string
+  const brandSlug = query.brand as string
+  const searchQ = query.q as string
+
   console.log('Category Slug:', categorySlug)
 
   const page = Number(query.page) || 1
   const limit = Number(query.limit) || 12
   const offset = (page - 1) * limit
 
-  let where = undefined
+  let whereParams = []
 
   if (categorySlug) {
     const category = await useDrizzle().query.categories.findFirst({
@@ -23,7 +26,7 @@ export default eventHandler(async (event) => {
       })
 
       const categoryIds = [category.id, ...subcategories.map(c => c.id)]
-      where = inArray(tables.products.categoryId, categoryIds)
+      whereParams.push(inArray(tables.products.categoryId, categoryIds))
     } else {
       return {
         products: [],
@@ -33,6 +36,29 @@ export default eventHandler(async (event) => {
       }
     }
   }
+
+  if (brandSlug) {
+    const brand = await useDrizzle().query.brands.findFirst({
+      where: eq(tables.brands.slug, brandSlug)
+    })
+
+    if (brand) {
+      whereParams.push(eq(tables.products.brandId, brand.id))
+    } else {
+      return {
+        products: [],
+        total: 0,
+        page,
+        limit
+      }
+    }
+  }
+
+  if (searchQ) {
+    whereParams.push(like(tables.products.name, `%${searchQ}%`))
+  }
+
+  const where = whereParams.length > 0 ? and(...whereParams) : undefined
 
   const sortParam = query.sort as string || 'default'
 

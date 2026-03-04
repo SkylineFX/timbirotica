@@ -46,6 +46,11 @@ const columns: FooterColumn[] = [
         label: 'Contact',
         to: '',
         target: '_blank'
+      },
+      {
+        label: 'ANPC',
+        to: 'https://anpc.ro/',
+        target: '_blank'
       }
     ]
   }
@@ -58,13 +63,17 @@ const columns: FooterColumn[] = [
       <UFooterColumns :columns="columns" class="py-8">
         <template #right>
           <div class="flex flex-col gap-4">
-            <div class="flex gap-2">
-                <img src="/footerImg/np-black-0.svg" alt="Netopia Payments" class="h-8" />
-            </div>
-            <div class="flex gap-2">
-                <img src="/footerImg/sal.webp" alt="SAL" class="h-8" />
-                <img src="/footerImg/sol.webp" alt="SOL" class="h-8" />
-            </div>
+            <a href="https://netopia-payments.com/" target="_blank">
+              <div class="flex gap-2">
+                  <img src="/footerImg/np-black-0.svg" alt="Netopia Payments" class="h-8" />
+              </div>
+            </a>
+            <a href="https://reclamatiisal.anpc.ro/" target="_blank">
+              <div class="flex gap-2">
+                  <img src="/footerImg/sal.webp" alt="SAL" class="h-8" />
+                  <img src="/footerImg/sol.webp" alt="SOL" class="h-8" />
+              </div>
+            </a>
           </div>
         </template>
       </UFooterColumns>

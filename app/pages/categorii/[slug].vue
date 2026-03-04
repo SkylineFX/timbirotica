@@ -59,13 +59,13 @@ const total = computed(() => data.value?.total || 0)
 <template>
   <UContainer class="py-6">
     <div class="flex flex-col mb-8 gap-4 rounded-lg p-4 bg-white">
-      <h1 class="text-xl font-bold capitalize flex items-baseline gap-2 xl:text-2xl">
-        {{ categorySlug.replace(/-/g, ' ') }}
+      <h1 class="text-xl font-bold flex flex-wrap items-baseline gap-2 xl:text-2xl">
+        {{ categorySlug.replace(/-/g, ' ').charAt(0).toUpperCase() + categorySlug.replace(/-/g, ' ').slice(1) }}
         <span v-if="total !== undefined" class="text-sm font-medium text-gray-500 normal-case">
           ({{ total }} produse)
         </span>
       </h1>
-      <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2 xl:gap-4">
         <div class="flex items-center gap-2">
           <p class="text-sm font-medium text-gray-500">Sorteaza dupa:</p>
           <USelectMenu v-model="sort" :items="sortOptions" value-key="value" label-key="label" class="w-40" />

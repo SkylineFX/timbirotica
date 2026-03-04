@@ -7,6 +7,7 @@ const { cartItems, removeFromCart, updateQuantity, total, fetchCart, isCartOpen,
 
 const { isFavoritesOpen, favorites } = useFavorites()
 const isNavOpen = ref(false)
+const searchQuery = ref('')
 
 // Initialize cart
 onMounted(() => {
@@ -14,6 +15,15 @@ onMounted(() => {
 })
 
 const route = useRoute()
+
+const performSearch = async () => {
+    if (!searchQuery.value.trim()) return
+    isNavOpen.value = false // close mobile menu if opened
+    await navigateTo({
+        path: '/cautare',
+        query: { q: searchQuery.value.trim() }
+    })
+}
 
 watch(() => route.path, () => {
     isNavOpen.value = false
@@ -105,6 +115,8 @@ const navigation = computed(() => [
       <!-- Center: Search (Desktop) -->
       <div class="hidden sm:flex flex-1 max-w-lg mx-4">
         <UInput
+          v-model="searchQuery"
+          @keyup.enter="performSearch"
           trailing-icon="i-lucide-search"
           size="md"
           variant="outline"
@@ -171,6 +183,8 @@ const navigation = computed(() => [
         <!-- Search on Mobile -->
         <div class="mb-4 sm:hidden">
             <UInput
+            v-model="searchQuery"
+            @keyup.enter="performSearch"
             class="w-full"
             size="md"
             variant="subtle"

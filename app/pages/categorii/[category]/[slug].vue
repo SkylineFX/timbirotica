@@ -30,7 +30,7 @@ const { addToCart } = useCart()
 <template>
   <UContainer class="py-6">
     <div v-if="product" class="grid grid-cols-1 md:grid-cols-2 gap-12">
-        <div class="flex items-center justify-center">
+        <div class="flex items-center justify-center bg-white">
             <ProductCarousel :productImages="product.image ? [product.image] : []"/>
         </div>
 
