@@ -52,29 +52,31 @@ const navigation = computed(() => [
       </div>
     </UContainer>
 
-    <UContainer class="my-6">
+    <div class="my-6 lg:my-8 flex flex-col gap-8">
+    <UContainer>
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold">Produse populare</h3>
+        <h3 class="text-xl lg:text-2xl font-normal">Produse populare</h3>
         <UButton class="text-sm" trailing-icon="i-lucide-arrow-right" label="Mai multe" to="/categorii" color="primary" variant="link" />
       </div>
       <CategoryCarousel url="/api/products?limit=6" />
     </UContainer>
 
-    <UContainer class="my-6">
+    <UContainer>
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold">Hartie copiator alba</h3>
+        <h3 class="text-xl lg:text-2xl font-normal">Hartie copiator alba</h3>
         <UButton class="text-sm" trailing-icon="i-lucide-arrow-right" label="Mai multe" to="/categorii/hartie-copiator" color="primary" variant="link" />
       </div>
       <CategoryCarousel url="/api/products?category=hartie-copiator-alba&limit=6" />
     </UContainer>
 
-    <UContainer class="my-6">
+    <UContainer>
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold">Pixuri</h3>
+        <h3 class="text-xl lg:text-2xl font-normal">Pixuri</h3>
         <UButton class="text-sm" trailing-icon="i-lucide-arrow-right" label="Mai multe" to="/categorii/pixuri" color="primary" variant="link" />
       </div>
       <CategoryCarousel url="/api/products?category=pixuri&limit=6" />
     </UContainer>
+    </div>
   </div>
 </template>
   

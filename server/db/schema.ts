@@ -116,3 +116,24 @@ export const favoritesRelations = relations(favorites, ({ one }) => ({
     references: [products.id],
   }),
 }))
+
+export const addresses = sqliteTable('addresses', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  fullName: text().notNull(),
+  phone: text().notNull(),
+  street: text().notNull(),
+  city: text().notNull(),
+  county: text().notNull(),
+  postalCode: text(),
+  isDefaultShipping: integer({ mode: 'boolean' }).default(false),
+  isDefaultBilling: integer({ mode: 'boolean' }).default(false),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+})
+
+export const addressesRelations = relations(addresses, ({ one }) => ({
+  user: one(users, {
+    fields: [addresses.userId],
+    references: [users.id],
+  }),
+}))
