@@ -30,17 +30,11 @@ const { addToCart } = useCart()
 <template>
   <UContainer class="py-6">
     <div v-if="product" class="grid grid-cols-1 md:grid-cols-2 gap-12">
-        <div class="flex items-center justify-center bg-white">
-            <ProductCarousel :productImages="product.image ? [product.image] : []"/>
+        <div class="w-full">
+            <ProductCarousel :productImages="product.image ? [product.image, product.image, product.image] : []"/>
         </div>
 
         <div class="flex flex-col">
-            <div v-if="product.brand" class="mb-4">
-                <UBadge color="neutral" variant="soft" size="md">
-                    {{ product.brand.name }}
-                </UBadge>
-            </div>
-
             <!-- Title -->
             <h1 class="text-xl font-semibold text-gray-900 dark:text-white mb-2 leading-tight">
                 {{ product.name }}
@@ -52,25 +46,18 @@ const { addToCart } = useCart()
             </p>
 
             <!-- Price -->
-            <div class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                {{ product.price }} Lei
+            <div class="flex flex-col gap-0 mb-6">
+                <p class="text-3xl lg:text-4xl font-bold text-gray-900">{{ product.price }} Lei</p>
+                <span class="text-xs text-gray-500">Pretul include TVA</span>
             </div>
 
             <!-- Stock Status -->
-            <div class="flex items-center gap-2 mb-8 font-medium" :class="stockColor">
-                <UIcon name="i-lucide-check-circle-2" class="w-5 h-5" />
-                <span>{{ 'Stoc disponibil' }}</span>
+            <div class="flex items-center gap-2 mb-4 font-medium" :class="stockColor">
+                <UBadge color="success" variant="soft" class="rounded-sm" leading-icon="i-lucide-check">In stoc</UBadge>
             </div>
 
             <!-- Actions -->
             <div class="flex items-center gap-3 mb-8 w-full max-w-md">
-                <UInput 
-                    type="number" 
-                    v-model="quantity" 
-                    :min="1" 
-                    class="w-24"
-                    size="xl"
-                />
                 <UButton 
                     size="xl" 
                     block  
@@ -82,21 +69,37 @@ const { addToCart } = useCart()
                 >
                     Adauga in cos
                 </UButton>
+                <UInput 
+                    type="number" 
+                    v-model="quantity" 
+                    :min="1" 
+                    class="w-24"
+                    size="xl"
+                />
             </div>
             
-            <!-- Additional Info / Description Placeholders -->
-             <div class="border-t border-gray-200 dark:border-gray-800 pt-6 mt-auto">
-                <h3 class="text-lg font-semibold mb-2">Descriere produs</h3>
-                <div class="prose dark:prose-invert text-sm text-gray-600 dark:text-gray-300">
-                    <p>{{ product.description }}</p>
+            <!-- Additional Info / Description -->
+            <div class="border-t border-gray-200 dark:border-gray-800 pt-6 flex flex-1 gap-6 flex-col justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold mb-2">Descriere produs</h3>
+                  <div class="prose dark:prose-invert text-sm text-gray-600 dark:text-gray-300">
+                      <p>{{ product.description }}</p>
+                  </div>
+                </div>
+
+                <!-- Brand container -->
+                <div v-if="product.brand" class="bg-white p-4 rounded-lg border border-gray-100 flex items-center justify-between">
+                    <span class="font-bold text-gray-900">{{ product.brand.name }}</span>
+                    <span class="text-xs text-gray-500">Vezi toate produsele</span>
                 </div>
             </div>
         </div>
     </div>
-
     <div class="mt-12">
-        <h2 class="text-2xl font-bold mb-6">Produse similare</h2>
-        <CategoryCarousel :url="`/api/products?category=${categorySlug}&limit=6`"/>
+        <CategoryCarousel 
+            title="Produse similare" 
+            :url="`/api/products?category=${categorySlug}&limit=6`"
+        />
     </div>
   </UContainer>
 </template>

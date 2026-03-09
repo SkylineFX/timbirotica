@@ -1,52 +1,41 @@
 <script setup lang="ts">
-defineProps<{ productImages: string[] }>()
+const props = defineProps<{ productImages: string[] }>()
 
 const carousel = useTemplateRef('carousel')
 const activeIndex = ref(0)
-
-function onClickPrev() {
-  activeIndex.value--
-}
-function onClickNext() {
-  activeIndex.value++
-}
-function onSelect(index: number) {
-  activeIndex.value = index
-}
-
-function select(index: number) {
-  activeIndex.value = index
-
-  carousel.value?.emblaApi?.scrollTo(index)
-}
 </script>
 
 <template>
-  <div class="flex-1 w-full">
+  <div class="flex-1 w-full h-full flex flex-col gap-4">
     <UCarousel
       ref="carousel"
       v-slot="{ item }"
       :items="productImages"
-      :prev="{ onClick: onClickPrev }"
-      :next="{ onClick: onClickNext }"
-      class="w-full max-w-xs mx-auto"
-      @select="onSelect"
+      class="w-full h-full bg-white rounded-lg border border-gray-100 relative overflow-hidden"
+      @select="activeIndex = $event"
       arrows
+      :prev-button="{ color: 'gray', variant: 'soft', class: 'ml-2 pointer-events-auto' }"
+      :next-button="{ color: 'gray', variant: 'soft', class: 'mr-2 pointer-events-auto' }"
+      :ui="{ 
+        item: 'w-full h-full', 
+        container: 'aspect-square'
+      }"
     >
-      <img :src="item" class="w-full h-full object-contain aspect-square rounded-lg" draggable="false">
+      <div class="w-full h-full p-4 flex justify-center items-center">
+        <img :src="item" class="max-w-full max-h-full object-contain" draggable="false">
+      </div>
     </UCarousel>
 
-    <div class="flex gap-1 justify-between pt-4 max-w-xs mx-auto">
+    <div v-if="productImages.length > 1" class="flex gap-2 justify-start">
       <div
         v-for="(item, index) in productImages"
         :key="index"
-        class="size-11 opacity-25 hover:opacity-100 transition-opacity"
-        :class="{ 'opacity-100': activeIndex === index }"
-        @click="select(index)"
+        class="w-16 h-16 shrink-0 rounded-md border-2 bg-white flex items-center justify-center p-1 cursor-pointer transition-all"
+        :class="activeIndex === index ? 'border-primary' : 'border-gray-200 opacity-60 hover:opacity-100'"
+        @click="carousel?.emblaApi?.scrollTo(index); activeIndex = index"
       >
-        <img :src="item" class="w-full h-full object-cover rounded-lg">
+        <img :src="item" class="max-w-full max-h-full object-contain">
       </div>
     </div>
   </div>
 </template>
-
