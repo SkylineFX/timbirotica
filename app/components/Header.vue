@@ -57,16 +57,26 @@ const loggedInItems = computed(() => [
   }],
   [{
     label: 'Detalii cont',
-    icon: 'i-lucide-user'
+    icon: 'i-lucide-user',
+    to: '/user'
   }, {
     label: 'Comenzile mele',
-    icon: 'i-lucide-receipt-text'
+    icon: 'i-lucide-receipt-text',
+    to: '/user/orders'
+  }, {
+    label: 'Adresele mele',
+    icon: 'i-lucide-map-pin',
+    to: '/user/addresses'
+  }, {
+    label: 'Date de facturare',
+    icon: 'i-lucide-signature',
+    to: '/user/billing'
   }],
   [{
     label: 'Deconectare',
     color: 'error',
     icon: 'i-lucide-log-out',
-    onSelect: logout
+    click: logout //not working
   }]
 ])
 
@@ -77,11 +87,16 @@ const { data: brands } = useFetch('/api/brands')
 
 const navigation = computed(() => [
   {
+    label: 'Contul meu',
+    to: '/user',
+    icon: 'i-lucide-user',
+    children: loggedIn.value ? loggedInItems.value.flat().slice(2) : loggedOutItems.flat()
+  },
+  {
     label: 'Toate Produsele',
-    to: '/categorii',
+    to: '/c',
     children: categoryTree.value || [],
     open: true,
-    disabled: true
   },
   {
     label: 'Producatori',
@@ -97,23 +112,91 @@ const navigation = computed(() => [
 
 <template>
   <div class="sticky top-0 z-50 bg-white backdrop-blur-none border-b border-gray-200 dark:border-gray-800">
-    <UContainer class="h-16 flex items-center justify-between gap-4 max-w-7xl">
-      <!-- Left: Navigation Toggle & Logo -->
-      <div class="flex items-center gap-4">
-        <UButton 
-          icon="i-lucide-menu" 
-          color="neutral" 
-          variant="ghost" 
-          @click="isNavOpen = true"
-          aria-label="Menu"
-        />
-        <NuxtLink to="/" class="flex-shrink-0">
-          <NuxtImg src="/logo.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
-        </NuxtLink>
+    <UContainer class="py-3 flex flex-col gap-3 sm:flex-row sm:h-16 sm:py-0 sm:items-center sm:justify-between max-w-7xl">
+      <!-- Top Row (Mobile) / Left+Right (Desktop) -->
+      <div class="flex items-center justify-between w-full sm:w-auto sm:flex-1">
+        <!-- Left: Navigation Toggle & Logo -->
+        <div class="flex items-center gap-4">
+          <UButton 
+            icon="i-lucide-menu" 
+            color="neutral" 
+            variant="ghost" 
+            @click="isNavOpen = true"
+            aria-label="Menu"
+          />
+          <NuxtLink to="/" class="flex-shrink-0">
+            <NuxtImg src="/logo.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
+          </NuxtLink>
+        </div>
+
+        <!-- Center: Search (Desktop only) -->
+        <div class="hidden sm:flex flex-1 max-w-lg mx-4">
+          <UInput
+            v-model="searchQuery"
+            @keyup.enter="performSearch"
+            trailing-icon="i-lucide-search"
+            size="md"
+            variant="outline"
+            placeholder="Cauta produse..."
+            class="w-full"
+            color="primary"
+          />
+        </div>
+
+        <!-- Right: Actions -->
+        <div class="flex items-center gap-2">
+          <UDropdownMenu :items="dropdownItems" :ui="{ content: 'w-48' }">
+            <UButton 
+              color="neutral"
+              variant="ghost"
+              icon="i-lucide-user"
+              aria-label="Contul meu"
+              class="hidden md:flex"
+            >
+              <span class="hidden md:inline">Contul meu</span>
+            </UButton>
+          </UDropdownMenu>
+
+          <!-- show only if user is logged in -->
+          <div v-if="user">
+            <UButton 
+              color="neutral" 
+              variant="ghost" 
+              icon="i-lucide-heart" 
+              aria-label="Favorite"
+              @click="isFavoritesOpen = true"
+              class="relative"
+            >
+                <UBadge 
+                v-if="favorites.length > 0" 
+                color="primary" 
+                :label="favorites.length" 
+                class="absolute -top-0.5 -right-0.5 rounded-full text-[10px] w-4 h-4 flex items-center justify-center p-0 ring-2 ring-white dark:ring-gray-900" 
+              />
+            </UButton>
+          </div>
+
+          <UButton 
+            color="neutral" 
+            variant="ghost" 
+            icon="i-lucide-shopping-cart" 
+            aria-label="Cosul meu"
+            @click="isCartOpen = true"
+            class="relative"
+            :loading="isLoading"
+          >
+            <UBadge 
+              v-if="cartItems.length > 0" 
+              color="primary" 
+              :label="cartItems.length" 
+              class="absolute -top-0.5 -right-0.5 rounded-full text-[10px] w-4 h-4 flex items-center justify-center p-0 ring-2 ring-white dark:ring-gray-900" 
+            />
+          </UButton>
+        </div>
       </div>
 
-      <!-- Center: Search (Desktop) -->
-      <div class="hidden sm:flex flex-1 max-w-lg mx-4">
+      <!-- Bottom Row: Search (Mobile only) -->
+      <div class="flex sm:hidden w-full">
         <UInput
           v-model="searchQuery"
           @keyup.enter="performSearch"
@@ -125,73 +208,11 @@ const navigation = computed(() => [
           color="primary"
         />
       </div>
-
-      <!-- Right: Actions -->
-      <div class="flex items-center gap-2">
-        <UDropdownMenu :items="dropdownItems" :ui="{ content: 'w-48' }">
-          <UButton 
-            color="neutral"
-            variant="ghost"
-            icon="i-lucide-user"
-            aria-label="Contul meu"
-          >
-            <span class="hidden md:inline">Contul meu</span>
-          </UButton>
-        </UDropdownMenu>
-
-        <!-- show only if user is logged in -->
-        <div v-if="user">
-          <UButton 
-            color="neutral" 
-            variant="ghost" 
-            icon="i-lucide-heart" 
-            aria-label="Favorite"
-            @click="isFavoritesOpen = true"
-            class="relative"
-          >
-              <UBadge 
-              v-if="favorites.length > 0" 
-              color="primary" 
-              :label="favorites.length" 
-              class="absolute -top-0.5 -right-0.5 rounded-full text-[10px] w-4 h-4 flex items-center justify-center p-0 ring-2 ring-white dark:ring-gray-900" 
-            />
-          </UButton>
-        </div>
-
-        <UButton 
-          color="neutral" 
-          variant="ghost" 
-          icon="i-lucide-shopping-cart" 
-          aria-label="Cosul meu"
-          @click="isCartOpen = true"
-          class="relative"
-          :loading="isLoading"
-        >
-          <UBadge 
-            v-if="cartItems.length > 0" 
-            color="primary" 
-            :label="cartItems.length" 
-            class="absolute -top-0.5 -right-0.5 rounded-full text-[10px] w-4 h-4 flex items-center justify-center p-0 ring-2 ring-white dark:ring-gray-900" 
-          />
-        </UButton>
-      </div>
     </UContainer>
 
     <!-- Navigation Slideover (Left) -->
     <USlideover v-model:open="isNavOpen" side="left" title="Meniu">
       <template #body>
-        <!-- Search on Mobile -->
-        <div class="mb-4 sm:hidden">
-            <UInput
-            v-model="searchQuery"
-            @keyup.enter="performSearch"
-            class="w-full"
-            size="md"
-            variant="subtle"
-            placeholder="Cauta produse..."
-            />
-        </div>
-
         <UNavigationMenu :items="navigation" orientation="vertical" type="single" />
       </template>
     </USlideover>

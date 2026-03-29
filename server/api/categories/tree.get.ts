@@ -3,12 +3,12 @@ export default eventHandler(async (event) => {
 
   // Map to store categories by ID for easy lookup
   const categoryMap = new Map()
-  
+
   // First pass: Create map and lightweight objects
   allCategories.forEach(cat => {
     categoryMap.set(cat.id, {
       label: cat.name,
-      to: `/categorii/${cat.slug}`,
+      to: `/c/${cat.slug}`,
       id: cat.id,
       parentId: cat.parentId,
       children: []

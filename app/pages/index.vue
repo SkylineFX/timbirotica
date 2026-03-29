@@ -5,10 +5,9 @@ const { data: brands } = useFetch('/api/brands')
 const navigation = computed(() => [
   {
     label: 'Toate Produsele',
-    to: '/categorii',
+    to: '/c',
     children: categoryTree.value || [],
     open: true,
-    disabled: true
   },
   {
     label: 'Producatori',
@@ -20,18 +19,13 @@ const navigation = computed(() => [
 const featuredCategories = [
   {
     title: "Produse populare",
-    link: "/categorii",
-    url: "/api/products?limit=6"
+    categoryId: 163
   },
   {
-    title: "Hartie copiator alba",
-    link: "/categorii/hartie-copiator",
-    url: "/api/products?category=hartie-copiator-alba&limit=6"
+    categoryId: 162
   },
   {
-    title: "Pixuri",
-    link: "/categorii/pixuri",
-    url: "/api/products?category=pixuri&limit=6"
+    categoryId: 73
   }
 ]
 
@@ -76,8 +70,7 @@ const featuredCategories = [
         v-for="(carousel, index) in featuredCategories"
         :key="index"
         :title="carousel.title"
-        :link="carousel.link"
-        :url="carousel.url" 
+        :categoryId="carousel.categoryId"
       />
     </UContainer>
   </div>

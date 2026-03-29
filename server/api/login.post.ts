@@ -2,12 +2,13 @@ import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 
 const bodySchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8),
 })
 
 export default defineEventHandler(async (event) => {
   const { email, password } = await readValidatedBody(event, bodySchema.parse)
+  const normalizedEmail = email.toLowerCase()
   const config = useRuntimeConfig()
 
   if (!config.session.password) {
@@ -19,7 +20,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDrizzle()
   const user = await db.query.users.findFirst({
-    where: eq(tables.users.email, email)
+    where: eq(tables.users.email, normalizedEmail)
   })
 
   if (!user) {
@@ -43,8 +44,8 @@ export default defineEventHandler(async (event) => {
     user: {
       id: user.id,
       name: user.name,
-      // Add other info if needed, e.g. id: user.id
     },
   })
+
   return {}
 })

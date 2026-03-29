@@ -4,6 +4,7 @@ const props = defineProps<{
   subtitle?: string
   apiQuery: Record<string, any>
   emptyMessage: string
+  breadcrumbs?: any[]
 }>()
 
 const route = useRoute()
@@ -68,6 +69,7 @@ const total = computed(() => data.value?.total || 0)
 
 <template>
   <UContainer class="py-6">
+    <UBreadcrumb v-if="breadcrumbs?.length" :items="breadcrumbs" class="mb-6" />
     <div class="flex flex-col mb-8 gap-4 rounded-lg p-4 bg-white">
       <h1 class="text-xl font-bold flex flex-wrap items-baseline gap-2 xl:text-2xl">
         {{ title }} <span v-if="subtitle" class="font-normal italic">"{{ subtitle }}"</span>
@@ -92,7 +94,7 @@ const total = computed(() => data.value?.total || 0)
             <ProductCard
                 v-for="product in products" 
                 :key="product.id" 
-                :to="`/categorii/${product.category?.slug || 'toate'}/${product.slug}`"
+                :to="`/c/${product.category?.slug || 'toate'}/${product.slug}`"
                 :product="product"
             />
         </div>

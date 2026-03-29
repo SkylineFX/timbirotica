@@ -1,7 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
 const slug = route.params.slug as string
-const categorySlug = route.params.category as string
 
 const { data: product } = await useFetch(`/api/products/${slug}`)
 
@@ -13,6 +12,15 @@ if (!product.value) {
 useSeoMeta({
   title: product.value.name,
   description: product.value.description
+})
+
+const breadcrumbs = computed(() => {
+  if (!product.value) return []
+  return [
+    { label: 'Acasa', to: '/' },
+    { label: product.value.category?.name || 'Categorii', to: `/c/${product.value.category?.slug}` },
+    { label: product.value.name, to: route.path }
+  ]
 })
 
 const quantity = ref(1)
@@ -29,6 +37,7 @@ const { addToCart } = useCart()
 
 <template>
   <UContainer class="py-6">
+    <UBreadcrumb :items="breadcrumbs" class="mb-6" />
     <div v-if="product" class="grid grid-cols-1 md:grid-cols-2 gap-12">
         <div class="w-full">
             <ProductCarousel :productImages="product.image ? [product.image, product.image, product.image] : []"/>
@@ -36,7 +45,7 @@ const { addToCart } = useCart()
 
         <div class="flex flex-col">
             <!-- Title -->
-            <h1 class="text-xl font-semibold text-gray-900 dark:text-white mb-2 leading-tight">
+            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 dark:text-white mb-2 leading-tight">
                 {{ product.name }}
             </h1>
             
@@ -47,7 +56,7 @@ const { addToCart } = useCart()
 
             <!-- Price -->
             <div class="flex flex-col gap-0 mb-6">
-                <p class="text-3xl lg:text-4xl font-bold text-gray-900">{{ product.price }} Lei</p>
+                <p class="text-3xl lg:text-3xl font-bold text-gray-900">{{ product.price }} Lei</p>
                 <span class="text-xs text-gray-500">Pretul include TVA</span>
             </div>
 
@@ -89,16 +98,18 @@ const { addToCart } = useCart()
 
                 <!-- Brand container -->
                 <div v-if="product.brand" class="bg-white p-4 rounded-lg border border-gray-100 flex items-center justify-between">
-                    <span class="font-bold text-gray-900">{{ product.brand.name }}</span>
-                    <span class="text-xs text-gray-500">Vezi toate produsele</span>
+                    <img v-if="product.brand.image" :src="product.brand.image" :alt="product.brand.name" class="h-8 object-contain" />
+                    <span v-else class="font-bold text-gray-900">{{ product.brand.name }}</span>
+                    <NuxtLink :to="`/producatori/${product.brand.slug}`" class="text-xs text-gray-500 underline hover:text-primary transition-colors">Vezi toate produsele</NuxtLink>
                 </div>
             </div>
         </div>
     </div>
-    <div class="mt-12">
+
+    <div class="mt-12" v-if="product?.categoryId">
         <CategoryCarousel 
             title="Produse similare" 
-            :url="`/api/products?category=${categorySlug}&limit=6`"
+            :categoryId="product?.categoryId"
         />
     </div>
   </UContainer>

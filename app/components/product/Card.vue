@@ -22,11 +22,11 @@ const toggleFavorite = async () => {
 <template>
   <NuxtLink :to="to" class="group h-full flex flex-col">
     <UCard class="flex-1 hover:ring-2 hover:ring-primary transition-all duration-200 flex flex-col rounded-sm bg-white" :ui="{ body: 'p-2 sm:p-2', footer: 'p-2 sm:p-2 flex-1 flex flex-col' }">
-      <div class="aspect-square bg-white flex items-center justify-center relative overlow-hidden">
+      <div class="aspect-square bg-white relative overflow-hidden">
         <NuxtImg 
           :src="product.image || ''" 
           :alt="product.name"
-          class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-200" 
+          class="absolute inset-0 w-full h-full p-4 object-contain group-hover:scale-105 transition-transform duration-200" 
         />
 
         <div class="absolute top-[0px] left-[0px]">

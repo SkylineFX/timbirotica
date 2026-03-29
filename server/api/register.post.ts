@@ -2,7 +2,7 @@ import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 
 const registerSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8),
   name: z.string().min(3),
   // avatar: z.string().url().optional().default('https://i.pravatar.cc/150'), 
@@ -11,11 +11,12 @@ const registerSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { email, password, name } = await readValidatedBody(event, registerSchema.parse)
+  const normalizedEmail = email.toLowerCase()
   const db = useDrizzle()
 
   // Check if user already exists
   const existingUser = await db.query.users.findFirst({
-    where: eq(tables.users.email, email)
+    where: eq(tables.users.email, normalizedEmail)
   })
 
   if (existingUser) {
@@ -30,7 +31,7 @@ export default defineEventHandler(async (event) => {
 
   // Insert user
   const newUser = await db.insert(tables.users).values({
-    email,
+    email: normalizedEmail,
     password: hashedPassword,
     name,
     avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&rounded=true`,
@@ -40,12 +41,10 @@ export default defineEventHandler(async (event) => {
   // Log them in immediately
   await setUserSession(event, {
     user: {
+      id: newUser.id,
       name: newUser.name,
-      // You might want to store ID or other details in session too
     }
   })
 
-  return {
-    user: newUser
-  }
+  return {}
 })

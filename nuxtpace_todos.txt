@@ -1,6 +1,7 @@
 TODO:
 
-breadcrumbs
+breadcrumbs (truncate to width, show all subcategories)
+fuzzy search, search by sku 
 
 api additional structure:
     - create 'recommended products' api endpoint
@@ -26,3 +27,7 @@ category image:
 other things:
     - send mail for forget password (account confirmation etc)
     - create orders table
+
+plasare comanda:
+    - alege medota de plasare a comenzii (trimite comanda prin email sau telefon)
+    - alege metoda de confirmare a comenzii (email sau telefon)

@@ -1,4 +1,4 @@
-import { inArray, like, and } from "drizzle-orm"
+import { inArray, like, and, or } from "drizzle-orm"
 
 export default eventHandler(async (event) => {
   const query = getQuery(event)
@@ -55,7 +55,18 @@ export default eventHandler(async (event) => {
   }
 
   if (searchQ) {
-    whereParams.push(like(tables.products.name, `%${searchQ}%`))
+    const searchTerms = searchQ.trim().split(/\s+/)
+
+    if (searchTerms.length > 0) {
+      const termConditions = searchTerms.map(term => {
+        return or(
+          like(tables.products.name, `%${term}%`),
+          like(tables.products.sku, `%${term}%`)
+        )
+      })
+      // Ensure that ALL words typed in the query are matched somewhere in the string or sku
+      whereParams.push(and(...termConditions))
+    }
   }
 
   const where = whereParams.length > 0 ? and(...whereParams) : undefined

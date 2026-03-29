@@ -20,23 +20,33 @@ interface ApiResponse {
 }
 
 const props = defineProps<{
-    id?: string
-    url: string
+    categoryId: number
     title?: string
-    link?: string
 }>()
 
+const displayTitle = ref(props.title)
+const displayLink = ref<string | undefined>(undefined)
+const fetchUrl = ref<string | undefined>(undefined)
 
-const { data: response } = await useFetch<ApiResponse>(() => props.url)
+const { data: category } = await useFetch<any>(`/api/categories/${props.categoryId}`)
+if (category.value) {
+  if (!displayTitle.value) {
+    displayTitle.value = category.value.name
+  }
+  displayLink.value = `/c/${category.value.slug}`
+  fetchUrl.value = `/api/products?category=${category.value.slug}&limit=6`
+}
+
+const { data: response } = await useFetch<ApiResponse>(() => fetchUrl.value || '')
 
 const items = computed(() => response.value?.products?.slice(0, 6) || [])
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <div v-if="title" class="flex justify-between items-center">
-      <h3 class="text-xl lg:text-2xl font-bold">{{ title }}</h3>
-      <UButton v-if="link" class="text-sm" trailing-icon="i-lucide-arrow-right" label="Mai multe" :to="link" color="primary" variant="link" />
+    <div v-if="displayTitle" class="flex justify-between items-center">
+      <h3 class="text-xl lg:text-2xl font-bold">{{ displayTitle }}</h3>
+      <UButton v-if="displayLink" class="text-sm" trailing-icon="i-lucide-arrow-right" label="Mai multe" :to="displayLink" color="primary" variant="link" />
     </div>
     <UCarousel
       v-slot="{ item }: { item: any }"
@@ -45,7 +55,7 @@ const items = computed(() => response.value?.products?.slice(0, 6) || [])
     >
       <ProductCard
         :key="item.id" 
-        :to="`/categorii/${item.category?.slug}/${item.slug}`"
+        :to="`/c/${item.category?.slug}/${item.slug}`"
         :product="item"
         class="w-full"
       />

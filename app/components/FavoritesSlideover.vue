@@ -13,13 +13,13 @@ const { addToCart } = useCart()
           </div>
           <UList v-else>
             <UListItem v-for="item in favorites" :key="item.id" class="flex gap-4 py-8 border-b border-gray-200 dark:border-gray-800">
-               <NuxtLink :to="`/categorii/${item.product?.category?.slug}/${item.product?.slug}`" class="flex-shrink-0">
+               <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`" class="flex-shrink-0">
                   <NuxtImg :src="item.product?.image || ''" class="w-16 h-16 object-contain bg-white rounded-md" />
                </NuxtLink>
               <div class="flex-1 flex flex-col justify-between">
                 <div>
                     <h3 class="font-medium text-sm line-clamp-2">
-                        <NuxtLink :to="`/categorii/${item.product?.category?.slug}/${item.product?.slug}`">{{ item.product?.name }}</NuxtLink>
+                        <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`">{{ item.product?.name }}</NuxtLink>
                     </h3>
                 </div>
                 <div class="flex justify-between items-center mt-2">
