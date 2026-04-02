@@ -18,7 +18,7 @@ const navigation = computed(() => [
 
 const featuredCategories = [
   {
-    title: "Produse populare",
+    title: "Produse recomandate",
     categoryId: 163
   },
   {

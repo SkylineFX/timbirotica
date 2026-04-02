@@ -63,14 +63,6 @@ const loggedInItems = computed(() => [
     label: 'Comenzile mele',
     icon: 'i-lucide-receipt-text',
     to: '/user/orders'
-  }, {
-    label: 'Adresele mele',
-    icon: 'i-lucide-map-pin',
-    to: '/user/addresses'
-  }, {
-    label: 'Date de facturare',
-    icon: 'i-lucide-signature',
-    to: '/user/billing'
   }],
   [{
     label: 'Deconectare',
@@ -86,12 +78,6 @@ const { data: categoryTree } = useFetch('/api/categories/tree')
 const { data: brands } = useFetch('/api/brands')
 
 const navigation = computed(() => [
-  {
-    label: 'Contul meu',
-    to: '/user',
-    icon: 'i-lucide-user',
-    children: loggedIn.value ? loggedInItems.value.flat().slice(2) : loggedOutItems.flat()
-  },
   {
     label: 'Toate Produsele',
     to: '/c',

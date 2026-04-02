@@ -42,12 +42,14 @@ const isNewAddressModalOpen = ref(false)
 const newAddress = ref({
   fullName: '',
   phone: '',
-  county: '',
+  county: 'București',
   city: '',
-  street: ''
+  street: '',
+  postalCode: ''
 })
 
-const counties = ['Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brașov', 'Brăila', 'Buzău', 'Caraș-Severin', 'Călărași', 'Cluj', 'Constanța', 'Covasna', 'Dâmbovița', 'Dolj', 'Galați', 'Giurgiu', 'Gorj', 'Harghita', 'Hunedoara', 'Ialomița', 'Iași', 'Ilfov', 'Maramureș', 'Mehedinți', 'Mureș', 'Neamț', 'Olt', 'Prahova', 'Satu Mare', 'Sălaj', 'Sibiu', 'Suceava', 'Teleorman', 'Timiș', 'Tulcea', 'Vaslui', 'Vâlcea', 'Vrancea', 'București']
+const counties = ['București']
+const sectors = ['Sector 1', 'Sector 2', 'Sector 3', 'Sector 4', 'Sector 5', 'Sector 6']
 
 async function saveNewAddress() {
   await $fetch('/api/user/addresses', {
@@ -58,7 +60,7 @@ async function saveNewAddress() {
   isNewAddressModalOpen.value = false
   isAddressModalOpen.value = true
   
-  newAddress.value = { fullName: '', phone: '', county: '', city: '', street: '' } // reset form
+  newAddress.value = { fullName: '', phone: '', county: 'București', city: '', street: '', postalCode: '' } // reset form
 }
 
 function openNewAddress() {
@@ -184,14 +186,9 @@ function selectAddress(id: number) {
     <!-- Modals -->
 
     <!-- Address Selection Modal -->
-    <UModal v-model:open="isAddressModalOpen" :ui="{ content: 'sm:max-w-2xl' }">
+    <UModal v-model:open="isAddressModalOpen" title="Alege adresa de livrare" :ui="{ content: 'sm:max-w-xl' }">
       <template #body>
-        <div class="p-4 sm:p-6 pb-8">
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-normal text-gray-900">Alege adresa de livrare</h3>
-            <UButton color="neutral" variant="ghost" icon="i-lucide-x" class="-my-1 w-8 h-8" @click="isAddressModalOpen = false" />
-          </div>
-
+         <div class="px-2">
           <div class="border border-gray-100 shadow-sm rounded-xl p-5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
              <span class="font-medium text-gray-900">Selecteaza o adresa din lista de mai jos sau adauga una noua.</span>
              <UButton color="primary" variant="outline" class="rounded-lg font-medium bg-white px-4" @click="openNewAddress">+ Adauga adresa noua</UButton>
@@ -215,53 +212,50 @@ function selectAddress(id: number) {
                 </div>
              </div>
           </div>
-        </div>
+         </div>
       </template>
     </UModal>
 
     <!-- New Address Form Modal -->
-    <UModal v-model:open="isNewAddressModalOpen" :ui="{ content: 'sm:max-w-2xl' }">
+    <UModal v-model:open="isNewAddressModalOpen" title="Adauga adresa noua" :ui="{ content: 'sm:max-w-xl' }">
       <template #body>
-        <div class="p-4 sm:p-6 pb-8">
-          <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-            <h3 class="text-xl font-normal text-gray-800">Adauga adresa noua</h3>
-            <UButton color="neutral" variant="ghost" icon="i-lucide-x" class="-my-1 w-8 h-8 text-gray-400 hover:text-gray-600" @click="isNewAddressModalOpen = false" />
-          </div>
-
-          <form @submit.prevent="saveNewAddress" class="space-y-6">
-            
+        <form @submit.prevent="saveNewAddress" class="space-y-6 px-2">
             <div>
               <h4 class="font-bold text-gray-900 mb-4 text-sm mt-2">Persoana de contact</h4>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <UFormGroup label="Nume">
-                   <UInput v-model="newAddress.fullName" placeholder="ex: Popescu Alexandru" required size="lg" />
-                </UFormGroup>
-                <UFormGroup label="Numar de telefon">
-                   <UInput v-model="newAddress.phone" placeholder="07xxxxxxxx" required size="lg" />
-                </UFormGroup>
+                <UFormField label="Nume" name="fullName">
+                   <UInput v-model="newAddress.fullName" placeholder="ex: Popescu Alexandru" required size="lg" class="w-full" />
+                </UFormField>
+                <UFormField label="Numar de telefon" name="phone">
+                   <UInput v-model="newAddress.phone" placeholder="07xxxxxxxx" required size="lg" class="w-full" />
+                </UFormField>
               </div>
             </div>
 
             <div>
                <h4 class="font-bold text-gray-900 mb-4 text-sm mt-4">Adresa de livrare</h4>
                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                  <UFormGroup label="Judet">
-                     <USelectMenu v-model="newAddress.county" :options="counties" placeholder="Selectati" required size="lg" />
-                  </UFormGroup>
-                  <UFormGroup label="Localitate">
-                     <UInput v-model="newAddress.city" placeholder="ex: Bucuresti" required size="lg" />
-                  </UFormGroup>
+                  <UFormField label="Judet" name="county">
+                     <USelectMenu v-model="newAddress.county" :items="counties" placeholder="Selectati" required size="lg" class="w-full" />
+                  </UFormField>
+                  <UFormField label="Localitate" name="city">
+                     <USelectMenu v-model="newAddress.city" :items="sectors" placeholder="Selectează sectorul" required size="lg" class="w-full" />
+                  </UFormField>
                </div>
-               <UFormGroup label="Adresa">
-                  <UInput v-model="newAddress.street" placeholder="ex: Strada, numar, bloc, scara, etaj, apartament" required size="lg" />
-               </UFormGroup>
+               <div class="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4">
+                  <UFormField label="Adresa" name="street">
+                     <UInput v-model="newAddress.street" placeholder="Strada, numar, bloc..." required size="lg" class="w-full" />
+                  </UFormField>
+                  <UFormField label="Cod Postal" name="postalCode">
+                     <UInput v-model="newAddress.postalCode" size="lg" class="w-full" />
+                  </UFormField>
+               </div>
             </div>
 
             <div class="pt-4 pb-2">
                <UButton type="submit" color="primary" block size="xl" class="rounded-full font-semibold"> Salveaza </UButton>
             </div>
           </form>
-        </div>
       </template>
     </UModal>
 </template>

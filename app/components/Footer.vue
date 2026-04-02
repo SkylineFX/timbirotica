@@ -6,8 +6,8 @@ const columns: FooterColumn[] = [
     label: 'Date comerciale',
     children: [
       {
-        label: 'eMAG Marketplace SRL',
-        to: 'https://nuxters.nuxt.com',
+        label: 'Eurotimalex SRL',
+        to: 'https://eurotimalex.ro',
         target: '_blank'
       },
       {
