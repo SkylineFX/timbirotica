@@ -1,4 +1,4 @@
-import { inArray, like, and, or } from "drizzle-orm"
+import { inArray, like, and, or, eq } from "drizzle-orm"
 
 export default eventHandler(async (event) => {
   const query = getQuery(event)
@@ -14,6 +14,10 @@ export default eventHandler(async (event) => {
   const offset = (page - 1) * limit
 
   let whereParams = []
+
+  if (query.recommended === 'true') {
+    whereParams.push(eq(tables.products.isRecommended, true))
+  }
 
   if (categorySlug) {
     const category = await useDrizzle().query.categories.findFirst({

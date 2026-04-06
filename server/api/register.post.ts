@@ -4,13 +4,12 @@ import bcrypt from 'bcryptjs'
 const registerSchema = z.object({
   email: z.email(),
   password: z.string().min(8),
-  name: z.string().min(3),
-  // avatar: z.string().url().optional().default('https://i.pravatar.cc/150'), 
-  // Let's generate a default avatar based on name if not provided, or just use a placeholder
+  firstName: z.string().min(2),
+  lastName: z.string().min(2),
 })
 
 export default defineEventHandler(async (event) => {
-  const { email, password, name } = await readValidatedBody(event, registerSchema.parse)
+  const { email, password, firstName, lastName } = await readValidatedBody(event, registerSchema.parse)
   const normalizedEmail = email.toLowerCase()
   const db = useDrizzle()
 
@@ -33,8 +32,9 @@ export default defineEventHandler(async (event) => {
   const newUser = await db.insert(tables.users).values({
     email: normalizedEmail,
     password: hashedPassword,
-    name,
-    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&rounded=true`,
+    firstName,
+    lastName,
+    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName + ' ' + lastName)}&background=random&rounded=true`,
     createdAt: new Date()
   }).returning().get()
 
@@ -42,7 +42,8 @@ export default defineEventHandler(async (event) => {
   await setUserSession(event, {
     user: {
       id: newUser.id,
-      name: newUser.name,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
     }
   })
 

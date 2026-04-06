@@ -3,7 +3,8 @@ import { relations } from 'drizzle-orm'
 
 export const users = sqliteTable('users', {
   id: integer().primaryKey({ autoIncrement: true }),
-  name: text().notNull(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull().default(''),
   email: text().notNull().unique(),
   password: text().notNull(),
   avatar: text().notNull(),
@@ -36,6 +37,7 @@ export const products = sqliteTable('products', {
   brandId: integer('brand_id').references(() => brands.id),
   image: text(),
   stock: integer().notNull().default(0),
+  isRecommended: integer({ mode: 'boolean' }).default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 })
 
@@ -135,5 +137,41 @@ export const addressesRelations = relations(addresses, ({ one }) => ({
   user: one(users, {
     fields: [addresses.userId],
     references: [users.id],
+  }),
+}))
+
+export const orders = sqliteTable('orders', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  orderNumber: text('order_number').notNull().unique(),
+  total: real().notNull(),
+  status: text().notNull().default('processing'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+})
+
+export const orderItems = sqliteTable('order_items', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  orderId: integer('order_id').references(() => orders.id).notNull(),
+  productId: integer('product_id').references(() => products.id).notNull(),
+  quantity: integer().notNull(),
+  priceAtBuy: real('price_at_buy').notNull(),
+})
+
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+  user: one(users, {
+    fields: [orders.userId],
+    references: [users.id],
+  }),
+  items: many(orderItems),
+}))
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+  order: one(orders, {
+    fields: [orderItems.orderId],
+    references: [orders.id],
+  }),
+  product: one(products, {
+    fields: [orderItems.productId],
+    references: [products.id],
   }),
 }))

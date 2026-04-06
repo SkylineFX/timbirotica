@@ -9,10 +9,16 @@ definePageMeta({
 const toast = useToast()
 
 const fields: AuthFormField[] = [{
-  name: 'name',
+  name: 'firstName',
+  type: 'text',
+  label: 'Prenume',
+  placeholder: 'Introduceti prenumele',
+  required: true
+}, {
+  name: 'lastName',
   type: 'text',
   label: 'Nume',
-  placeholder: 'Introduceti numele dumneavoastra',
+  placeholder: 'Introduceti numele',
   required: true
 }, {
   name: 'email',
@@ -43,7 +49,8 @@ const providers = [{
 }]
 
 const schema = z.object({
-  name: z.string('Numele este obligatoriu').min(2, 'Numele trebuie sa aiba cel putin 2 caractere'),
+  firstName: z.string('Prenumele este obligatoriu').min(2, 'Prenumele trebuie sa aiba cel putin 2 caractere'),
+  lastName: z.string('Numele este obligatoriu').min(2, 'Numele trebuie sa aiba cel putin 2 caractere'),
   email: z.email('Adresa de email nu este valida'),
   password: z.string('Parola este obligatorie').min(8, 'Parola trebuie sa aiba cel putin 8 caractere'),
   passwordConfirm: z.string('Confirmarea parolei este obligatorie').min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
@@ -64,7 +71,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     await $fetch('/api/register', {
       method: 'POST',
       body: {
-        name: payload.data.name,
+        firstName: payload.data.firstName,
+        lastName: payload.data.lastName,
         email: payload.data.email,
         password: payload.data.password,
       },

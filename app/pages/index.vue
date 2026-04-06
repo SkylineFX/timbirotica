@@ -19,7 +19,7 @@ const navigation = computed(() => [
 const featuredCategories = [
   {
     title: "Produse recomandate",
-    categoryId: 163
+    recommended: true
   },
   {
     categoryId: 162
@@ -71,7 +71,15 @@ const featuredCategories = [
         :key="index"
         :title="carousel.title"
         :categoryId="carousel.categoryId"
+        :recommended="carousel.recommended"
       />
+    </UContainer>
+
+    <UContainer class="my-6 lg:my-12 flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl lg:text-2xl font-bold">Marci populare</h3>
+      </div>
+      <BrandMarquee />
     </UContainer>
   </div>
 </template>

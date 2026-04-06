@@ -2,9 +2,9 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
 const bodySchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  avatar: z.string().url().optional()
+  firstName: z.string().min(2),
+  lastName: z.string().min(2),
+  email: z.string().email()
 })
 
 export default eventHandler(async (event) => {
@@ -14,14 +14,15 @@ export default eventHandler(async (event) => {
 
   const updatedUser = await db.update(tables.users)
     .set({
-      name: body.name,
+      firstName: body.firstName,
+      lastName: body.lastName,
       email: body.email,
-      avatar: body.avatar || 'https://raw.githubusercontent.com/creativetimofficial/public-assets/master/soft-ui-design-system/assets/img/marie.jpg',
     })
     .where(eq(tables.users.id, session.user.id))
     .returning({
       id: tables.users.id,
-      name: tables.users.name,
+      firstName: tables.users.firstName,
+      lastName: tables.users.lastName,
       email: tables.users.email,
       avatar: tables.users.avatar
     })
@@ -37,7 +38,8 @@ export default eventHandler(async (event) => {
   await setUserSession(event, {
     user: {
       id: updatedUser[0].id,
-      name: updatedUser[0].name,
+      firstName: updatedUser[0].firstName,
+      lastName: updatedUser[0].lastName,
     }
   })
 

@@ -20,7 +20,8 @@ interface ApiResponse {
 }
 
 const props = defineProps<{
-    categoryId: number
+    categoryId?: number
+    recommended?: boolean
     title?: string
 }>()
 
@@ -28,18 +29,26 @@ const displayTitle = ref(props.title)
 const displayLink = ref<string | undefined>(undefined)
 const fetchUrl = ref<string | undefined>(undefined)
 
-const { data: category } = await useFetch<any>(`/api/categories/${props.categoryId}`)
-if (category.value) {
-  if (!displayTitle.value) {
-    displayTitle.value = category.value.name
+if (props.categoryId) {
+  const { data: category } = await useFetch<any>(`/api/categories/${props.categoryId}`)
+  if (category.value) {
+    if (!displayTitle.value) {
+      displayTitle.value = category.value.name
+    }
+    displayLink.value = `/c/${category.value.slug}`
+    fetchUrl.value = `/api/products?category=${category.value.slug}&limit=10`
   }
-  displayLink.value = `/c/${category.value.slug}`
-  fetchUrl.value = `/api/products?category=${category.value.slug}&limit=6`
+} else if (props.recommended) {
+  if (!displayTitle.value) {
+    displayTitle.value = 'Produse Recomandate'
+  }
+  displayLink.value = '/recomandate'
+  fetchUrl.value = `/api/products?recommended=true&limit=10`
 }
 
 const { data: response } = await useFetch<ApiResponse>(() => fetchUrl.value || '')
 
-const items = computed(() => response.value?.products?.slice(0, 6) || [])
+const items = computed(() => response.value?.products?.slice(0, 10) || [])
 </script>
 
 <template>

@@ -51,18 +51,18 @@ const loggedOutItems: DropdownMenuItem[][] = [
 
 const loggedInItems = computed(() => [
   [{
-    label: 'Salut ' + (user.value?.name || 'Client'),
+    label: 'Salut ' + (user.value?.firstName || 'Client'),
     disabled: true,
     class: 'font-bold text-gray-900 dark:text-white'
   }],
   [{
     label: 'Detalii cont',
     icon: 'i-lucide-user',
-    to: '/user'
+    to: '/user',
   }, {
     label: 'Comenzile mele',
     icon: 'i-lucide-receipt-text',
-    to: '/user/orders'
+    to: '/orders',
   }],
   [{
     label: 'Deconectare',

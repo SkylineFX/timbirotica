@@ -1,11 +1,8 @@
 <script setup lang="ts">
 const items = [
-  'https://picsum.photos/640/640?random=1',
-  'https://picsum.photos/640/640?random=2',
-  'https://picsum.photos/640/640?random=3',
-  'https://picsum.photos/640/640?random=4',
-  'https://picsum.photos/640/640?random=5',
-  'https://picsum.photos/640/640?random=6'
+  '/bannerImg/bg_banner_faber.webp',
+  '/bannerImg/bg_banner_fellowes.webp',
+  '/bannerImg/bg_banner_leuchtturm.webp',
 ]
 </script>
 
@@ -14,10 +11,12 @@ const items = [
     v-slot="{ item }"
     fade
     dots
+    arrows
     :items="items"
-    class="w-full max-w-fit mx-auto"
+    :ui="{arrows: 'hidden md:block absolute top-1/2 left-16 right-16'}"
+    class="w-full max-w-fit mx-auto bg-white rounded-md"
   >
-    <img :src="item" class="rounded-sm h-64 lg:h-120 w-full object-cover">
+    <NuxtImg :src="item" class="rounded-sm h-64 lg:h-120 w-full object-contain" />
   </UCarousel>
 </template>
 

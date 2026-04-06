@@ -8,7 +8,8 @@ export default eventHandler(async (event) => {
     where: eq(tables.users.id, session.user.id),
     columns: {
       id: true,
-      name: true,
+      firstName: true,
+      lastName: true,
       email: true,
       avatar: true,
       createdAt: true
