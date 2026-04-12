@@ -11,16 +11,16 @@ const columns: FooterColumn[] = [
         target: '_blank'
       },
       {
-        label: 'RO34901127',
+        label: 'RO18034200',
       },
       {
         label: 'J2000000604084',
       },
       {
-        label: 'B-dul Dimitrie Pompei 12A',
+        label: 'Strada Drumul Taberei Nr. 92',
       },
       {
-        label: 'Sector 2, Bucuresti',
+        label: 'Sector 6, Bucuresti',
       }
     ]
   },
@@ -29,23 +29,21 @@ const columns: FooterColumn[] = [
     children: [
       {
         label: 'Termeni si conditii',
-        to: '',
-        target: '_blank'
+        to: '/termeni-si-conditii',
+        exactHash: true
       },
       {
         label: 'Politica de confidentialitate',
-        to: '',
-        target: '_blank'
+        to: '/politica-de-confidentialitate'
       },
       {
         label: 'Livrare si retur',
-        to: '',
-        target: '_blank'
+        to: '/termeni-si-conditii#livrare-si-retur',
+        exactHash: true
       },
       {
         label: 'Contact',
-        to: '',
-        target: '_blank'
+        to: '/contact'
       },
       {
         label: 'ANPC',

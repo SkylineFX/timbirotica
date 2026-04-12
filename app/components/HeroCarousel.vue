@@ -14,9 +14,9 @@ const items = [
     arrows
     :items="items"
     :ui="{arrows: 'hidden md:block absolute top-1/2 left-16 right-16'}"
-    class="w-full max-w-fit mx-auto bg-white rounded-md"
+    class="w-full flex-1 bg-white rounded-md"
   >
-    <NuxtImg :src="item" class="rounded-sm h-64 lg:h-120 w-full object-contain" />
+    <NuxtImg :src="item" class="rounded-sm w-full h-full object-cover aspect-[50/33]" />
   </UCarousel>
 </template>
 

@@ -122,7 +122,8 @@ export const favoritesRelations = relations(favorites, ({ one }) => ({
 export const addresses = sqliteTable('addresses', {
   id: integer().primaryKey({ autoIncrement: true }),
   userId: integer('user_id').references(() => users.id).notNull(),
-  fullName: text().notNull(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull().default(''),
   phone: text().notNull(),
   street: text().notNull(),
   city: text().notNull(),

@@ -4,7 +4,7 @@ const { data: brands } = useFetch('/api/brands')
 
 const navigation = computed(() => [
   {
-    label: 'Toate Produsele',
+    label: 'Produse',
     to: '/c',
     children: categoryTree.value || [],
     open: true,
@@ -14,6 +14,10 @@ const navigation = computed(() => [
     to: '/producatori',
     children: brands.value || []
   },
+  {
+    label: 'Recomandate',
+    to: '/recommended'
+  }
 ])
 
 const featuredCategories = [
@@ -33,11 +37,13 @@ const featuredCategories = [
 
 <template>
   <div>
-    <UContainer class="my-6 flex gap-4">
-      <div class="h-64 lg:h-120 justify-start items-start bg-white rounded-md overflow-y-auto hidden lg:flex lg:flex-1 lg:flex-col lg:basis-md">
-        <UNavigationMenu :items="navigation" orientation="vertical" type="single" class="w-full"/>
+    <UContainer class="my-6 grid grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)] gap-4 items-stretch">
+      <div class="bg-white rounded-md hidden lg:block relative">
+        <div class="absolute inset-0 overflow-y-auto">
+          <UNavigationMenu :items="navigation" orientation="vertical" type="single" class="w-full"/>
+        </div>
       </div>
-      <HeroCarousel />
+      <HeroCarousel class="w-full min-w-0" />
     </UContainer>
     
     <UContainer class="my-6">
@@ -45,7 +51,7 @@ const featuredCategories = [
           <UCard class="text-center rounded-sm">
               <UIcon name="i-heroicons-truck" class="text-4xl text-primary mb-1" />
               <h3 class="font-bold">Livrare in Bucuresti</h3>
-              <p class="text-sm text-gray-500">Livrare gratuita la comenzi >300 RON</p>
+              <p class="text-sm text-gray-500">Livrare gratuita la comenzi >200 RON</p>
           </UCard>
           <UCard class="text-center rounded-sm">
               <UIcon name="i-heroicons-credit-card" class="text-4xl text-primary mb-1" />

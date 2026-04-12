@@ -23,7 +23,8 @@ export default eventHandler(async (event) => {
 
   // Update address
   const updatedAddress = await db.update(tables.addresses).set({
-    fullName: body.fullName !== undefined ? body.fullName : address.fullName,
+    firstName: body.firstName !== undefined ? body.firstName : address.firstName,
+    lastName: body.lastName !== undefined ? body.lastName : address.lastName,
     phone: body.phone !== undefined ? body.phone : address.phone,
     street: body.street !== undefined ? body.street : address.street,
     city: body.city !== undefined ? body.city : address.city,

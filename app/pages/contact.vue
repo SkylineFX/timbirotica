@@ -116,14 +116,14 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             <div class="flex items-start gap-3">
               <UIcon name="i-lucide-phone" class="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
               <div>
-                <p class="font-medium hover:text-primary transition-colors"><a href="tel:+40123456789">+40 (123) 456 789</a></p>
+                <p class="font-medium hover:text-primary transition-colors"><a href="tel:+40751022882">+40 751 022 882</a></p>
                 <p class="text-sm text-gray-500">Luni - Vineri: 09:00 - 17:00</p>
               </div>
             </div>
             <div class="flex items-start gap-3">
               <UIcon name="i-lucide-at-sign" class="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
               <div>
-                <p class="font-medium hover:text-primary transition-colors"><a href="mailto:contact@eurotimalex.ro">contact@eurotimalex.ro</a></p>
+                <p class="font-medium hover:text-primary transition-colors"><a href="mailto:eurotimalex@gmail.com">eurotimalex@gmail.com</a></p>
                 <p class="text-sm text-gray-500">Răspuns în 24-48 ore lucrătoare</p>
               </div>
             </div>
@@ -149,7 +149,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
               <span class="text-gray-500">CUI (VAT)</span>
-              <span class="font-medium">RO12345678</span>
+              <span class="font-medium">RO18034200</span>
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
               <span class="text-gray-500">Nr. Înreg. (Reg. Com.)</span>
@@ -157,7 +157,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             </div>
             <div class="flex flex-col gap-1 border-b border-gray-200 pb-2">
               <span class="text-gray-500">Adresă Sediu Social</span>
-              <span class="font-medium">Strada Exemplu Nr. 1<br>București, România</span>
+              <span class="font-medium">Strada Drumul Tabrei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-500">Țară Înregistrare</span>

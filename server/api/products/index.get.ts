@@ -2,12 +2,9 @@ import { inArray, like, and, or, eq } from "drizzle-orm"
 
 export default eventHandler(async (event) => {
   const query = getQuery(event)
-  console.log('API Query Params:', query)
   const categorySlug = query.category as string
   const brandSlug = query.brand as string
   const searchQ = query.q as string
-
-  console.log('Category Slug:', categorySlug)
 
   const page = Number(query.page) || 1
   const limit = Number(query.limit) || 12

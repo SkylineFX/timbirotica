@@ -37,7 +37,7 @@ const { addToCart } = useCart()
 
 <template>
   <UContainer class="py-6">
-    <UBreadcrumb :items="breadcrumbs" class="mb-6" />
+    <UBreadcrumb :items="breadcrumbs" class="mb-6 [&_ol]:flex-nowrap [&_ol]:overflow-hidden [&_li]:shrink-0 [&_li:last-child]:shrink-1 [&_li:last-child]:min-w-0" />
     <div v-if="product" class="grid grid-cols-1 md:grid-cols-2 gap-12">
         <div class="w-full">
             <ProductCarousel :productImages="product.image ? [product.image, product.image, product.image] : []"/>

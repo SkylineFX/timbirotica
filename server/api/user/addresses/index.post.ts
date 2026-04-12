@@ -14,7 +14,8 @@ export default eventHandler(async (event) => {
 
   const nAddress = await db.insert(tables.addresses).values({
     userId: session.user.id,
-    fullName: body.fullName,
+    firstName: body.firstName,
+    lastName: body.lastName,
     phone: body.phone,
     street: body.street,
     city: body.city,

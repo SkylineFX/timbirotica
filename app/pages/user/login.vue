@@ -30,14 +30,15 @@ const fields: AuthFormField[] = [{
 const providers = [{
   label: 'Google',
   icon: 'i-simple-icons-google',
-  onClick: () => {
-    toast.add({ title: 'Google', description: 'Login with Google' })
-  }
+  to: '/auth/google',
+  exact: true,
+  external: true
 }]
 
 const schema = z.object({
   email: z.email('Adresa de email nu este valida'),
-  password: z.string('Parola este obligatorie').min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
+  password: z.string('Parola este obligatorie').min(8, 'Parola trebuie sa aiba cel putin 8 caractere'),
+  remember: z.boolean().optional()
 })
 
 type Schema = z.output<typeof schema>

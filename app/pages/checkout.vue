@@ -9,7 +9,8 @@ const deliveryMethod = ref('courier') // 'courier' or 'pickup'
 
 type Address = {
   id: number
-  fullName: string
+  firstName: string
+  lastName: string
   phone: string
   county: string
   city: string
@@ -40,7 +41,8 @@ const isNewAddressModalOpen = ref(false)
 
 // Form State
 const newAddress = ref({
-  fullName: '',
+  firstName: '',
+  lastName: '',
   phone: '',
   county: 'București',
   city: '',
@@ -60,7 +62,7 @@ async function saveNewAddress() {
   isNewAddressModalOpen.value = false
   isAddressModalOpen.value = true
   
-  newAddress.value = { fullName: '', phone: '', county: 'București', city: '', street: '', postalCode: '' } // reset form
+  newAddress.value = { firstName: '', lastName: '', phone: '', county: 'București', city: '', street: '', postalCode: '' } // reset form
 }
 
 function openNewAddress() {
@@ -148,7 +150,7 @@ function selectAddress(id: number) {
                 <!-- Address Details -->
                 <div class="flex-1">
                   <div v-if="selectedAddress">
-                     <p class="font-medium text-gray-900 text-lg">{{ selectedAddress.fullName }} - {{ selectedAddress.phone }}</p>
+                     <p class="font-medium text-gray-900 text-lg">{{ selectedAddress.firstName }} {{ selectedAddress.lastName }} - {{ selectedAddress.phone }}</p>
                      <p class="text-gray-600 mt-1">{{ selectedAddress.street }}, {{ selectedAddress.city }} ({{ selectedAddress.county }})</p>
                   </div>
                   <div v-else>
@@ -205,7 +207,7 @@ function selectAddress(id: number) {
                 </div>
                 <div class="flex-1">
                    <div class="flex justify-between items-start">
-                      <p class="font-bold text-gray-900 text-base">{{ addr.fullName }} - {{ addr.phone }}</p>
+                      <p class="font-bold text-gray-900 text-base">{{ addr.firstName }} {{ addr.lastName }} - {{ addr.phone }}</p>
                       <UButton color="neutral" variant="outline" class="rounded-lg text-sm px-3 py-1 bg-white border-gray-300 text-gray-700" size="xs">editează</UButton>
                    </div>
                    <p class="text-gray-600 mt-2 pr-12">{{ addr.street }}, {{ addr.city }} ({{ addr.county }})</p>
@@ -223,10 +225,13 @@ function selectAddress(id: number) {
             <div>
               <h4 class="font-bold text-gray-900 mb-4 text-sm mt-2">Persoana de contact</h4>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <UFormField label="Nume" name="fullName">
-                   <UInput v-model="newAddress.fullName" placeholder="ex: Popescu Alexandru" required size="lg" class="w-full" />
+                <UFormField label="Prenume" name="firstName">
+                   <UInput v-model="newAddress.firstName" placeholder="ex: Alexandru" required size="lg" class="w-full" />
                 </UFormField>
-                <UFormField label="Numar de telefon" name="phone">
+                <UFormField label="Nume" name="lastName">
+                   <UInput v-model="newAddress.lastName" placeholder="ex: Popescu" required size="lg" class="w-full" />
+                </UFormField>
+                <UFormField label="Numar de telefon" name="phone" class="sm:col-span-2">
                    <UInput v-model="newAddress.phone" placeholder="07xxxxxxxx" required size="lg" class="w-full" />
                 </UFormField>
               </div>

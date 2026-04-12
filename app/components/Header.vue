@@ -61,14 +61,14 @@ const loggedInItems = computed(() => [
     to: '/user',
   }, {
     label: 'Comenzile mele',
-    icon: 'i-lucide-receipt-text',
+    icon: 'i-lucide-package',
     to: '/orders',
   }],
   [{
     label: 'Deconectare',
     color: 'error',
     icon: 'i-lucide-log-out',
-    click: logout //not working
+    onSelect: logout
   }]
 ])
 
@@ -79,7 +79,7 @@ const { data: brands } = useFetch('/api/brands')
 
 const navigation = computed(() => [
   {
-    label: 'Toate Produsele',
+    label: 'Produse',
     to: '/c',
     children: categoryTree.value || [],
     open: true,
@@ -88,6 +88,10 @@ const navigation = computed(() => [
     label: 'Producatori',
     to: '/producatori',
     children: brands.value || []
+  },
+  {
+    label: 'Recomandate',
+    to: '/recommended'
   },
   {
     label: "Contact",
@@ -137,7 +141,7 @@ const navigation = computed(() => [
               variant="ghost"
               icon="i-lucide-user"
               aria-label="Contul meu"
-              class="hidden md:flex"
+              class=""
             >
               <span class="hidden md:inline">Contul meu</span>
             </UButton>

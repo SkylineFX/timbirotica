@@ -43,9 +43,9 @@ const fields: AuthFormField[] = [{
 const providers = [{
   label: 'Google',
   icon: 'i-simple-icons-google',
-  onClick: () => {
-    toast.add({ title: 'Google', description: 'Login with Google' })
-  }
+  to: '/auth/google',
+  exact: true,
+  external: true
 }]
 
 const schema = z.object({

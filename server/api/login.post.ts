@@ -4,10 +4,11 @@ import bcrypt from 'bcryptjs'
 const bodySchema = z.object({
   email: z.email(),
   password: z.string().min(8),
+  remember: z.boolean().optional()
 })
 
 export default defineEventHandler(async (event) => {
-  const { email, password } = await readValidatedBody(event, bodySchema.parse)
+  const { email, password, remember } = await readValidatedBody(event, bodySchema.parse)
   const normalizedEmail = email.toLowerCase()
   const config = useRuntimeConfig()
 
@@ -46,6 +47,8 @@ export default defineEventHandler(async (event) => {
       firstName: user.firstName,
       lastName: user.lastName,
     },
+  }, {
+    maxAge: remember ? 60 * 60 * 24 * 30 : undefined
   })
 
   return {}

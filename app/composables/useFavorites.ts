@@ -11,6 +11,13 @@ export const useFavorites = () => {
       favorites.value = []
       return
     }
+    
+    // Auto-block SSR fetching (Nuxt SSR $fetch doesn't natively forward your browser cookie without proxying)
+    if (import.meta.server) return
+    
+    // Prevent duplicated fetch spam if multiple components initialize the composable 
+    if (isLoading.value || favorites.value.length > 0) return
+
     isLoading.value = true
     try {
       const data = await $fetch('/api/favorites')
