@@ -72,7 +72,7 @@ const loggedInItems = computed(() => [
   }]
 ])
 
-const dropdownItems = computed(() => loggedIn.value ? loggedInItems.value : loggedOutItems)
+const dropdownItems = computed<any[][]>(() => loggedIn.value ? loggedInItems.value : loggedOutItems)
 
 const { data: categoryTree } = useFetch('/api/categories/tree')
 const { data: brands } = useFetch('/api/brands')

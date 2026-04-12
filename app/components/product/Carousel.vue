@@ -7,24 +7,26 @@ const activeIndex = ref(0)
 
 <template>
   <div class="flex-1 w-full h-full flex flex-col gap-4">
-    <UCarousel
-      ref="carousel"
-      v-slot="{ item }"
-      :items="productImages"
-      class="w-full h-full bg-white rounded-lg border border-gray-100 relative overflow-hidden"
-      @select="activeIndex = $event"
-      arrows
-      :prev-button="{ color: 'gray', variant: 'soft', class: 'ml-2 pointer-events-auto' }"
-      :next-button="{ color: 'gray', variant: 'soft', class: 'mr-2 pointer-events-auto' }"
-      :ui="{ 
-        item: 'w-full h-full', 
-        container: 'aspect-square'
-      }"
-    >
-      <div class="w-full h-full p-4 flex justify-center items-center">
-        <img :src="item" class="max-w-full max-h-full object-contain" draggable="false">
-      </div>
-    </UCarousel>
+    <div class="w-full bg-white rounded-lg border border-gray-100 flex items-center justify-center p-0 md:p-6 md:px-16 relative">
+      <UCarousel
+        ref="carousel"
+        v-slot="{ item }"
+        :items="productImages"
+        class="w-full aspect-square"
+        @select="activeIndex = $event"
+        arrows
+        :prev-button="{ color: 'gray', variant: 'soft', class: '!left-2 md:!-left-12 pointer-events-auto flex absolute' }"
+        :next-button="{ color: 'gray', variant: 'soft', class: '!right-2 md:!-right-12 pointer-events-auto flex absolute' }"
+        :ui="{ 
+          item: 'w-full h-full', 
+          container: 'w-full h-full overflow-hidden'
+        }"
+      >
+        <div class="w-full h-full flex justify-center items-center">
+          <img :src="item" class="max-w-full max-h-full object-contain" draggable="false">
+        </div>
+      </UCarousel>
+    </div>
 
     <div v-if="productImages.length > 1" class="flex gap-2 justify-start">
       <div
