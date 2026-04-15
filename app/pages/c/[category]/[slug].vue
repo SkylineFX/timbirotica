@@ -38,12 +38,12 @@ const accordionItems = [
   {
     label: 'Livrare',
     icon: 'i-lucide-truck',
-    content: 'Livrarea se face prin curier rapid in 24-48 de ore de la confirmarea comenzii. Costul transportului este de 19 Lei pentru comenzile sub 200 Lei, si gratuit pentru cele care depasesc aceasta suma. Toate coletele sunt asigurate pe durata transportului.'
+    content: 'Livrarea se face in 24-48 de ore de la confirmarea comenzii. Costul transportului este de 30 RON pentru comenzile sub 200 RON, si gratuit pentru cele care depasesc aceasta suma.'
   },
   {
     label: 'Retur',
     icon: 'i-lucide-rotate-ccw',
-    content: 'Ai la dispozitie 14 zile calendaristice pentru a returna produsul, fara invocarea niciunui motiv. Produsul trebuie sa fie in aceeasi stare in care a fost livrat, in ambalajul original cu toate accesoriile.',
+    content: 'Ai la dispozitie 14 zile calendaristice pentru a returna produsul. Acesta trebuie sa fie in aceeasi stare in care a fost livrat, in ambalajul original.',
   }
 ]
 </script>
@@ -53,16 +53,14 @@ const accordionItems = [
     <UBreadcrumb :items="breadcrumbs" class="mb-6 [&_ol]:flex-nowrap [&_ol]:overflow-hidden [&_li]:shrink-0 [&_li:last-child]:shrink-1 [&_li:last-child]:min-w-0" />
     <div v-if="product" class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
         <div class="w-full md:col-span-7">
-            <ProductCarousel :productImages="product.image ? [product.image, product.image, product.image] : []"/>
-        </div>
-
-        <div class="w-full md:col-span-5">
-            <div class="flex flex-col h-full md:pb-[80px]">
+            <!-- Mobile Header (hidden on desktop) -->
+            <div class="block md:hidden mb-6">
                 <!-- Brand container -->
-                <div v-if="product.brand" class="mb-6 bg-white dark:bg-gray-900 p-3 rounded-md border border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                    <img v-if="product.brand.image" :src="product.brand.image" :alt="product.brand.name" class="h-6 object-contain" />
-                    <span v-else class="font-bold text-gray-900 border-gray-100 dark:text-white">{{ product.brand.name }}</span>
-                    <NuxtLink :to="`/producatori/${product.brand.slug}`" class="text-xs text-gray-500 underline hover:text-primary transition-colors">Vezi toate produsele</NuxtLink>
+                <div v-if="product.brand" class="mb-2 dark:bg-gray-900 p-1 rounded-md border border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                    <NuxtLink :to="`/producatori/${product.brand.slug}`" class="text-xs text-gray-500 underline hover:text-primary transition-colors">
+                        <img v-if="product.brand.image" :src="product.brand.image" :alt="product.brand.name" class="h-4 object-contain" />
+                        <span v-else class="font-bold text-gray-900 border-gray-100 dark:text-white">{{ product.brand.name }}</span>
+                    </NuxtLink>
                 </div>
 
                 <!-- Title -->
@@ -71,18 +69,48 @@ const accordionItems = [
                 </h1>
                 
                 <!-- SKU / Code -->
-                <p class="text-sm text-gray-500 mb-6 font-mono">
+                <p class="text-sm text-gray-500 mb-0 font-mono">
                     Cod: {{ product.sku}}
                 </p>
+            </div>
+            
+            <ProductCarousel :productImages="product.image ? [product.image, product.image, product.image] : []"/>
+        </div>
+
+        <div class="w-full md:col-span-5">
+            <div class="flex flex-col h-full md:pb-[80px]">
+                <!-- Desktop Header (hidden on mobile) -->
+                <div class="hidden md:block">
+                    <!-- Brand container -->
+                    <div v-if="product.brand" class="mb-6 bg-white dark:bg-gray-900 p-3 rounded-md border border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                        <img v-if="product.brand.image" :src="product.brand.image" :alt="product.brand.name" class="h-6 object-contain" />
+                        <span v-else class="font-bold text-gray-900 border-gray-100 dark:text-white">{{ product.brand.name }}</span>
+                        <NuxtLink :to="`/producatori/${product.brand.slug}`" class="text-xs text-gray-500 underline hover:text-primary transition-colors">Vezi toate produsele</NuxtLink>
+                    </div>
+
+                    <!-- Title -->
+                    <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 dark:text-white mb-2 leading-tight lowercase first-letter:uppercase">
+                        {{ product.name }}
+                    </h1>
+                    
+                    <!-- SKU / Code -->
+                    <p class="text-sm text-gray-500 mb-6 font-mono">
+                        Cod: {{ product.sku}}
+                    </p>
+                </div>
 
                 <!-- Stock Status -->
                 <div class="flex items-center gap-2 mb-2 font-medium" :class="stockColor">
-                    <UBadge color="success" variant="soft" class="rounded-sm" leading-icon="i-lucide-check">In stoc</UBadge>
+                    <UBadge color="success" variant="soft" class="rounded-sm" leading-icon="i-lucide-check">Disponibil</UBadge>
                 </div>
 
                 <!-- Price -->
                 <div class="flex flex-col gap-0 mb-6">
-                    <p class="text-3xl lg:text-3xl font-bold text-gray-900">{{ product.price }} RON</p>
+                    <p class="text-3xl lg:text-3xl font-bold text-gray-900">
+                        <span class="text-3xl lg:text-3xl">{{ product.price.toString().split('.')[0] }}</span> 
+                        <span class="text-sm align-top">{{ product.price.toString().split('.')[1] }}</span> 
+                        <span class="text-md ml-2">RON</span>
+                    </p>
                     <span class="text-xs text-gray-500">Pretul include TVA</span>
                 </div>
 
@@ -97,7 +125,7 @@ const accordionItems = [
                             size="xs"
                         />
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 w-full">
                         <UButton 
                             block  
                             class="flex-1"

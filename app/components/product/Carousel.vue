@@ -12,19 +12,13 @@ const activeIndex = ref(0)
         ref="carousel"
         v-slot="{ item }"
         :items="productImages"
-        class="w-full aspect-square"
+        class="w-full"
         @select="activeIndex = $event"
         arrows
         :prev-button="{ color: 'gray', variant: 'soft', class: '!left-2 md:!-left-12 pointer-events-auto flex absolute' }"
         :next-button="{ color: 'gray', variant: 'soft', class: '!right-2 md:!-right-12 pointer-events-auto flex absolute' }"
-        :ui="{ 
-          item: 'w-full h-full', 
-          container: 'w-full h-full overflow-hidden'
-        }"
       >
-        <div class="w-full h-full flex justify-center items-center">
-          <img :src="item" class="max-w-full max-h-full object-contain" draggable="false">
-        </div>
+        <img :src="item" class="w-full aspect-square object-contain select-none block mx-auto pointer-events-none" draggable="false">
       </UCarousel>
     </div>
 
@@ -36,7 +30,7 @@ const activeIndex = ref(0)
         :class="activeIndex === index ? 'border-primary' : 'border-gray-200 opacity-60 hover:opacity-100'"
         @click="carousel?.emblaApi?.scrollTo(index); activeIndex = index"
       >
-        <img :src="item" class="max-w-full max-h-full object-contain">
+        <img :src="item" class="w-full h-full object-contain">
       </div>
     </div>
   </div>
