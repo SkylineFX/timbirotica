@@ -95,7 +95,7 @@ watchEffect(() => {
 <template>
   <UContainer class="py-8 lg:py-12 max-w-5xl">
     <h1 class="text-3xl lg:text-4xl font-bold mb-6">Detalii cont</h1>
-    <UCard class="overflow-hidden" :ui="{ body: 'p-0 sm:p-0' }">
+    <UCard class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-0 sm:p-0' }">
       <!-- User Profile Header Section -->
       <div class="bg-gray-50/50 p-6 sm:p-8 border-b border-gray-200 flex flex-row gap-6 items-start sm:items-center justify-between">
          <div class="flex items-center gap-5">

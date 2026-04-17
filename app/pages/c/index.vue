@@ -10,22 +10,21 @@ const { data: categories } = await useFetch('/api/categories/tree')
       <UCard 
         v-for="category in categories" 
         :key="category.id" 
-        class="h-full overflow-hidden hover:shadow-md transition-shadow duration-200 rounded-xl flex flex-col"
+        class="h-full overflow-hidden rounded-sm flex flex-col"
         :ui="{ body: 'flex-1 flex flex-col !p-0' }"
       >
         <div class="flex flex-1 min-h-[9rem] sm:min-h-[10rem]">
-          <!-- Left Side: Image Placeholder (Clickable to parent category) -->
+          <!-- Left: Image -->
           <NuxtLink 
             :to="category.to" 
             class="w-2/5 flex items-center justify-center border-r border-gray-200 hover:opacity-90 transition-opacity"
           >
-            <!-- Add a subtle background structure in CSS if needed, removing bg-gray-100 -->
             <div class="w-full h-full bg-gray-50 flex items-center justify-center">
                 <UIcon name="i-heroicons-photo" class="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" />
             </div>
           </NuxtLink>
           
-          <!-- Right Side: Content -->
+          <!-- Right: Content -->
           <div class="w-3/5 p-4 flex flex-col">
             <NuxtLink :to="category.to" class="group">
               <h2 class="text-base sm:text-lg font-semibold text-gray-900 mb-2 group-hover:text-primary transition-colors line-clamp-2">
@@ -45,7 +44,7 @@ const { data: categories } = await useFetch('/api/categories/tree')
               </li>
               <li v-if="category.children.length > 3" class="text-xs mt-1">
                 <NuxtLink :to="category.to" class="text-gray-400 hover:text-primary transition-colors">
-                  + {{ category.children.length - 3 }} mai multe
+                  + {{ category.children.length - 3 }} subcategorii
                 </NuxtLink>
               </li>
             </ul>

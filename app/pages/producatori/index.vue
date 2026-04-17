@@ -14,7 +14,7 @@ const { data: brands } = await useFetch('/api/brands')
         :to="brand.to"
         class="group"
       >
-        <UCard class="h-full hover:ring-2 hover:ring-primary transition-all duration-200">
+        <UCard :ui="{ root: 'rounded-md' }" class="h-full hover:ring-2 hover:ring-primary transition-all duration-200">
           <div class="aspect-[16/9] bg-white flex items-center justify-center">
             <NuxtImg 
               :src="brand.image || ''" 

@@ -307,7 +307,7 @@ const finalTotal = computed(() => {
          <div class="pt-6 flex justify-between items-end mt-4 border-t border-gray-300 border-dashed">
             <div class="flex flex-col">
                <span class="text-xl font-extrabold text-gray-900">Total</span>
-               <span class="text-xs text-gray-500 mt-0.5" v-if="finalTotal > 0">Include TVA de {{ (finalTotal * 0.19).toFixed(2) }} RON</span>
+               <span class="text-xs text-gray-500 mt-0.5" v-if="finalTotal > 0">Include TVA de {{ (finalTotal * 0.21).toFixed(2) }} RON</span>
             </div>
             <div class="flex items-end gap-2 mb-0.5">
                <span class="text-2xl sm:text-3xl leading-none tracking-tight font-extrabold text-gray-900">{{ finalTotal.toFixed(2) }} RON</span>
@@ -326,7 +326,7 @@ const finalTotal = computed(() => {
 
   <!-- Modals remain the same functionally, only minor classes to match the new border-radius theme -->
   <!-- Address Selection Modal -->
-  <UModal v-model:open="isAddressModalOpen" title="Adresă de livrare" :ui="{ content: 'sm:max-w-xl p-0' }" class="rounded-2xl">
+  <UModal v-model:open="isAddressModalOpen" title="Adresă de livrare" :ui="{ content: 'sm:max-w-xl p-0' }" class="rounded-md">
     <template #body>
        <div class="">
 
@@ -358,7 +358,7 @@ const finalTotal = computed(() => {
   </UModal>
 
   <!-- New Address Form Modal -->
-  <UModal v-model:open="isNewAddressModalOpen" title="Adauga adresa noua" :ui="{ content: 'sm:max-w-xl' }">
+  <UModal v-model:open="isNewAddressModalOpen" title="Adauga adresa noua" :ui="{ content: 'sm:max-w-xl' }" class="rounded-md">
     <template #body>
       <AddressForm 
         :is-first-address="!userAddresses || userAddresses.length === 0" 

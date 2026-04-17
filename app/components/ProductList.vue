@@ -69,7 +69,7 @@ const total = computed(() => data.value?.total || 0)
 
 <template>
   <UContainer class="py-6">
-    <UBreadcrumb v-if="breadcrumbs?.length" :items="breadcrumbs" class="mb-6 [&_ol]:flex-nowrap [&_ol]:overflow-hidden [&_li]:shrink-0 [&_li:last-child]:shrink-1 [&_li:last-child]:min-w-0" />
+    <UBreadcrumb v-if="breadcrumbs?.length" :items="breadcrumbs" :ui="{ separatorIcon: 'w-4 h-4' }" class="mb-6 [&_ol]:flex-nowrap [&_ol]:overflow-hidden [&_li]:shrink-0 [&_li:last-child]:shrink-1 [&_li:last-child]:min-w-0" />
     <div class="flex flex-col mb-8 gap-4 rounded-lg p-4 bg-white">
       <h1 class="text-xl font-bold flex flex-wrap items-baseline gap-2 xl:text-2xl">
         {{ title }} <span v-if="subtitle" class="font-normal italic">"{{ subtitle }}"</span>

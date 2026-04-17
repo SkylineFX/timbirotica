@@ -110,7 +110,7 @@ async function submit() {
        </div>
         <div class="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4">
           <UFormField label="Adresa" name="street" required>
-             <UInput v-model="form.street" placeholder="Strada, numar, bloc..." size="lg" class="w-full" required />
+             <UInput v-model="form.street" placeholder="Strada, numar, bloc, scara, etaj, apartament" size="lg" class="w-full" required />
           </UFormField>
           <UFormField label="Cod Postal" name="postalCode" required>
              <UInput v-model="form.postalCode" size="lg" class="w-full" required />

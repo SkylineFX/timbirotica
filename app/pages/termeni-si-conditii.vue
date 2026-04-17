@@ -20,7 +20,7 @@ useHead({
       
       <section>
         <h2 class="text-2xl font-semibold text-gray-900 border-b border-gray-100 pb-2 mb-4">I. Despre Noi</h2>
-        <p>Serviciul de comert electronic este oferit de <strong>Eurotimalex SRL</strong>, cu sediul în <strong>Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București</strong>, înmatriculată în Registrul Comerțului sub nr. <strong>J2000000604084</strong>, având cod unic de înregistrare <strong>RO18034200</strong>.</p>
+        <p>Serviciul de comert electronic este oferit de <strong>Eurotimalex SRL</strong>, cu sediul în <strong>Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București</strong>, înmatriculată în Registrul Comerțului sub nr. <strong>J40/17160/2005</strong>, având cod unic de înregistrare <strong>RO18034200</strong>.</p>
         <p>Ne puteți contacta prin următoarele mijloace:</p>
         <ul class="list-disc pl-5 mt-2 space-y-1">
           <li><strong>Prin e-mail la:</strong> <a class="hover:text-primary transition-colors" href="mailto:eurotimalex@gmail.com">eurotimalex@gmail.com</a></li>

@@ -16,11 +16,11 @@ useHead({
     </div>
 
     <!-- Content -->
-    <UCard :ui="{ body: 'p-6 sm:p-8' }">
+    <UCard :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
       <div class="space-y-6 text-gray-700 leading-relaxed text-[15px] sm:text-base">
         
         <p>
-          <strong class="font-semibold text-gray-900">Eurotimalex</strong> este numele comercial al SC EUROTIMALEX SRL, cu sediul social în Drumul Taberei nr. 92, București, ROMÂNIA, CUI RO18034200, Nr. inreg. J6/168/2015. 
+          <strong class="font-semibold text-gray-900">Eurotimalex</strong> este numele comercial al SC EUROTIMALEX SRL, cu sediul social în Drumul Taberei nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, București, ROMÂNIA, CUI RO18034200, Nr. inreg. J40/17160/2005. 
         </p>
 
         <div class="p-4 bg-gray-50 rounded-md border border-gray-100">
@@ -56,7 +56,7 @@ useHead({
                <p class="text-gray-600 mt-1">Strada Drumul Taberei Nr. 92<br/>Bloc C7, Sc. F, Et. 4, Ap. 216<br/>Sector 6, 061406<br/>București, România</p>
             </div>
             
-            <div class="w-full lg:w-2/3 h-64 sm:h-80 rounded-xl overflow-hidden shadow-sm border border-gray-200">
+            <div class="w-full lg:w-2/3 h-64 sm:h-80 rounded-sm overflow-hidden border border-gray-200">
                <iframe 
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2849.7160194869502!2d26.016399476685354!3d44.41847277107616!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b200464542ac57%3A0x35703c7ee2e04b3a!2sDrumul%20Taberei%2092%2C%20061406%20Bucure%C8%99ti!5e0!3m2!1sen!2sro!4v1776374742718!5m2!1sen!2sro" 
                   class="w-full h-full" 

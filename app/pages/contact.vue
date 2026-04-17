@@ -60,7 +60,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       
       <!-- Stânga: Formular de contact -->
       <div class="lg:col-span-2 h-full flex flex-col">
-        <UCard class="flex-1 flex flex-col" :ui="{ body: 'p-6 sm:p-8 flex-1 flex flex-col' }">
+        <UCard class="flex-1 flex flex-col" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8 flex-1 flex flex-col' }">
           <template #header>
             <h2 class="text-xl font-bold flex items-center gap-2">
               <UIcon name="i-lucide-mail" class="w-6 h-6 text-primary" />
@@ -105,7 +105,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       <div class="space-y-6">
         
         <!-- Suport Clienti -->
-        <UCard>
+        <UCard :ui="{ root: 'rounded-md' }">
           <template #header>
             <h3 class="text-lg font-bold flex items-center gap-2">
               <UIcon name="i-lucide-headset" class="w-5 h-5 text-primary" />
@@ -131,7 +131,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         </UCard>
 
         <!-- Date Companie -->
-        <UCard>
+        <UCard :ui="{ root: 'rounded-md' }">
           <template #header>
             <h3 class="text-lg font-bold flex items-center gap-2">
               <UIcon name="i-lucide-building-2" class="w-5 h-5 text-primary" />
@@ -153,7 +153,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
               <span class="text-gray-500">Nr. Înreg. (Reg. Com.)</span>
-              <span class="font-medium">Jxx/xxxx/xxxx</span>
+              <span class="font-medium">J40/17160/2005</span>
             </div>
             <div class="flex flex-col gap-1 border-b border-gray-200 pb-2">
               <span class="text-gray-500">Adresă Sediu Social</span>
