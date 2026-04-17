@@ -53,7 +53,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     <!-- Header -->
     <div class="mb-8 lg:mb-12">
       <h1 class="text-3xl lg:text-4xl font-bold mb-4">Contactează-ne</h1>
-      <p class="text-gray-600 max-w-2xl text-lg">Ai o întrebare sau ai nevoie de asistență? Suntem aici pentru a te ajuta. Completează formularul sau folosește detaliile de contact de mai jos.</p>
+      <p class="text-gray-600 max-w-2xl text-md lg:text-lg">Ai o întrebare sau ai nevoie de asistență? <br/> Completează formularul sau folosește detaliile de contact de mai jos.</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">

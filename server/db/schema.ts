@@ -130,7 +130,6 @@ export const addresses = sqliteTable('addresses', {
   county: text().notNull(),
   postalCode: text(),
   isDefaultShipping: integer({ mode: 'boolean' }).default(false),
-  isDefaultBilling: integer({ mode: 'boolean' }).default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 })
 

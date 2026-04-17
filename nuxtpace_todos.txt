@@ -1,33 +1,13 @@
 TODO:
 
-breadcrumbs (truncate to width, show all subcategories)
-fuzzy search, search by sku 
-
-api additional structure:
-    - create 'recommended products' api endpoint
-    - use endpoint for home page recommendations
-
-contact, about pages:
-    - create contact form
-    - create about page
-
-addresses:
-    - create addresses table
-    - update profile info to allow address update
-    - allow client to pick an address and save it for future or not
+main image carousel links
+category carousel arrows
 
 products database table:
-    - modify the stock column to actually store stock information values
     - add support for multiple photos (associative table products_images or json column)
     
 category image:
-    - add image column to category table in db
     - populate categories index.vue page with grid of primary categories cards  
 
 other things:
     - send mail for forget password (account confirmation etc)
-    - create orders table
-
-plasare comanda:
-    - alege medota de plasare a comenzii (trimite comanda prin email sau telefon)
-    - alege metoda de confirmare a comenzii (email sau telefon)

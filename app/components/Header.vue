@@ -25,10 +25,13 @@ const performSearch = async () => {
     })
 }
 
-watch(() => route.path, () => {
+watch(() => route.path, (newPath) => {
     isNavOpen.value = false
     isCartOpen.value = false
     isFavoritesOpen.value = false
+    if (newPath !== '/cautare') {
+        searchQuery.value = ''
+    }
 })
 
 async function logout () {
@@ -213,25 +216,9 @@ const navigation = computed(() => [
           <div v-if="cartItems.length === 0" class="p-8 text-center text-gray-500">
             Cosul tau este gol.
           </div>
-          <UList v-else>
-            <UListItem v-for="item in cartItems" :key="item.id || item.productId" class="flex gap-4 py-8 border-b border-gray-200 dark:border-gray-800">
-              <NuxtImg :src="item.product?.image || ''" class="w-16 h-16 object-contain bg-white rounded-md" />
-              <div class="flex-1 flex flex-col justify-between">
-                <div>
-                    <p class="font-medium text-sm line-clamp-2">{{ item.product?.name }}</p>
-                </div>
-                <div class="flex justify-between items-center mt-2">
-                       <div class="flex items-center gap-1">
-                           <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" @click="removeFromCart(item.id)" />
-                           <UInputNumber size="xs" class="w-24" :model-value="item.quantity" :min="0" :step="1" @update:model-value="(val) => updateQuantity(item.id, Number(val))" />
-                       </div>
-                       <div class="flex flex-col items-end">
-                           <span class="font-bold text-sm">{{ (item.product?.price * item.quantity).toFixed(2) }} RON</span>
-                       </div>
-                </div>
-              </div>
-            </UListItem>
-          </UList>
+          <div v-else class="w-full">
+            <CartItem v-for="item in cartItems" :key="item.id || item.productId" :item="item" />
+          </div>
       </template>
 
       <template #footer>

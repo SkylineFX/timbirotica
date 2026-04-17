@@ -49,61 +49,27 @@ type Address = {
   street: string
   postalCode?: string | null
   isDefaultShipping: boolean | null
-  isDefaultBilling: boolean | null
 }
 
 const isAddressModalOpen = ref(false)
 const modalMode = ref<'add' | 'edit'>('add')
 const currentAddressId = ref<number | null>(null)
 
-const addressForm = ref({
-  firstName: '',
-  lastName: '',
-  phone: '',
-  county: 'București',
-  city: '',
-  street: '',
-  postalCode: '',
-  isDefaultShipping: false,
-  isDefaultBilling: false
-})
-
-const counties = ['București']
-const sectors = ['Sector 1', 'Sector 2', 'Sector 3', 'Sector 4', 'Sector 5', 'Sector 6']
-
 function openAddAddress() {
   modalMode.value = 'add'
   currentAddressId.value = null
-  addressForm.value = {
-    firstName: '',
-    lastName: '',
-    phone: '',
-    county: 'București',
-    city: '',
-    street: '',
-    postalCode: '',
-    isDefaultShipping: userAddresses.value?.length === 0,
-    isDefaultBilling: userAddresses.value?.length === 0
-  }
   isAddressModalOpen.value = true
 }
 
 function openEditAddress(addr: Address) {
   modalMode.value = 'edit'
   currentAddressId.value = addr.id
-  addressForm.value = {
-    firstName: addr.firstName,
-    lastName: addr.lastName,
-    phone: addr.phone,
-    county: addr.county,
-    city: addr.city,
-    street: addr.street,
-    postalCode: addr.postalCode || '',
-    isDefaultShipping: addr.isDefaultShipping ?? false,
-    isDefaultBilling: addr.isDefaultBilling ?? false
-  }
   isAddressModalOpen.value = true
 }
+
+const currentAddress = computed(() => {
+  return (userAddresses.value as Address[])?.find((a: Address) => a.id === currentAddressId.value) || null
+})
 
 async function removeAddress(id: number) {
   if (!confirm('Sigur doresti sa stergi aceasta adresa?')) return
@@ -112,23 +78,9 @@ async function removeAddress(id: number) {
   useToast().add({ title: 'Adresa stearsa', color: 'success' })
 }
 
-async function saveAddress() {
-  isLoading.value = true
-  try {
-    if (modalMode.value === 'add') {
-      await $fetch('/api/user/addresses', { method: 'POST', body: addressForm.value })
-      useToast().add({ title: 'Adresa adaugata cu succes', color: 'success' })
-    } else if (currentAddressId.value) {
-      await $fetch(`/api/user/addresses/${currentAddressId.value}`, { method: 'PUT', body: addressForm.value })
-      useToast().add({ title: 'Adresa salvata', color: 'success' })
-    }
-    await refreshAddresses()
-    isAddressModalOpen.value = false
-  } catch(err: any) {
-     useToast().add({ title: 'Eroare la salvarea adresei', description: err.message, color: 'error' })
-  } finally {
-    isLoading.value = false
-  }
+async function handleAddressSaved() {
+  await refreshAddresses()
+  isAddressModalOpen.value = false
 }
 
 watchEffect(() => {
@@ -165,19 +117,21 @@ watchEffect(() => {
            <UButton @click="openAddAddress" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-md px-2">Adaugă</UButton>
          </div>
 
-         <div v-if="userAddresses?.length === 0" class="text-center py-12 text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+         <div v-if="userAddresses?.length === 0" class="text-center py-12 text-gray-500 bg-gray-50 rounded-md border border-dashed border-gray-200">
             Nici o adresa salvata in cont.
          </div>
 
          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div v-for="addr in userAddresses" :key="addr.id" class="p-5 rounded-md border border-gray-200 bg-white relative hover:border-gray-300 transition-all">
+            <div v-for="addr in userAddresses" :key="addr.id" class="p-5 rounded-sm border border-gray-200 bg-white relative hover:border-gray-300 transition-all">
                
               <div class="flex items-center justify-between mb-2">
                <div class="flex gap-2 items-center">
                   <UBadge v-if="addr.isDefaultShipping" color="primary" size="xs">Livrare</UBadge>
-                  <UBadge v-if="addr.isDefaultBilling" color="warning" size="xs">Facturare</UBadge>
                </div>
-                <UButton color="neutral" variant="ghost" size="sm" icon="i-lucide-pencil" class="font-medium" @click="openEditAddress(addr)"><span class="hidden sm:block">Editează</span></UButton>
+               <div class="flex gap-1">
+                  <UButton color="neutral" variant="ghost" size="sm" icon="i-lucide-pencil" class="font-medium" @click="openEditAddress(addr)"><span class="hidden sm:hidden">Editează</span></UButton>
+                  <UButton color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" class="font-medium" @click="removeAddress(addr.id)"></UButton>
+               </div>
               </div>
 
                <div class="mb-4 h-24">
@@ -185,10 +139,6 @@ watchEffect(() => {
                   <p class="text-sm text-gray-600 mt-1">{{ addr.phone }}</p>
                   <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.street }}</p>
                   <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.city }}, {{ addr.county }} <span v-if="addr.postalCode">({{ addr.postalCode }})</span></p>
-               </div>
-
-               <div class="flex items-center gap-2 pt-4 border-t border-gray-100">
-                  <UButton color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" class="font-medium" @click="removeAddress(addr.id)">Șterge</UButton>
                </div>
             </div>
          </div>
@@ -221,51 +171,11 @@ watchEffect(() => {
     <!-- Address Form Modal -->
     <UModal v-model:open="isAddressModalOpen" :title="modalMode === 'add' ? 'Adauga adresa noua' : 'Editeaza adresa'" :ui="{ content: 'sm:max-w-xl' }">
       <template #body>
-        <form @submit.prevent="saveAddress" class="space-y-6 px-2">
-          <div>
-            <h4 class="font-bold text-gray-900 mb-4 text-sm mt-2">Persoana de contact</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <UFormField label="Prenume" name="firstName">
-                 <UInput v-model="addressForm.firstName" placeholder="ex: Alexandru" required size="lg" class="w-full" />
-              </UFormField>
-              <UFormField label="Nume" name="lastName">
-                 <UInput v-model="addressForm.lastName" placeholder="ex: Popescu" required size="lg" class="w-full" />
-              </UFormField>
-              <UFormField label="Numar de telefon" name="phone" class="col-span-2">
-                 <UInput v-model="addressForm.phone" placeholder="07xxxxxxxx" required size="lg" class="w-full" />
-              </UFormField>
-            </div>
-          </div>
-
-          <div>
-             <h4 class="font-bold text-gray-900 mb-4 text-sm mt-4">Detalii adresa</h4>
-             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                <UFormField label="Judet" name="county">
-                   <USelectMenu v-model="addressForm.county" :items="counties" placeholder="Selectati" required size="lg" class="w-full" />
-                </UFormField>
-                <UFormField label="Localitate" name="city">
-                   <USelectMenu v-model="addressForm.city" :items="sectors" placeholder="Selecteaza sectorul" required size="lg" class="w-full" />
-                </UFormField>
-             </div>
-             <div class="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4">
-                <UFormField label="Adresa" name="street">
-                   <UInput v-model="addressForm.street" placeholder="Strada, numar, bloc..." required size="lg" class="w-full" />
-                </UFormField>
-                <UFormField label="Cod Postal" name="postalCode">
-                   <UInput v-model="addressForm.postalCode" size="lg" class="w-full" />
-                </UFormField>
-             </div>
-          </div>
-
-          <div class="pt-2 flex flex-col gap-3">
-               <UCheckbox v-model="addressForm.isDefaultShipping" name="isDefaultShipping" label="Seteaza ca adresa implicita de livrare" />
-               <UCheckbox v-model="addressForm.isDefaultBilling" name="isDefaultBilling" label="Seteaza ca adresa implicita de facturare" />
-          </div>
-
-          <div class="pt-4 pb-2">
-             <UButton type="submit" color="primary" block size="xl" class="rounded-md font-semibold" :loading="isLoading">Salveaza</UButton>
-          </div>
-        </form>
+      <AddressForm 
+        :is-first-address="!userAddresses || userAddresses.length === 0" 
+        :address="modalMode === 'edit' ? currentAddress : null" 
+        @saved="handleAddressSaved" 
+      />
       </template>
     </UModal>
 

@@ -21,6 +21,14 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Address not found' })
   }
 
+  const newIsDefaultShipping = body.isDefaultShipping !== undefined ? body.isDefaultShipping : address.isDefaultShipping
+
+  if (newIsDefaultShipping && !address.isDefaultShipping) {
+    await db.update(tables.addresses)
+      .set({ isDefaultShipping: false })
+      .where(eq(tables.addresses.userId, session.user.id))
+  }
+
   // Update address
   const updatedAddress = await db.update(tables.addresses).set({
     firstName: body.firstName !== undefined ? body.firstName : address.firstName,
@@ -30,8 +38,7 @@ export default eventHandler(async (event) => {
     city: body.city !== undefined ? body.city : address.city,
     county: body.county !== undefined ? body.county : address.county,
     postalCode: body.postalCode !== undefined ? body.postalCode : address.postalCode,
-    isDefaultShipping: body.isDefaultShipping !== undefined ? body.isDefaultShipping : address.isDefaultShipping,
-    isDefaultBilling: body.isDefaultBilling !== undefined ? body.isDefaultBilling : address.isDefaultBilling,
+    isDefaultShipping: newIsDefaultShipping,
   }).where(
     eq(tables.addresses.id, id)
   ).returning()

@@ -14,7 +14,11 @@ export default defineEventHandler(async (event) => {
   const favorites = await db.query.favorites.findMany({
     where: eq(tables.favorites.userId, userId),
     with: {
-      product: true
+      product: {
+        with: {
+          category: true
+        }
+      }
     },
     orderBy: (favorites, { desc }) => [desc(favorites.createdAt)]
   })

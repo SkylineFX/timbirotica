@@ -56,7 +56,7 @@ const featuredCategories = [
           <UCard class="text-center rounded-sm">
               <UIcon name="i-heroicons-credit-card" class="text-4xl text-primary mb-1" />
               <h3 class="font-bold">Modalitati de plata</h3>
-              <p class="text-sm text-gray-500">Plata ramburs la livrare sau cu cardul online</p>
+              <p class="text-sm text-gray-500">Plata ramburs la livrare sau prin virament bancar</p>
           </UCard>
           <UCard class="text-center rounded-sm">
               <UIcon name="i-heroicons-information-circle" class="text-4xl text-primary mb-1" />
