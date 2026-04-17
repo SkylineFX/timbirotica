@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const items = [
-  '/bannerImg/bg_banner_faber.webp',
-  '/bannerImg/bg_banner_fellowes.webp',
-  '/bannerImg/bg_banner_leuchtturm.webp',
+  { image: '/bannerImg/bg_banner_faber.webp', link: '/producatori/faber-castell' },
+  { image: '/bannerImg/bg_banner_fellowes.webp', link: '/producatori/fellowes' },
+  { image: '/bannerImg/bg_banner_leuchtturm.webp', link: '/producatori/leuchtturm' },
 ]
 </script>
 
@@ -16,7 +16,8 @@ const items = [
     :ui="{arrows: 'hidden md:block absolute top-1/2 left-16 right-16'}"
     class="w-full flex-1 bg-white rounded-md"
   >
-    <NuxtImg :src="item" class="rounded-sm w-full h-full object-cover aspect-[50/33]" />
+    <NuxtLink :to="item.link" class="w-full h-full block">
+      <NuxtImg :src="item.image" class="rounded-sm w-full h-full object-cover aspect-[50/33]" />
+    </NuxtLink>
   </UCarousel>
 </template>
-

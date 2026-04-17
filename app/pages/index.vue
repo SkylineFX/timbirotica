@@ -82,8 +82,14 @@ const featuredCategories = [
     </UContainer>
 
     <UContainer class="my-6 lg:my-12 flex flex-col gap-4">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between sm:justify-start items-baseline border-b border-gray-200 pb-1">
         <h3 class="text-xl lg:text-2xl font-bold">Marci populare</h3>
+        <UButton class="text-xs py-0 self-center" to="/producatori" color="primary" variant="link">
+          <span class="block sm:hidden">Vezi tot</span>
+          <template #trailing>
+            <UIcon name="i-lucide-arrow-right" class="w-4 sm:w-5 h-4 sm:h-5 mt-0 sm:mt-1" />
+          </template>
+        </UButton>
       </div>
       <BrandMarquee />
     </UContainer>

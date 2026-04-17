@@ -1,5 +1,5 @@
 <script setup lang="ts">
-
+import { ref, computed } from 'vue'
 interface Product {
   id: number
   name: string
@@ -53,14 +53,30 @@ const items = computed(() => response.value?.products?.slice(0, 10) || [])
 
 <template>
   <div class="flex flex-col gap-4">
-    <div v-if="displayTitle" class="flex justify-between items-center">
+    <div v-if="displayTitle" class="flex justify-between sm:justify-start items-baseline border-b border-gray-200 pb-1">
       <h3 class="text-xl lg:text-2xl font-bold">{{ displayTitle }}</h3>
-      <UButton v-if="displayLink" class="text-sm" trailing-icon="i-lucide-arrow-right" label="Mai multe" :to="displayLink" color="primary" variant="link" />
+      <UButton v-if="displayLink" class="text-xs py-0 self-center" :to="displayLink" color="primary" variant="link">
+        <span class="block sm:hidden">Vezi tot</span>
+        <template #trailing>
+          <UIcon name="i-lucide-arrow-right" class="w-4 sm:w-5 h-4 sm:h-5" />
+        </template>
+      </UButton>
     </div>
     <UCarousel
-      v-slot="{ item }: { item: any }"
+      v-slot="{ item }"
       :items="items"
-      :ui="{ item: 'basis-1/2 sm:basis-1/3 lg:basis-1/5 m-[2px]' }"
+      align="start"
+      :ui="{ 
+        viewport: '-m-1 p-1',
+        container: '-ml-2',
+        item: 'basis-1/2 sm:basis-1/3 lg:basis-1/5 pl-2',
+        arrows: 'hidden sm:flex absolute right-4 sm:right-[35px] -top-[35px] items-center z-10'
+      }"
+      arrows
+      prev-icon="i-lucide-chevron-left"
+      next-icon="i-lucide-chevron-right"
+      :prev="{ color: 'neutral', variant: 'link', size: 'xl' }"
+      :next="{ color: 'neutral', variant: 'link', size: 'xl' }"
     >
       <ProductCard
         :key="item.id" 
