@@ -27,8 +27,10 @@ type Address = {
 }
 
 const { data: userAddresses, refresh: refreshAddresses } = await useFetch<Address[]>('/api/user/addresses')
+const { data: userBillingAddresses, refresh: refreshBillingAddresses } = await useFetch<any[]>('/api/user/billing-addresses')
 
 const selectedAddressId = ref<number | null>(null)
+const selectedBillingId = ref<number | null>(null)
 
 watchEffect(() => {
   const addresses = userAddresses.value
@@ -38,8 +40,20 @@ watchEffect(() => {
   }
 })
 
+watchEffect(() => {
+  const bAddresses = userBillingAddresses.value
+  if (bAddresses && bAddresses.length > 0 && !selectedBillingId.value) {
+    const def = bAddresses.find(a => a.isDefaultBilling)
+    selectedBillingId.value = def ? def.id : (bAddresses[0]?.id || null)
+  }
+})
+
 const selectedAddress = computed(() => {
   return (userAddresses.value || []).find(a => a.id === selectedAddressId.value) || null
+})
+
+const selectedBilling = computed(() => {
+  return (userBillingAddresses.value || []).find(a => a.id === selectedBillingId.value) || null
 })
 
 // State for sections
@@ -51,6 +65,9 @@ const billingSameAsShipping = ref(true)
 const isAddressModalOpen = ref(false)
 const isNewAddressModalOpen = ref(false)
 
+const isBillingSelectorOpen = ref(false)
+const isNewBillingModalOpen = ref(false)
+
 async function handleAddressSaved() {
   const oldIds = new Set((userAddresses.value || []).map(a => a.id))
   await refreshAddresses()
@@ -61,7 +78,6 @@ async function handleAddressSaved() {
   }
   
   isNewAddressModalOpen.value = false
-  isAddressModalOpen.value = false
 }
 
 function openNewAddress() {
@@ -69,9 +85,21 @@ function openNewAddress() {
   isNewAddressModalOpen.value = true
 }
 
-function selectAddress(id: number) {
-   selectedAddressId.value = id
-   isAddressModalOpen.value = false
+async function handleBillingSaved() {
+  const oldIds = new Set((userBillingAddresses.value || []).map(a => a.id))
+  await refreshBillingAddresses()
+  
+  const newAddr = (userBillingAddresses.value || []).find(a => !oldIds.has(a.id))
+  if (newAddr) {
+    selectedBillingId.value = newAddr.id
+  }
+  
+  isNewBillingModalOpen.value = false
+}
+
+function openNewBilling() {
+  isBillingSelectorOpen.value = false
+  isNewBillingModalOpen.value = true
 }
 
 // Payment mock data
@@ -122,7 +150,7 @@ const finalTotal = computed(() => {
           >
             <div>
                <template v-if="selectedAddress">
-                 <span class="font-bold inline mb-0.5">{{ selectedAddress.firstName }} {{ selectedAddress.lastName }}</span><span class="text-gray-500 inline ml-2">· {{ selectedAddress.phone.replace('+40', '0')}}</span>
+                 <span class="font-bold inline mb-1">{{ selectedAddress.firstName }} {{ selectedAddress.lastName }}</span><span class="text-gray-500 inline ml-2">· {{ selectedAddress.phone.replace('+40', '0')}}</span>
                  <span class="text-gray-600 block">{{ selectedAddress.street }}</span> 
                  <span class="text-gray-600 block">{{ selectedAddress.city }}, {{ selectedAddress.county }}</span>
                </template>
@@ -256,8 +284,18 @@ const finalTotal = computed(() => {
               <span class="text-sm font-medium text-gray-900">Folosește altă adresă de facturare</span>
               <input type="radio" :value="false" v-model="billingSameAsShipping" class="hidden">
             </label>
-            <div v-if="!billingSameAsShipping" class="p-6 bg-gray-50 flex justify-center text-center">
-               <span class="text-sm text-gray-500">Formularul pentru o altă adresă de facturare s-ar afișa aici.</span>
+            <div v-if="!billingSameAsShipping" class="text-sm p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors" @click="isBillingSelectorOpen = true">
+               <div>
+                  <template v-if="selectedBilling">
+                     <span class="font-bold inline mb-1">{{ selectedBilling.companyName }}</span><span class="text-gray-500 inline ml-2">· {{ selectedBilling.hasRo ? 'RO ' : '' }}{{ selectedBilling.cui }}</span>
+                     <span class="text-gray-600 block">{{ selectedBilling.street }}</span> 
+                     <span class="text-gray-600 block">{{ selectedBilling.city }}, {{ selectedBilling.county }}</span>
+                  </template>
+                  <template v-else>
+                     <span class="text-gray-500">Alege o adresă de facturare...</span>
+                  </template>
+               </div>
+               <UIcon name="i-lucide-chevron-right" class="w-5 h-5 text-gray-400 opacity-50 shrink-0" />
             </div>
           </div>
         </div>
@@ -326,37 +364,41 @@ const finalTotal = computed(() => {
 
   <!-- Modals remain the same functionally, only minor classes to match the new border-radius theme -->
   <!-- Address Selection Modal -->
-  <UModal v-model:open="isAddressModalOpen" title="Adresă de livrare" :ui="{ content: 'sm:max-w-xl p-0' }" class="rounded-md">
-    <template #body>
-       <div class="">
-
-        <div class="space-y-4 mb-6">
-           <div v-if="userAddresses?.length === 0" class="text-center py-8 text-gray-500 bg-gray-50 rounded-md border border-gray-100">
-              Nu ai nicio adresa salvata in cont.
-           </div>
-
-           <div v-for="addr in userAddresses" :key="addr.id" class="flex items-start gap-4 p-5 rounded-md border transition-all cursor-pointer group hover:bg-gray-50" :class="selectedAddressId === addr.id ? 'border-primary bg-blue-50/20' : 'border-gray-200'" @click="selectAddress(addr.id)">
-              <div class="mt-1 flex-shrink-0 w-6 h-6 rounded-full border flex items-center justify-center transition-colors bg-white" :class="selectedAddressId === addr.id ? 'border-primary bg-primary' : 'border-gray-300'">
-                 <div v-if="selectedAddressId === addr.id" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
-              </div>
-              <div class="flex-1">
-                 <div class="flex justify-between items-start">
-                    <p class="font-bold text-gray-900 text-[15px] group-hover:text-primary transition-colors">{{ addr.firstName }} {{ addr.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ addr.phone.replace('+40', '0')}}</p>
-                 </div>
-                 <p class="text-gray-600 mt-1 text-sm leading-relaxed">{{ addr.street }}</p>
-                 <p class="text-gray-600 mt-1 text-sm leading-relaxed">{{ addr.city }}, {{ addr.county }}</p>
-              </div>
-           </div>
-        </div>
-
-        <UButton color="neutral" variant="solid" class="rounded-sm font-bold px-5 py-2.5 bg-gray-900 text-white hover:bg-gray-800" @click="openNewAddress">
-          <UIcon name="i-lucide-plus" class="w-4 h-4 text-white inline align-middle"/> 
-          Foloseste alta adresa
-        </UButton>
-
-       </div>
+  <AddressSelectorModal 
+    v-model:open="isAddressModalOpen" 
+    v-model:selectedId="selectedAddressId" 
+    title="Adresă de livrare" 
+    :items="userAddresses" 
+    empty-message="Nu ai nicio adresă salvată în cont."
+    @add-new="openNewAddress"
+  >
+    <template #item="{ item }">
+      <div class="flex justify-between items-start">
+         <p class="font-bold mb-1 text-gray-900 text-[15px] group-hover:text-primary transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone.replace('+40', '0')}}</p>
+      </div>
+      <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
+      <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
     </template>
-  </UModal>
+  </AddressSelectorModal>
+
+  <!-- Billing Selection Modal -->
+  <AddressSelectorModal 
+    v-model:open="isBillingSelectorOpen" 
+    v-model:selectedId="selectedBillingId" 
+    title="Date de facturare (Persoane juridice)" 
+    :items="userBillingAddresses" 
+    empty-message="Nu ai nicio companie salvată în cont."
+    @add-new="openNewBilling"
+  >
+    <template #item="{ item }">
+      <div class="flex justify-between items-start">
+         <p class="font-bold mb-1 text-gray-900 text-[15px] group-hover:text-primary transition-colors">{{ item.companyName }}</p>
+      </div>
+      <p class="text-gray-600 text-sm leading-relaxed">CUI: {{ item.hasRo ? 'RO ' : '' }}{{ item.cui }} | ONRC: {{ item.onrc }}</p>
+      <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
+      <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
+    </template>
+  </AddressSelectorModal>
 
   <!-- New Address Form Modal -->
   <UModal v-model:open="isNewAddressModalOpen" title="Adauga adresa noua" :ui="{ content: 'sm:max-w-xl' }" class="rounded-md">
@@ -364,6 +406,16 @@ const finalTotal = computed(() => {
       <AddressForm 
         :is-first-address="!userAddresses || userAddresses.length === 0" 
         @saved="handleAddressSaved" 
+      />
+    </template>
+  </UModal>
+
+  <!-- New Billing Form Modal -->
+  <UModal v-model:open="isNewBillingModalOpen" title="Adaugă persoană juridică" :ui="{ content: 'sm:max-w-xl' }" class="rounded-md">
+    <template #body>
+      <BillingAddressForm 
+        :is-first-address="!userBillingAddresses || userBillingAddresses.length === 0" 
+        @saved="handleBillingSaved" 
       />
     </template>
   </UModal>
