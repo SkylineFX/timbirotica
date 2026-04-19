@@ -43,7 +43,7 @@ const columns: FooterColumn[] = [
       },
       {
         label: 'Despre noi',
-        to: '/about'
+        to: '/despre-noi'
       },
       {
         label: 'ANPC',

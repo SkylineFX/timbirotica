@@ -175,3 +175,26 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
     references: [products.id],
   }),
 }))
+
+export const billingAddresses = sqliteTable('billing_addresses', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').references(() => users.id).notNull(),
+  companyName: text('company_name').notNull(),
+  cui: text('cui').notNull(),
+  hasRo: integer('has_ro', { mode: 'boolean' }).default(false),
+  onrc: text('onrc').notNull(),
+  bankName: text('bank_name'),
+  iban: text('iban'),
+  street: text('street').notNull(),
+  city: text('city').notNull(),
+  county: text('county').notNull(),
+  isDefaultBilling: integer('is_default_billing', { mode: 'boolean' }).default(false),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+})
+
+export const billingAddressesRelations = relations(billingAddresses, ({ one }) => ({
+  user: one(users, {
+    fields: [billingAddresses.userId],
+    references: [users.id],
+  }),
+}))

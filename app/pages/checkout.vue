@@ -122,8 +122,9 @@ const finalTotal = computed(() => {
           >
             <div>
                <template v-if="selectedAddress">
-                 <span class="font-bold block mb-0.5">{{ selectedAddress.firstName }} {{ selectedAddress.lastName }}</span>
-                 <span class="text-gray-600 block sm:inline">{{ selectedAddress.street }}, {{ selectedAddress.city }}, {{ selectedAddress.county }}</span> <span class="text-gray-500 block sm:inline mt-1 sm:mt-0 sm:ml-2">· {{ selectedAddress.phone }}</span>
+                 <span class="font-bold inline mb-0.5">{{ selectedAddress.firstName }} {{ selectedAddress.lastName }}</span><span class="text-gray-500 inline ml-2">· {{ selectedAddress.phone.replace('+40', '0')}}</span>
+                 <span class="text-gray-600 block">{{ selectedAddress.street }}</span> 
+                 <span class="text-gray-600 block">{{ selectedAddress.city }}, {{ selectedAddress.county }}</span>
                </template>
                <template v-else>
                  <span class="text-gray-500">Alege o adresă de livrare...</span>
@@ -140,7 +141,7 @@ const finalTotal = computed(() => {
           </div>
           <div class="border border-gray-200 rounded-md overflow-hidden">
             <!-- Courier Option -->
-            <label class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white transition-colors border-b border-gray-200" :class="{'bg-gray-50/50': deliveryMethod === 'courier'}">
+            <label class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50 transition-colors border-b border-gray-200" :class="{'bg-gray-50/50': deliveryMethod === 'courier'}">
               <div class="flex items-center gap-4">
                 <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="deliveryMethod === 'courier' ? 'border-primary' : 'border-gray-300'">
                   <div v-if="deliveryMethod === 'courier'" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
@@ -150,36 +151,35 @@ const finalTotal = computed(() => {
                    <div class="text-gray-500 text-xs mt-0.5">Cu masinile noastre, doar in Bucuresti.</div>
                 </div>
               </div>
-              <div class="text-sm font-semibold text-gray-900">20.00 Lei</div>
+              <div class="text-sm font-semibold text-gray-900 min-w-fit">30.00 RON</div>
               <input type="radio" value="courier" v-model="deliveryMethod" class="hidden">
             </label>
 
             <div v-show="deliveryMethod === 'courier'" class="p-5 bg-gray-50 border-b border-gray-200 space-y-4">
-               <div class="text-sm text-gray-600 text-center flex flex-col items-center gap-2">
-                <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" />
-                <p class="text-sm text-gray-600"> Livrarea se face in 2-5 zile lucratoare de la primirea facturii pe mail si dupa ce comanda a fost confirmata telefonic.</p>
+               <div class="text-sm text-gray-600 text-justify flex flex-col items-center gap-2">
+                <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
+                <p class="text-sm text-gray-600"> Livrarea se face in 2-3 zile lucratoare de la primirea facturii pe mail si dupa ce comanda a fost confirmata telefonic.</p>
                </div>
             </div>
 
             <!-- Pickup Option -->
-            <label class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white transition-colors" :class="{'bg-gray-50/50': deliveryMethod === 'pickup'}">
+            <label class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50 transition-colors" :class="{'bg-gray-50/50': deliveryMethod === 'pickup'}">
               <div class="flex items-center gap-4">
                 <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="deliveryMethod === 'pickup' ? 'border-primary' : 'border-gray-300'">
                   <div v-if="deliveryMethod === 'pickup'" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
                 </div>
                 <div>
                    <div class="font-semibold text-gray-900 text-sm">Ridicare Personala</div>
-                   <div class="text-gray-500 text-xs mt-0.5">De la sediul nostru</div>
+                   <div class="text-gray-500 text-xs mt-0.5">De la <a href="/despre-noi#locatie" class="text-primary underline">sediul nostru</a></div>
                 </div>
               </div>
-              <div class="text-sm font-semibold text-gray-900">Gratuit</div>
+              <div class="text-sm font-semibold text-gray-900 min-w-fit">Gratuit</div>
               <input type="radio" value="pickup" v-model="deliveryMethod" class="hidden">
             </label>
 
 
-            <div v-show="deliveryMethod === 'pickup'" class="p-5 bg-gray-50 border-t border-gray-200 text-center flex flex-col items-center gap-2">
-               <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" />
-               <p class="text-sm text-gray-600">Strada Drumul Taberei Nr. 92, Sector 6, București</p>
+            <div v-show="deliveryMethod === 'pickup'" class="p-5 bg-gray-50 border-t border-gray-200 text-justify flex flex-col items-center gap-2">
+               <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
                <p class="text-sm text-gray-600">Te vom anunța pe email când comanda ta este gata de ridicare.</p>
             </div>
           </div>
@@ -193,7 +193,7 @@ const finalTotal = computed(() => {
           </div>
           <div class="border border-gray-200 rounded-md overflow-hidden mt-1">
             <!-- Bank Transfer -->
-            <label class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white transition-colors border-b border-gray-200"
+            <label class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50 transition-colors border-b border-gray-200"
                    :class="{ 'bg-blue-50/10': paymentMethod === 'transfer' }">
               <div class="flex items-center gap-4">
                 <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="paymentMethod === 'transfer' ? 'border-primary' : 'border-gray-300'">
@@ -209,29 +209,29 @@ const finalTotal = computed(() => {
             
             <!-- Bank transfer info -->
             <div v-show="paymentMethod === 'transfer'" class="p-5 bg-gray-50 border-b border-gray-200 space-y-4">
-               <div class="text-sm text-gray-600 text-center flex flex-col items-center gap-2">
-                 <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" />
-                 <p>Efectuează plata direct în contul nostru bancar prin virament bancar dupa primirea facturii pe mail. Te rugăm să specifici numărul comenzii la detalii de plată.</p>
+               <div class="text-sm text-gray-600 text-justify flex flex-col items-center gap-2">
+                 <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
+                 <p> Efectuează plata direct în contul nostru prin virament dupa primirea detaliilor bancare si a facturii pe mail. Te rugăm să specifici numărul comenzii la detalii.</p>
                </div>
             </div>
 
             <!-- Cash on Delivery Option -->
-            <label class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white transition-colors"
+            <label class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50 transition-colors"
                    :class="{ 'bg-blue-50/10': paymentMethod === 'cash' }">
               <div class="flex items-center gap-4">
                 <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="paymentMethod === 'cash' ? 'border-primary' : 'border-gray-300'">
                   <div v-if="paymentMethod === 'cash'" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
                 </div>
-                <span class="text-sm font-semibold text-gray-900">Ramburs la curier (Numerar)</span>
+                <span class="text-sm font-semibold text-gray-900">Ramburs la curier</span>
               </div>
               <!-- Money icon -->
               <UIcon name="i-lucide-banknote" class="w-6 h-6 text-gray-400"></UIcon>
               <input type="radio" value="cash" v-model="paymentMethod" class="hidden">
             </label>
             
-            <div v-show="paymentMethod === 'cash'" class="p-5 bg-gray-50 border-t border-gray-200 text-center flex flex-col items-center gap-2">
-               <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" />
-               <p class="text-sm text-gray-600">Plata se va face în numerar către curierul care livrează coletul. Dupa primirea facturii pe mail, agentul nostru te va contacta pentru confirmare si pentru stabilirea datei livrarii.</p>
+            <div v-show="paymentMethod === 'cash'" class="p-5 bg-gray-50 border-t border-gray-200 text-justify flex flex-col items-center gap-2">
+               <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
+               <p class="text-sm text-gray-600">Plata se va face în numerar la primirea coletului. Dupa primirea facturii pe mail, agentul nostru te va contacta pentru confirmare si pentru stabilirea datei livrarii.</p>
             </div>
           </div>
         </div>
@@ -341,9 +341,10 @@ const finalTotal = computed(() => {
               </div>
               <div class="flex-1">
                  <div class="flex justify-between items-start">
-                    <p class="font-bold text-gray-900 text-[15px] group-hover:text-primary transition-colors">{{ addr.firstName }} {{ addr.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ addr.phone }}</p>
+                    <p class="font-bold text-gray-900 text-[15px] group-hover:text-primary transition-colors">{{ addr.firstName }} {{ addr.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ addr.phone.replace('+40', '0')}}</p>
                  </div>
-                 <p class="text-gray-600 mt-1 pr-12 text-sm leading-relaxed">{{ addr.street }}, {{ addr.city }} ({{ addr.county }})</p>
+                 <p class="text-gray-600 mt-1 text-sm leading-relaxed">{{ addr.street }}</p>
+                 <p class="text-gray-600 mt-1 text-sm leading-relaxed">{{ addr.city }}, {{ addr.county }}</p>
               </div>
            </div>
         </div>
