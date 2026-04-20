@@ -1,7 +1,7 @@
 <script setup>
 useHead({
   bodyAttrs: {
-    class: 'bg-slate-100 min-h-screen'
+    class: 'bg-stone-100 min-h-screen'
   }
 })
 </script>

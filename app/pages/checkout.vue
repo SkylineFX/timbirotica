@@ -114,12 +114,61 @@ const subscribeNews = ref(false)
 
 // Computed totals
 const orderSummaryShippingCost = computed(() => {
-  return deliveryMethod.value === 'courier' ? 20 : 0
+  return deliveryMethod.value === 'courier' ? 30 : 0
 })
 
 const finalTotal = computed(() => {
   return total.value + orderSummaryShippingCost.value
 })
+const isSubmitting = ref(false)
+const toast = useToast()
+
+async function submitOrder() {
+  if (cartItems.value.length === 0) {
+    toast.add({ title: 'Coș gol', description: 'Coșul trebuie să conțină produse.', color: 'error' })
+    return
+  }
+
+  if (deliveryMethod.value === 'courier' && !selectedAddress.value) {
+    toast.add({ title: 'Adresă lipsă', description: 'Te rugăm să selectezi o adresă de livrare pentru expedierea prin curier.', color: 'error' })
+    return
+  }
+
+  if (!billingSameAsShipping.value && !selectedBilling.value) {
+     toast.add({ title: 'Facturare lipsă', description: 'Te rugăm să selectezi datele de facturare.', color: 'error' })
+     return
+  }
+
+  isSubmitting.value = true
+
+  const payload = {
+    shippingMethod: deliveryMethod.value,
+    paymentMethod: paymentMethod.value,
+    shippingAddress: deliveryMethod.value === 'courier' ? selectedAddress.value : null,
+    billingAddress: billingSameAsShipping.value ? (deliveryMethod.value === 'courier' ? selectedAddress.value : null) : selectedBilling.value
+  }
+
+  try {
+    const res = await $fetch('/api/orders', {
+      method: 'POST',
+      body: payload
+    })
+    
+    await fetchCart() // Refresh local cart composable to empty state
+    
+    navigateTo({
+      path: '/comanda-finalizata',
+      query: {
+        order: res.orderNumber,
+        payment: paymentMethod.value
+      }
+    })
+  } catch(e: any) {
+    toast.add({ title: 'Eroare la procesare', description: e.statusMessage || e.message || 'Te rugăm să incerci din nou.', color: 'error' })
+  } finally {
+    isSubmitting.value = false
+  }
+}
 </script>
 
 <template>
@@ -301,11 +350,11 @@ const finalTotal = computed(() => {
         </div>
 
         <!-- Extra / Submit -->
-        <div class="mt-6">
-           <button class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] hidden lg:block">
-              Plasează comanda
-           </button>
-        </div>
+         <div class="mt-6">
+            <UButton :loading="isSubmitting" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] hidden lg:flex justify-center">
+               Plasează comanda
+            </UButton>
+         </div>
       </div>
 
       <!-- Right Column (Order Summary) -->
@@ -326,11 +375,11 @@ const finalTotal = computed(() => {
 
          <!-- Totals -->
          <div class="pt-6 space-y-3 mt-2 border-t border-gray-200">
-            <div class="flex justify-between items-center text-[15px] text-gray-600">
+            <div class="flex justify-between items-center text-base text-gray-600">
               <span>Subtotal</span>
               <span class="font-bold text-gray-800">{{ total.toFixed(2) }} RON</span>
             </div>
-            <div class="flex justify-between items-center text-[15px] text-gray-600">
+            <div class="flex justify-between items-center text-base text-gray-600">
               <span class="flex items-center gap-1">
                 Livrare 
                 <a class="cursor-pointer flex items-center" href="/termeni-si-conditii#livrare-si-retur" @click.prevent="navigateTo('/termeni-si-conditii#livrare-si-retur')">
@@ -353,9 +402,9 @@ const finalTotal = computed(() => {
          </div>
 
         <div class="mt-6">
-           <button class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] lg:hidden">
+           <UButton :loading="isSubmitting" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] lg:hidden flex justify-center">
               Plasează comanda
-           </button>
+           </UButton>
         </div>
       </div>
 
@@ -374,7 +423,7 @@ const finalTotal = computed(() => {
   >
     <template #item="{ item }">
       <div class="flex justify-between items-start">
-         <p class="font-bold mb-1 text-gray-900 text-[15px] group-hover:text-primary transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone.replace('+40', '0')}}</p>
+         <p class="font-bold mb-1 text-gray-900 text-base group-hover:text-primary transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone.replace('+40', '0')}}</p>
       </div>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
@@ -392,7 +441,7 @@ const finalTotal = computed(() => {
   >
     <template #item="{ item }">
       <div class="flex justify-between items-start">
-         <p class="font-bold mb-1 text-gray-900 text-[15px] group-hover:text-primary transition-colors">{{ item.companyName }}</p>
+         <p class="font-bold mb-1 text-gray-900 text-base group-hover:text-primary transition-colors">{{ item.companyName }}</p>
       </div>
       <p class="text-gray-600 text-sm leading-relaxed">CUI: {{ item.hasRo ? 'RO ' : '' }}{{ item.cui }} | ONRC: {{ item.onrc }}</p>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>

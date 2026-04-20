@@ -11,7 +11,6 @@ const { user: sessionUser, fetch: refreshSession } = useUserSession()
 const { data: userProfile, refresh: refreshProfile } = await useFetch('/api/user')
 const { data: userAddresses, refresh: refreshAddresses } = await useFetch('/api/user/addresses')
 const { data: userBillingAddresses, refresh: refreshBillingAddresses } = await useFetch('/api/user/billing-addresses')
-
 const isLoading = ref(false)
 
 // Edit Profile Form State

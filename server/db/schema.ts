@@ -146,6 +146,11 @@ export const orders = sqliteTable('orders', {
   orderNumber: text('order_number').notNull().unique(),
   total: real().notNull(),
   status: text().notNull().default('processing'),
+  shippingMethod: text('shipping_method').notNull().default('courier'),
+  paymentMethod: text('payment_method').notNull().default('transfer'),
+  shippingCost: real('shipping_cost').notNull().default(0),
+  shippingAddressSnapshot: text('shipping_address_snapshot'),
+  billingAddressSnapshot: text('billing_address_snapshot'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 })
 

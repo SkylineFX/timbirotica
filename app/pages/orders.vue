@@ -7,12 +7,26 @@ definePageMeta({
 
 const { data: userOrders, refresh: refreshOrders } = await useFetch('/api/user/orders')
 
-// Order Details Modal State
 const isOrderModalOpen = ref(false)
 const selectedOrder = ref<any>(null)
+const parsedShippingAddress = ref<any>({})
+const parsedBillingAddress = ref<any>({})
 
 function openOrderDetails(order: any) {
   selectedOrder.value = order
+  
+  try {
+    parsedShippingAddress.value = JSON.parse(order.shippingAddressSnapshot || '{}')
+  } catch(e) {
+    parsedShippingAddress.value = {}
+  }
+  
+  try {
+    parsedBillingAddress.value = JSON.parse(order.billingAddressSnapshot || '{}')
+  } catch(e) {
+    parsedBillingAddress.value = {}
+  }
+  
   isOrderModalOpen.value = true
 }
 </script>
@@ -26,29 +40,35 @@ function openOrderDetails(order: any) {
             Nu aveți nicio comandă plasată momentan.
          </div>
 
-         <div v-else class="flex flex-col gap-4">
-            <div v-for="order in userOrders" :key="order.id" class="p-5 border border-gray-200 rounded-md bg-white hover:border-gray-300 transition-all flex justify-between gap-4">
-               <div class="flex flex-col items-start justify-between">
-                  <UBadge :color="order.status === 'completed' ? 'success' : order.status === 'processing' ? 'warning' : 'neutral'" size="xs" class="uppercase">
-                     {{ order.status }}
-                  </UBadge>
-                  <div class="flex flex-col justify-center items-start">
-                     <p class="font-bold text-gray-900 text-lg">{{ order.orderNumber }}</p>
-                     <p class="text-sm text-gray-500">
-                        Data: {{ new Date(order.createdAt).toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' }) }}
-                     </p>
-                  </div>
-               </div>
-               
-               <div class="flex flex-col items-end justify-between gap-5">
-                  <UButton color="neutral" variant="outline" size="sm" @click="openOrderDetails(order)">
-                     Detalii comandă
-                  </UButton>
-                  <div class="text-right">
-                    <p class="text-sm text-gray-500">Total Comandă</p>
-                    <p class="font-bold text-gray-900 text-lg">{{ order.total.toFixed(2) }} Lei</p>
-                  </div>
-               </div>
+         <div v-else class="grid grid-cols-1 gap-5">
+            <div v-for="order in userOrders" :key="order.id" class="p-5 rounded-sm border border-gray-200 bg-white hover:border-gray-300 transition-all flex flex-col justify-between">
+              
+              <div>
+                <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                 <div class="flex flex-col">
+                    <p class="text-gray-900 tracking-wider">Nr. comandă: 
+                      <span class="font-bold text-lg text-gray-900">{{ order.orderNumber }}</span>
+                    </p>
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm text-gray-500">{{ new Date(order.createdAt).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' }) }}</span>
+                      <span class="text-sm text-gray-500">|</span>
+                      <span class="text-sm text-gray-500">Total: {{ order.total.toFixed(2) }} RON</span>
+                    </div>
+                 </div>
+                 <UBadge :color="order.status === 'processing' ? 'warning' : 'success'" variant="subtle" size="sm" class="capitalize">{{ order.status }}</UBadge>
+                </div>
+              </div>
+
+              <div class="mt-2 flex justify-between items-center">
+                <span class="text-sm text-gray-500 flex flex-col">
+                  <span>Livrare: <span class="font-medium text-gray-700">{{ (order.shippingCost ?? 0).toFixed(2) }} RON</span></span>
+                  <span class="capitalize">Produse: <span class="font-medium text-gray-700">{{ (order.total - order.shippingCost).toFixed(2) }} RON</span></span>
+                </span>
+                <div class="flex flex-col items-end gap-2">
+                  <UButton color="neutral" variant="outline" size="sm" class="justify-center w-full" @click="openOrderDetails(order)">Detalii comandă</UButton>
+                </div>
+              </div>
+              
             </div>
          </div>
     </div>
@@ -59,16 +79,59 @@ function openOrderDetails(order: any) {
          <div v-if="selectedOrder" class="px-2 space-y-6">
             <div class="flex justify-between items-center border-b border-gray-100 pb-4">
                <div>
-                  <h4 class="font-bold text-gray-900">Comanda {{ selectedOrder.orderNumber }}</h4>
-                  <p class="text-sm text-gray-500">Plasată pe {{ new Date(selectedOrder.createdAt).toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' }) }}</p>
+                  <h4 class="font-bold text-gray-900 text-xl tracking-tight">{{ selectedOrder.orderNumber }}</h4>
+                  <p class="text-sm text-gray-500 mt-0.5">Plasată pe {{ new Date(selectedOrder.createdAt).toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' }) }}</p>
                </div>
                <div class="text-right">
-                  <p class="text-sm text-gray-500">Total</p>
-                  <p class="font-bold text-gray-900 text-lg">{{ selectedOrder.total.toFixed(2) }} Lei</p>
+                  <p class="text-sm text-gray-500">Total + Livrare</p>
+                  <p class="font-bold text-gray-900 text-xl">{{ selectedOrder.total.toFixed(2) }} RON</p>
                </div>
             </div>
 
-            <div class="space-y-4">
+            <!-- Context Info grids -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+               <!-- Livrare Box -->
+               <div class="bg-gray-50/70 p-4 rounded-md border border-gray-100">
+                  <div class="flex justify-between mb-2">
+                     <h5 class="text-sm font-bold text-gray-900 flex items-center gap-1.5"><UIcon name="i-lucide-truck" class="w-4 h-4"/> Livrare</h5>
+                     <span class="text-xs uppercase font-medium bg-primary text-white px-2 py-0.5 rounded-sm" v-if="selectedOrder.shippingMethod === 'courier'">Curier</span>
+                     <span class="text-xs uppercase font-medium bg-primary text-white px-2 py-0.5 rounded-sm" v-else>Ridicare personala</span>
+                  </div>
+                  
+                  <template v-if="selectedOrder.shippingMethod === 'courier'">
+                     <p class="font-medium text-sm text-gray-900">{{ parsedShippingAddress.firstName }} {{ parsedShippingAddress.lastName }}</p>
+                     <p class="text-sm text-gray-600 mt-1">{{ parsedShippingAddress.phone }}</p>
+                     <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedShippingAddress.street }}</p>
+                     <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedShippingAddress.city }}, {{ parsedShippingAddress.county }}</p>
+                  </template>
+                  <template v-else>
+                     <p class="text-sm text-gray-600">Comanda va fi ridicată de la <a href="/despre-noi#locatie" class="text-primary underline">sediul nostru</a> conform orarului.</p>
+                  </template>
+               </div>
+
+               <!-- Facturare Box -->
+               <div class="bg-gray-50/70 p-4 rounded-md border border-gray-100">
+                  <div class="flex justify-between mb-2">
+                     <h5 class="text-sm font-bold text-gray-900 flex items-center gap-1.5"><UIcon name="i-lucide-receipt-text" class="w-4 h-4"/> Facturare</h5>
+                     <span class="text-xs uppercase font-medium bg-primary text-white px-2 py-0.5 rounded-sm">{{ selectedOrder.paymentMethod === 'cash' ? 'Ramburs' : 'Transfer Bancar' }}</span>
+                  </div>
+
+                  <template v-if="parsedBillingAddress.companyName">
+                     <p class="font-medium text-sm text-gray-900">{{ parsedBillingAddress.companyName }}</p>
+                     <p class="text-sm text-gray-600 mt-1">CUI: {{ parsedBillingAddress.hasRo ? 'RO ' : '' }}{{ parsedBillingAddress.cui }} | ONRC: {{ parsedBillingAddress.onrc }}</p>
+                     <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedBillingAddress.street }}</p>
+                     <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedBillingAddress.city }}, {{ parsedBillingAddress.county }}</p>
+                  </template>
+                  <template v-else-if="parsedShippingAddress.firstName">
+                     <p class="font-medium text-sm text-gray-900">{{ parsedShippingAddress.firstName }} {{ parsedShippingAddress.lastName }}</p>
+                     <p class="text-sm text-gray-600 mt-1">{{ parsedShippingAddress.phone }}</p>
+                     <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedShippingAddress.street }}</p>
+                     <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedShippingAddress.city }}, {{ parsedShippingAddress.county }}</p>
+                  </template>
+               </div>
+            </div>
+
+            <div class="space-y-4 mt-6">
                <h5 class="font-semibold text-gray-900">Produse comandate</h5>
                <div class="flex flex-col gap-3">
                   <div v-for="item in selectedOrder.items" :key="item.id" class="flex gap-4 p-3 rounded-lg border border-gray-100 bg-gray-50/50">
@@ -85,7 +148,7 @@ function openOrderDetails(order: any) {
                         <p class="text-sm text-gray-500 mt-1">Cantitate: {{ item.quantity }}</p>
                      </div>
                      <div class="text-right flex-shrink-0 flex items-center">
-                        <p class="font-bold text-gray-900">{{ (item.priceAtBuy * item.quantity).toFixed(2) }} Lei</p>
+                        <p class="font-bold text-gray-900">{{ (item.priceAtBuy * item.quantity).toFixed(2) }} RON</p>
                      </div>
                   </div>
                </div>
