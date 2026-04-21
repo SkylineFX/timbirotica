@@ -34,6 +34,18 @@ const stockColor = computed(() => {
 
 const { addToCart } = useCart()
 
+const { favorites, addToFavorites, removeFromFavorites } = useFavorites()
+const isFavorite = computed(() => favorites.value.some((f: any) => f.productId === product.value?.id))
+
+const toggleFavorite = async () => {
+    if (isFavorite.value) {
+        const fav = favorites.value.find((f: any) => f.productId === product.value?.id)
+        if (fav) await removeFromFavorites(fav.id)
+    } else if (product.value) {
+        await addToFavorites(product.value)
+    }
+}
+
 const accordionItems = [
   {
     label: 'Livrare',
@@ -58,7 +70,7 @@ const accordionItems = [
                 <!-- Brand container -->
                 <div v-if="product.brand" class="mb-2 dark:bg-gray-900 p-1 rounded-md border border-gray-100 dark:border-gray-800 flex items-center justify-between">
                     <NuxtLink :to="`/producatori/${product.brand.slug}`" class="text-xs text-gray-500 underline hover:text-primary transition-colors">
-                        <img v-if="product.brand.image" :src="product.brand.image" :alt="product.brand.name" class="h-4 object-contain" />
+                        <NuxtImg v-if="product.brand.image" :src="product.brand.image" :alt="product.brand.name" class="h-4 object-contain" />
                         <span v-else class="font-bold text-gray-900 border-gray-100 dark:text-white">{{ product.brand.name }}</span>
                     </NuxtLink>
                 </div>
@@ -74,7 +86,7 @@ const accordionItems = [
                 </p>
             </div>
             
-            <ProductCarousel :productImages="product.image ? [product.image, product.image, product.image] : []"/>
+            <ProductCarousel :productImages="product.images || []"/>
         </div>
 
         <div class="w-full md:col-span-5">
@@ -83,7 +95,7 @@ const accordionItems = [
                 <div class="hidden md:block">
                     <!-- Brand container -->
                     <div v-if="product.brand" class="mb-6 bg-white dark:bg-gray-900 p-3 rounded-md border border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                        <img v-if="product.brand.image" :src="product.brand.image" :alt="product.brand.name" class="h-6 object-contain" />
+                        <NuxtImg v-if="product.brand.image" :src="product.brand.image" :alt="product.brand.name" class="h-6 object-contain" />
                         <span v-else class="font-bold text-gray-900 border-gray-100 dark:text-white">{{ product.brand.name }}</span>
                         <NuxtLink :to="`/producatori/${product.brand.slug}`" class="text-xs text-gray-500 underline hover:text-primary transition-colors">Vezi toate produsele</NuxtLink>
                     </div>
@@ -115,7 +127,7 @@ const accordionItems = [
                 </div>
 
                 <!-- Actions -->
-                <div class="flex flex-col items-start gap-3 mb-8 w-full max-w-md">
+                <div class="flex flex-col items-start gap-3 mb-4 md:mb-8 w-full max-w-md">
                     <div class="flex items-center gap-2">
                         <p>Cantitate:</p>
                         <UInputNumber
@@ -128,7 +140,7 @@ const accordionItems = [
                     <div class="flex gap-2 w-full">
                         <UButton 
                             block  
-                            class="flex-1"
+                            class="flex-1 rounded-sm"
                             color="primary" 
                             variant="subtle"
                             icon="i-lucide-shopping-cart"
@@ -138,24 +150,26 @@ const accordionItems = [
                         </UButton>
                         <UButton 
                             size="xl" 
-                            color="primary" 
-                            variant="subtle"
+                            :color="isFavorite ? 'primary' : 'neutral'" 
+                            :variant="isFavorite ? 'solid' : 'subtle'" 
+                            class="rounded-sm"
                             icon="i-lucide-heart"
+                            @click.prevent="toggleFavorite"
                         />
                     </div>
                 </div>
                 
                 <!-- Additional Info -->
                 <div class="mt-auto w-full dark:border-gray-800 pt-6">
-                    <UAccordion :items="accordionItems" color="primary" variant="soft" size="md" default-value="0" />
+                    <UAccordion :items="accordionItems" color="primary" variant="soft" size="md" default-value="0"  />
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Description Container -->
-    <div v-if="product && product.description" class="mt-12 border-t border-gray-200 dark:border-gray-800 pt-8">
-        <h2 class="text-2xl font-semibold mb-4">Descriere produs</h2>
+    <div v-if="product && product.description" class="mt-12 md:border-t md:border-gray-200 dark:border-gray-800 md:pt-8 flex flex-col gap-4">
+        <h2 class="text-xl lg:text-2xl font-semibold items-baseline border-b-0 border-gray-200 pb-1">Descriere produs</h2>
         <div class="prose dark:prose-invert text-gray-600 dark:text-gray-300 max-w-none">
             <p>{{ product.description }}</p>
         </div>

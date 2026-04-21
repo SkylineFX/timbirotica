@@ -68,7 +68,7 @@ const columns: FooterColumn[] = [
                   <a href="tel:+40751022882" class="text-sm hover:text-primary transition-colors">+40 751 022 882</a>
                 </span>
                 <span class="text-sm text-muted">Email:
-                  <a href="mailto:eurotimalex@gmail.com" class="text-sm hover:text-primary transition-colors">eurotimalex@gmail.com</a>
+                  <a href="mailto:eurotimalex@yahoo.com" class="text-sm hover:text-primary transition-colors">eurotimalex@yahoo.com</a>
                 </span>
               </div>
             </div>
@@ -76,13 +76,13 @@ const columns: FooterColumn[] = [
             <div class="flex flex-col gap-4">
               <a href="https://netopia-payments.com/" target="_blank">
                 <div class="flex gap-2">
-                    <img src="/footerImg/np-black-0.svg" alt="Netopia Payments" class="h-8" />
+                    <img src="/uploads/footer/np-black-0.svg" alt="Netopia Payments" class="h-8" />
                 </div>
               </a>
               <a href="https://reclamatiisal.anpc.ro/" target="_blank">
                 <div class="flex gap-2">
-                    <img src="/footerImg/sal.webp" alt="SAL" class="h-8" />
-                    <img src="/footerImg/sol.webp" alt="SOL" class="h-8" />
+                    <img src="/uploads/footer/sal.webp" alt="SAL" class="h-8" />
+                    <img src="/uploads/footer/sol.webp" alt="SOL" class="h-8" />
                 </div>
               </a>
             </div>

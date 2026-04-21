@@ -83,13 +83,13 @@ async function submit() {
       <h4 class="font-bold text-gray-900 mb-4 text-sm mt-2">Persoana de contact</h4>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <UFormField label="Prenume" name="firstName" required>
-           <UInput v-model="form.firstName" placeholder="ex: Alexandru" size="lg" class="w-full" required />
+           <UInput v-model="form.firstName" size="lg" class="w-full" required />
         </UFormField>
         <UFormField label="Nume" name="lastName" required>
-           <UInput v-model="form.lastName" placeholder="ex: Popescu" size="lg" class="w-full" required />
+           <UInput v-model="form.lastName" size="lg" class="w-full" required />
         </UFormField>
         <UFormField label="Numar de telefon" name="phone" class="sm:col-span-2" required>
-           <UInput v-model="form.phone" v-maska="'### ### ###'" placeholder="xxx xxx xxx" size="lg" class="w-full" type="tel" required>
+           <UInput v-model="form.phone" v-maska="'### ### ###'" size="lg" class="w-full" type="tel" required :ui="{base: 'ps-11'}">
             <template #leading>
                <span class="text-gray-500">+40</span>
             </template>
@@ -110,7 +110,7 @@ async function submit() {
        </div>
         <div class="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4">
           <UFormField label="Adresa" name="street" required>
-             <UInput v-model="form.street" placeholder="Strada, numar, bloc, scara, etaj, apartament" size="lg" class="w-full" required />
+             <UInput v-model="form.street" placeholder="Strada, numar, bloc, scara, etaj, apartament" size="lg" class="w-full" required :ui="{base: 'text-sm'}" />
           </UFormField>
           <UFormField label="Cod Postal" name="postalCode" required>
              <UInput v-model="form.postalCode" size="lg" class="w-full" required />

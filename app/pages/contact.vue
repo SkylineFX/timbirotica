@@ -117,13 +117,13 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               <UIcon name="i-lucide-phone" class="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
               <div>
                 <p class="font-medium hover:text-primary transition-colors"><a href="tel:+40751022882">+40 751 022 882</a></p>
-                <p class="text-sm text-gray-500">Luni - Vineri: 09:00 - 17:00</p>
+                <p class="text-sm text-gray-500">Luni - Vineri: 09:00 - 18:00</p>
               </div>
             </div>
             <div class="flex items-start gap-3">
               <UIcon name="i-lucide-at-sign" class="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
               <div>
-                <p class="font-medium hover:text-primary transition-colors"><a href="mailto:eurotimalex@gmail.com">eurotimalex@gmail.com</a></p>
+                <p class="font-medium hover:text-primary transition-colors"><a href="mailto:eurotimalex@yahoo.com">eurotimalex@yahoo.com</a></p>
                 <p class="text-sm text-gray-500">Răspuns în 24-48 ore lucrătoare</p>
               </div>
             </div>
@@ -148,7 +148,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               <span class="font-medium text-right">EUROTIMALEX S.R.L.</span>
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
-              <span class="text-gray-500">CUI (VAT)</span>
+              <span class="text-gray-500">CUI</span>
               <span class="font-medium">RO18034200</span>
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
@@ -161,7 +161,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             </div>
             <div class="flex justify-between">
               <span class="text-gray-500">Țară Înregistrare</span>
-              <span class="font-medium">România (EU)</span>
+              <span class="font-medium">România</span>
             </div>
           </div>
         </UCard>

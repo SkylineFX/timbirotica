@@ -24,7 +24,7 @@ const toggleFavorite = async () => {
     <UCard class="flex-1 hover:ring-2 hover:ring-primary transition-all duration-200 flex flex-col rounded-sm bg-white" :ui="{ body: 'p-2 sm:p-2', footer: 'p-2 sm:p-2 flex-1 flex flex-col' }">
       <div class="aspect-square bg-white relative overflow-hidden">
         <NuxtImg 
-          :src="product.image || ''" 
+          :src="product.images?.[0] || ''" 
           :alt="product.name"
           class="absolute inset-0 w-full h-full p-4 object-contain group-hover:scale-105 transition-transform duration-200" 
         />

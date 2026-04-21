@@ -1,4 +1,11 @@
 import { eq } from 'drizzle-orm'
+import { randomBytes } from 'crypto'
+
+interface OrderCartItem {
+  productId: number;
+  quantity: number;
+  product: { price: number };
+}
 
 export default eventHandler(async (event) => {
   const session = await requireUserSession(event)
@@ -44,7 +51,7 @@ export default eventHandler(async (event) => {
   let isUnique = false
 
   while (!isUnique) {
-    const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase()
+    const randomStr = randomBytes(3).toString('hex').toUpperCase()
     orderNumber = `${yymmdd}-${randomStr}`
 
     // Validate uniqueness against the DB to permanently avoid collision
@@ -81,7 +88,7 @@ export default eventHandler(async (event) => {
   }
 
   // Build items array matching current historical pricing
-  const orderItemsPayload = cart.items.map(item => ({
+  const orderItemsPayload = cart.items.map((item: OrderCartItem) => ({
     orderId,
     productId: item.productId,
     quantity: item.quantity,

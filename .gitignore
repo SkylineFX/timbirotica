@@ -17,6 +17,8 @@ logs
 .DS_Store
 .fleet
 .idea
+public/products
+public/uploads
 
 # Local env files
 .env

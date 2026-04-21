@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const items = [
-  { image: '/bannerImg/bg_banner_faber.webp', link: '/producatori/faber-castell' },
-  { image: '/bannerImg/bg_banner_fellowes.webp', link: '/producatori/fellowes' },
-  { image: '/bannerImg/bg_banner_leuchtturm.webp', link: '/producatori/leuchtturm' },
+  { image: '/uploads/banners/bg_banner_faber.webp', link: '/producatori/faber-castell' },
+  { image: '/uploads/banners/bg_banner_fellowes.webp', link: '/producatori/fellowes' },
+  { image: '/uploads/banners/bg_banner_leuchtturm.webp', link: '/producatori/leuchtturm' },
 ]
 </script>
 

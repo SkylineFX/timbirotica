@@ -11,7 +11,7 @@ const emit = defineEmits(['saved'])
 const form = ref({
   companyName: '',
   cui: '',
-  hasRo: false,
+  hasRo: 'RO',
   onrc: '',
   bankName: '',
   iban: '',
@@ -31,7 +31,7 @@ watch(() => address, (newAddr) => {
     form.value = {
       companyName: '',
       cui: '',
-      hasRo: false,
+      hasRo: 'RO',
       onrc: '',
       bankName: '',
       iban: '',
@@ -49,8 +49,8 @@ const sectors = ['Sector 1', 'Sector 2', 'Sector 3', 'Sector 4', 'Sector 5', 'Se
 const toast = useToast()
 
 const hasRoOptions = [
-  { label: 'RO', value: true },
-  { label: '-', value: false }
+  { label: 'RO', value: 'RO', selected: true },
+  { label: '-', value: '-', selected: false }
 ]
 
 async function submit() {
@@ -88,7 +88,7 @@ async function submit() {
         </UFormField>
         <UFormField label="Cod unic de Înregistrare" name="cui" required>
            <div class="flex gap-2 w-full">
-             <USelectMenu v-model="form.hasRo" :items="hasRoOptions as any[]" value-attribute="value" option-attribute="label" size="lg" class="w-24 shrink-0" />
+             <USelect v-model="form.hasRo" :items="hasRoOptions as any[]" value-attribute="value" option-attribute="label" size="lg" class="w-24 shrink-0" />
              <UInput v-model="form.cui" size="lg" class="w-full" required />
            </div>
         </UFormField>

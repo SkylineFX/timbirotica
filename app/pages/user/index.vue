@@ -166,9 +166,9 @@ watchEffect(() => {
                </div>
               </div>
 
-               <div class="mb-4 h-24">
-                  <p class="font-bold text-gray-900">{{ addr.firstName + ' ' + addr.lastName }}</p>
-                  <p class="text-sm text-gray-600 mt-1">{{ addr.phone }}</p>
+               <div>
+                  <p class="font-bold text-gray-900 inline">{{ addr.firstName + ' ' + addr.lastName }}</p>
+                  <p class="text-gray-500 text-sm inline ml-1" v-if="addr.phone">· {{ addr.phone.replace('+40', '0') }}</p>
                   <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.street }}</p>
                   <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.city }}, {{ addr.county }} <span v-if="addr.postalCode">({{ addr.postalCode }})</span></p>
                </div>
@@ -179,7 +179,7 @@ watchEffect(() => {
       <!-- Billing Address Management Section -->
       <div class="p-6 sm:p-8 border-t border-gray-200">
          <div class="flex items-center justify-between mb-6">
-           <h3 class="text-lg sm:text-xl font-bold text-gray-900">Date de facturare (Persoane juridice)</h3>
+           <h3 class="text-lg sm:text-xl font-bold text-gray-900">Persoane Juridice</h3>
            <UButton @click="openAddBilling" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-md px-2">Adaugă</UButton>
          </div>
 
@@ -200,9 +200,10 @@ watchEffect(() => {
                </div>
               </div>
 
-               <div class="mb-4 h-24">
-                  <p class="font-bold text-gray-900">{{ addr.companyName }}</p>
-                  <p class="text-sm text-gray-600 mt-1">CUI: {{ addr.hasRo ? 'RO ' : '' }}{{ addr.cui }} | ONRC: {{ addr.onrc }}</p>
+               <div class="mb-4">
+                  <p class="font-bold text-gray-900 inline">{{ addr.companyName }}</p>
+                  <p class="text-sm text-gray-600 inline ml-1">· {{ addr.onrc }}</p>
+                  <p class="text-sm text-gray-600 mt-1">CUI: {{ addr.hasRo ? 'RO ' : '' }}{{ addr.cui }}</p>
                   <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.street }}</p>
                   <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.city }}, {{ addr.county }}</p>
                </div>

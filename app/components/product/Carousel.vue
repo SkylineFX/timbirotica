@@ -22,7 +22,7 @@ const activeIndex = ref(0)
       </UCarousel>
     </div>
 
-    <div v-if="productImages.length > 1" class="flex gap-2 justify-start">
+    <div v-if="productImages.length > 0" class="flex gap-2 justify-start">
       <div
         v-for="(item, index) in productImages"
         :key="index"

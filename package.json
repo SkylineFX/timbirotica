@@ -17,6 +17,7 @@
     "@nuxt/ui": "^4.3.0",
     "@nuxthub/core": "^0.10.4",
     "bcryptjs": "^3.0.3",
+    "csv-parse": "^6.2.1",
     "drizzle-kit": "^0.31.8",
     "drizzle-orm": "^0.45.1",
     "maska": "^3.2.0",

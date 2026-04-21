@@ -35,7 +35,7 @@ export const products = sqliteTable('products', {
   price: real().notNull(),
   categoryId: integer('category_id').references(() => categories.id),
   brandId: integer('brand_id').references(() => brands.id),
-  image: text(),
+  images: text('images', { mode: 'json' }).$type<string[]>(),
   stock: integer().notNull().default(0),
   isRecommended: integer({ mode: 'boolean' }).default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
