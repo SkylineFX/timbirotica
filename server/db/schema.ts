@@ -203,3 +203,26 @@ export const billingAddressesRelations = relations(billingAddresses, ({ one }) =
     references: [users.id],
   }),
 }))
+
+export const counties = sqliteTable('counties', {
+  id: integer().primaryKey(),
+  code: text('code').notNull().unique(),
+  name: text('name').notNull(),
+})
+
+export const cities = sqliteTable('cities', {
+  id: integer().primaryKey(),
+  countyId: integer('county_id').references(() => counties.id).notNull(),
+  name: text('name').notNull(),
+})
+
+export const countiesRelations = relations(counties, ({ many }) => ({
+  cities: many(cities),
+}))
+
+export const citiesRelations = relations(cities, ({ one }) => ({
+  county: one(counties, {
+    fields: [cities.countyId],
+    references: [counties.id],
+  }),
+}))

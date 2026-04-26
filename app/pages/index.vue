@@ -16,7 +16,7 @@ const navigation = computed(() => [
   },
   {
     label: 'Recomandate',
-    to: '/recommended'
+    to: '/produse-recomandate'
   }
 ])
 

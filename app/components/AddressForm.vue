@@ -42,9 +42,37 @@ watch(() => address, (newAddr) => {
   }
 }, { immediate: true })
 
+const { data: countiesData } = await useFetch('/api/locations/counties')
+const countyNames = computed(() => (countiesData.value as any[])?.map(c => c.name) || [])
+const citiesData = ref<string[]>([])
+const isFetchingCities = ref(false)
+
+const loadCities = async (countyName: string) => {
+  if (!countyName) {
+    citiesData.value = []
+    return
+  }
+  isFetchingCities.value = true
+  try {
+    const res = await ($fetch as any)('/api/locations/cities', { params: { countyName } })
+    citiesData.value = res.map((c: any) => c.name)
+  } catch (e) {
+    console.error('Failed to load cities', e)
+  } finally {
+    isFetchingCities.value = false
+  }
+}
+
+watch(() => form.value.county, (newCounty, oldCounty) => {
+  if (newCounty !== oldCounty && oldCounty !== undefined) {
+    form.value.city = ''
+  }
+  if (newCounty) {
+    loadCities(newCounty)
+  }
+})
+
 const isLoading = ref(false)
-const counties = ['București']
-const sectors = ['Sector 1', 'Sector 2', 'Sector 3', 'Sector 4', 'Sector 5', 'Sector 6']
 const toast = useToast()
 
 async function submit() {
@@ -102,10 +130,10 @@ async function submit() {
        <h4 class="font-bold text-gray-900 mb-4 text-sm mt-4">Detalii adresa</h4>
        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <UFormField label="Judet" name="county" required>
-             <USelectMenu v-model="form.county" :items="counties" placeholder="Selectati" size="lg" class="w-full" />
+             <USelectMenu v-model="form.county" :items="countyNames" placeholder="Selectati" size="lg" class="w-full" />
           </UFormField>
           <UFormField label="Localitate" name="city" required>
-             <USelectMenu v-model="form.city" :items="sectors" placeholder="Selecteaza sectorul" size="lg" class="w-full" />
+             <USelectMenu v-model="form.city" :items="citiesData" placeholder="Selectati" size="lg" class="w-full" :disabled="!form.county || isFetchingCities" :loading="isFetchingCities" />
           </UFormField>
        </div>
         <div class="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4">

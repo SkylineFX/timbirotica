@@ -28,7 +28,7 @@ if (!orderNumber) {
       </p>
       
       <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 inline-block w-full">
-        <span class="font-mono text-xl font-bold text-gray-900 tracking-wider">#{{ orderNumber }}</span>
+        <span class="font-mono text-xl font-bold text-gray-900 tracking-wider">{{ orderNumber }}</span>
       </div>
 
       <div class="mt-6 text-[15px] text-gray-600 text-left space-y-4 bg-blue-50/50 p-5 rounded-lg border border-blue-100/50">

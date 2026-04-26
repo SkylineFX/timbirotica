@@ -42,7 +42,7 @@ if (props.categoryId) {
   if (!displayTitle.value) {
     displayTitle.value = 'Produse Recomandate'
   }
-  displayLink.value = '/recommended'
+  displayLink.value = '/produse-recomandate'
   fetchUrl.value = `/api/products?recommended=true&limit=10`
 }
 
