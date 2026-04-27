@@ -126,16 +126,7 @@ const navigation = computed(() => [
 
         <!-- Center: Search (Desktop only) -->
         <div class="hidden sm:flex flex-1 max-w-lg mx-4">
-          <UInput
-            v-model="searchQuery"
-            @keyup.enter="performSearch"
-            trailing-icon="i-lucide-search"
-            size="md"
-            variant="outline"
-            placeholder="Cauta produse..."
-            class="w-full"
-            color="primary"
-          />
+          <SearchInput v-model="searchQuery" @search="performSearch" />
         </div>
 
         <!-- Right: Actions -->
@@ -192,16 +183,7 @@ const navigation = computed(() => [
 
       <!-- Bottom Row: Search (Mobile only) -->
       <div class="flex sm:hidden w-full">
-        <UInput
-          v-model="searchQuery"
-          @keyup.enter="performSearch"
-          trailing-icon="i-lucide-search"
-          size="md"
-          variant="outline"
-          placeholder="Cauta produse..."
-          class="w-full"
-          color="primary"
-        />
+        <SearchInput v-model="searchQuery" @search="performSearch" />
       </div>
     </UContainer>
 
