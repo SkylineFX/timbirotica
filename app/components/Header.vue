@@ -7,7 +7,13 @@ const { cartItems, removeFromCart, updateQuantity, total, fetchCart, isCartOpen,
 
 const { isFavoritesOpen, favorites } = useFavorites()
 const isNavOpen = ref(false)
+const activeMenus = ref<any[]>([])
 const searchQuery = ref('')
+
+function closeAll() {
+  isNavOpen.value = false
+  activeMenus.value = []
+}
 
 // Initialize cart
 onMounted(() => {
@@ -18,7 +24,7 @@ const route = useRoute()
 
 const performSearch = async () => {
     if (!searchQuery.value.trim()) return
-    isNavOpen.value = false // close mobile menu if opened
+    closeAll() // close mobile menu if opened
     await navigateTo({
         path: '/cautare',
         query: { q: searchQuery.value.trim() }
@@ -26,7 +32,7 @@ const performSearch = async () => {
 }
 
 watch(() => route.path, (newPath) => {
-    isNavOpen.value = false
+    closeAll()
     isCartOpen.value = false
     isFavoritesOpen.value = false
     if (newPath !== '/cautare') {
@@ -82,7 +88,7 @@ const { data: brands } = useFetch('/api/brands')
 
 const navigation = computed(() => [
   {
-    label: 'Produse',
+    label: 'Categorii produse',
     to: '/c',
     children: categoryTree.value || [],
     open: true,
@@ -93,12 +99,8 @@ const navigation = computed(() => [
     children: brands.value || []
   },
   {
-    label: 'Recomandate',
+    label: 'Produse recomandate',
     to: '/produse-recomandate'
-  },
-  {
-    label: "Contact",
-    to: '/contact'
   }
 ])
 </script>
@@ -204,9 +206,137 @@ const navigation = computed(() => [
     </UContainer>
 
     <!-- Navigation Slideover (Left) -->
-    <USlideover v-model:open="isNavOpen" side="left" title="Meniu">
+    <USlideover v-model:open="isNavOpen" side="left" title="Meniu" @update:open="(val) => { if (!val) activeMenus = [] }">
       <template #body>
-        <UNavigationMenu :items="navigation" orientation="vertical" type="single" />
+        <div class="flex flex-col gap-1">
+          <template v-for="item in navigation" :key="item.label">
+            <UButton
+              v-if="item.children && item.children.length > 0"
+              color="neutral"
+              variant="ghost"
+              class="justify-between w-full"
+              trailing-icon="i-lucide-chevron-right"
+              @click="activeMenus.push(item)"
+            >
+              <span class="truncate">{{ item.label }}</span>
+            </UButton>
+            <UButton
+              v-else
+              color="neutral"
+              variant="ghost"
+              :to="item.to"
+              class="w-full"
+              @click="closeAll"
+            >
+              <span class="truncate">{{ item.label }}</span>
+            </UButton>
+          </template>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex flex-col gap-1 w-full">
+          <UButton
+            variant="ghost"
+            color="neutral"
+            icon="i-lucide-phone"
+            to="tel:+40751022882"
+            class="justify-start w-full"
+          >
+            0751 022 882
+          </UButton>
+          <UButton
+            variant="ghost"
+            color="neutral"
+            icon="i-lucide-mail"
+            to="/contact"
+            @click="closeAll"
+            class="justify-start w-full"
+          >
+            Contact
+          </UButton>
+          <UButton
+            variant="ghost"
+            color="neutral"
+            icon="i-lucide-user"
+            :to="user ? '/user' : '/user/login'"
+            @click="closeAll"
+            class="justify-start w-full"
+          >
+            Contul meu
+          </UButton>
+        </div>
+      </template>
+    </USlideover>
+
+    <!-- Nested Navigation Slideovers -->
+    <USlideover 
+      v-for="(menu, index) in activeMenus" 
+      :key="index"
+      :open="true"
+      @update:open="(val) => { if(!val) closeAll() }"
+      side="left"
+    >
+      <template #header>
+        <div class="flex items-center justify-between w-full">
+          <UButton 
+            color="neutral"
+            variant="ghost" 
+            icon="i-lucide-arrow-left" 
+            class="text-base font-semibold px-2 -ml-2"
+            @click="activeMenus.splice(index)"
+          >
+            {{ menu.label }}
+          </UButton>
+          
+          <UButton
+            icon="i-lucide-x"
+            color="neutral"
+            variant="ghost"
+            aria-label="Close"
+            @click="closeAll"
+          />
+        </div>
+      </template>
+      <template #body>
+        <div class="flex flex-col gap-1">
+          <template v-for="child in menu.children" :key="child.label">
+            <UButton
+              v-if="child.children && child.children.length > 0"
+              color="neutral"
+              variant="ghost"
+              class="justify-between w-full"
+              trailing-icon="i-lucide-chevron-right"
+              @click="activeMenus.push(child)"
+            >
+              <span class="truncate">{{ child.label }}</span>
+            </UButton>
+            <UButton
+              v-else
+              color="neutral"
+              variant="ghost"
+              :to="child.to"
+              class="w-full"
+              @click="closeAll"
+            >
+              <span class="truncate">{{ child.label }}</span>
+            </UButton>
+          </template>
+        </div>
+      </template>
+      <template #footer v-if="menu.to">
+        <div class="w-full flex flex-col gap-2">
+          <UButton 
+            :to="menu.to" 
+            color="primary" 
+            variant="subtle" 
+            trailing-icon="i-lucide-arrow-right"
+            block
+            class="rounded-sm p-3 justify-between"
+            @click="closeAll"
+          >
+            Vezi toate
+          </UButton>
+        </div>
       </template>
     </USlideover>
 

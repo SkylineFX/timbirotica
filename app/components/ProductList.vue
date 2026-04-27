@@ -10,14 +10,13 @@ const props = defineProps<{
 const route = useRoute()
 
 const limitOptions = [
-  { label: '12 pe pagina', value: 12 },
   { label: '24 pe pagina', value: 24 },
-  { label: '36 pe pagina', value: 36 },
-  { label: '72 pe pagina', value: 72 }
+  { label: '48 pe pagina', value: 48 },
+  { label: '96 pe pagina', value: 96 }
 ]
 
 const limit = computed({
-  get: () => Number(route.query.limit) || 12,
+  get: () => Number(route.query.limit) || 24,
   set: async (val) => {
     if (val === limit.value) return
     await navigateTo({ query: { ...route.query, limit: val, page: 1 } })
@@ -77,14 +76,14 @@ const total = computed(() => data.value?.total || 0)
           ({{ total }} produse)
         </span>
       </h1>
-      <div class="flex flex-col sm:flex-row sm:items-center gap-2 xl:gap-4">
-        <div class="flex items-center gap-2">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 xl:gap-4">
+        <div class="flex items-center justify-between gap-2">
           <p class="text-sm font-medium text-gray-500">Sorteaza dupa:</p>
-          <USelectMenu v-model="sort" :items="sortOptions" value-key="value" label-key="label" class="w-40" />
+          <USelect v-model="sort" :items="sortOptions" value-key="value" label-key="label" class="w-36" />
         </div>
-        <div class="flex items-center gap-2">
+        <div class="hidden md:flex items-center gap-2">
            <p class="text-sm font-medium text-gray-500">Produse:</p>
-           <USelectMenu v-model="limit" :items="limitOptions" value-key="value" label-key="label" class="w-36" />
+           <USelect v-model="limit" :items="limitOptions" value-key="value" label-key="label" class="w-36" />
         </div>
       </div>
     </div>
