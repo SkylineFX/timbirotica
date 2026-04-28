@@ -84,9 +84,21 @@ useHead({
 
         <section id="livrare" class="pb-8">
           <h2 class="text-2xl font-semibold mb-4 font-serif">V. Livrare</h2>
-          <p>In cazul alegerii optiunii: Ridicare de la sediu" adresa de ridicare a comenzilor este : 
-            <br/><strong>Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București.</strong>
-          </p>
+
+          <div class="flex flex-col gap-2 mb-4">
+            <p>Livrarea comenzilor se poate face în următoarele moduri:</p>
+            <ol class="list-decimal pl-5 space-y-2">
+              <li><strong>Ridicare de la sediul nostru:</strong> Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București.</li>
+              <li><strong>Cu mașinile proprii</strong>: Momentan, livrările se efectuează doar în București.</li>
+            </ol>
+          </div>
+
+          <p class="mt-4 font-medium">Costuri de livrare:</p>
+          <ul class="list-disc pl-5 mt-2 space-y-2">
+            <li>Livrarea este <strong>GRATUITĂ</strong> pentru comenzi mai mari de 200 lei (TVA inclus) și care au maxim 40kg.</li>
+            <li>Pentru comenzi mai mici de 200 lei și cu greutate sub 40kg, se va aplica o taxă de livrare de <strong>30.00 lei</strong> (TVA inclus).</li>
+            <li>La comenzile mai grele de 40 kg se vor taxa kilogramele suplimentare cu <strong>2 lei/kg</strong> (TVA inclus).</li>
+          </ul>
 
           <p class="mt-4 font-semibold">Termenul standard de expediere este:</p>
           <ul class="list-disc pl-5 mt-2 space-y-1">
@@ -95,8 +107,7 @@ useHead({
 
           <p class="mt-4 font-semibold">Transport GRATUIT pentru comenzile eligibile:</p>
           <ul class="list-disc pl-5 mt-2 space-y-1">
-            <li>Transport gratuit pentru comenzile de peste 250 lei, livrate in Bucuresti si Ilfov. </li>
-            <li>Transport gratuit pentru comenzile de peste 350 lei, livrate in restul tarii.</li>
+            <li>Transport gratuit pentru comenzile de peste 200 lei, livrate in Bucuresti si Ilfov. </li>
           </ul>
           
           <p class="mt-4 font-semibold">Pentru comenzile sub aceste praguri, costurile de livrare sunt următoarele:</p>
@@ -118,55 +129,49 @@ useHead({
         <section id="retur" class="pb-8 scroll-mt-24">
           <h2 class="text-2xl font-semibold mb-4 font-serif">VI. Retur</h2>
           <p class="mb-4 font-medium">Dreptul de retragere (retur) este disponibil consumatorilor (persoane fizice), în termen de 14 zile calendaristice de la data primirii produsului, conform OUG nr. 34/2014 privind contractele încheiate la distanță. De asemenea, returul este disponibil și persoanelor juridice, conform politicii comerciale.</p>
-          <h3 class="text-lg font-semibold mb-2">1. Condiții de acceptare a returului</h3>
-          <p>Pentru a fi acceptat returul, produsul trebuie să fie în aceeași stare în care a fost livrat:</p>
-          <ul class="list-disc pl-5 mt-2 space-y-1 mb-4">
-            <li>nefolosit, fără urme de utilizare;</li>
-            <li>fără lovituri, zgârieturi sau deteriorări;</li>
-            <li>însoțit de toate accesoriile cu care a fost livrat;</li>
-            <li>în ambalajul original (acolo unde este cazul) și ambalat corespunzător pentru transport în siguranță. </li>
-          </ul>
-          <h3 class="text-lg font-semibold mb-2">2. Cum puteți solicita returul</h3>
-          <p>Solicitările de retur pentru comenzile se transmit exclusiv prin completarea formularului de retur disponibil la următorul link:</p>
-          <p>După înregistrarea cererii de retur, aveți două opțiuni:</p>
-          <ul class="list-disc pl-5 mt-2 space-y-1 mb-4">
-            <li>Preluare prin Eurotimalex SRL de la adresa comunicată; sau</li>
-            <li>Expediere directă către sediul nostru din: Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București</li>
-            <li>Destinatar: Eurotimalex SRL</li>
-            <li>(cu menționarea numelui/denumirii clientului și a numărului cererii de retur)</li>
-          </ul>
-          <h3 class="text-lg font-semibold mb-2">3. Costul transportului pentru retur (suportat de client)</h3>
-          <p>Costul transportului pentru retur este suportat de client și se aplică în funcție de tipul produsului/categoriei din care face parte produsul returnat, astfel:</p>
-          <ul class="list-disc pl-5 mt-2 space-y-1 mb-4">
-            <li>30 lei pentru colete standard (majoritatea produselor);</li>
-            <li>Aceste tarife se aplică indiferent de motivul returului, în situațiile în care returul este solicitat de client și produsul este conform.</li> 
-          </ul>
 
-          <h3 class="text-lg font-semibold mb-2">4. Rambursare / compensare</h3>
-          <p>După verificarea produsului returnat, contravaloarea acestuia va fi:</p>
-          <ul class="list-disc pl-5 mt-2 space-y-1 mb-4">
-            <li>restituită;</li>
-            <li>compensată cu livrarea altor produse alese de dvs. (la solicitare).</li> 
-          </ul>
-          <p>Termenul de soluționare a returului este de 14 zile de la data recepționării produsului returnat de către DNS Birotica. </p>
+          <div class="flex flex-col gap-2 mb-4">
+            <h3 class="text-lg font-semibold">1. Condiții de acceptare a returului</h3>
+            <p>Pentru a fi acceptat returul, produsul trebuie să fie în aceeași stare în care a fost livrat:</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>nefolosit, fără urme de utilizare;</li>
+              <li>fără lovituri, zgârieturi sau deteriorări;</li>
+              <li>însoțit de toate accesoriile cu care a fost livrat;</li>
+              <li>în ambalajul original (acolo unde este cazul) și ambalat corespunzător pentru transport în siguranță. </li>
+            </ul>
+          </div>
 
-          <h3 class="text-lg font-semibold mb-2">5. Costuri de livrare</h3>
-          <p>Livrarea comenzilor se poate face în următoarele moduri:</p>
-          <ol class="list-decimal pl-5 mt-2 space-y-2 mb-4">
-            <li><strong>Ridicare de la sediul nostru</strong> din București, Strada Etc nr.1A;</li>
-            <li><strong>Cu mașinile proprii</strong>: Putem livra doar în București momentan.</li>
-          </ol>
-          <p class="mt-4 font-medium">Termenul de livrare, este următorul:</p>
-          <ul class="list-disc pl-5 mt-2 space-y-1 mb-6">
-            <li>~ 24-48 ore pentru produsele aflate în stoc;</li>
-          </ul>
+          <div class="flex flex-col gap-2 mb-4">
+            <h3 class="text-lg font-semibold">2. Cum puteți solicita returul</h3>
+            <p>Solicitările de retur pentru comenzile se transmit exclusiv prin completarea formularului de retur disponibil la următorul link:</p>
+            <p>După înregistrarea cererii de retur, aveți două opțiuni:</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>Preluare prin Eurotimalex SRL de la adresa comunicată; sau</li>
+              <li>Expediere directă către sediul nostru din: Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București</li>
+              <li>Destinatar: Eurotimalex SRL</li>
+              <li>(cu menționarea numelui/denumirii clientului și a numărului cererii de retur)</li>
+            </ul>
+          </div>
 
-          <p class="mt-4 font-medium">Costuri de livrare:</p>
-          <ul class="list-disc pl-5 mt-2 space-y-2">
-            <li>Livrarea este <strong>GRATUITĂ</strong> pentru comenzi mai mari de 200 lei (TVA inclus) și care au maxim 5kg.</li>
-            <li>Pentru comenzi mai mici de 200 lei și cu greutate sub 5kg, se va aplica o taxă de livrare de <strong>30.00 lei</strong> (TVA inclus).</li>
-            <li>La comenzile mai grele de 5 kg se vor taxa kilogramele suplimentare cu <strong>2 lei/kg</strong> (TVA inclus).</li>
-          </ul>
+          <div class="flex flex-col gap-2 mb-4">
+            <h3 class="text-lg font-semibold">3. Costul transportului pentru retur (suportat de client)</h3>
+            <p>Costul transportului pentru retur este suportat de client și se aplică în funcție de tipul produsului/categoriei din care face parte produsul returnat, astfel:</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>30 lei pentru colete standard (majoritatea produselor);</li>
+              <li>Aceste tarife se aplică indiferent de motivul returului, în situațiile în care returul este solicitat de client și produsul este conform.</li> 
+            </ul>
+          </div>
+
+          <div class="flex flex-col gap-2 mb-4">
+            <h3 class="text-lg font-semibold">4. Rambursare / compensare</h3>
+            <p>După verificarea produsului returnat, contravaloarea acestuia va fi:</p>
+            <ul class="list-disc pl-5 space-y-1">
+              <li>restituită;</li>
+              <li>compensată cu livrarea altor produse alese de dvs. (la solicitare).</li> 
+            </ul>
+            <p>Termenul de soluționare a returului este de 14 zile de la data recepționării produsului returnat.</p>
+          </div>
+          
         </section>
 
         <section class="pb-8">

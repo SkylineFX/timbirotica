@@ -127,7 +127,7 @@ function openOrderDetails(order: any) {
             <div class="space-y-4 mt-6">
                <h5 class="font-semibold text-gray-900">Produse comandate</h5>
                <div class="flex flex-col gap-3">
-                  <div v-for="item in selectedOrder.items" :key="item.id" class="flex gap-4 p-3 rounded-lg border border-gray-100 bg-gray-50/50">
+                  <div v-for="item in selectedOrder.items" :key="item.id" class="flex gap-4 py-3 border-b border-gray-100 last:border-0">
                      <div class="w-16 h-16 bg-white rounded-md border border-gray-200 overflow-hidden flex-shrink-0">
                         <img v-if="item.product && item.product.images?.[0]" :src="item.product.images[0]" :alt="item.product.name" class="w-full h-full object-contain p-1" />
                         <div v-else class="w-full h-full flex items-center justify-center bg-gray-100/50">
@@ -147,7 +147,7 @@ function openOrderDetails(order: any) {
                </div>
             </div>
 
-            <div class="border-t border-gray-100 pt-6">
+            <div class="border-t border-gray-200 border-dashed pt-6">
                <div class="flex justify-between items-center mb-2">
                   <p class="text-gray-600">Subtotal</p>
                   <p class="font-medium text-gray-900">{{ (selectedOrder.total - selectedOrder.shippingCost).toFixed(2) }} RON</p>
