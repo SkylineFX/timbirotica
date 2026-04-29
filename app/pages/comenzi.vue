@@ -47,7 +47,7 @@ function openOrderDetails(order: any) {
                 <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
                  <div class="flex flex-col">
                     <p class="text-gray-900 tracking-wider">Nr. comandă: 
-                      <span class="font-bold text-md text-gray-900">{{ order.orderNumber }}</span>
+                      <span class="font-bold text-md text-gray-900">#{{ order.orderNumber }}</span>
                     </p>
                     <div class="flex items-center gap-2">
                       <span class="text-sm text-gray-500">{{ new Date(order.createdAt).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' }) }}</span>
@@ -79,7 +79,7 @@ function openOrderDetails(order: any) {
          <div v-if="selectedOrder" class="px-2 space-y-6">
             <div class="flex justify-between items-center border-b border-gray-100 pb-4">
                <div>
-                  <h4 class="font-bold text-gray-900 text-xl tracking-tight">{{ selectedOrder.orderNumber }}</h4>
+                  <h4 class="font-bold text-gray-900 text-xl tracking-tight">#{{ selectedOrder.orderNumber }}</h4>
                   <p class="text-sm text-gray-500 mt-0.5">Plasată pe {{ new Date(selectedOrder.createdAt).toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' }) }}</p>
                </div>
                <div class="text-right">

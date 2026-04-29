@@ -44,10 +44,17 @@ export const useCart = () => {
     }
   }
 
-  // Persist guest cart to LocalStorage automatically
+  // Persist guest cart to localStorage automatically.
+  // Remove the key when the cart is empty so no stale entry (e.g. "[]") is left
+  // behind after logout — that would otherwise cause an unnecessary syncCart()
+  // call on the next OAuth login.
   watch(cartItems, (newItems) => {
     if (!loggedIn.value && import.meta.client) {
-      localStorage.setItem('guest-cart', JSON.stringify(newItems))
+      if (newItems.length > 0) {
+        localStorage.setItem('guest-cart', JSON.stringify(newItems))
+      } else {
+        localStorage.removeItem('guest-cart')
+      }
     }
   }, { deep: true })
 
@@ -179,11 +186,17 @@ export const useCart = () => {
           }
         })
         if (import.meta.client) localStorage.removeItem('guest-cart')
+        // Only fetch from DB after a successful sync so a sync failure doesn't
+        // overwrite the in-memory guest cart with an empty DB cart.
+        await fetchCart()
       } catch (e) {
         console.error("Sync failed", e)
+        // Keep the current in-memory cart state on failure.
       }
+    } else {
+      // No guest items to merge — just refresh from the DB.
+      await fetchCart()
     }
-    await fetchCart()
   }
 
   const total = computed(() => {

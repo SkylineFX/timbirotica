@@ -1,16 +1,25 @@
 import { eq } from 'drizzle-orm'
 import { randomBytes } from 'crypto'
+import { sendOrderConfirmation } from '../../utils/email'
 
 interface OrderCartItem {
   productId: number;
   quantity: number;
-  product: { price: number };
+  product: { name: string; price: number };
 }
 
 export default eventHandler(async (event) => {
   const session = await requireUserSession(event)
   const body = await readBody(event)
   const db = useDrizzle()
+
+  const userRecord = await db.query.users.findFirst({
+    where: eq(tables.users.id, session.user.id)
+  })
+
+  if (!userRecord) {
+    throw createError({ statusCode: 401, statusMessage: 'Utilizatorul nu a fost gasit.' })
+  }
 
   // 1. Fetch the user's cart holding the products
   const cart = await db.query.carts.findFirst({
@@ -43,7 +52,7 @@ export default eventHandler(async (event) => {
   const shippingCost = body.shippingMethod === 'courier' ? 30 : 0
   const total = subtotal + shippingCost
 
-  // 4. Generate pseudo-random, standardized order number: YYMMDD-XXXXXX with guaranteed uniqueness
+  // 4. Generate pseudo-random, standardized order number: YYMMDDXXXXXX with guaranteed uniqueness
   const date = new Date()
   const yymmdd = date.toISOString().split('T')[0]!.replace(/-/g, '').substring(2)
 
@@ -52,7 +61,7 @@ export default eventHandler(async (event) => {
 
   while (!isUnique) {
     const randomStr = randomBytes(3).toString('hex').toUpperCase()
-    orderNumber = `${yymmdd}-${randomStr}`
+    orderNumber = `${yymmdd}${randomStr}`
 
     // Validate uniqueness against the DB to permanently avoid collision
     const existingOrder = await db.query.orders.findFirst({
@@ -99,6 +108,51 @@ export default eventHandler(async (event) => {
 
   // 6. Finalize successfully by clearing the cart's items
   await db.delete(tables.cartItems).where(eq(tables.cartItems.cartId, cart.id))
+
+  // 7. Dispatch the order confirmation email asynchronously
+  const emailItems = cart.items.map((item: OrderCartItem) => ({
+    name: item.product.name,
+    quantity: item.quantity,
+    price: item.product.price
+  }))
+
+  const emailShippingAddress = body.shippingMethod === 'courier' ? {
+    fullName: `${body.shippingAddress?.firstName || ''} ${body.shippingAddress?.lastName || ''}`.trim(),
+    address: body.shippingAddress?.street || '',
+    city: body.shippingAddress?.city || '',
+    county: body.shippingAddress?.county || '',
+    phone: body.shippingAddress?.phone || ''
+  } : undefined
+
+  const emailBillingAddress = (body.billingAddress && body.billingAddress.companyName) ? {
+    companyName: body.billingAddress.companyName,
+    cui: (body.billingAddress.hasRo ? 'RO' : '') + (body.billingAddress.cui || ''),
+    onrc: body.billingAddress.onrc || '',
+    bankName: body.billingAddress.bankName || '',
+    iban: body.billingAddress.iban || '',
+    address: body.billingAddress.street || '',
+    city: body.billingAddress.city || '',
+    county: body.billingAddress.county || ''
+  } : undefined
+
+  const emailData = {
+    orderNumber,
+    customerName: body.shippingAddress?.firstName || session.user.firstName || 'Client',
+    customerEmail: userRecord.email,
+    orderDate: date.toISOString(),
+    paymentMethod: body.paymentMethod,
+    shippingMethod: body.shippingMethod,
+    total,
+    shippingCost,
+    items: emailItems,
+    shippingAddress: emailShippingAddress,
+    billingAddress: emailBillingAddress
+  }
+
+  // Use event.waitUntil so the serverless runtime doesn't kill the process before the email is sent
+  event.waitUntil(
+    sendOrderConfirmation(emailData).catch((err: any) => console.error('Background email dispatch failed:', err))
+  )
 
   return { success: true, orderNumber }
 })

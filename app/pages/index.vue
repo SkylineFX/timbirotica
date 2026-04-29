@@ -3,21 +3,13 @@ const { data: categoryTree } = useFetch('/api/categories/tree')
 const { data: brands } = useFetch('/api/brands')
 
 const navigation = computed(() => [
-  {
-    label: 'Produse',
-    to: '/c',
-    children: categoryTree.value || [],
-    open: true,
-  },
-  {
-    label: 'Producatori',
-    to: '/producatori',
-    children: brands.value || []
-  },
-  {
-    label: 'Recomandate',
-    to: '/produse-recomandate'
-  }
+  [
+    { label: 'Categorii produse', type: 'link', to: '/c', class: 'font-bold bg-primary/90 text-white rounded-t-md' },
+    ...(categoryTree.value || []),
+  ],
+  [
+    { label: 'Recomandate', to: '/produse-recomandate' }
+  ]
 ])
 
 const featuredCategories = [

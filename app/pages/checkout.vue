@@ -9,9 +9,11 @@ definePageMeta({
 // Cart integration
 const { cartItems, total, fetchCart, removeFromCart, updateQuantity } = useCart()
 
-// Fetch cart on mount if not already populated (helpful if refreshing)
-if (import.meta.client) {
-   fetchCart()
+// Only fetch from DB when the cart state is empty (e.g. hard page refresh).
+// If cartItems already has entries — e.g. carried over from the login/sync flow —
+// don't overwrite them with a potentially stale or empty DB response.
+if (import.meta.client && cartItems.value.length === 0) {
+  fetchCart()
 }
 
 type Address = {
@@ -255,9 +257,9 @@ async function submitOrder() {
             </label>
 
 
-            <div v-show="deliveryMethod === 'pickup'" class="p-5 bg-gray-50 border-t border-gray-200 text-justify flex flex-col items-center gap-2">
+            <div v-show="deliveryMethod === 'pickup'" class="p-5 bg-gray-50 border-t border-gray-200 text-justify lg:text-left flex flex-col items-center gap-2">
                <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-               <p class="text-sm text-gray-600">Te vom anunța pe email când comanda ta este gata de ridicare.</p>
+               <p class="text-sm text-gray-600">Comanda va fi pregatita in maximum 2 zile lucratoare de la confirmare. Te vom anunța pe email când aceasta este gata de ridicare.</p>
             </div>
           </div>
         </div>
@@ -286,9 +288,9 @@ async function submitOrder() {
             
             <!-- Bank transfer info -->
             <div v-show="paymentMethod === 'transfer'" class="p-5 bg-gray-50 border-b border-gray-200 space-y-4">
-               <div class="text-sm text-gray-600 text-justify flex flex-col items-center gap-2">
+               <div class="text-sm text-gray-600 text-justify lg:text-left flex flex-col items-center gap-2">
                  <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-                 <p> Efectuează plata direct în contul nostru prin virament dupa primirea detaliilor bancare si a facturii pe mail. Te rugăm să specifici numărul comenzii la detalii.</p>
+                 <p> Efectuează plata în contul nostru bancar după primirea facturii proforme pe mail. Te rugăm să specifici numărul comenzii la detalii.</p>
                </div>
             </div>
 
@@ -306,9 +308,9 @@ async function submitOrder() {
               <input type="radio" value="cash" v-model="paymentMethod" class="hidden">
             </label>
             
-            <div v-show="paymentMethod === 'cash'" class="p-5 bg-gray-50 border-t border-gray-200 text-justify flex flex-col items-center gap-2">
+            <div v-show="paymentMethod === 'cash'" class="p-5 bg-gray-50 border-t border-gray-200 text-justify lg:text-left flex flex-col items-center gap-2">
                <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-               <p class="text-sm text-gray-600">Plata se va face în numerar la primirea coletului. Dupa primirea facturii pe mail, agentul nostru te va contacta pentru confirmare si pentru stabilirea datei livrarii.</p>
+               <p class="text-sm text-gray-600">Plata se va face în numerar la primirea coletului. Dupa primirea facturii pe mail, te vom contacta pentru confirmare si pentru stabilirea datei livrarii.</p>
             </div>
           </div>
         </div>

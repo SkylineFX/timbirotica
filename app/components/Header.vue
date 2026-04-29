@@ -15,9 +15,14 @@ function closeAll() {
   activeMenus.value = []
 }
 
-// Initialize cart
+// Initialize cart.
+// Skip the fetch when app.vue is about to run syncCart() (OAuth login case —
+// a guest-cart exists and the user is already logged in on this fresh page load).
+// syncCart() calls fetchCart() itself after the sync completes, so fetching
+// here first would race against it and briefly show an empty cart.
 onMounted(() => {
-    fetchCart()
+  if (loggedIn.value && import.meta.client && localStorage.getItem('guest-cart')) return
+  fetchCart()
 })
 
 const route = useRoute()
@@ -71,7 +76,7 @@ const loggedInItems = computed(() => [
   }, {
     label: 'Comenzile mele',
     icon: 'i-lucide-package',
-    to: '/orders',
+    to: '/comenzi',
   }],
   [{
     label: 'Deconectare',
