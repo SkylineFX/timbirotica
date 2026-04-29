@@ -35,7 +35,7 @@ watch(() => address, (newAddr) => {
       onrc: '',
       bankName: '',
       iban: '',
-      county: 'București',
+      county: '',
       city: '',
       street: '',
       isDefaultBilling: isFirstAddress

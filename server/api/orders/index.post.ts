@@ -49,19 +49,16 @@ export default eventHandler(async (event) => {
   }
 
   // Cost mapping exactly mirroring the frontend logical rules
-  const shippingCost = body.shippingMethod === 'courier' ? 30 : 0
+  const shippingCost = body.shippingMethod === 'courier' && subtotal < 200 ? 30 : 0
   const total = subtotal + shippingCost
 
-  // 4. Generate pseudo-random, standardized order number: YYMMDDXXXXXX with guaranteed uniqueness
+  // 4. Generate 8-character random order number with guaranteed uniqueness
   const date = new Date()
-  const yymmdd = date.toISOString().split('T')[0]!.replace(/-/g, '').substring(2)
-
   let orderNumber = ''
   let isUnique = false
 
   while (!isUnique) {
-    const randomStr = randomBytes(3).toString('hex').toUpperCase()
-    orderNumber = `${yymmdd}${randomStr}`
+    orderNumber = randomBytes(4).toString('hex').toUpperCase()
 
     // Validate uniqueness against the DB to permanently avoid collision
     const existingOrder = await db.query.orders.findFirst({

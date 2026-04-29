@@ -76,7 +76,7 @@ const accordionItems = [
                 </div>
 
                 <!-- Title -->
-                <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 dark:text-white mb-2 leading-tight lowercase first-letter:uppercase">
+                <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 dark:text-white mb-2 leading-tight"> <!-- lowercase first-letter:uppercase-->
                     {{ product.name }}
                 </h1>
                 

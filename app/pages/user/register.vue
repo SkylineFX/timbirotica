@@ -78,8 +78,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       },
     })
     toast.add({
-      title: 'Registration successful',
-      description: 'You have been logged in.',
+      title: 'Inregistrare reusita',
       color: 'success',
     })
     const { fetch } = useUserSession()
@@ -87,8 +86,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     await navigateTo('/')
   } catch (err: any) {
     toast.add({
-      title: 'Registration failed',
-      description: err.data?.message || 'Something went wrong',
+      title: 'Inregistrare esuata',
+      description: err.data?.message || 'Eroare la inregistrare.',
       color: 'error',
     })
   }

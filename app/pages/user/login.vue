@@ -76,7 +76,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         @submit="onSubmit"
       >
         <template #description>
-          Nu aveti un cont? <ULink to="/user/register" class="text-primary font-medium">Inregistrare</ULink>.
+          Nu ai cont? <ULink to="/user/register" class="text-primary font-medium">Inregistrare</ULink>.
         </template>
         <template #password-hint>
           <ULink to="/user/forgot-password" class="text-primary font-medium" tabindex="-1">Am uitat parola</ULink>

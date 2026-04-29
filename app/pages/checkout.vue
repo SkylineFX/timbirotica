@@ -115,8 +115,10 @@ const cardDetails = ref({
 const subscribeNews = ref(false)
 
 // Computed totals
+const courierShippingCost = computed(() => total.value >= 200 ? 0 : 30)
+
 const orderSummaryShippingCost = computed(() => {
-  return deliveryMethod.value === 'courier' ? 30 : 0
+  return deliveryMethod.value === 'courier' ? courierShippingCost.value : 0
 })
 
 const finalTotal = computed(() => {
@@ -230,7 +232,9 @@ async function submitOrder() {
                    <div class="text-gray-500 text-xs mt-0.5">Cu masinile noastre, doar in Bucuresti.</div>
                 </div>
               </div>
-              <div class="text-sm font-semibold text-gray-900 min-w-fit">30.00 RON</div>
+              <div class="text-sm font-semibold min-w-fit" :class="courierShippingCost === 0 ? 'text-green-600' : 'text-gray-900'">
+                {{ courierShippingCost === 0 ? 'Gratuit' : '30.00 RON' }}
+              </div>
               <input type="radio" value="courier" v-model="deliveryMethod" class="hidden">
             </label>
 

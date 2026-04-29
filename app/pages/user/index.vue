@@ -5,7 +5,7 @@ definePageMeta({
   middleware: ['authenticated']
 })
 
-const { user: sessionUser, fetch: refreshSession } = useUserSession()
+const { fetch: refreshSession } = useUserSession()
 
 // Fetch full profile info
 const { data: userProfile, refresh: refreshProfile } = await useFetch('/api/user')
@@ -17,8 +17,7 @@ const isLoading = ref(false)
 const isProfileModalOpen = ref(false)
 const editProfileForm = ref({
   firstName: userProfile.value?.firstName || '',
-  lastName: userProfile.value?.lastName || '',
-  email: userProfile.value?.email || ''
+  lastName: userProfile.value?.lastName || ''
 })
 
 async function saveProfile() {
@@ -119,7 +118,6 @@ watchEffect(() => {
    if (userProfile.value) {
       editProfileForm.value.firstName = userProfile.value.firstName
       editProfileForm.value.lastName = userProfile.value.lastName
-      editProfileForm.value.email = userProfile.value.email
    }
 })
 </script>
@@ -224,10 +222,6 @@ watchEffect(() => {
                  <UInput v-model="editProfileForm.lastName" size="lg" class="w-full" required />
               </UFormField>
            </div>
-           <UFormField label="Email" name="email">
-              <UInput v-model="editProfileForm.email" size="lg" class="w-full" required />
-           </UFormField>
-           
            <div class="pt-4 pb-2">
               <UButton type="submit" color="primary" block size="xl" class="rounded-md font-semibold" :loading="isLoading">Salveaza Profilul</UButton>
            </div>

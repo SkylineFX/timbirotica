@@ -3,6 +3,7 @@ export const useCart = () => {
   const cartItems = useState<any[]>('cart-items', () => [])
   const isLoading = useState<boolean>('cart-loading', () => false)
   const isCartOpen = useState<boolean>('cart-open', () => false)
+  const toast = useToast()
 
   // Explicitly fetch cart using $fetch (no caching issues)
   const fetchCart = async () => {
@@ -93,12 +94,9 @@ export const useCart = () => {
           })
         }
       }
-      isCartOpen.value = false
-      const toast = useToast()
       toast.add({ title: 'Produs adaugat in cos', color: 'success' })
     } catch (e) {
       console.error('Failed to add to cart', e)
-      const toast = useToast()
       toast.add({ title: 'Eroare la adaugarea in cos', color: 'error' })
     } finally {
       isLoading.value = false
@@ -115,14 +113,10 @@ export const useCart = () => {
     if (loggedIn.value) {
       try {
         await $fetch(`/api/cart/${itemId}`, { method: 'DELETE' })
-        // No need to refetch if we trust the optimistic update, 
-        // but let's fetch in background to be safe
-        fetchCart()
+        // DELETE confirmed — server state matches the optimistic update, no re-fetch needed.
       } catch (e) {
         console.error('Failed to remove item', e)
-        // Rollback
         cartItems.value = previousItems
-        const toast = useToast()
         toast.add({ title: 'Nu s-a putut sterge produsul', color: 'error' })
       }
     }
@@ -136,20 +130,24 @@ export const useCart = () => {
       return
     }
 
+    const item = cartItems.value.find(i => i.id === itemId)
+    if (!item) return
+
+    const previousQuantity = item.quantity
+    item.quantity = quantity
+
     if (loggedIn.value) {
       try {
         await $fetch(`/api/cart/${itemId}`, {
           method: 'PATCH',
           body: { quantity }
         })
-        await fetchCart()
+        // PATCH confirmed — server state matches the optimistic update, no re-fetch needed.
       } catch (e) {
         console.error('Failed to update quantity', e)
-      }
-    } else {
-      const item = cartItems.value.find(item => item.id === itemId)
-      if (item) {
-        item.quantity = quantity
+        item.quantity = previousQuantity
+        const toast = useToast()
+        toast.add({ title: 'Nu s-a putut actualiza cantitatea', color: 'error' })
       }
     }
   }

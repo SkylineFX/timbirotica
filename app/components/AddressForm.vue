@@ -13,7 +13,7 @@ const form = ref({
   firstName: '',
   lastName: '',
   phone: '',
-  county: 'București',
+  county: '',
   city: '',
   street: '',
   postalCode: '',
@@ -33,7 +33,7 @@ watch(() => address, (newAddr) => {
       firstName: '',
       lastName: '',
       phone: '',
-      county: 'București',
+      county: '',
       city: '',
       street: '',
       postalCode: '',
@@ -42,8 +42,10 @@ watch(() => address, (newAddr) => {
   }
 }, { immediate: true })
 
-const { data: countiesData } = await useFetch('/api/locations/counties')
-const countyNames = computed(() => (countiesData.value as any[])?.map(c => c.name) || [])
+// When expanding shipping beyond Bucharest, replace this with the dynamic fetch below:
+// const { data: countiesData } = await useFetch('/api/locations/counties')
+// const countyNames = computed(() => (countiesData.value as any[])?.map(c => c.name) || [])
+const countyNames = ['București', 'Ilfov']
 const citiesData = ref<string[]>([])
 const isFetchingCities = ref(false)
 

@@ -204,6 +204,14 @@ export const billingAddressesRelations = relations(billingAddresses, ({ one }) =
   }),
 }))
 
+export const passwordResetTokens = sqliteTable('password_reset_tokens', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').notNull().references(() => users.id),
+  tokenHash: text('token_hash').notNull().unique(),
+  expiresAt: integer('expires_at').notNull(),
+  createdAt: integer('created_at').notNull(),
+})
+
 export const counties = sqliteTable('counties', {
   id: integer().primaryKey(),
   code: text('code').notNull().unique(),

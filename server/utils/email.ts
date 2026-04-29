@@ -72,3 +72,33 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
 
   console.log(`Order confirmation email sent to ${data.customerEmail} for order ${data.orderNumber}`)
 }
+
+export async function sendPasswordReset(data: { email: string; firstName: string; resetLink: string }): Promise<void> {
+  const config = useRuntimeConfig()
+
+  if (!config.resendApiKey) {
+    console.warn('RESEND_API_KEY is not set. Skipping email dispatch.')
+    return
+  }
+
+  const resend = new Resend(config.resendApiKey)
+
+  const template = await renderEmailComponent('ResetPassword', {
+    firstName: data.firstName,
+    resetLink: data.resetLink
+  })
+
+  const htmlContent = typeof template === 'string' ? template : template.html
+
+  const { error } = await resend.emails.send({
+    from: 'Eurotimalex <onboarding@resend.dev>',
+    to: data.email,
+    subject: 'Resetare parolă - Eurotimalex',
+    html: htmlContent
+  })
+
+  if (error) {
+    console.error('Resend API Error:', error)
+    throw new Error(error.message)
+  }
+}

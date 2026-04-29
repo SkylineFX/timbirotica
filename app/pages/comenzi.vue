@@ -7,6 +7,18 @@ definePageMeta({
 
 const { data: userOrders, refresh: refreshOrders } = await useFetch('/api/user/orders')
 
+const statusLabel: Record<string, string> = {
+  processing: 'În procesare',
+  completed: 'Finalizată',
+  cancelled: 'Anulată'
+}
+
+const statusColor: Record<string, 'warning' | 'success' | 'error' | 'neutral' | 'primary' | 'secondary' | 'info'> = {
+  processing: 'warning',
+  completed: 'success',
+  cancelled: 'error'
+}
+
 const isOrderModalOpen = ref(false)
 const selectedOrder = ref<any>(null)
 const parsedShippingAddress = ref<any>({})
@@ -44,7 +56,7 @@ function openOrderDetails(order: any) {
             <div v-for="order in userOrders" :key="order.id" class="p-5 rounded-sm border border-gray-200 bg-white hover:border-gray-300 transition-all flex flex-col justify-between">
               
               <div>
-                <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                <div class="flex items-center justify-between pb-2 border-b border-gray-100">
                  <div class="flex flex-col">
                     <p class="text-gray-900 tracking-wider">Nr. comandă: 
                       <span class="font-bold text-md text-gray-900">#{{ order.orderNumber }}</span>
@@ -55,8 +67,32 @@ function openOrderDetails(order: any) {
                       <span class="text-sm text-gray-500">Total: {{ order.total.toFixed(2) }} RON</span>
                     </div>
                  </div>
-                 <!-- <UBadge :color="order.status === 'processing' ? 'warning' : 'success'" variant="subtle" size="sm" class="capitalize">{{ order.status }}</UBadge> -->
+                 <UBadge :color="statusColor[order.status]" variant="subtle" size="sm" class="hidden lg:block">{{ statusLabel[order.status] }}</UBadge>
+                 <span class="relative flex h-3 w-3 flex-shrink-0 lg:hidden">
+                    <span v-if="order.status === 'processing'" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3" :class="{ 'bg-yellow-300': order.status === 'processing' }"></span>
+                 </span>
                 </div>
+              </div>
+
+              <!-- Product image strip -->
+              <div class="flex gap-2 overflow-hidden my-4 pb-4 border-b border-gray-100">
+                <NuxtLink
+                  v-for="item in order.items"
+                  :key="item.id"
+                  :to="`/c/toate/${item.product?.slug}`"
+                  class="flex-shrink-0 w-14 h-14 rounded-sm border border-gray-200 bg-white overflow-hidden hover:border-primary transition-colors"
+                >
+                  <NuxtImg
+                    v-if="item.product?.images?.[0]"
+                    :src="item.product.images[0]"
+                    :alt="item.product?.name"
+                    class="w-full h-full object-contain p-1"
+                  />
+                  <div v-else class="w-full h-full flex items-center justify-center bg-gray-50">
+                    <UIcon name="i-lucide-image" class="w-5 h-5 text-gray-300" />
+                  </div>
+                </NuxtLink>
               </div>
 
               <div class="mt-2 flex justify-between items-center">
@@ -83,7 +119,7 @@ function openOrderDetails(order: any) {
                   <p class="text-sm text-gray-500 mt-0.5">Plasată pe {{ new Date(selectedOrder.createdAt).toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' }) }}</p>
                </div>
                <div class="text-right">
-                  <UBadge :color="selectedOrder.status === 'processing' ? 'warning' : 'success'" variant="subtle" size="sm" class="capitalize">{{ selectedOrder.status }}</UBadge>
+                  <UBadge :color="statusColor[selectedOrder.status] ?? 'neutral'" variant="subtle" size="sm">{{ statusLabel[selectedOrder.status] ?? selectedOrder.status }}</UBadge>
                </div>
             </div>
 
