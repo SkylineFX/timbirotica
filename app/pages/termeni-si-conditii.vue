@@ -64,7 +64,7 @@ useHead({
           <ul class="list-disc pl-5 mt-2 space-y-1">
             <li>Identificarea și alegerea produselor, finalizând adăugarea lor in Coș.</li>
             <li>Efectuarea plății produselor (transfer bancar pe baza facturii sau numerar la livrare).</li>
-            <li>Livrarea produselor comandate care va fi însoțită, dacă este cazul, de manuale sau alte certificate conform legislației.</li>
+            <li>Livrarea produselor comandate.</li>
           </ul>
           <p class="mt-4">Prin lansarea unei comenzi electronice, sunteți de acord cu forma de comunicare prin care Site-ul își derulează operațiunile.</p>
         </section>
@@ -78,7 +78,7 @@ useHead({
           <ol class="list-decimal list-inside pl-5 mt-2 space-y-1">
             <li><strong>Plata ramburs:</strong> in numerar (lei - maxim 5000 ron), pentru livrare la adresa (clienti persoane juridice sau persoane fizice), catre comisionarul care efectueaza livrarea. Pentru plata ramburs se aplica o taxa suplimentara de 15 lei.</li>
             <li><strong>Ordin de plata / virament bancar</strong> (clienti persoane juridice sau persoane fizice). In acest caz, se va emite o factura proforma care se va transmite la adresa de e-mail comunicata de catre comparator si dupa efectuarea platii, comanda se va livra.</li>
-            <li><strong>Plata online cu card bancar.</strong> Tranzactiile se realizeaza in conditii de maxima siguranta, prin intermediul ING WebPay.</li>
+            <!-- <li><strong>Plata online cu card bancar.</strong> Tranzactiile se realizeaza in conditii de maxima siguranta, prin intermediul ING WebPay.</li> -->
           </ol>
         </section>
 
@@ -110,12 +110,6 @@ useHead({
             <li>Transport gratuit pentru comenzile de peste 200 lei, livrate in Bucuresti si Ilfov. </li>
           </ul>
           
-          <p class="mt-4 font-semibold">Pentru comenzile sub aceste praguri, costurile de livrare sunt următoarele:</p>
-          <ul class="list-disc pl-5 mt-2 space-y-1">
-            <li>42,95 lei pentru comenzile mai mici de 50 lei;</li>
-            <li>17,95 lei pentru comenzile peste 50 lei;</li>
-          </ul>
-
           <p class="mt-4 font-semibold">Termenii și Condițiile de livrare:</p>
           <ul class="list-disc pl-5 mt-2 space-y-1">
             <li>Termenul efectiv de livrare poate fi influentat de durata expedierii de catre curier.</li>

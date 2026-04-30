@@ -15,6 +15,17 @@ export default defineEventHandler(async (event) => {
   const userId = session.user.id
   const db = useDrizzle()
 
+  const product = await db.query.products.findFirst({
+    where: eq(tables.products.id, productId),
+    columns: { id: true, stock: true, name: true }
+  })
+  if (!product) {
+    throw createError({ statusCode: 404, message: 'Produsul nu există.' })
+  }
+  if (product.stock <= 0) {
+    throw createError({ statusCode: 409, message: `Produsul "${product.name}" nu este disponibil.` })
+  }
+
   // 1. Get or Create Cart
   let cart = await db.query.carts.findFirst({
     where: eq(tables.carts.userId, userId)

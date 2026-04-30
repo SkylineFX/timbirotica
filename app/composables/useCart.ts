@@ -95,9 +95,9 @@ export const useCart = () => {
         }
       }
       toast.add({ title: 'Produs adaugat in cos', color: 'success' })
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to add to cart', e)
-      toast.add({ title: 'Eroare la adaugarea in cos', color: 'error' })
+      toast.add({ title: 'Eroare la adaugarea in cos', description: e?.data?.message, color: 'error' })
     } finally {
       isLoading.value = false
     }

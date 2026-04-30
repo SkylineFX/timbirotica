@@ -37,6 +37,14 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Cosul de cumparaturi este gol.' })
   }
 
+  const unavailable = cart.items.filter(i => (i.product?.stock ?? 0) <= 0)
+  if (unavailable.length) {
+    throw createError({
+      statusCode: 409,
+      message: `Următoarele produse nu mai sunt disponibile: ${unavailable.map(i => i.product.name).join(', ')}.`
+    })
+  }
+
   // 2. Validate addressing requirements natively to prevent bad payloads
   if (body.shippingMethod === 'courier' && !body.shippingAddress) {
     throw createError({ statusCode: 400, statusMessage: 'Adresa de livrare este obligatorie pentru comanda prin curier.' })

@@ -47,7 +47,8 @@ const toggleFavorite = async () => {
           </div>
           <div class="leading-none flex flex-col gap-1 items-start">
             <p class="text-xs">Cod: {{ product.sku || 123456789 }}</p>
-            <UBadge color="success" variant="soft" class="rounded-sm" leading-icon="i-lucide-check">In stoc</UBadge>
+            <UBadge v-if="product.stock > 0" color="success" variant="soft" class="rounded-sm" leading-icon="i-lucide-check">Disponibil</UBadge>
+            <UBadge v-else color="error" variant="soft" class="rounded-sm" leading-icon="i-lucide-x">Indisponibil</UBadge>
           </div>
           <div class="flex flex-col gap-2">
             <div class="leading-none">
@@ -55,13 +56,14 @@ const toggleFavorite = async () => {
               <!-- <span class="text-xs text-gray-500">Pretul include TVA</span> -->
             </div>
             <div class="flex justify-center items-center text-center">
-              <UButton 
-                size="sm" 
-                color="primary" 
-                variant="solid" 
-                class="rounded-sm flex-1 justify-center text-center text-xs lg:text-sm" 
+              <UButton
+                size="sm"
+                color="primary"
+                variant="solid"
+                class="rounded-sm flex-1 justify-center text-center text-xs lg:text-sm"
                 @click.prevent="addToCart(product)"
                 :loading="isLoading"
+                :disabled="product.stock === 0"
               >
                 Adauga in cos
               </UButton>

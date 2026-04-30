@@ -101,7 +101,7 @@ const accordionItems = [
                     </div>
 
                     <!-- Title -->
-                    <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 dark:text-white mb-2 leading-tight lowercase first-letter:uppercase">
+                    <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 dark:text-white mb-2 leading-tight"> <!-- lowercase first-letter:uppercase-->
                         {{ product.name }}
                     </h1>
                     
@@ -113,7 +113,8 @@ const accordionItems = [
 
                 <!-- Stock Status -->
                 <div class="flex items-center gap-2 mb-2 font-medium" :class="stockColor">
-                    <UBadge color="success" variant="soft" class="rounded-sm" leading-icon="i-lucide-check">Disponibil</UBadge>
+                    <UBadge v-if="product.stock > 0" color="success" variant="soft" class="rounded-sm" leading-icon="i-lucide-check">Disponibil</UBadge>
+                    <UBadge v-else color="error" variant="soft" class="rounded-sm" leading-icon="i-lucide-x">Indisponibil</UBadge>
                 </div>
 
                 <!-- Price -->
@@ -138,12 +139,13 @@ const accordionItems = [
                         />
                     </div>
                     <div class="flex gap-2 w-full">
-                        <UButton 
-                            block  
+                        <UButton
+                            block
                             class="flex-1 rounded-sm"
-                            color="primary" 
+                            color="primary"
                             variant="subtle"
                             icon="i-lucide-shopping-cart"
+                            :disabled="product.stock === 0"
                             @click="addToCart(product, quantity)"
                         >
                             Adauga in cos

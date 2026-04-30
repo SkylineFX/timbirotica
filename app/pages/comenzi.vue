@@ -6,6 +6,8 @@ definePageMeta({
 })
 
 const { data: userOrders, refresh: refreshOrders } = await useFetch('/api/user/orders')
+const { fetchCart } = useCart()
+const toast = useToast()
 
 const statusLabel: Record<string, string> = {
   processing: 'În procesare',
@@ -23,23 +25,72 @@ const isOrderModalOpen = ref(false)
 const selectedOrder = ref<any>(null)
 const parsedShippingAddress = ref<any>({})
 const parsedBillingAddress = ref<any>({})
+const isCancelLoading = ref(false)
+const isReorderLoading = ref(false)
 
 function openOrderDetails(order: any) {
   selectedOrder.value = order
-  
+
   try {
     parsedShippingAddress.value = JSON.parse(order.shippingAddressSnapshot || '{}')
   } catch(e) {
     parsedShippingAddress.value = {}
   }
-  
+
   try {
     parsedBillingAddress.value = JSON.parse(order.billingAddressSnapshot || '{}')
   } catch(e) {
     parsedBillingAddress.value = {}
   }
-  
+
   isOrderModalOpen.value = true
+}
+
+async function cancelOrder() {
+  if (!selectedOrder.value) return
+  isCancelLoading.value = true
+  try {
+    await $fetch(`/api/user/orders/${selectedOrder.value.id}`, { method: 'PATCH' })
+    await refreshOrders()
+    selectedOrder.value = { ...selectedOrder.value, status: 'cancelled' }
+    toast.add({ title: 'Comanda a fost anulată', color: 'success' })
+  } catch (err: any) {
+    toast.add({ title: 'Eroare la anularea comenzii', description: err.data?.message, color: 'error' })
+  } finally {
+    isCancelLoading.value = false
+  }
+}
+
+async function orderAgain() {
+  if (!selectedOrder.value?.items?.length) return
+  isReorderLoading.value = true
+  try {
+    const items = selectedOrder.value.items
+    const results = await Promise.allSettled(
+      items.map((item: any) =>
+        $fetch('/api/cart', { method: 'POST', body: { productId: item.productId, quantity: item.quantity } })
+      )
+    )
+    await fetchCart()
+
+    const skipped = results
+      .map((r, i) => ({ r, name: items[i].product?.name }))
+      .filter(({ r }) => r.status === 'rejected')
+      .map(({ name }) => name)
+      .filter(Boolean)
+
+    if (skipped.length === items.length) {
+      toast.add({ title: 'Produsele nu sunt disponibile', description: skipped.join(', '), color: 'error' })
+    } else if (skipped.length) {
+      toast.add({ title: 'Unele produse nu sunt disponibile', description: `Sărite: ${skipped.join(', ')}`, color: 'warning' })
+    } else {
+      toast.add({ title: 'Produsele au fost adăugate în coș', color: 'success' })
+    }
+  } catch {
+    toast.add({ title: 'Eroare la adăugarea în coș', color: 'error' })
+  } finally {
+    isReorderLoading.value = false
+  }
 }
 </script>
 
@@ -196,6 +247,24 @@ function openOrderDetails(order: any) {
                   <p class="font-bold text-gray-900">Total</p>
                   <p class="font-bold text-gray-900 text-xl">{{ selectedOrder.total.toFixed(2) }} RON</p>
                </div>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+               <UButton
+                  v-if="selectedOrder.status === 'processing'"
+                  color="error"
+                  variant="outline"
+                  class="flex-1 justify-center"
+                  :loading="isCancelLoading"
+                  @click="cancelOrder"
+               >Anulează comanda</UButton>
+               <UButton
+                  color="neutral"
+                  variant="outline"
+                  class="flex-1 justify-center"
+                  :loading="isReorderLoading"
+                  @click="orderAgain"
+               >Comandă din nou</UButton>
             </div>
          </div>
       </template>

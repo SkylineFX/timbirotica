@@ -168,7 +168,7 @@ async function submitOrder() {
       }
     })
   } catch(e: any) {
-    toast.add({ title: 'Eroare la procesare', description: e.statusMessage || e.message || 'Te rugăm să incerci din nou.', color: 'error' })
+    toast.add({ title: 'Eroare la procesare', description: e?.data?.message || e.statusMessage || e.message || 'Te rugăm să incerci din nou.', color: 'error' })
   } finally {
     isSubmitting.value = false
   }
