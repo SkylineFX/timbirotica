@@ -19,19 +19,15 @@ useHead({
     <UCard :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
       <div class="space-y-6 text-gray-700 leading-relaxed text-[15px] sm:text-base">
         
-        <p>
-          <strong class="font-semibold text-gray-900">Eurotimalex</strong> este numele comercial al SC EUROTIMALEX SRL, cu sediul social în Drumul Taberei nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, București, ROMÂNIA, CUI RO18034200, Nr. inreg. J40/17160/2005. 
-        </p>
+        <p>Serviciul de comert electronic este oferit de <strong class="font-semibold">Eurotimalex SRL</strong>, cu sediul social în Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București, Romania, <strong class="font-semibold">CUI RO18034200</strong>, Nr. inregistrare <strong class="font-semibold">J40/17160/2005</strong>.</p>
+        <p><strong class="font-semibold">Eurotimalex</strong> își propune să ofere clienților din România produse de birotica si papetarie de înaltă calitate, susținute de consultanță specializată și grijă față de client.</p>
 
         <div class="p-4 bg-gray-50 rounded-md border border-gray-100">
           <p class="font-semibold text-gray-900 mb-1">Obiect de activitate:</p>
-          <p><strong class="font-semibold text-gray-900">4791</strong> - Comerț cu amănuntul prin intermediul caselor de comenzi sau prin Internet</p>
+          <p><strong class="font-semibold">4791</strong> - Comerț cu amănuntul prin intermediul caselor de comenzi sau prin Internet</p>
         </div>
 
-        <p>
-          <strong class="font-semibold text-gray-900">Eurotimalex</strong> își propune să ofere clienților din România produse de birotica si papetarie de înaltă calitate, susținute de consultanță specializată și grijă față de client.
-        </p>
-
+        
         <div class="pt-4 border-t border-gray-100">
           <h3 class="font-bold text-gray-900 mb-3 text-lg">Program și Contact</h3>
           <p class="mb-2">Preluăm apeluri telefonice de luni până vineri în intervalul orar: <strong class="font-semibold text-gray-900">09:00 - 18:00</strong></p>

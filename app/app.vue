@@ -43,5 +43,7 @@ watch(loggedIn, (isLoggedIn) => {
     </UMain>
 
     <Footer />
+
+    <CookieBanner />
   </UApp>
 </template> 

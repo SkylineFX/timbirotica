@@ -18,13 +18,13 @@ useHead({
     <!-- Content -->
     <UCard :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
       <div class="space-y-6 text-gray-700 leading-relaxed text-sm lg:text-base divide-y divide-gray-100">
-        
+
         <section class="pb-8">
           <h2 class="text-2xl font-semibold mb-4 font-serif">I. Despre Noi</h2>
           <p>Serviciul de comert electronic este oferit de <strong>Eurotimalex SRL</strong>, cu sediul în <strong>Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București</strong>, înmatriculată în Registrul Comerțului sub nr. <strong>J40/17160/2005</strong>, având cod unic de înregistrare <strong>RO18034200</strong>.</p>
 
           <div class="flex flex-col gap-4 my-4">
-            <p>Folosirea acestui site de către orice persoană (atât fizică cât și juridică) în scopul de a se informa sau de a achiziționa produsele, denumit în continuare “utilizator”, reprezintă acordul acestuia fără limitări sau rezerve a prezenților Termeni și Condiții. Numai persoanele cu vârsta peste 18 ani se pot înregistra pe site.</p>
+            <p>Folosirea acestui site de către orice persoană (atât fizică cât și juridică) în scopul de a se informa sau de a achiziționa produsele, denumit în continuare “utilizator”, reprezintă acordul acestuia fără limitări sau rezerve a prezenților Termeni și Condiții.</p>
 
             <div>
               <p>Trimiterea unei comenzi se poate face prin una dintre următoarele metode:</p>
@@ -35,14 +35,9 @@ useHead({
               </ul>
             </div>
 
-            <p>În momentul confirmării unei comenzi, cumpărătorul își exprimă acordul privind încheierea contractului și își asumă obligațiile ce-i revin.</p>
-            <p>Prin lansarea unei comenzi pe site, Cumpărătorul este de acord cu forma de comunicare (e-mail, SMS, telefon) prin care Vânzătorul își derulează operațiunile pe site.</p>
-            <p>Deși încercăm să evităm publicarea datelor eronate pe cât posibil, ne rezervăm dreptul de a exista erori la publicarea automată a detaliilor produselor existente pe site: descrieri, fotografii, preț etc. În cazul unor erori, vă rugăm să ne contactați.</p>
-            <p>Vânzătorul va informa Cumpărătorul înregistrarea (preluarea) comenzii, respectiv confirmarea comenzii. Înregistrarea unei comenzi online de către Vânzător, discuțiile telefonice sau prin alte mijloace de comunicare nu constituie o validare și confirmare ferme ale comenzii și, în consecință, nu semnifică încheierea contractului la distanță. Dacă Vânzătorul confirmă explicit o comandă, acest lucru va implica o acceptare completă a termenilor comenzii. Acceptarea comenzii de către Vânzător se consideră finalizată atunci când există o confirmare scrisă (e-mail, SMS) din partea Vânzătorului către Cumpărător, fără a necesita o confirmare de primire din partea acestuia din urmă. Comanda se consideră validă numai după confirmarea de către Vânzător a disponibilității stocului, a prețului precum și a caracteristicilor produselor respectiv a serviciilor solicitate de Cumpărător.</p>
-            <p>În lipsa unei confirmări exprese din partea Vânzătorului, prezentele termene și condiții generale de vânzare vor sta la baza Contractului încheiat, în completarea acestora fiind Certificatul de Garanție emis de către Vânzător, și documentele fiscale. Certificatul de garanție tehnică (sau comercială) precum și certificatul de garanție pentru montaj, dacă acesta a fost realizat de echipa Eurotimalex SRL, se găsesc în coletul de livrare sau cutia Produsului. Eventuala lipsă a certificatului de garanție trebuie semnalată în cel mai scurt timp de la recepția comenzii la adresa de e-mail eurotimalex@yahoo.com ori telefonic la 0751022882.</p>
+            <p>Prin lansarea unei comenzi pe site, Cumpărătorul este de acord cu forma de comunicare (e-mail, SMS, telefon) prin care Vânzătorul își derulează operațiunile pe site și își exprimă acordul privind încheierea contractului.</p>
+            <p>Vânzătorul va informa Cumpărătorul preluarea comenzii, respectiv confirmarea comenzii. Dacă Vânzătorul confirmă explicit o comandă, acest lucru va implica o acceptare completă a termenilor comenzii. Acceptarea comenzii de către Vânzător se consideră finalizată atunci când există o confirmare scrisă (e-mail, SMS) din partea Vânzătorului către Cumpărător, fără a necesita o confirmare de primire din partea acestuia din urmă. Comanda se consideră validă numai după confirmarea de către Vânzător a disponibilității stocului, a prețului precum și a caracteristicilor produselor respectiv a serviciilor solicitate de Cumpărător.</p>
           </div>
-
-
 
           <p>Ne puteți contacta prin următoarele mijloace:</p>
           <ul class="list-disc pl-5 mt-2 space-y-1">
@@ -52,14 +47,31 @@ useHead({
         </section>
 
         <section class="pb-8">
-          <h2 class="text-2xl font-semibold mb-4 font-serif">II. Înregistrarea ca utilizator</h2>
+          <h2 class="text-2xl font-semibold mb-4 font-serif">II. Datele dvs. cu caracter personal</h2>
+          <p>Site-ul prelucrează date cu caracter personal furnizate de dumneavoastră în conformitate cu Regulamentul UE 2016/679 (GDPR) și cu legislația română aplicabilă. Pentru detalii privind categoriile de date colectate, scopurile prelucrării, destinatarii, durata de păstrare și drepturile dumneavoastră, vă rugăm să consultați <NuxtLink to="/politica-de-confidentialitate" class="text-primary hover:underline">Politica de Confidențialitate</NuxtLink>.</p>
+          <p class="mt-2">Prin navigarea pe site, crearea unui cont sau plasarea unei comenzi, declarați că ați citit și sunteți de acord cu Politica de Confidențialitate.</p>
+        </section>
+
+        <section class="pb-8">
+          <h2 class="text-2xl font-semibold mb-4 font-serif">III. Înregistrarea ca utilizator</h2>
           <p>Site-ul poate fi accesat în mod gratuit, iar simpla navigare în paginile acestuia nu este condiționată de înregistrarea ca utilizator (crearea unui cont pe site). Pentru a beneficia însă de anumite servicii (precum achiziționarea produselor, verificarea situației comenzilor proprii), va trebui să vă creați un cont de utilizator.</p>
           <p>Înregistrarea ca utilizator presupune acceptarea prealabilă de către dvs. a Termenilor și Condițiilor de utilizare și a <strong>Politicii de Confidențialitate</strong>.</p>
           <p>Ne rezervăm dreptul de a închide conturi de utilizatori sau de a refuza vânzarea de produse, la propria discreție, în cazul unor abuzuri.</p>
         </section>
 
         <section class="pb-8">
-          <h2 class="text-2xl font-semibold mb-4 font-serif">III. Procedura de cumpărare</h2>
+          <h2 class="text-2xl font-semibold mb-4 font-serif">IV. Reguli privind utilizarea site-ului</h2>
+          <p>Prin accesarea, vizitarea, plasarea unei comenzi sau desfășurarea oricărei alte activități pe site, vă obligați să respectați următoarele reguli:</p>
+          <ol class="list-decimal pl-5 mt-2 space-y-1">
+            <li>Veți folosi acest site exclusiv pentru efectuarea de comenzi legitime sau pentru informare.</li>
+            <li>Veți furniza informații reale, exacte, complete și actualizate.</li>
+            <li>Nu veți desfășura nicio acțiune care ar putea aduce prejudicii site-ului, inclusiv tentative de acces neautorizat, supraîncărcare a serverelor sau exploatarea unor vulnerabilități.</li>
+          </ol>
+          <p class="mt-4"><strong>Consecințe.</strong> Ne rezervăm dreptul de a bloca accesul oricărui utilizator care încalcă regulile de mai sus, de a anula comenzile si de a sesiza autoritățile competente.</p>
+        </section>
+
+        <section class="pb-8">
+          <h2 class="text-2xl font-semibold mb-4 font-serif">V. Procedura de cumpărare</h2>
           <p>Pentru a cumpăra și intra în posesia produselor oferite spre vânzare este necesară parcurgerea următoarelor etape:</p>
           <ul class="list-disc pl-5 mt-2 space-y-1">
             <li>Identificarea și alegerea produselor, finalizând adăugarea lor in Coș.</li>
@@ -69,21 +81,32 @@ useHead({
           <p class="mt-4">Prin lansarea unei comenzi electronice, sunteți de acord cu forma de comunicare prin care Site-ul își derulează operațiunile.</p>
         </section>
 
-        <section id="plata" class="pb-8">
-          <h2 class="text-2xl font-semibold mb-4 font-serif">IV. Prețurile și Plata</h2>
+        <section class="pb-8">
+          <h2 class="text-2xl font-semibold mb-4 font-serif">VI. Disponibilitatea produselor</h2>
+          <p>Deși încercăm să menținem informațiile despre disponibilitate actualizate în timp real, nu putem garanta că un produs care s-a regăsit la un moment dat pe site va fi disponibil în orice moment pentru achiziție.</p>
+          <p class="mt-4"><strong>Indisponibilitate ulterioară plasării comenzii.</strong> În cazul în care un produs din comanda dumneavoastră devine indisponibil după plasarea comenzii, vă vom informa în cel mai scurt timp și vă vom propune una dintre următoarele opțiuni:</p>
+          <ul class="list-disc pl-5 mt-2 space-y-1">
+            <li>înlocuirea produsului cu unul similar, la valoare egală sau apropiată;</li>
+            <li>menținerea comenzii pentru produsele disponibile și anularea celor indisponibile;</li>
+            <li>anularea integrală a comenzii.</li>
+          </ul>
+          <p class="mt-4">În cazul în care ați achitat în avans produse care s-au dovedit indisponibile, vom proceda la rambursarea integrală a sumelor de bani aferente, în cel mai scurt timp posibil.</p>
+        </section>
+
+        <section id="plata" class="pb-8 scroll-mt-24">
+          <h2 class="text-2xl font-semibold mb-4 font-serif">VII. Prețurile și Plata</h2>
           <p>Cu excepția cazurilor în care este prevăzut altfel, prețurile produselor afișate reprezintă prețurile finale de cumpărare și <strong>includ TVA</strong> (taxa pe valoare adăugată valabilă în România conform codului fiscal curent).</p>
           <p>Dacă adresa de livrare nu este aceeași cu adresa de facturare, aveți posibilitatea de a le distinge direct în secțiunea de Checkout (Finalizare comandă). Informațiile transmise trebuie să fie integral corecte, altfel comanda poate fi întârziată sau neonorată.</p>
 
           <p class="mt-4 font-semibold">Opțiunile de plată acceptate sunt:</p>
           <ol class="list-decimal list-inside pl-5 mt-2 space-y-1">
-            <li><strong>Plata ramburs:</strong> in numerar (lei - maxim 5000 ron), pentru livrare la adresa (clienti persoane juridice sau persoane fizice), catre comisionarul care efectueaza livrarea. Pentru plata ramburs se aplica o taxa suplimentara de 15 lei.</li>
-            <li><strong>Ordin de plata / virament bancar</strong> (clienti persoane juridice sau persoane fizice). In acest caz, se va emite o factura proforma care se va transmite la adresa de e-mail comunicata de catre comparator si dupa efectuarea platii, comanda se va livra.</li>
-            <!-- <li><strong>Plata online cu card bancar.</strong> Tranzactiile se realizeaza in conditii de maxima siguranta, prin intermediul ING WebPay.</li> -->
+            <li><strong>Plata ramburs:</strong> in numerar (maxim 5000 RON), pentru livrare la adresa, catre curier sau la ridicarea comenzii din sediul nostru.</li>
+            <li><strong>Ordin de plata / virament bancar</strong> (clienti persoane juridice sau persoane fizice). In acest caz, se va emite o factura proforma care se va transmite la adresa de e-mail comunicata de catre client si dupa efectuarea platii, comanda se va livra.</li>
           </ol>
         </section>
 
-        <section id="livrare" class="pb-8">
-          <h2 class="text-2xl font-semibold mb-4 font-serif">V. Livrare</h2>
+        <section id="livrare" class="pb-8 scroll-mt-24">
+          <h2 class="text-2xl font-semibold mb-4 font-serif">VIII. Livrare</h2>
 
           <div class="flex flex-col gap-2 mb-4">
             <p>Livrarea comenzilor se poate face în următoarele moduri:</p>
@@ -102,29 +125,20 @@ useHead({
 
           <p class="mt-4 font-semibold">Termenul standard de expediere este:</p>
           <ul class="list-disc pl-5 mt-2 space-y-1">
-            <li>24 - 48 de ore, pentru comenzile plasate in zile lucratoare.</li>
+            <li>24 - 48 de ore, pentru comenzile plasate in zile lucratoare (poate fi influentat de durata expedierii de catre curier).</li>
           </ul>
 
           <p class="mt-4 font-semibold">Transport GRATUIT pentru comenzile eligibile:</p>
           <ul class="list-disc pl-5 mt-2 space-y-1">
             <li>Transport gratuit pentru comenzile de peste 200 lei, livrate in Bucuresti si Ilfov. </li>
           </ul>
-          
-          <p class="mt-4 font-semibold">Termenii și Condițiile de livrare:</p>
-          <ul class="list-disc pl-5 mt-2 space-y-1">
-            <li>Termenul efectiv de livrare poate fi influentat de durata expedierii de catre curier.</li>
-            <li>Acest magazin online este destinat exclusiv livrarii de produse catre clienti persoane juridice, persoane fizice, persoane fizice autorizate, intreprinderi individuale sau intreprinderi familiale, numai la adrese de pe teritoriul Romaniei. In momentul livrarii, o persoana cu varsta de minim 18 ani, reprezentand persoana fizica sau juridica, va semna pentru toate produsele expediate.</li>
-            <li>În cazul în care Vânzătorul nu poate executa Contractul din motivul indisponibilității produsului sau serviciului, Vânzătorul va informa Cumpărătorul despre aceasta indisponibilitate, urmând ca sumele de bani achitate de către Cumpărător pentru produsul sau serviciul indisponibil să fie rambursate.</li>
-            <li>În cazul în care Vânzătorul primește informații eronate legate de facturarea sau livrarea produselor, a respingerii de către banca emitentă a cardului sau a tranzacției, a invalidării tranzacției de către procesatorul de carduri, a amânării de către Cumpărător a termenului de livrare stabilit, Vânzătorul își rezervă dreptul de a denunța unilateral contractul, fără ca acest lucru să se considere o încălcare a Contractului.</li>
-            <li>Dreptul de retragere (retur) este disponibil consumatorilor (persoane fizice), în termen de 14 zile calendaristice de la data primirii produsului, conform OUG nr. 34/2014 privind contractele încheiate la distanță. De asemenea, returul este disponibil și persoanelor juridice, conform politicii comerciale.</li>
-          </ul>
         </section>
 
-        <section id="retur" class="pb-8 scroll-mt-24">
-          <h2 class="text-2xl font-semibold mb-4 font-serif">VI. Retur</h2>
-          <p class="mb-4 font-medium">Dreptul de retragere (retur) este disponibil consumatorilor (persoane fizice), în termen de 14 zile calendaristice de la data primirii produsului, conform OUG nr. 34/2014 privind contractele încheiate la distanță. De asemenea, returul este disponibil și persoanelor juridice, conform politicii comerciale.</p>
+        <section id="retur" class="pb-8 flex flex-col gap-4 scroll-mt-24">
+          <h2 class="text-2xl font-semibold font-serif">IX. Retur</h2>
+          <p class="font-medium">Dreptul de retragere (retur) este disponibil consumatorilor (persoane fizice), în termen de 14 zile calendaristice de la data primirii produsului, conform OUG nr. 34/2014 privind contractele încheiate la distanță. De asemenea, returul este disponibil și persoanelor juridice, conform politicii comerciale.</p>
 
-          <div class="flex flex-col gap-2 mb-4">
+          <div class="flex flex-col gap-2">
             <h3 class="text-lg font-semibold">1. Condiții de acceptare a returului</h3>
             <p>Pentru a fi acceptat returul, produsul trebuie să fie în aceeași stare în care a fost livrat:</p>
             <ul class="list-disc pl-5 space-y-1">
@@ -135,43 +149,36 @@ useHead({
             </ul>
           </div>
 
-          <div class="flex flex-col gap-2 mb-4">
+          <div class="flex flex-col gap-2">
             <h3 class="text-lg font-semibold">2. Cum puteți solicita returul</h3>
-            <p>Solicitările de retur pentru comenzile se transmit exclusiv prin completarea formularului de retur disponibil la următorul link:</p>
-            <p>După înregistrarea cererii de retur, aveți două opțiuni:</p>
-            <ul class="list-disc pl-5 space-y-1">
-              <li>Preluare prin Eurotimalex SRL de la adresa comunicată; sau</li>
-              <li>Expediere directă către sediul nostru din: Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București</li>
-              <li>Destinatar: Eurotimalex SRL</li>
-              <li>(cu menționarea numelui/denumirii clientului și a numărului cererii de retur)</li>
-            </ul>
+            <p>Solicitările de retur pentru comenzile se transmit telefonic sau prin completarea <NuxtLink to="/contact" class="text-primary">formularului de contact</NuxtLink>.</p>
+            <p>După primirea solicitării dumneavoastră, vă vom contacta în cel mai scurt timp pentru a stabili modalitatea de soluționare a acesteia.</p>
           </div>
 
-          <div class="flex flex-col gap-2 mb-4">
+          <div class="flex flex-col gap-2">
             <h3 class="text-lg font-semibold">3. Costul transportului pentru retur (suportat de client)</h3>
             <p>Costul transportului pentru retur este suportat de client și se aplică în funcție de tipul produsului/categoriei din care face parte produsul returnat, astfel:</p>
             <ul class="list-disc pl-5 space-y-1">
               <li>30 lei pentru colete standard (majoritatea produselor);</li>
-              <li>Aceste tarife se aplică indiferent de motivul returului, în situațiile în care returul este solicitat de client și produsul este conform.</li> 
+              <li>Aceste tarife se aplică indiferent de motivul returului, în situațiile în care returul este solicitat de client și produsul este conform.</li>
             </ul>
           </div>
 
-          <div class="flex flex-col gap-2 mb-4">
+          <div class="flex flex-col gap-2">
             <h3 class="text-lg font-semibold">4. Rambursare / compensare</h3>
             <p>După verificarea produsului returnat, contravaloarea acestuia va fi:</p>
             <ul class="list-disc pl-5 space-y-1">
               <li>restituită;</li>
-              <li>compensată cu livrarea altor produse alese de dvs. (la solicitare).</li> 
+              <li>compensată cu livrarea altor produse alese de dvs. (la solicitare).</li>
             </ul>
             <p>Termenul de soluționare a returului este de 14 zile de la data recepționării produsului returnat.</p>
           </div>
-          
         </section>
 
         <section class="pb-8">
-          <h2 class="text-2xl font-semibold mb-4 font-serif">VII. Modificări și Litigii</h2>
-          <p><strong>Legislația aplicabilă:</strong> Serviciile oferite sunt guvernate de dispozițiile legilor române (incluzând OUG nr. 34/2014 privind drepturile consumatorilor). În caz de litigiu, se va încerca mai întâi o rezolvare pe cale amiabilă. În eventualitatea unor excepții legale nerezolvate amiabil, litigiile se vor supune instanțelor judecătorești competente de pe raza municipiului București.</p>
-          <p class="mt-4"><strong>Acuratețea detaliilor tehnice:</strong> Datele tehnice prezente pe site au un caracter strict informativ și pot suferi modificări fără o înștiințare prealabilă. Fotografiile produselor rămân cu titlu orientativ.</p>
+          <h2 class="text-2xl font-semibold mb-4 font-serif">X. Modificări</h2>
+          <p><strong>Modificarea Termenilor.</strong> Ne rezervăm dreptul de a modifica oricând Termenii și Condițiile. Comenzii dumneavoastră i se vor aplica termenii care sunt în vigoare la momentul plasării comenzii. Versiunea cea mai recentă va fi disponibilă în permanență pe site.</p>
+          <p class="mt-2"><strong>Acuratețea detaliilor tehnice.</strong> Datele tehnice prezente pe site au un caracter strict informativ și pot suferi modificări fără o înștiințare prealabilă. Fotografiile produselor rămân cu titlu orientativ.</p>
         </section>
 
       </div>
