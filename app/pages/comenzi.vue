@@ -249,7 +249,7 @@ async function orderAgain() {
                </div>
             </div>
 
-            <div class="flex gap-3 pt-2">
+            <div class="flex flex-wrap gap-3 pt-2">
                <UButton
                   v-if="selectedOrder.status === 'processing'"
                   color="error"
@@ -265,6 +265,15 @@ async function orderAgain() {
                   :loading="isReorderLoading"
                   @click="orderAgain"
                >Comandă din nou</UButton>
+               <UButton
+                  icon="i-lucide-download"
+                  color="neutral"
+                  variant="soft"
+                  class="flex-1 justify-center"
+                  :to="`/api/user/orders/${selectedOrder.id}/proforma`"
+                  external
+                  download
+               >Descarcă proforma</UButton>
             </div>
          </div>
       </template>

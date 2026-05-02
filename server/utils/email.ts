@@ -19,6 +19,11 @@ export interface BillingAddress {
   county: string
 }
 
+export interface EmailAttachment {
+  filename: string
+  content: Uint8Array
+}
+
 export interface OrderEmailData {
   orderNumber: string
   customerName: string
@@ -31,6 +36,7 @@ export interface OrderEmailData {
   orderDate: string
   paymentMethod: string
   shippingMethod: string
+  attachment?: EmailAttachment
 }
 
 export async function sendOrderConfirmation(data: OrderEmailData): Promise<void> {
@@ -62,7 +68,11 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
     from: 'Eurotimalex <onboarding@resend.dev>', // Temporary verified domain provided by Resend
     to: data.customerEmail,
     subject: `Confirmare înregistrare comandă #${data.orderNumber}`,
-    html: htmlContent
+    html: htmlContent,
+    attachments: data.attachment ? [{
+      filename: data.attachment.filename,
+      content: Buffer.from(data.attachment.content)
+    }] : undefined
   })
 
   if (error) {

@@ -18,7 +18,7 @@ const form = ref({
   county: 'București',
   city: '',
   street: '',
-  isDefaultBilling: isFirstAddress
+  isDefaultBilling: true
 })
 
 watch(() => address, (newAddr) => {
@@ -38,7 +38,7 @@ watch(() => address, (newAddr) => {
       county: '',
       city: '',
       street: '',
-      isDefaultBilling: isFirstAddress
+      isDefaultBilling: true
     }
   }
 }, { immediate: true })

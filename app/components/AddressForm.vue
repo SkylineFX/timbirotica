@@ -17,7 +17,7 @@ const form = ref({
   city: '',
   street: '',
   postalCode: '',
-  isDefaultShipping: isFirstAddress
+  isDefaultShipping: true
 })
 
 watch(() => address, (newAddr) => {
@@ -37,7 +37,7 @@ watch(() => address, (newAddr) => {
       city: '',
       street: '',
       postalCode: '',
-      isDefaultShipping: isFirstAddress
+      isDefaultShipping: true
     }
   }
 }, { immediate: true })

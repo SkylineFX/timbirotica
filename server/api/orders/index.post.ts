@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { randomBytes } from 'crypto'
 import { sendOrderConfirmation } from '../../utils/email'
+import { generateProformaPdf, resolveProformaCustomer } from '../../utils/proforma'
 
 interface OrderCartItem {
   productId: number;
@@ -140,6 +141,33 @@ export default eventHandler(async (event) => {
     county: body.billingAddress.county || ''
   } : undefined
 
+  // 8. Generate the proforma PDF (best-effort — order succeeds even if PDF fails)
+  let proformaPdf: Uint8Array | undefined
+  try {
+    const billingSnapshot = body.billingAddress?.companyName ? body.billingAddress : null
+    const shippingSnapshot = body.shippingAddress ?? null
+    const customer = resolveProformaCustomer(billingSnapshot, shippingSnapshot, {
+      firstName: userRecord.firstName,
+      lastName: userRecord.lastName
+    })
+    proformaPdf = await generateProformaPdf({
+      orderNumber,
+      orderDate: date,
+      paymentMethod: body.paymentMethod,
+      shippingMethod: body.shippingMethod,
+      shippingCost,
+      total,
+      items: cart.items.map((it: OrderCartItem) => ({
+        name: it.product.name,
+        quantity: it.quantity,
+        priceAtBuy: it.product.price
+      })),
+      customer
+    })
+  } catch (err) {
+    console.error('Proforma PDF generation failed (order will still be created):', err)
+  }
+
   const emailData = {
     orderNumber,
     customerName: body.shippingAddress?.firstName || session.user.firstName || 'Client',
@@ -151,7 +179,11 @@ export default eventHandler(async (event) => {
     shippingCost,
     items: emailItems,
     shippingAddress: emailShippingAddress,
-    billingAddress: emailBillingAddress
+    billingAddress: emailBillingAddress,
+    attachment: proformaPdf ? {
+      filename: `Proforma-${orderNumber}.pdf`,
+      content: proformaPdf
+    } : undefined
   }
 
   // Use event.waitUntil so the serverless runtime doesn't kill the process before the email is sent
