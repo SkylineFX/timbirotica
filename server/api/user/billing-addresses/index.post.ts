@@ -1,8 +1,9 @@
 import { eq } from 'drizzle-orm'
+import { billingAddressSchema } from '~~/shared/schemas/billingAddress'
 
 export default eventHandler(async (event) => {
   const session = await requireUserSession(event)
-  const body = await readBody(event)
+  const body = await readValidatedBody(event, billingAddressSchema.parse)
   const db = useDrizzle()
 
   // Find existing addresses to check if we should auto-default

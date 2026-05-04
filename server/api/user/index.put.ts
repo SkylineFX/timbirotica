@@ -22,7 +22,6 @@ export default eventHandler(async (event) => {
       firstName: tables.users.firstName,
       lastName: tables.users.lastName,
       email: tables.users.email,
-      avatar: tables.users.avatar
     })
 
   if (!updatedUser) {
@@ -34,6 +33,7 @@ export default eventHandler(async (event) => {
       id: updatedUser.id,
       firstName: updatedUser.firstName,
       lastName: updatedUser.lastName,
+      role: session.user.role,
     }
   })
 

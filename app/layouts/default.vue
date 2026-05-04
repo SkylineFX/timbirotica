@@ -1,3 +1,8 @@
 <template>
-  <slot />
+  <Header />
+  <UMain>
+    <slot />
+  </UMain>
+  <Footer />
+  <CookieBanner />
 </template>

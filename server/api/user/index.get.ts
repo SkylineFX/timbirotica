@@ -11,7 +11,6 @@ export default eventHandler(async (event) => {
       firstName: true,
       lastName: true,
       email: true,
-      avatar: true,
       createdAt: true
     }
   })

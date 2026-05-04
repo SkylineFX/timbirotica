@@ -33,17 +33,8 @@ watch(loggedIn, (isLoggedIn) => {
 
 <template>
   <UApp>
-    <Header />
-
-
-    <UMain>
-      <NuxtLayout>
-        <NuxtPage />
-      </NuxtLayout>
-    </UMain>
-
-    <Footer />
-
-    <CookieBanner />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </UApp>
-</template> 
+</template>

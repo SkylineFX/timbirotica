@@ -46,6 +46,7 @@ export default defineEventHandler(async (event) => {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
+      role: user.role as 'user' | 'admin',
     },
   }, {
     maxAge: remember ? 60 * 60 * 24 * 30 : undefined

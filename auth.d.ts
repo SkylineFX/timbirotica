@@ -3,6 +3,7 @@ declare module '#auth-utils' {
     id: number
     firstName: string
     lastName: string
+    role: 'user' | 'admin'
   }
 
   interface UserSession {

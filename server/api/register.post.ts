@@ -34,7 +34,6 @@ export default defineEventHandler(async (event) => {
     password: hashedPassword,
     firstName,
     lastName,
-    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName + ' ' + lastName)}&background=random&rounded=true`,
     createdAt: new Date()
   }).returning().get()
 
@@ -44,6 +43,7 @@ export default defineEventHandler(async (event) => {
       id: newUser.id,
       firstName: newUser.firstName,
       lastName: newUser.lastName,
+      role: 'user',
     }
   })
 

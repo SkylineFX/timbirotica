@@ -1,12 +1,13 @@
 import { eq, and } from 'drizzle-orm'
+import { addressPayloadSchema } from '~~/shared/schemas/address'
 
 export default eventHandler(async (event) => {
   const session = await requireUserSession(event)
   const idParam = getRouterParam(event, 'id')
   if (!idParam) throw createError({ statusCode: 400, message: 'Missing address ID' })
-  
+
   const id = parseInt(idParam, 10)
-  const body = await readBody(event)
+  const body = await readValidatedBody(event, addressPayloadSchema.parse)
   const db = useDrizzle()
 
   // Verify the address belongs to the user

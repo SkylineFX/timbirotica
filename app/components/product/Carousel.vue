@@ -18,7 +18,7 @@ const activeIndex = ref(0)
         :prev-button="{ color: 'gray', variant: 'soft', class: '!left-2 md:!-left-12 pointer-events-auto flex absolute' }"
         :next-button="{ color: 'gray', variant: 'soft', class: '!right-2 md:!-right-12 pointer-events-auto flex absolute' }"
       >
-        <NuxtImg :src="item" class="w-full aspect-square object-contain select-none block mx-auto pointer-events-none rounded-lg" draggable="false" alt="Imagine Produs"> </NuxtImg>
+        <NuxtImg :src="item" class="w-full aspect-square object-contain select-none block mx-auto pointer-events-none rounded-sm p-4" draggable="false" alt="Imagine Produs"> </NuxtImg>
       </UCarousel>
     </div>
 
@@ -26,11 +26,11 @@ const activeIndex = ref(0)
       <div
         v-for="(item, index) in productImages"
         :key="index"
-        class="w-16 h-16 shrink-0 rounded-md border-2 bg-white flex items-center justify-center p-1 cursor-pointer transition-all"
+        class="w-16 h-16 shrink-0 rounded-md border-2 bg-white flex items-center justify-center p-0.5 cursor-pointer transition-all"
         :class="activeIndex === index ? 'border-primary' : 'border-gray-200 opacity-60 hover:opacity-100'"
         @click="carousel?.emblaApi?.scrollTo(index); activeIndex = index"
       >
-        <NuxtImg :src="item" class="w-full h-full object-contain" alt="Imagine Produs"> </NuxtImg>
+        <NuxtImg :src="item" class="w-full h-full object-contain rounded-sm" alt="Imagine Produs"> </NuxtImg>
       </div>
     </div>
   </div>

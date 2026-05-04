@@ -14,7 +14,11 @@ export default eventHandler(async (event) => {
     with: {
       items: {
         with: {
-          product: true
+          product: {
+            with: {
+              category: { columns: { slug: true } }
+            }
+          }
         }
       }
     }

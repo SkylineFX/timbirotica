@@ -14,7 +14,6 @@ export default defineOAuthGoogleEventHandler({
         firstName: user.given_name || user.name?.split(' ')[0] || 'Utilizator',
         lastName: user.family_name || user.name?.split(' ').slice(1).join(' ') || '',
         password: 'OAUTH_USER',
-        avatar: user.picture || '',
         createdAt: new Date()
       }).returning().get()
     }
@@ -25,6 +24,7 @@ export default defineOAuthGoogleEventHandler({
         id: dbUser.id,
         firstName: dbUser.firstName,
         lastName: dbUser.lastName,
+        role: dbUser.role as 'user' | 'admin',
       }
     }, {
       // Keep Google-authenticated sessions alive for 30 days automatically

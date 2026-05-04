@@ -1,8 +1,9 @@
 import { eq } from 'drizzle-orm'
+import { addressPayloadSchema } from '~~/shared/schemas/address'
 
 export default eventHandler(async (event) => {
   const session = await requireUserSession(event)
-  const body = await readBody(event)
+  const body = await readValidatedBody(event, addressPayloadSchema.parse)
   const db = useDrizzle()
 
   // Find existing addresses to check if we should auto-default

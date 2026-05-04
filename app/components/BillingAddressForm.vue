@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { billingAddressSchema, type BillingAddress } from '~~/shared/schemas/billingAddress'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
 const { address = null, isFirstAddress = false } = defineProps<{
   address?: any | null
@@ -8,10 +10,10 @@ const { address = null, isFirstAddress = false } = defineProps<{
 
 const emit = defineEmits(['saved'])
 
-const form = ref({
+const form = ref<Partial<BillingAddress>>({
   companyName: '',
   cui: '',
-  hasRo: 'RO',
+  hasRo: true,
   onrc: '',
   bankName: '',
   iban: '',
@@ -25,13 +27,14 @@ watch(() => address, (newAddr) => {
   if (newAddr) {
     form.value = {
       ...newAddr,
+      hasRo: newAddr.hasRo ?? true,
       isDefaultBilling: newAddr.isDefaultBilling ?? false
     }
   } else {
     form.value = {
       companyName: '',
       cui: '',
-      hasRo: 'RO',
+      hasRo: true,
       onrc: '',
       bankName: '',
       iban: '',
@@ -77,29 +80,24 @@ const isLoading = ref(false)
 const toast = useToast()
 
 const hasRoOptions = [
-  { label: 'RO', value: 'RO', selected: true },
-  { label: '-', value: '-', selected: false }
+  { label: 'RO', value: true },
+  { label: '-', value: false }
 ]
 
-async function submit() {
-  if (!form.value.companyName || !form.value.cui || !form.value.onrc || !form.value.county || !form.value.city || !form.value.street) {
-    toast.add({ title: 'Câmpuri obligatorii', description: 'Te rugăm să completezi toate câmpurile necesare pentru a adăuga compania.', color: 'error' })
-    return
-  }
-  
+async function submit(event: FormSubmitEvent<BillingAddress>) {
   isLoading.value = true
-  
+
   try {
     if (address?.id) {
-      await $fetch(`/api/user/billing-addresses/${address.id}`, { method: 'PUT', body: form.value })
+      await $fetch(`/api/user/billing-addresses/${address.id}`, { method: 'PUT', body: event.data })
       toast.add({ title: 'Companie salvată', color: 'success' })
     } else {
-      await $fetch('/api/user/billing-addresses', { method: 'POST', body: form.value })
+      await $fetch('/api/user/billing-addresses', { method: 'POST', body: event.data })
       toast.add({ title: 'Companie adăugată cu succes', color: 'success' })
     }
     emit('saved')
   } catch(err: any) {
-     toast.add({ title: 'Eroare la salvare', description: err.message, color: 'error' })
+     toast.add({ title: 'Eroare la salvare', description: err?.data?.message ?? err.message, color: 'error' })
   } finally {
     isLoading.value = false
   }
@@ -107,21 +105,21 @@ async function submit() {
 </script>
 
 <template>
-  <form @submit.prevent="submit" class="space-y-6 px-2">
+  <UForm :schema="billingAddressSchema" :state="form" class="space-y-6 px-2" @submit="submit">
     <div>
       <h4 class="font-bold text-gray-900 mb-4 text-sm mt-2">Detalii companie</h4>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <UFormField label="Nume firmă" name="companyName" required>
-           <UInput v-model="form.companyName" size="lg" class="w-full" required />
+           <UInput v-model="form.companyName" size="lg" class="w-full" />
         </UFormField>
         <UFormField label="Cod unic de Înregistrare" name="cui" required>
            <div class="flex gap-2 w-full">
              <USelect v-model="form.hasRo" :items="hasRoOptions as any[]" value-attribute="value" option-attribute="label" size="lg" class="w-24 shrink-0" />
-             <UInput v-model="form.cui" size="lg" class="w-full" required />
+             <UInput v-model="form.cui" size="lg" class="w-full" />
            </div>
         </UFormField>
         <UFormField label="Număr de înregistrare în Registrul Comerțului" name="onrc" class="sm:col-span-2" required>
-           <UInput v-model="form.onrc" placeholder="ex: J40/1234/2024" size="lg" class="w-full" required />
+           <UInput v-model="form.onrc" placeholder="ex: J40/1234/2024" size="lg" class="w-full" />
         </UFormField>
         <UFormField label="Banca" name="bankName">
            <UInput v-model="form.bankName" size="lg" class="w-full" />
@@ -144,7 +142,7 @@ async function submit() {
        </div>
        <div class="grid grid-cols-1 gap-4">
           <UFormField label="Adresa" name="street" required>
-             <UInput v-model="form.street" placeholder="ex: Strada, număr, bloc, scara, etaj, apartament" size="lg" class="w-full" required />
+             <UInput v-model="form.street" placeholder="ex: Strada, număr, bloc, scara, etaj, apartament" size="lg" class="w-full" />
           </UFormField>
        </div>
     </div>
@@ -156,5 +154,5 @@ async function submit() {
     <div class="pt-4 pb-2">
        <UButton type="submit" color="primary" block size="xl" class="rounded-md font-semibold justify-center" :loading="isLoading">Salvează</UButton>
     </div>
-  </form>
+  </UForm>
 </template>

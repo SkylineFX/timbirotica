@@ -9,17 +9,8 @@ const { data: userOrders, refresh: refreshOrders } = await useFetch('/api/user/o
 const { fetchCart } = useCart()
 const toast = useToast()
 
-const statusLabel: Record<string, string> = {
-  processing: 'În procesare',
-  completed: 'Finalizată',
-  cancelled: 'Anulată'
-}
-
-const statusColor: Record<string, 'warning' | 'success' | 'error' | 'neutral' | 'primary' | 'secondary' | 'info'> = {
-  processing: 'warning',
-  completed: 'success',
-  cancelled: 'error'
-}
+const statusLabel = ORDER_STATUS_LABEL
+const statusColor = ORDER_STATUS_COLOR
 
 const isOrderModalOpen = ref(false)
 const selectedOrder = ref<any>(null)
@@ -131,7 +122,7 @@ async function orderAgain() {
                 <NuxtLink
                   v-for="item in order.items"
                   :key="item.id"
-                  :to="`/c/toate/${item.product?.slug}`"
+                  :to="`/c/${item.product?.category?.slug ?? 'toate'}/${item.product?.slug}`"
                   class="flex-shrink-0 w-14 h-14 rounded-sm border border-gray-200 bg-white overflow-hidden hover:border-primary transition-colors"
                 >
                   <NuxtImg
@@ -222,7 +213,7 @@ async function orderAgain() {
                         </div>
                      </div>
                      <div class="flex flex-1 min-w-0 flex-col justify-between">
-                        <NuxtLink :to="`/c/toate/${item.product?.slug}`" class="font-medium text-gray-900 hover:text-primary transition-colors line-clamp-1">
+                        <NuxtLink :to="`/c/${item.product?.category?.slug ?? 'toate'}/${item.product?.slug}`" class="font-medium text-gray-900 hover:text-primary transition-colors line-clamp-1">
                            {{ item.product?.name || 'Produs indisponibil' }}
                         </NuxtLink>
                         <div class="flex justify-between items-center gap-2">
