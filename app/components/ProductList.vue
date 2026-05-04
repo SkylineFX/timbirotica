@@ -27,8 +27,8 @@ const page = computed({
   get: () => Number(route.query.page) || 1,
   set: async (val) => {
     if (val === page.value) return
+    window.scrollTo({ top: 0, behavior: 'instant' })
     await navigateTo({ query: { ...route.query, page: val } })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 })
 
@@ -88,26 +88,26 @@ const total = computed(() => data.value?.total || 0)
       </div>
     </div>
 
-    <div v-if="products?.length" class="space-y-8">
+    <div v-if="status === 'pending'" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 lg:gap-4">
+        <ProductCardSkeleton v-for="i in limit" :key="i" />
+    </div>
+    <div v-else-if="products?.length" class="space-y-8">
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 lg:gap-4">
             <ProductCard
-                v-for="product in products" 
-                :key="product.id" 
+                v-for="product in products"
+                :key="product.id"
                 :to="`/c/${product.category?.slug || 'toate'}/${product.slug}`"
                 :product="product"
             />
         </div>
-        
+
         <div class="flex justify-center">
-            <UPagination 
+            <UPagination
                 v-model:page="page"
-                :total="total" 
-                :items-per-page="limit" 
+                :total="total"
+                :items-per-page="limit"
             />
         </div>
-    </div>
-    <div v-else-if="status === 'pending'" class="py-12 flex justify-center">
-        <UIcon name="i-lucide-loader-2" class="animate-spin w-8 h-8" />
     </div>
     <div v-else class="text-center py-12 text-gray-500">
         {{ emptyMessage }}

@@ -9,6 +9,8 @@ const { favorites, addToFavorites, removeFromFavorites } = useFavorites()
 
 const isFavorite = computed(() => favorites.value.some((f: any) => f.productId === props.product.id))
 
+const imageLoaded = ref(false)
+
 const toggleFavorite = async () => {
     if (isFavorite.value) {
         const fav = favorites.value.find((f: any) => f.productId === props.product.id)
@@ -23,10 +25,15 @@ const toggleFavorite = async () => {
   <NuxtLink :to="to" class="group h-full flex flex-col">
     <UCard class="flex-1 hover:ring-2 hover:ring-primary transition-all duration-200 flex flex-col rounded-sm bg-white" :ui="{ body: 'p-2 sm:p-2', footer: 'p-2 sm:p-2 flex-1 flex flex-col' }">
       <div class="aspect-square bg-white relative overflow-hidden">
-        <NuxtImg 
-          :src="product.images?.[0] || ''" 
+        <USkeleton v-if="!imageLoaded" class="absolute inset-0 w-full h-full" />
+        <NuxtImg
+          :src="product.images?.[0] || ''"
           :alt="product.name"
-          class="absolute inset-0 w-full h-full p-4 object-contain group-hover:scale-105 transition-transform duration-200" 
+          loading="lazy"
+          class="absolute inset-0 w-full h-full p-4 object-contain group-hover:scale-105 transition-all duration-200"
+          :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
+          @load="imageLoaded = true"
+          @error="imageLoaded = true"
         />
 
         <div class="absolute top-[0px] left-[0px]">
