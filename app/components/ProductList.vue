@@ -53,7 +53,12 @@ const fetchQuery = computed(() => {
     ...props.apiQuery,
     page: page.value,
     sort: sort.value,
-    limit: limit.value
+    limit: limit.value,
+    minPrice: route.query.minPrice,
+    maxPrice: route.query.maxPrice,
+    available: route.query.available,
+    sub: route.query.sub,
+    b: route.query.b
   }
 })
 
@@ -64,6 +69,22 @@ const { data, status, refresh } = await useFetch('/api/products', {
 
 const products = computed(() => data.value?.products || [])
 const total = computed(() => data.value?.total || 0)
+const facets = computed(() => data.value?.facets || { price: null, brands: null, subcategories: null })
+
+const hideBrand = computed(() => !!props.apiQuery.brand)
+const hideSubcategory = computed(() => !props.apiQuery.category)
+
+const activeFilterCount = computed(() => {
+  const q = route.query
+  let count = 0
+  if (q.minPrice || q.maxPrice) count++
+  if (q.available === '1') count++
+  if (q.sub) count += String(q.sub).split(',').filter(Boolean).length
+  if (q.b) count += String(q.b).split(',').filter(Boolean).length
+  return count
+})
+
+const isFiltersOpen = ref(false)
 </script>
 
 <template>
@@ -77,7 +98,21 @@ const total = computed(() => data.value?.total || 0)
         </span>
       </h1>
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 xl:gap-4">
-        <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <UButton
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-sliders-horizontal"
+            class="rounded-sm"
+            @click="isFiltersOpen = true"
+          >
+            Filtre
+            <UBadge v-if="activeFilterCount > 0" color="primary" variant="solid" class="rounded-sm ml-1">
+              {{ activeFilterCount }}
+            </UBadge>
+          </UButton>
+        </div>
+        <div class="flex items-center justify-between gap-2 sm:ml-auto">
           <p class="text-sm font-medium text-gray-500">Sorteaza dupa:</p>
           <USelect v-model="sort" :items="sortOptions" value-key="value" label-key="label" class="w-36" />
         </div>
@@ -87,6 +122,16 @@ const total = computed(() => data.value?.total || 0)
         </div>
       </div>
     </div>
+
+    <USlideover v-model:open="isFiltersOpen" side="right" title="Filtre">
+      <template #body>
+        <ProductFilters
+          :facets="facets"
+          :hide-brand="hideBrand"
+          :hide-subcategory="hideSubcategory"
+        />
+      </template>
+    </USlideover>
 
     <div v-if="status === 'pending'" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 lg:gap-4">
         <ProductCardSkeleton v-for="i in limit" :key="i" />

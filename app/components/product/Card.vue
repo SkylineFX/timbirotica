@@ -53,13 +53,13 @@ const toggleFavorite = async () => {
               <p class="font-medium text-sm truncate-3 min-h-[60px]">{{ product.name }}</p>
           </div>
           <div class="leading-none flex flex-col gap-1 items-start">
-            <p class="text-xs">Cod: {{ product.sku || 123456789 }}</p>
+            <p class="text-xs">Cod: {{ product.sku || '-' }}</p>
             <UBadge v-if="product.stock > 0" color="success" variant="soft" class="rounded-sm" leading-icon="i-lucide-check">Disponibil</UBadge>
             <UBadge v-else color="error" variant="soft" class="rounded-sm" leading-icon="i-lucide-x">Indisponibil</UBadge>
           </div>
           <div class="flex flex-col gap-2">
             <div class="leading-none">
-              <p class="font-bold text-primary">{{ product.price }} RON</p>
+              <p class="font-bold text-primary">{{ product.price.toFixed(2) }} RON</p>
               <!-- <span class="text-xs text-gray-500">Pretul include TVA</span> -->
             </div>
             <div class="flex justify-center items-center text-center">

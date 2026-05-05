@@ -143,7 +143,7 @@ const performSearch = () => {
             
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 break-words leading-tight">{{ product.name }}</p>
-              <p class="text-xs font-semibold text-primary mt-1">{{ product.price }} RON</p>
+              <p class="text-xs font-semibold text-primary mt-1">{{ product.price.toFixed(2) }} RON</p>
             </div>
           </NuxtLink>
         </div>

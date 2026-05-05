@@ -27,7 +27,7 @@ const { addToCart } = useCart()
                            <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" @click="removeFromFavorites(item.id)" />
                            <UButton size="xs" color="primary" variant="soft" icon="i-lucide-shopping-cart" @click="addToCart(item.product)" tooltip="Adauga in cos" />
                        </div>
-                       <span class="font-bold text-sm">{{ item.product?.price }} RON</span>
+                       <span class="font-bold text-sm">{{ (item.product?.price ?? 0).toFixed(2) }} RON</span>
                 </div>
               </div>
             </li>

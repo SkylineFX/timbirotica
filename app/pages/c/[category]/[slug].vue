@@ -120,8 +120,8 @@ const accordionItems = [
                 <!-- Price -->
                 <div class="flex flex-col gap-0 mb-6">
                     <p class="text-3xl lg:text-3xl font-bold text-gray-900">
-                        <span class="text-3xl lg:text-3xl">{{ product.price.toString().split('.')[0] }}</span> 
-                        <span class="text-sm align-top">{{ product.price.toString().split('.')[1] }}</span> 
+                        <span class="text-3xl lg:text-3xl">{{ product.price.toFixed(2).split('.')[0] }}</span>
+                        <span class="text-sm align-top">{{ product.price.toFixed(2).split('.')[1] }}</span>
                         <span class="text-md ml-2">RON</span>
                     </p>
                     <span class="text-xs text-gray-500">Pretul include TVA</span>

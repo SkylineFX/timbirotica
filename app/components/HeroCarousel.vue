@@ -9,11 +9,12 @@ const items = [
 <template>
   <UCarousel
     v-slot="{ item }"
-    fade
+    :autoplay="{delay: 10000}"
+    loop
     dots
     arrows
     :items="items"
-    :ui="{arrows: 'hidden md:block absolute top-1/2 left-16 right-16'}"
+    :ui="{arrows: 'absolute top-1/2 left-0 right-0 sm:left-16 sm:right-16'}"
     class="w-full flex-1 bg-white rounded-md"
   >
     <NuxtLink :to="item.link" class="w-full h-full block">

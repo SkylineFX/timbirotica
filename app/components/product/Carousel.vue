@@ -7,7 +7,7 @@ const activeIndex = ref(0)
 
 <template>
   <div class="flex-1 w-full h-full flex flex-col gap-4">
-    <div class="w-full bg-white rounded-lg border border-gray-100 flex items-center justify-center p-0 md:p-6 md:px-16 relative">
+    <div class="w-full bg-white rounded-lg border border-gray-100 flex items-center justify-center p-4 md:p-6 md:px-16 relative">
       <UCarousel
         ref="carousel"
         v-slot="{ item }"
@@ -15,10 +15,9 @@ const activeIndex = ref(0)
         class="w-full"
         @select="activeIndex = $event"
         arrows
-        :prev-button="{ color: 'gray', variant: 'soft', class: '!left-2 md:!-left-12 pointer-events-auto flex absolute' }"
-        :next-button="{ color: 'gray', variant: 'soft', class: '!right-2 md:!-right-12 pointer-events-auto flex absolute' }"
+        :ui="{arrows: 'absolute top-1/2 -left-4 -right-4 sm:left-0 sm:right-0'}"
       >
-        <NuxtImg :src="item" class="w-full aspect-square object-contain select-none block mx-auto pointer-events-none rounded-sm p-4" draggable="false" alt="Imagine Produs"> </NuxtImg>
+        <NuxtImg :src="item" class="w-full aspect-square object-contain select-none block mx-auto pointer-events-none rounded-sm" draggable="false" alt="Imagine Produs"> </NuxtImg>
       </UCarousel>
     </div>
 
