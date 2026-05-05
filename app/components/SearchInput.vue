@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onUnmounted, computed } from 'vue'
+import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
 
 const props = defineProps({
   modelValue: { type: String, default: '' }
@@ -12,9 +12,10 @@ const localQuery = computed({
   set: (val) => emit('update:modelValue', val)
 })
 
-const isFocused = ref(false)
+const isOpen = ref(false)
 const isLoading = ref(false)
 const products = ref<any[]>([])
+const containerRef = ref<HTMLElement | null>(null)
 
 // Cache: simple LRU map limit to 50
 const searchCache = new Map<string, any[]>()
@@ -80,30 +81,44 @@ watch(localQuery, (newQuery) => {
   }, 300)
 })
 
+const onPointerDown = (e: PointerEvent) => {
+  if (containerRef.value && !containerRef.value.contains(e.target as Node)) {
+    isOpen.value = false
+  }
+}
+
+const onKeyDown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') isOpen.value = false
+}
+
+const router = useRouter()
+const stopAfterEach = router.afterEach(() => { isOpen.value = false })
+
+onMounted(() => {
+  document.addEventListener('pointerdown', onPointerDown)
+  document.addEventListener('keydown', onKeyDown)
+})
+
 onUnmounted(() => {
   if (debounceTimer) clearTimeout(debounceTimer)
   if (abortController) abortController.abort()
+  document.removeEventListener('pointerdown', onPointerDown)
+  document.removeEventListener('keydown', onKeyDown)
+  stopAfterEach()
 })
 
-const handleBlur = () => {
-  setTimeout(() => {
-    isFocused.value = false
-  }, 200)
-}
-
 const performSearch = () => {
-  isFocused.value = false
+  isOpen.value = false
   emit('search')
 }
 </script>
 
 <template>
-  <div class="relative w-full z-[60]">
+  <div ref="containerRef" class="relative w-full z-[60]">
     <UInput
       v-model="localQuery"
       @keyup.enter="performSearch"
-      @focus="isFocused = true"
-      @blur="handleBlur"
+      @focus="isOpen = true"
       trailing-icon="i-lucide-search"
       size="md"
       variant="outline"
@@ -121,15 +136,15 @@ const performSearch = () => {
       leave-from-class="transform scale-100 opacity-100"
       leave-to-class="transform scale-95 opacity-0"
     >
-      <div 
-        v-if="isFocused && localQuery.trim().length >= 3" 
-        class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md shadow-lg overflow-hidden flex flex-col"
+      <div
+        v-if="isOpen && localQuery.trim().length >= 3"
+        class="absolute top-full left-0 right-0 mt-3 sm:mt-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md rounded-t-none shadow-sm overflow-hidden flex flex-col max-h-[calc(100dvh-8rem)]"
       >
         <div v-if="isLoading" class="p-8 flex justify-center items-center">
           <UIcon name="i-lucide-loader-2" class="animate-spin text-primary w-6 h-6" />
         </div>
-        
-        <div v-else-if="products.length > 0" class="flex flex-col max-h-96 overflow-y-auto">
+
+        <div v-else-if="products.length > 0" class="flex flex-col flex-1 min-h-0 overflow-y-auto">
           <NuxtLink 
             v-for="product in products" 
             :key="product.id" 
@@ -148,7 +163,7 @@ const performSearch = () => {
           </NuxtLink>
         </div>
         
-        <div v-if="!isLoading && products.length > 0" class="border-t border-gray-200 dark:border-gray-800 p-2 bg-gray-50 dark:bg-gray-900/50 mt-auto">
+        <div v-if="!isLoading && products.length > 0" class="border-t border-gray-200 dark:border-gray-800 p-2 bg-gray-50 dark:bg-gray-900/50 shrink-0">
           <UButton 
             variant="ghost" 
             color="primary" 
