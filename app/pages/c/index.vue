@@ -15,12 +15,18 @@ const { data: categories } = await useFetch('/api/categories/tree')
       >
         <div class="flex flex-1 min-h-[9rem] sm:min-h-[10rem]">
           <!-- Left: Image -->
-          <NuxtLink 
-            :to="category.to" 
+          <NuxtLink
+            :to="category.to"
             class="w-2/5 flex items-center justify-center border-r border-gray-200 hover:opacity-90 transition-opacity"
           >
-            <div class="w-full h-full bg-gray-50 flex items-center justify-center">
-                <UIcon name="i-heroicons-photo" class="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" />
+            <div class="w-full h-full bg-gray-50/0 flex items-center justify-center">
+                <NuxtImg
+                  v-if="category.image"
+                  :src="category.image"
+                  :alt="category.label"
+                  class="w-full h-full object-contain p-4"
+                />
+                <UIcon v-else name="i-heroicons-photo" class="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" />
             </div>
           </NuxtLink>
           

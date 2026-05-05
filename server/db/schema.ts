@@ -15,7 +15,8 @@ export const categories = sqliteTable('categories', {
   id: integer().primaryKey({ autoIncrement: true }),
   name: text().notNull(),
   slug: text().notNull(),
-  parentId: integer('parent_id').references((): AnySQLiteColumn => categories.id)
+  parentId: integer('parent_id').references((): AnySQLiteColumn => categories.id),
+  image: text()
 })
 
 export const brands = sqliteTable('brands', {

@@ -11,6 +11,7 @@ export default eventHandler(async (event) => {
       to: `/c/${cat.slug}`,
       id: cat.id,
       parentId: cat.parentId,
+      image: cat.image,
       children: []
     })
   })
