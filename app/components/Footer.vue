@@ -49,11 +49,6 @@ const columns: FooterColumn[] = [
         label: 'ANPC',
         to: 'https://anpc.ro/',
         target: '_blank'
-      },
-      {
-        label: 'Soluționare litigii UE (ODR)',
-        to: 'https://ec.europa.eu/consumers/odr',
-        target: '_blank'
       }
     ]
   },

@@ -82,10 +82,10 @@ useHead({
           <h2 class="text-2xl font-semibold mb-4 font-serif">V. Destinatari și transferuri către terți</h2>
           <p>Nu vindem și nu închiriem datele dumneavoastră. Le împărtășim exclusiv cu furnizorii care fac posibilă funcționarea magazinului online:</p>
           <ul class="list-disc pl-5 mt-2 space-y-3">
-            <li><strong>Resend</strong> (furnizor de e-mail).</li>
+            <li><strong>Resend</strong> (furnizor servicii e-mail).</li>
             <li><strong>Agentii de curierat</strong>, atunci când alegeți livrarea prin curier: numele, telefonul și adresa de livrare necesare expedierii.</li>
           </ul>
-          <p class="mt-4 text-sm">Toți acești furnizori procesează datele exclusiv pentru a ne ajuta să prestăm serviciul, în baza unor obligații contractuale și a măsurilor de securitate adecvate.</p>
+          <p class="mt-4 text-sm">Toți acești furnizori procesează datele exclusiv pentru a ne ajuta să prestăm serviciul, în baza unor măsuri de securitate adecvate.</p>
         </section>
 
         <!-- Drepturile utilizatorului -->

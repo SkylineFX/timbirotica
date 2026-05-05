@@ -21,29 +21,23 @@ useHead({
 
         <section class="pb-8">
           <h2 class="text-2xl font-semibold mb-4 font-serif">I. Despre Noi</h2>
-          <p>Serviciul de comert electronic este oferit de <strong>Eurotimalex SRL</strong>, cu sediul în <strong>Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București</strong>, înmatriculată în Registrul Comerțului sub nr. <strong>J40/17160/2005</strong>, având cod unic de înregistrare <strong>RO18034200</strong>.</p>
+          <p>Serviciul de comert electronic este oferit de <strong>Eurotimalex SRL</strong>, denumit in continuare "Vanzator", cu sediul în <strong>Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București</strong>, înmatriculată în Registrul Comerțului sub nr. <strong>J40/17160/2005</strong>, având cod unic de înregistrare <strong>RO18034200</strong>.</p>
 
-          <div class="flex flex-col gap-4 my-4">
-            <p>Folosirea acestui site de către orice persoană (atât fizică cât și juridică) în scopul de a se informa sau de a achiziționa produsele, denumit în continuare “utilizator”, reprezintă acordul acestuia fără limitări sau rezerve a prezenților Termeni și Condiții.</p>
+          <div class="flex flex-col gap-4 mt-4">
+            <p>Folosirea acestui site de către orice persoană (atât fizică cât și juridică) în scopul de a se informa sau de a achiziționa produsele, denumit în continuare "Utilizator" / "Cumpărător", reprezintă acordul acestuia fără limitări sau rezerve a prezenților Termeni și Condiții.</p>
 
             <div>
               <p>Trimiterea unei comenzi se poate face prin una dintre următoarele metode:</p>
               <ul class="list-disc list-inside ml-2 mt-2 space-y-1">
                 <li>direct de pe site-ul Vânzătorului</li>
-                <li>prin e-mail la <a href="mailto:eurotimalex@yahoo.com">eurotimalex@yahoo.com</a></li>
-                <li>telefonic la numărul de telefon <a href="tel:+40751022882">+40 751 022 882</a></li>
+                <li><strong>Prin e-mail la:</strong> <a class="text-primary hover:underline" href="mailto:eurotimalex@yahoo.com">eurotimalex@yahoo.com</a></li>
+                <li><strong>Prin telefon la:</strong> <a class="text-primary hover:underline" href="tel:+40751022882">+40 751 022 882</a>.</li>
               </ul>
             </div>
 
             <p>Prin lansarea unei comenzi pe site, Cumpărătorul este de acord cu forma de comunicare (e-mail, SMS, telefon) prin care Vânzătorul își derulează operațiunile pe site și își exprimă acordul privind încheierea contractului.</p>
             <p>Vânzătorul va informa Cumpărătorul preluarea comenzii, respectiv confirmarea comenzii. Dacă Vânzătorul confirmă explicit o comandă, acest lucru va implica o acceptare completă a termenilor comenzii. Acceptarea comenzii de către Vânzător se consideră finalizată atunci când există o confirmare scrisă (e-mail, SMS) din partea Vânzătorului către Cumpărător, fără a necesita o confirmare de primire din partea acestuia din urmă. Comanda se consideră validă numai după confirmarea de către Vânzător a disponibilității stocului, a prețului precum și a caracteristicilor produselor respectiv a serviciilor solicitate de Cumpărător.</p>
           </div>
-
-          <p>Ne puteți contacta prin următoarele mijloace:</p>
-          <ul class="list-disc pl-5 mt-2 space-y-1">
-            <li><strong>Prin e-mail la:</strong> <a class="hover:text-primary transition-colors" href="mailto:eurotimalex@yahoo.com">eurotimalex@yahoo.com</a></li>
-            <li><strong>Prin telefon la:</strong> <a class="hover:text-primary transition-colors" href="tel:+40751022882">+40 751 022 882</a>.</li>
-          </ul>
         </section>
 
         <section class="pb-8">
@@ -55,8 +49,7 @@ useHead({
         <section class="pb-8">
           <h2 class="text-2xl font-semibold mb-4 font-serif">III. Înregistrarea ca utilizator</h2>
           <p>Site-ul poate fi accesat în mod gratuit, iar simpla navigare în paginile acestuia nu este condiționată de înregistrarea ca utilizator (crearea unui cont pe site). Pentru a beneficia însă de anumite servicii (precum achiziționarea produselor, verificarea situației comenzilor proprii), va trebui să vă creați un cont de utilizator.</p>
-          <p>Înregistrarea ca utilizator presupune acceptarea prealabilă de către dvs. a Termenilor și Condițiilor de utilizare și a <strong>Politicii de Confidențialitate</strong>.</p>
-          <p>Ne rezervăm dreptul de a închide conturi de utilizatori sau de a refuza vânzarea de produse, la propria discreție, în cazul unor abuzuri.</p>
+          <p>Înregistrarea ca utilizator presupune acceptarea prealabilă de către dvs. a Termenilor și Condițiilor de utilizare și a <a class="text-primary hover:underline" href="/politica-de-confidentialitate">Politicii de Confidențialitate</a>.</p>
         </section>
 
         <section class="pb-8">
@@ -67,7 +60,7 @@ useHead({
             <li>Veți furniza informații reale, exacte, complete și actualizate.</li>
             <li>Nu veți desfășura nicio acțiune care ar putea aduce prejudicii site-ului, inclusiv tentative de acces neautorizat, supraîncărcare a serverelor sau exploatarea unor vulnerabilități.</li>
           </ol>
-          <p class="mt-4"><strong>Consecințe.</strong> Ne rezervăm dreptul de a bloca accesul oricărui utilizator care încalcă regulile de mai sus, de a anula comenzile si de a sesiza autoritățile competente.</p>
+          <p class="mt-4">Ne rezervăm dreptul de a bloca accesul oricărui utilizator care încalcă regulile de mai sus, de a anula comenzile si de a sesiza autoritățile competente in cazul unor abuzuri.</p>
         </section>
 
         <section class="pb-8">
@@ -101,7 +94,7 @@ useHead({
           <p class="mt-4 font-semibold">Opțiunile de plată acceptate sunt:</p>
           <ol class="list-decimal list-inside pl-5 mt-2 space-y-1">
             <li><strong>Plata ramburs:</strong> in numerar (maxim 5000 RON), pentru livrare la adresa, catre curier sau la ridicarea comenzii din sediul nostru.</li>
-            <li><strong>Ordin de plata / virament bancar</strong> (clienti persoane juridice sau persoane fizice). In acest caz, se va emite o factura proforma care se va transmite la adresa de e-mail comunicata de catre client si dupa efectuarea platii, comanda se va livra.</li>
+            <li><strong>Ordin de plata / virament bancar.</strong> In acest caz, se va emite o factura proforma care se va transmite la adresa de e-mail comunicata de catre client, iar dupa efectuarea platii comanda va fi pregatita pentru livrare.</li>
           </ol>
         </section>
 
@@ -112,7 +105,7 @@ useHead({
             <p>Livrarea comenzilor se poate face în următoarele moduri:</p>
             <ol class="list-decimal pl-5 space-y-2">
               <li><strong>Ridicare de la sediul nostru:</strong> Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București.</li>
-              <li><strong>Cu mașinile proprii</strong>: Momentan, livrările se efectuează doar în București.</li>
+              <li><strong>Cu mașinile proprii</strong>: Momentan, livrările se efectuează doar în București și Ilfov.</li>
             </ol>
           </div>
 
@@ -159,9 +152,9 @@ useHead({
             <h3 class="text-lg font-semibold">3. Costul transportului pentru retur (suportat de client)</h3>
             <p>Costul transportului pentru retur este suportat de client și se aplică în funcție de tipul produsului/categoriei din care face parte produsul returnat, astfel:</p>
             <ul class="list-disc pl-5 space-y-1">
-              <li>30 lei pentru colete standard (majoritatea produselor);</li>
-              <li>Aceste tarife se aplică indiferent de motivul returului, în situațiile în care returul este solicitat de client și produsul este conform.</li>
+              <li>30 lei pentru colete standard;</li>
             </ul>
+            <p>Aceste tarife se aplică indiferent de motivul returului, în situațiile în care returul este solicitat de client și produsul este conform.</p>
           </div>
 
           <div class="flex flex-col gap-2">

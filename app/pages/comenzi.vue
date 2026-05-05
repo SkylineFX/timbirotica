@@ -112,7 +112,7 @@ async function orderAgain() {
                  <UBadge :color="statusColor[order.status]" variant="subtle" size="sm" class="hidden lg:block">{{ statusLabel[order.status] }}</UBadge>
                  <span class="relative flex h-3 w-3 flex-shrink-0 lg:hidden">
                     <span v-if="order.status === 'processing'" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3" :class="{ 'bg-yellow-300': order.status === 'processing' }"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3" :class="{ 'bg-yellow-200': order.status === 'processing' }"></span>
                  </span>
                 </div>
               </div>
@@ -240,31 +240,36 @@ async function orderAgain() {
                </div>
             </div>
 
-            <div class="flex flex-wrap gap-3 pt-2">
-               <UButton
-                  v-if="selectedOrder.status === 'processing'"
-                  color="error"
-                  variant="outline"
-                  class="flex-1 justify-center"
-                  :loading="isCancelLoading"
-                  @click="cancelOrder"
-               >Anulează comanda</UButton>
-               <UButton
-                  color="neutral"
-                  variant="outline"
-                  class="flex-1 justify-center"
-                  :loading="isReorderLoading"
-                  @click="orderAgain"
-               >Comandă din nou</UButton>
-               <UButton
-                  icon="i-lucide-download"
-                  color="neutral"
-                  variant="soft"
-                  class="flex-1 justify-center"
-                  :to="`/api/user/orders/${selectedOrder.id}/proforma`"
-                  external
-                  download
-               >Descarcă proforma</UButton>
+            <div class="flex flex-col gap-2">
+              <div class="flex flex-col gap-2 md:flex-row">
+                <UButton
+                    icon="i-lucide-download"
+                    color="neutral"
+                    size="xl"
+                    variant="soft"
+                    class="flex-1 justify-center text-sm md:text-base"
+                    :to="`/api/user/orders/${selectedOrder.id}/proforma`"
+                    external
+                    download
+                >Descarcă proforma</UButton>
+                <UButton
+                    color="neutral"
+                    size="xl"
+                    variant="outline"
+                    class="flex-1 justify-center text-sm md:text-base"
+                    :loading="isReorderLoading"
+                    @click="orderAgain"
+                >Comandă din nou</UButton>
+              </div>
+              <UButton
+                v-if="selectedOrder.status === 'processing'"
+                color="error"
+                size="xl"
+                variant="outline"
+                class="flex-1 justify-center text-sm md:text-base"
+                :loading="isCancelLoading"
+                @click="cancelOrder"
+              >Anulează comanda</UButton>
             </div>
          </div>
       </template>

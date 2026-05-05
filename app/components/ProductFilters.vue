@@ -108,15 +108,6 @@ const showSub = computed(() =>
   !props.hideSubcategory && !!props.facets.subcategories && props.facets.subcategories.length > 0
 )
 
-const reset = () => {
-  updateQuery({
-    minPrice: undefined,
-    maxPrice: undefined,
-    available: undefined,
-    sub: undefined,
-    b: undefined
-  })
-}
 </script>
 
 <template>
@@ -167,9 +158,5 @@ const reset = () => {
         />
       </div>
     </section>
-
-    <UButton variant="ghost" color="neutral" block @click="reset">
-      Reseteaza filtrele
-    </UButton>
   </div>
 </template>

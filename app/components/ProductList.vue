@@ -85,12 +85,16 @@ const activeFilterCount = computed(() => {
 })
 
 const isFiltersOpen = ref(false)
+
+const resetFilters = () => {
+  navigateTo({ query: { ...route.query, minPrice: undefined, maxPrice: undefined, available: undefined, sub: undefined, b: undefined, page: 1 } })
+}
 </script>
 
 <template>
   <UContainer class="py-6">
     <UBreadcrumb v-if="breadcrumbs?.length" :items="breadcrumbs" :ui="{ separatorIcon: 'w-4 h-4' }" class="mb-6 [&_ol]:flex-nowrap [&_ol]:overflow-hidden [&_li]:shrink-0 [&_li:last-child]:shrink-1 [&_li:last-child]:min-w-0" />
-    <div class="flex flex-col mb-8 gap-4 rounded-lg p-4 bg-white">
+    <div class="flex flex-col mb-8 gap-4 rounded-md p-4 bg-white">
       <h1 class="text-xl font-bold flex flex-wrap items-baseline gap-2 xl:text-2xl">
         {{ title }} <span v-if="subtitle" class="font-normal italic">"{{ subtitle }}"</span>
         <span v-if="total !== undefined" class="text-sm font-medium text-gray-500 normal-case">
@@ -98,38 +102,56 @@ const isFiltersOpen = ref(false)
         </span>
       </h1>
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 xl:gap-4">
-        <div class="flex items-center gap-2">
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-sliders-horizontal"
-            class="rounded-sm"
-            @click="isFiltersOpen = true"
-          >
-            Filtre
-            <UBadge v-if="activeFilterCount > 0" color="primary" variant="solid" class="rounded-sm ml-1">
-              {{ activeFilterCount }}
-            </UBadge>
-          </UButton>
+        <div class="w-full flex gap-2">
+          <div class="flex items-center gap-2 flex-1 sm:flex-none">
+            <UButton
+              color="neutral"
+              variant="outline"
+              icon="i-lucide-sliders-horizontal"
+              class="rounded-sm sm:text-sm w-full sm:w-auto"
+              size="lg"
+              @click="isFiltersOpen = true"
+            >
+              <span class="flex justify-between items-center gap-2 w-full">Filtreaza
+              <UBadge v-if="activeFilterCount > 0" color="primary" variant="solid" class="ml-1 rounded-sm w-5 h-5 p-0 flex items-center justify-center text-xs">
+                {{ activeFilterCount }}
+              </UBadge>
+              </span>
+            </UButton>
+          </div>
+          <div class="flex items-center justify-between gap-2 sm:ml-auto flex-1 sm:flex-none">
+            <p class="hidden md:block text-sm font-medium text-gray-500">Sorteaza dupa:</p>
+            <USelect v-model="sort" :items="sortOptions" value-key="value" label-key="label" size="lg" class="w-full sm:w-36 rounded-sm" />
+          </div>
         </div>
-        <div class="flex items-center justify-between gap-2 sm:ml-auto">
-          <p class="text-sm font-medium text-gray-500">Sorteaza dupa:</p>
-          <USelect v-model="sort" :items="sortOptions" value-key="value" label-key="label" class="w-36" />
-        </div>
+
         <div class="hidden md:flex items-center gap-2">
            <p class="text-sm font-medium text-gray-500">Produse:</p>
-           <USelect v-model="limit" :items="limitOptions" value-key="value" label-key="label" class="w-36" />
+           <USelect v-model="limit" :items="limitOptions" value-key="value" label-key="label" size="lg" class="w-36 rounded-sm" />
         </div>
       </div>
     </div>
 
-    <USlideover v-model:open="isFiltersOpen" side="right" title="Filtre">
+    <USlideover v-model:open="isFiltersOpen" side="left" title="Filtre">
       <template #body>
         <ProductFilters
           :facets="facets"
           :hide-brand="hideBrand"
           :hide-subcategory="hideSubcategory"
         />
+      </template>
+      <template #footer>
+        <UButton
+          v-if="activeFilterCount > 0"
+          color="error"
+          variant="subtle"
+          block
+          class="rounded-sm p-3 justify-start"
+          icon="i-lucide-x"
+          @click="resetFilters"
+        >
+          Sterge filtrele ({{ activeFilterCount }})
+        </UButton>
       </template>
     </USlideover>
 
