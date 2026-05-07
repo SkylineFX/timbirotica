@@ -82,7 +82,7 @@ const accordionItems = [
                 
                 <!-- SKU / Code -->
                 <p class="text-sm text-gray-500 mb-0 font-mono">
-                    Cod: {{ product.sku}}
+                    Cod produs: {{ product.sku}}
                 </p>
             </div>
             
@@ -90,7 +90,7 @@ const accordionItems = [
         </div>
 
         <div class="w-full md:col-span-5">
-            <div class="flex flex-col h-full md:pb-[80px]">
+            <div class="flex flex-col h-full md:pb-[0px]">
                 <!-- Desktop Header (hidden on mobile) -->
                 <div class="hidden md:block">
                     <!-- Brand container -->
@@ -107,7 +107,7 @@ const accordionItems = [
                     
                     <!-- SKU / Code -->
                     <p class="text-sm text-gray-500 mb-6 font-mono">
-                        Cod: {{ product.sku}}
+                        Cod produs: {{ product.sku}}
                     </p>
                 </div>
 
@@ -128,7 +128,7 @@ const accordionItems = [
                 </div>
 
                 <!-- Actions -->
-                <div class="flex flex-col items-start gap-3 mb-4 md:mb-8 w-full max-w-md">
+                <div class="flex flex-col items-start gap-3 mb-6 w-full max-w-md">
                     <div class="flex items-center gap-2">
                         <p>Cantitate:</p>
                         <UInputNumber
@@ -159,10 +159,17 @@ const accordionItems = [
                             @click.prevent="toggleFavorite"
                         />
                     </div>
+                    <div class="flex items-center">
+                        <p class="text-sm text-gray-500 flex items-center gap-1">
+                            <span>Sau poti comanda</span>
+                            <a href="tel:+40751022882" class="font-bold underline">telefonic</a>
+                            <UIcon name="i-lucide-phone" class="w-4 h-4" />
+                        </p>
+                    </div>
                 </div>
                 
                 <!-- Additional Info -->
-                <div class="mt-auto w-full dark:border-gray-800 pt-6">
+                <div class="mt-auto w-full">
                     <UAccordion :items="accordionItems" color="primary" variant="soft" size="md" default-value="0"  />
                 </div>
             </div>
@@ -170,8 +177,8 @@ const accordionItems = [
     </div>
 
     <!-- Description Container -->
-    <div v-if="product && product.description" class="mt-12 md:border-t md:border-gray-200 dark:border-gray-800 md:pt-8 flex flex-col gap-4">
-        <h2 class="text-xl lg:text-2xl font-bold items-baseline border-b md:border-b-0 border-gray-200 pb-1">Descriere produs</h2>
+    <div v-if="product && product.description" class="mt-8 md:mt-12 md:pt-4 flex flex-col gap-4">
+        <h2 class="text-xl lg:text-2xl font-bold items-baseline border-b border-gray-200 pb-1">Descriere produs</h2>
         <div class="prose dark:prose-invert text-gray-600 dark:text-gray-300 max-w-none">
             <p>{{ product.description }}</p>
         </div>

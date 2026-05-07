@@ -5,7 +5,7 @@ const { data: brands } = await useFetch('/api/brands')
 
 <template>
   <UContainer class="py-8 lg:py-12">
-    <h1 class="text-3xl lg:text-4xl font-bold mb-6">Lista producatorilor</h1>
+    <h1 class="text-2xl lg:text-3xl font-bold mb-4 md:mb-6">Lista producatorilor</h1>
     
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
       <NuxtLink 

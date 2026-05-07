@@ -11,7 +11,7 @@ useHead({
   <UContainer class="py-8 lg:py-12 max-w-5xl">
     <!-- Header -->
     <div class="mb-8 lg:mb-12">
-      <h1 class="text-3xl lg:text-4xl font-bold mb-4">Despre Noi</h1>
+      <h1 class="text-2xl lg:text-3xl font-bold mb-4">Despre Noi</h1>
       <p class="text-gray-600 max-w-2xl text-md lg:text-lg">Află mai multe despre detaliile companiei.</p>
     </div>
 

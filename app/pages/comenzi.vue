@@ -87,7 +87,7 @@ async function orderAgain() {
 
 <template>
   <UContainer class="py-8 lg:py-12 max-w-5xl">
-    <h1 class="text-3xl lg:text-4xl font-bold mb-6">Comenzile mele</h1>
+    <h1 class="text-2xl lg:text-3xl font-bold mb-4 md:mb-6">Comenzile mele</h1>
     <div class="overflow-hidden">
       <!-- Order History Section -->
          <div v-if="!userOrders || userOrders.length === 0" class="text-center py-12 rounded-md text-gray-500 bg-gray-50 border border-dashed border-gray-200">
@@ -112,7 +112,7 @@ async function orderAgain() {
                  <UBadge :color="statusColor[order.status]" variant="subtle" size="sm" class="hidden lg:block">{{ statusLabel[order.status] }}</UBadge>
                  <span class="relative flex h-3 w-3 flex-shrink-0 lg:hidden">
                     <span v-if="order.status === 'processing'" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3" :class="{ 'bg-yellow-200': order.status === 'processing' }"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3" :class="{ 'ring-1 ring-yellow-300 bg-yellow-200': order.status === 'processing' }"></span>
                  </span>
                 </div>
               </div>
