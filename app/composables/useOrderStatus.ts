@@ -1,8 +1,9 @@
-export type OrderStatus = 'processing' | 'shipped' | 'completed' | 'cancelled'
+export type OrderStatus = 'processing' | 'confirmed' | 'shipped' | 'completed' | 'cancelled'
 type BadgeColor = 'warning' | 'info' | 'success' | 'error' | 'neutral' | 'primary' | 'secondary'
 
 export const ORDER_STATUS_LABEL: Record<string, string> = {
   processing: 'În procesare',
+  confirmed: 'Confirmată',
   shipped: 'Expediată',
   completed: 'Finalizată',
   cancelled: 'Anulată',
@@ -10,12 +11,13 @@ export const ORDER_STATUS_LABEL: Record<string, string> = {
 
 export const ORDER_STATUS_COLOR: Record<string, BadgeColor> = {
   processing: 'warning',
+  confirmed: 'primary',
   shipped: 'info',
   completed: 'success',
   cancelled: 'error',
 }
 
-export const ORDER_STATUS_VALUES: OrderStatus[] = ['processing', 'shipped', 'completed', 'cancelled']
+export const ORDER_STATUS_VALUES: OrderStatus[] = ['processing', 'confirmed', 'shipped', 'completed', 'cancelled']
 
 export function useOrderStatus() {
   return {

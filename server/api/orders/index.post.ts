@@ -22,6 +22,10 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Utilizatorul nu a fost gasit.' })
   }
 
+  if (!userRecord.emailVerifiedAt) {
+    throw createError({ statusCode: 403, statusMessage: 'Trebuie sa confirmi adresa de email inainte de a plasa o comanda.' })
+  }
+
   // 1. Fetch the user's cart holding the products
   const cart = await db.query.carts.findFirst({
     where: eq(tables.carts.userId, session.user.id),

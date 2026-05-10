@@ -159,6 +159,13 @@ export const useCart = () => {
     }
   }
 
+  const clearServerCart = async () => {
+    if (loggedIn.value) {
+      await $fetch('/api/cart', { method: 'DELETE' })
+    }
+    clearCart()
+  }
+
   const syncCart = async () => {
     if (!loggedIn.value) return
 
@@ -212,6 +219,7 @@ export const useCart = () => {
     removeFromCart,
     updateQuantity,
     clearCart,
+    clearServerCart,
     syncCart,
     total
   }

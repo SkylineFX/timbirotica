@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
 const bodySchema = z.object({
-  status: z.enum(['processing', 'shipped', 'completed', 'cancelled'])
+  status: z.enum(['processing', 'confirmed', 'shipped', 'completed', 'cancelled'])
 })
 
 export default eventHandler(async (event) => {

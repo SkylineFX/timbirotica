@@ -1,7 +1,13 @@
-export default defineNuxtRouteMiddleware(() => {
-  const { loggedIn } = useUserSession()
+export default defineNuxtRouteMiddleware(async () => {
+  const { loggedIn, fetch: refreshSession } = useUserSession()
 
-  // redirect the user to the login screen if they're not authenticated
+  // Cached `loggedIn` can be stale (cookie expired, server restarted, session
+  // revoked) — re-validate against the server before letting the user through,
+  // otherwise protected pages render with null data instead of redirecting.
+  if (import.meta.client) {
+    await refreshSession()
+  }
+
   if (!loggedIn.value) {
     return navigateTo('/user/login')
   }

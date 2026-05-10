@@ -6,7 +6,7 @@ definePageMeta({
 })
 
 const { data: userOrders, refresh: refreshOrders } = await useFetch('/api/user/orders')
-const { fetchCart } = useCart()
+const { fetchCart, cartItems, clearServerCart } = useCart()
 const toast = useToast()
 
 const statusLabel = ORDER_STATUS_LABEL
@@ -18,6 +18,7 @@ const parsedShippingAddress = ref<any>({})
 const parsedBillingAddress = ref<any>({})
 const isCancelLoading = ref(false)
 const isReorderLoading = ref(false)
+const isReorderConfirmOpen = ref(false)
 
 function openOrderDetails(order: any) {
   selectedOrder.value = order
@@ -52,10 +53,28 @@ async function cancelOrder() {
   }
 }
 
-async function orderAgain() {
+function orderAgain() {
+  if (!selectedOrder.value?.items?.length) return
+  if (cartItems.value.length > 0) {
+    isReorderConfirmOpen.value = true
+    return
+  }
+  performReorder({ replace: false })
+}
+
+async function performReorder({ replace }: { replace: boolean }) {
   if (!selectedOrder.value?.items?.length) return
   isReorderLoading.value = true
   try {
+    if (replace) {
+      try {
+        await clearServerCart()
+      } catch {
+        toast.add({ title: 'Nu am putut goli coșul', color: 'error' })
+        return
+      }
+    }
+
     const items = selectedOrder.value.items
     const results = await Promise.allSettled(
       items.map((item: any) =>
@@ -75,12 +94,13 @@ async function orderAgain() {
     } else if (skipped.length) {
       toast.add({ title: 'Unele produse nu sunt disponibile', description: `Sărite: ${skipped.join(', ')}`, color: 'warning' })
     } else {
-      toast.add({ title: 'Produsele au fost adăugate în coș', color: 'success' })
+      toast.add({ title: replace ? 'Coșul a fost înlocuit' : 'Produsele au fost adăugate în coș', color: 'success' })
     }
   } catch {
     toast.add({ title: 'Eroare la adăugarea în coș', color: 'error' })
   } finally {
     isReorderLoading.value = false
+    isReorderConfirmOpen.value = false
   }
 }
 </script>
@@ -247,7 +267,7 @@ async function orderAgain() {
                     color="neutral"
                     size="xl"
                     variant="soft"
-                    class="flex-1 justify-center text-sm md:text-base"
+                    class="flex-1 justify-center text-sm"
                     :to="`/api/user/orders/${selectedOrder.id}/proforma`"
                     external
                     download
@@ -256,7 +276,7 @@ async function orderAgain() {
                     color="neutral"
                     size="xl"
                     variant="outline"
-                    class="flex-1 justify-center text-sm md:text-base"
+                    class="flex-1 justify-center text-sm"
                     :loading="isReorderLoading"
                     @click="orderAgain"
                 >Comandă din nou</UButton>
@@ -266,12 +286,42 @@ async function orderAgain() {
                 color="error"
                 size="xl"
                 variant="outline"
-                class="flex-1 justify-center text-sm md:text-base"
+                class="flex-1 justify-center text-sm"
                 :loading="isCancelLoading"
                 @click="cancelOrder"
               >Anulează comanda</UButton>
             </div>
          </div>
+      </template>
+    </UModal>
+
+    <UModal v-model:open="isReorderConfirmOpen" title="Coșul nu este gol" :ui="{ content: 'rounded-md sm:max-w-md' }">
+      <template #body>
+        <p class="text-sm text-gray-600">
+          Coșul tău conține deja produse. Cum vrei să adaugi produsele din această comandă?
+        </p>
+      </template>
+      <template #footer>
+        <div class="flex flex-col sm:flex-row gap-2 w-full">
+          <UButton
+            color="error"
+            variant="soft"
+            class="flex-1 justify-center rounded-sm"
+            :loading="isReorderLoading"
+            @click="performReorder({ replace: true })"
+          >
+            Înlocuiește coșul
+          </UButton>
+          <UButton
+            color="primary"
+            variant="solid"
+            class="flex-1 justify-center rounded-sm"
+            :loading="isReorderLoading"
+            @click="performReorder({ replace: false })"
+          >
+            Adaugă la coș
+          </UButton>
+        </div>
       </template>
     </UModal>
   </UContainer>

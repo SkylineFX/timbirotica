@@ -16,7 +16,7 @@ if (!orderNumber) {
 
 <template>
   <div class="min-h-[60vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-md border border-gray-200 text-center">
+    <div class="max-w-md w-full space-y-8 bg-white p-6 md:p-8 lg:p-10 rounded-md border border-gray-200 text-center">
       <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100">
         <UIcon name="i-lucide-check" class="h-10 w-10 text-green-600" />
       </div>

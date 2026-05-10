@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect } from 'vue'
+import { ref, computed, watchEffect, onMounted, onUnmounted } from 'vue'
 import { useCart } from '~/composables/useCart'
 
 definePageMeta({
@@ -30,6 +30,52 @@ type Address = {
 
 const { data: userAddresses, refresh: refreshAddresses } = await useFetch<Address[]>('/api/user/addresses')
 const { data: userBillingAddresses, refresh: refreshBillingAddresses } = await useFetch<any[]>('/api/user/billing-addresses')
+const { data: verificationStatus, refresh: refreshVerification } = await useFetch<{ verified: boolean }>('/api/auth/verification-status')
+
+const isEmailVerified = computed(() => !!verificationStatus.value?.verified)
+const isResendingVerification = ref(false)
+const resendCooldown = ref(0)
+let cooldownTimer: ReturnType<typeof setInterval> | null = null
+
+function startCooldown(seconds: number) {
+  resendCooldown.value = seconds
+  if (cooldownTimer) clearInterval(cooldownTimer)
+  cooldownTimer = setInterval(() => {
+    resendCooldown.value -= 1
+    if (resendCooldown.value <= 0 && cooldownTimer) {
+      clearInterval(cooldownTimer)
+      cooldownTimer = null
+    }
+  }, 1000)
+}
+
+onUnmounted(() => {
+  if (cooldownTimer) clearInterval(cooldownTimer)
+})
+
+async function resendVerificationEmail() {
+  isResendingVerification.value = true
+  try {
+    await $fetch('/api/auth/send-verification', { method: 'POST' })
+    toast.add({ title: 'Email trimis', description: 'Verifica inbox-ul sau folderul de spam pentru linkul de confirmare.', color: 'success' })
+    startCooldown(60)
+  } catch (e: any) {
+    if (e?.statusCode === 429 && e?.data?.data?.retryAfter) {
+      startCooldown(e.data.data.retryAfter)
+    }
+    toast.add({ title: 'Eroare', description: e?.data?.message || 'Nu am putut trimite emailul. Incearca din nou.', color: 'error' })
+  } finally {
+    isResendingVerification.value = false
+  }
+}
+
+const onVisibility = () => {
+  if (document.visibilityState === 'visible' && !isEmailVerified.value) {
+    refreshVerification()
+  }
+}
+onMounted(() => document.addEventListener('visibilitychange', onVisibility))
+onUnmounted(() => document.removeEventListener('visibilitychange', onVisibility))
 
 const selectedAddressId = ref<number | null>(null)
 const selectedBillingId = ref<number | null>(null)
@@ -128,6 +174,11 @@ const isSubmitting = ref(false)
 const toast = useToast()
 
 async function submitOrder() {
+  if (!isEmailVerified.value) {
+    toast.add({ title: 'Confirmă adresa de email', description: 'Trebuie să confirmi adresa de email înainte de a plasa o comandă.', color: 'error' })
+    return
+  }
+
   if (cartItems.value.length === 0) {
     toast.add({ title: 'Coș gol', description: 'Coșul trebuie să conțină produse.', color: 'error' })
     return
@@ -184,10 +235,34 @@ async function submitOrder() {
       <div class="w-full lg:w-3/5 px-4 sm:px-6 lg:px-8 py-8 lg:py-12 flex flex-col gap-8 bg-white border-r border-gray-100">
 
         <!-- Logo / Title -->
-        <div class="mb-4">
+        <div class="mb-2">
            <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">Finalizare comandă</h1>
            <p class="text-gray-500 mt-1">Completeaza detaliile de mai jos.</p>
         </div>
+
+        <UAlert
+          v-if="!isEmailVerified"
+          color="warning"
+          variant="subtle"
+          icon="i-lucide-mail-warning"
+          title="Confirmă adresa de email"
+          description="Pentru a putea plasa comanda, te rugăm să confirmi adresa de email."
+          class="rounded-sm"
+        >
+          <template #actions>
+            <UButton
+              color="warning"
+              variant="solid"
+              size="sm"
+              :loading="isResendingVerification"
+              :disabled="resendCooldown > 0"
+              class="rounded-sm"
+              @click="resendVerificationEmail"
+            >
+              {{ resendCooldown > 0 ? `Retrimite emailul (${resendCooldown}s)` : 'Retrimite emailul' }}
+            </UButton>
+          </template>
+        </UAlert>
 
         <!-- 1. Ship to -->
         <div class="flex flex-col gap-3">
@@ -229,7 +304,7 @@ async function submitOrder() {
                 </div>
                 <div>
                    <div class="font-semibold text-gray-900 text-sm">Livrare prin Curier</div>
-                   <div class="text-gray-500 text-xs mt-0.5">Cu masinile noastre, doar in Bucuresti.</div>
+                   <div class="text-gray-500 text-xs mt-0.5">Cu masinile noastre, doar in Bucuresti si Ilfov.</div>
                 </div>
               </div>
               <div class="text-sm font-semibold min-w-fit" :class="courierShippingCost === 0 ? 'text-green-600' : 'text-gray-900'">
@@ -336,7 +411,7 @@ async function submitOrder() {
               <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="!billingSameAsShipping ? 'border-primary' : 'border-gray-300'">
                 <div v-if="!billingSameAsShipping" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
               </div>
-              <span class="text-sm font-medium text-gray-900">Folosește altă adresă de facturare</span>
+              <span class="text-sm font-medium text-gray-900">Adresă de facturare persoană juridică</span>
               <input type="radio" :value="false" v-model="billingSameAsShipping" class="hidden">
             </label>
             <div v-if="!billingSameAsShipping" class="text-sm p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors" @click="isBillingSelectorOpen = true">
@@ -357,7 +432,7 @@ async function submitOrder() {
 
         <!-- Extra / Submit -->
          <div class="mt-6">
-            <UButton :loading="isSubmitting" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] hidden lg:flex justify-center">
+            <UButton :loading="isSubmitting" :disabled="!isEmailVerified" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] hidden lg:flex justify-center">
                Plasează comanda
             </UButton>
          </div>
@@ -408,7 +483,7 @@ async function submitOrder() {
          </div>
 
         <div class="mt-6">
-           <UButton :loading="isSubmitting" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] lg:hidden flex justify-center">
+           <UButton :loading="isSubmitting" :disabled="!isEmailVerified" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] lg:hidden flex justify-center">
               Plasează comanda
            </UButton>
         </div>
@@ -440,7 +515,7 @@ async function submitOrder() {
   <AddressSelectorModal 
     v-model:open="isBillingSelectorOpen" 
     v-model:selectedId="selectedBillingId" 
-    title="Date de facturare (Persoane juridice)" 
+    title="Adresa de facturare (Companie)" 
     :items="userBillingAddresses" 
     empty-message="Nu ai nicio companie salvată în cont."
     @add-new="openNewBilling"

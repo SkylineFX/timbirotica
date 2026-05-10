@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
+import { issueVerificationToken } from '../utils/emailVerification'
 
 const registerSchema = z.object({
   email: z.email(),
@@ -46,6 +47,12 @@ export default defineEventHandler(async (event) => {
       role: 'user',
     }
   })
+
+  try {
+    await issueVerificationToken(event, { id: newUser.id, email: newUser.email, firstName: newUser.firstName })
+  } catch (e) {
+    console.error('Failed to send verification email at registration', e)
+  }
 
   return {}
 })

@@ -8,6 +8,7 @@ export const users = sqliteTable('users', {
   email: text().notNull().unique(),
   password: text().notNull(),
   role: text().notNull().default('user'),
+  emailVerifiedAt: integer('email_verified_at', { mode: 'timestamp' }),
   createdAt: integer({ mode: 'timestamp' }).notNull(),
 })
 
@@ -206,6 +207,14 @@ export const billingAddressesRelations = relations(billingAddresses, ({ one }) =
 }))
 
 export const passwordResetTokens = sqliteTable('password_reset_tokens', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').notNull().references(() => users.id),
+  tokenHash: text('token_hash').notNull().unique(),
+  expiresAt: integer('expires_at').notNull(),
+  createdAt: integer('created_at').notNull(),
+})
+
+export const emailVerificationTokens = sqliteTable('email_verification_tokens', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   userId: integer('user_id').notNull().references(() => users.id),
   tokenHash: text('token_hash').notNull().unique(),

@@ -138,14 +138,25 @@ const performSearch = () => {
       v-model="localQuery"
       @keyup.enter="performSearch"
       @focus="isOpen = true"
-      trailing-icon="i-lucide-search"
       size="md"
       variant="outline"
       placeholder="Cauta produse..."
       class="w-full"
       color="primary"
       :ui="{base: 'text-sm'}"
-    />
+    >
+      <template #trailing>
+        <UButton
+          color="neutral"
+          variant="link"
+          icon="i-lucide-search"
+          size="md"
+          class="p-0"
+          aria-label="Cauta"
+          @click="performSearch"
+        />
+      </template>
+    </UInput>
 
     <Transition
       enter-active-class="transition duration-100 ease-out"

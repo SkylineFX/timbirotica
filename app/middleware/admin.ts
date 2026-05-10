@@ -1,5 +1,10 @@
-export default defineNuxtRouteMiddleware(() => {
-  const { user, loggedIn } = useUserSession()
+export default defineNuxtRouteMiddleware(async () => {
+  const { user, loggedIn, fetch: refreshSession } = useUserSession()
+
+  if (import.meta.client) {
+    await refreshSession()
+  }
+
   if (!loggedIn.value) {
     return navigateTo('/user/login')
   }
