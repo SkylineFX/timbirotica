@@ -29,12 +29,12 @@ function accept() {
       v-if="visible"
       class="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6 pointer-events-none"
     >
-      <div class="mx-auto max-w-3xl pointer-events-auto bg-white rounded-md shadow-lg border border-gray-200 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+      <div class="mx-auto max-w-3xl pointer-events-auto bg-white rounded-sm shadow-lg border border-gray-200 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
         <p class="text-sm text-gray-700 leading-relaxed flex-1">
           Folosim doar cookie-uri strict necesare pentru funcționarea site-ului (autentificare, coș de cumpărături). Nu utilizăm cookie-uri de analiză sau publicitate.
           <NuxtLink to="/politica-de-confidentialitate#cookies" class="text-primary hover:underline font-medium">Detalii</NuxtLink>
         </p>
-        <UButton color="primary" size="md" class="rounded-md justify-center" @click="accept">
+        <UButton color="primary" size="sm" class="rounded-sm justify-center" @click="accept">
           Am înțeles
         </UButton>
       </div>

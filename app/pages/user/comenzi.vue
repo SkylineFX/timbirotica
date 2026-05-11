@@ -132,7 +132,7 @@ async function performReorder({ replace }: { replace: boolean }) {
                  <UBadge :color="statusColor[order.status]" variant="subtle" size="sm" class="hidden lg:block">{{ statusLabel[order.status] }}</UBadge>
                  <span class="relative flex h-3 w-3 flex-shrink-0 lg:hidden">
                     <span v-if="order.status === 'processing'" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3" :class="{ 'ring-1 ring-yellow-300 bg-yellow-200': order.status === 'processing' }"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3" :class="{ 'bg-yellow-200': order.status === 'processing' }"></span>
                  </span>
                 </div>
               </div>

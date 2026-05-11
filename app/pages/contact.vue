@@ -52,7 +52,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   <UContainer class="py-8 lg:py-12">
     <!-- Header -->
     <div class="mb-8 lg:mb-12">
-      <h1 class="text-2xl lg:text-3xl font-bold mb-2 md:mb-4">Contactează-ne</h1>
+      <h1 class="text-3xl lg:text-3xl font-bold mb-2 md:mb-4">Contactează-ne</h1>
       <p class="text-gray-600 max-w-2xl text-md lg:text-lg">Ai o întrebare sau ai nevoie de asistență? <br/> Completează formularul sau folosește detaliile de contact de mai jos.</p>
     </div>
 

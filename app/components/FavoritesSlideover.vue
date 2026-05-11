@@ -13,8 +13,8 @@ const { addToCart } = useCart()
           </div>
           <ul v-else class="flex flex-col">
             <li v-for="item in favorites" :key="item.id" class="flex gap-4 py-8 border-b border-gray-200 dark:border-gray-800">
-               <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`" class="flex-shrink-0">
-                  <NuxtImg :src="item.product?.images?.[0] || ''" class="w-16 h-16 object-contain bg-white rounded-md" />
+               <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`" class="flex-shrink-0 cursor-pointer border border-gray-200 rounded-sm flex items-center justify-center p-1">
+                  <NuxtImg :src="item.product?.images?.[0] || ''" class="w-16 h-16 object-contain bg-white rounded-sm" />
                </NuxtLink>
               <div class="flex-1 flex flex-col justify-between">
                 <div>
@@ -22,10 +22,10 @@ const { addToCart } = useCart()
                         <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`">{{ item.product?.name }}</NuxtLink>
                     </h3>
                 </div>
-                <div class="flex justify-between items-center mt-2">
+                <div class="flex justify-between items-end mt-2">
                        <div class="flex items-center gap-2">
-                           <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" @click="removeFromFavorites(item.id)" />
-                           <UButton size="xs" color="primary" variant="soft" icon="i-lucide-shopping-cart" @click="addToCart(item.product)" tooltip="Adauga in cos" />
+                           <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" @click="removeFromFavorites(item.id)" class="p-1.5" />
+                           <UButton size="xs" color="primary" variant="soft" icon="i-lucide-shopping-cart" @click="addToCart(item.product)" tooltip="Adauga in cos" class="p-1.5" />
                        </div>
                        <span class="font-bold text-sm">{{ (item.product?.price ?? 0).toFixed(2) }} RON</span>
                 </div>

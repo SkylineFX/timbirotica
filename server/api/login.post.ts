@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 
 const bodySchema = z.object({
   email: z.email(),
-  password: z.string().min(8),
+  password: z.string().min(1),
   remember: z.boolean().optional()
 })
 
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       status: 401,
-      message: 'Bad credentials',
+      message: 'Adresa de email sau parola incorecta.',
     })
   }
 
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
   if (!isPasswordValid) {
     throw createError({
       status: 401,
-      message: 'Bad credentials',
+      message: 'Adresa de email sau parola incorecta.',
     })
   }
 

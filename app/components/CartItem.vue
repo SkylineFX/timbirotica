@@ -11,8 +11,8 @@ const { removeFromCart, updateQuantity } = useCart()
 
 <template>
   <div class="flex gap-4 w-full" :class="variant === 'slideover' ? 'border-b border-gray-200 dark:border-gray-800 py-8' : 'py-3'">
-    <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`">
-      <NuxtImg :src="item.product?.images?.[0] || 'https://placehold.co/100'" class="w-16 h-16 object-contain bg-white rounded-md shrink-0" :class="variant === 'checkout' ? 'p-1' : ''" />
+    <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`" class="flex-shrink-0 cursor-pointer border border-gray-200 rounded-sm p-1 flex items-center justify-center">
+      <NuxtImg :src="item.product?.images?.[0] || 'https://placehold.co/100'" class="w-16 h-16 object-contain bg-white rounded-sm shrink-0" :class="variant === 'checkout' ? 'p-1' : ''" />
     </NuxtLink>
     <div class="flex-1 flex flex-col justify-between min-w-0">
         <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`">
@@ -20,9 +20,9 @@ const { removeFromCart, updateQuantity } = useCart()
              {{ item.product?.name }}
           </p>
         </NuxtLink>
-      <div class="flex justify-between items-center mt-2">
+      <div class="flex justify-between items-end mt-2">
              <div class="flex items-center gap-1">
-                 <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" @click="removeFromCart(item.id)" />
+                 <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" @click="removeFromCart(item.id)" class="p-1.5" />
                  <UInputNumber size="xs" class="w-24" :model-value="item.quantity" :min="0" :step="1" @update:model-value="(val) => updateQuantity(item.id, Number(val))" />
              </div>
              <div class="flex flex-col items-end">

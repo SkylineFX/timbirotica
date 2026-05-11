@@ -104,7 +104,7 @@ useHead({
           <div class="flex flex-col gap-2 mb-4">
             <p>Livrarea comenzilor se poate face în următoarele moduri:</p>
             <ol class="list-decimal pl-5 space-y-2">
-              <li><strong>Ridicare de la sediul nostru:</strong> Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București.</li>
+              <li><strong>Ridicare de la <a href="/despre-noi/#locatie" class="text-primary hover:underline">sediul nostru:</a></strong> Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București.</li>
               <li><strong>Cu mașinile proprii</strong>: Momentan, livrările se efectuează doar în București și Ilfov.</li>
             </ol>
           </div>

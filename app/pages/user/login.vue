@@ -37,7 +37,7 @@ const providers = [{
 
 const schema = z.object({
   email: z.email('Adresa de email nu este valida'),
-  password: z.string('Parola este obligatorie').min(8, 'Parola trebuie sa aiba cel putin 8 caractere'),
+  password: z.string('Parola este obligatorie').min(1, 'Parola este obligatorie'),
   remember: z.boolean().optional()
 })
 

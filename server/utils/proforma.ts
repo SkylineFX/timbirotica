@@ -137,7 +137,7 @@ export async function generateProformaPdf(input: ProformaInput): Promise<Uint8Ar
   let y = height - margin
 
   // Header — title + reference
-  page.drawText('FACTURĂ PROFORMĂ', { x: margin, y: y - 18, size: 20, font: fontBold, color: black })
+  page.drawText('PROFORMĂ', { x: margin, y: y - 18, size: 20, font: fontBold, color: black })
   const refLabel = `Nr. ${input.orderNumber}`
   const refDate = fmtDate(input.orderDate)
   page.drawText(refLabel, { x: width - margin - fontBold.widthOfTextAtSize(refLabel, 12), y: y - 8, size: 12, font: fontBold, color: black })
@@ -168,7 +168,7 @@ export async function generateProformaPdf(input: ProformaInput): Promise<Uint8Ar
   }
 
   drawHeading('FURNIZOR', supplierX, y)
-  drawHeading(input.customer.type === 'company' ? 'CUMPĂRĂTOR' : 'CLIENT', customerX, y)
+  drawHeading('CLIENT', customerX, y)
 
   const supplierLines = [
     COMPANY.name,
@@ -200,110 +200,155 @@ export async function generateProformaPdf(input: ProformaInput): Promise<Uint8Ar
   page.drawLine({ start: { x: margin, y }, end: { x: width - margin, y }, thickness: 0.8, color: lightGrey })
   y -= 16
 
-  // Items table — A4 with 36pt margins.
-  const colIdx   = { x: margin,        width: 22,  align: 'left'  as const }
-  const colName  = { x: margin + 22,   width: 200, align: 'left'  as const }
-  const colQty   = { x: margin + 222,  width: 36,  align: 'right' as const }
-  const colUnit  = { x: margin + 258,  width: 70,  align: 'right' as const }
-  const colNet   = { x: margin + 328,  width: 70,  align: 'right' as const }
-  const colVat   = { x: margin + 398,  width: 50,  align: 'right' as const }
-  const colGross = { x: margin + 448,  width: 75,  align: 'right' as const }
+  // Items table — A4 with 36pt margins. Columns mirror the printed proforma sample.
+  const colIdx = { x: margin, width: 22, align: 'left' as const }
+  const colName = { x: margin + 22, width: 210, align: 'left' as const }
+  const colUm = { x: margin + 232, width: 38, align: 'center' as const }
+  const colQty = { x: margin + 270, width: 38, align: 'center' as const }
+  const colPrice = { x: margin + 308, width: 65, align: 'right' as const }
+  const colValue = { x: margin + 373, width: 70, align: 'right' as const }
+  const colVat = { x: margin + 443, width: 80, align: 'right' as const }
 
-  // Header row
-  page.drawRectangle({ x: margin, y: y - 14, width: width - margin * 2, height: 18, color: lightGrey })
-  drawCell(page, 'Nr.',           colIdx.x,   y - 4, colIdx.width,   fontBold, 9, black, colIdx.align)
-  drawCell(page, 'Denumire',      colName.x,  y - 4, colName.width,  fontBold, 9, black, colName.align)
-  drawCell(page, 'Cant.',         colQty.x,   y - 4, colQty.width,   fontBold, 9, black, colQty.align)
-  drawCell(page, 'P.U. fără TVA', colUnit.x,  y - 4, colUnit.width,  fontBold, 9, black, colUnit.align)
-  drawCell(page, 'Val. fără TVA', colNet.x,   y - 4, colNet.width,   fontBold, 9, black, colNet.align)
-  drawCell(page, 'TVA',           colVat.x,   y - 4, colVat.width,   fontBold, 9, black, colVat.align)
-  drawCell(page, 'Val. cu TVA',   colGross.x, y - 4, colGross.width, fontBold, 9, black, colGross.align)
-  y -= 22
+  // Header — two lines (label + "Lei" sub-label for currency columns)
+  const headerHeight = 28
+  page.drawRectangle({ x: margin, y: y - headerHeight, width: width - margin * 2, height: headerHeight, color: lightGrey })
+  const headerLabelY = y - 11
+  const headerSubY = y - 22
+  drawCell(page, '#', colIdx.x, headerLabelY, colIdx.width, fontBold, 9, black, colIdx.align)
+  drawCell(page, 'Denumire', colName.x, headerLabelY, colName.width, fontBold, 9, black, colName.align)
+  drawCell(page, 'U.M.', colUm.x, headerLabelY, colUm.width, fontBold, 9, black, colUm.align)
+  drawCell(page, 'Cant.', colQty.x, headerLabelY, colQty.width, fontBold, 9, black, colQty.align)
+  drawCell(page, 'Preț fără TVA', colPrice.x, headerLabelY, colPrice.width, fontBold, 9, black, colPrice.align)
+  drawCell(page, 'Valoare', colValue.x, headerLabelY, colValue.width, fontBold, 9, black, colValue.align)
+  drawCell(page, 'Valoare TVA', colVat.x, headerLabelY, colVat.width, fontBold, 9, black, colVat.align)
+  drawCell(page, 'Lei', colPrice.x, headerSubY, colPrice.width, font, 8, grey, colPrice.align)
+  drawCell(page, 'Lei', colValue.x, headerSubY, colValue.width, font, 8, grey, colValue.align)
+  drawCell(page, 'Lei', colVat.x, headerSubY, colVat.width, font, 8, grey, colVat.align)
+  y -= headerHeight + 4
 
-  // Rows
+  // Rows — generous vertical breathing room, thin separator after each
   const vatMul = 1 + VAT_RATE / 100
   let subtotalNet = 0
   let subtotalVat = 0
+
+  const drawRow = (cells: { idx: string; name: string; qty: string; unitNet: number; lineNet: number; lineVat: number }) => {
+    const nameLines = wrapText(cells.name, font, 10, colName.width - 4)
+    const contentTop = y - 12
+    drawCell(page, cells.idx, colIdx.x, contentTop, colIdx.width, font, 10, black, colIdx.align)
+    nameLines.forEach((ln, i) => {
+      drawCell(page, ln, colName.x, contentTop - i * 12, colName.width, font, 10, black, colName.align)
+    })
+    drawCell(page, 'BUC', colUm.x, contentTop, colUm.width, font, 10, black, colUm.align)
+    drawCell(page, cells.qty, colQty.x, contentTop, colQty.width, font, 10, black, colQty.align)
+    drawCell(page, ronFmt.format(cells.unitNet), colPrice.x, contentTop, colPrice.width, font, 10, black, colPrice.align)
+    drawCell(page, ronFmt.format(cells.lineNet), colValue.x, contentTop, colValue.width, font, 10, black, colValue.align)
+    drawCell(page, ronFmt.format(cells.lineVat), colVat.x, contentTop, colVat.width, font, 10, black, colVat.align)
+    const rowHeight = Math.max(28, nameLines.length * 12 + 16)
+    y -= rowHeight
+    page.drawLine({ start: { x: margin, y: y + 2 }, end: { x: width - margin, y: y + 2 }, thickness: 0.3, color: lightGrey })
+  }
 
   input.items.forEach((it, idx) => {
     const lineGross = it.priceAtBuy * it.quantity
     const lineNet = lineGross / vatMul
     const lineVat = lineGross - lineNet
     const unitNet = it.priceAtBuy / vatMul
-
     subtotalNet += lineNet
     subtotalVat += lineVat
-
-    // Wrap product name if needed
-    const nameLines = wrapText(it.name, font, 9, colName.width - 4)
-    const rowHeight = Math.max(14, nameLines.length * 11 + 4)
-
-    drawCell(page, String(idx + 1),          colIdx.x,   y, colIdx.width,   font, 9, black, colIdx.align)
-    nameLines.forEach((ln, i) => {
-      drawCell(page, ln,                     colName.x,  y - i * 11, colName.width, font, 9, black, colName.align)
+    drawRow({
+      idx: String(idx + 1),
+      name: it.name,
+      qty: String(it.quantity),
+      unitNet,
+      lineNet,
+      lineVat,
     })
-    drawCell(page, String(it.quantity),      colQty.x,   y, colQty.width,   font, 9, black, colQty.align)
-    drawCell(page, ronFmt.format(unitNet),   colUnit.x,  y, colUnit.width,  font, 9, black, colUnit.align)
-    drawCell(page, ronFmt.format(lineNet),   colNet.x,   y, colNet.width,   font, 9, black, colNet.align)
-    drawCell(page, `${VAT_RATE}%`,           colVat.x,   y, colVat.width,   font, 9, black, colVat.align)
-    drawCell(page, ronFmt.format(lineGross), colGross.x, y, colGross.width, font, 9, black, colGross.align)
-
-    y -= rowHeight
-    page.drawLine({ start: { x: margin, y: y + 4 }, end: { x: width - margin, y: y + 4 }, thickness: 0.3, color: lightGrey })
   })
 
-  // Shipping line (if any)
+  // Shipping line
   const shippingGross = input.shippingCost
   const shippingNet = shippingGross / vatMul
   const shippingVat = shippingGross - shippingNet
   if (shippingGross > 0) {
     subtotalNet += shippingNet
     subtotalVat += shippingVat
-    drawCell(page, '',                           colIdx.x,   y, colIdx.width,   font, 9, black, colIdx.align)
-    drawCell(page, 'Transport',                  colName.x,  y, colName.width,  font, 9, black, colName.align)
-    drawCell(page, '1',                          colQty.x,   y, colQty.width,   font, 9, black, colQty.align)
-    drawCell(page, ronFmt.format(shippingNet),   colUnit.x,  y, colUnit.width,  font, 9, black, colUnit.align)
-    drawCell(page, ronFmt.format(shippingNet),   colNet.x,   y, colNet.width,   font, 9, black, colNet.align)
-    drawCell(page, `${VAT_RATE}%`,               colVat.x,   y, colVat.width,   font, 9, black, colVat.align)
-    drawCell(page, ronFmt.format(shippingGross), colGross.x, y, colGross.width, font, 9, black, colGross.align)
-    y -= 14
-    page.drawLine({ start: { x: margin, y: y + 4 }, end: { x: width - margin, y: y + 4 }, thickness: 0.3, color: lightGrey })
+    drawRow({
+      idx: '',
+      name: 'Transport',
+      qty: '1',
+      unitNet: shippingNet,
+      lineNet: shippingNet,
+      lineVat: shippingVat,
+    })
   }
 
-  y -= 12
+  // "Total" row — values aligned with their columns
+  y -= 8
+  const totalLabelX = colValue.x - 6
+  const totalLabelWidth = fontBold.widthOfTextAtSize('Total', 10)
+  page.drawText('Total', { x: totalLabelX - totalLabelWidth, y, size: 10, font: fontBold, color: black })
+  drawCell(page, ronFmt.format(subtotalNet), colValue.x, y, colValue.width, fontBold, 10, black, colValue.align)
+  drawCell(page, ronFmt.format(subtotalVat), colVat.x, y, colVat.width, fontBold, 10, black, colVat.align)
+  y -= 20
 
-  // Totals block (right-aligned)
-  const totalsX = width - margin - 220
-  const valuesX = width - margin
-  const drawTotalRow = (label: string, value: string, bold = false) => {
-    const f = bold ? fontBold : font
-    page.drawText(label, { x: totalsX, y, size: 10, font: f, color: black })
-    const valWidth = f.widthOfTextAtSize(value, 10)
-    page.drawText(value, { x: valuesX - valWidth, y, size: 10, font: f, color: black })
-    y -= 14
-  }
-  drawTotalRow('Total fără TVA', fmtRon(subtotalNet))
-  drawTotalRow(`TVA (${VAT_RATE}%)`, fmtRon(subtotalVat))
-  y -= 4
-  drawTotalRow('Total de plată', fmtRon(input.total), true)
+  // Highlighted "Total proforma" bar
+  const tpBarHeight = 26
+  page.drawRectangle({ x: margin, y: y - tpBarHeight, width: width - margin * 2, height: tpBarHeight, color: lightGrey })
+  const tpLabel = 'Total proformă'
+  const tpValue = fmtRon(input.total)
+  page.drawText(tpLabel, { x: margin + 10, y: y - 17, size: 11, font: fontBold, color: black })
+  const tpValueWidth = fontBold.widthOfTextAtSize(tpValue, 13)
+  page.drawText(tpValue, { x: width - margin - 10 - tpValueWidth, y: y - 18, size: 13, font: fontBold, color: black })
 
-  y -= 16
-
-  // Payment / shipping summary
-  page.drawText(`Modalitate de plată: ${paymentLabel(input.paymentMethod)}`, { x: margin, y, size: 9, font, color: black })
-  y -= 12
-  page.drawText(`Modalitate de livrare: ${shippingLabel(input.shippingMethod)}`, { x: margin, y, size: 9, font, color: black })
-  y -= 24
-
-  // Disclaimer (mandatory)
-  const disclaimer = 'Acest document este o factură proformă și nu reprezintă document fiscal. Factura fiscală va fi emisă la livrarea/încasarea comenzii.'
-  const disclaimerLines = wrapText(disclaimer, fontBold, 9, width - margin * 2)
-  for (const ln of disclaimerLines) {
-    page.drawText(ln, { x: margin, y, size: 9, font: fontBold, color: black })
-    y -= 12
-  }
+  // === Footer (anchored to the bottom of the page) ===
+  drawFooter(page, width, margin, font, fontBold, grey, black, lightGrey, {
+    payment: paymentLabel(input.paymentMethod),
+    shipping: shippingLabel(input.shippingMethod),
+  })
 
   return await pdfDoc.save()
+}
+
+function drawFooter(
+  page: PDFPage,
+  width: number,
+  margin: number,
+  font: PDFFont,
+  fontBold: PDFFont,
+  grey: ReturnType<typeof rgb>,
+  black: ReturnType<typeof rgb>,
+  lightGrey: ReturnType<typeof rgb>,
+  meta: { payment: string; shipping: string }
+) {
+  let fy = 130
+  page.drawText(`Modalitate de plată: ${meta.payment}`, { x: margin, y: fy, size: 9, font, color: black })
+  fy -= 12
+  page.drawText(`Modalitate de livrare: ${meta.shipping}`, { x: margin, y: fy, size: 9, font, color: black })
+  fy -= 16
+
+  const disclaimer = 'Acest document este o factură proformă și nu reprezintă document fiscal. Factura fiscală va fi emisă la livrarea/încasarea comenzii.'
+  const disclaimerLines = wrapText(disclaimer, font, 8, width - margin * 2)
+  for (const ln of disclaimerLines) {
+    page.drawText(ln, { x: margin, y: fy, size: 8, font, color: grey })
+    fy -= 10
+  }
+  fy -= 6
+  page.drawLine({ start: { x: margin, y: fy }, end: { x: width - margin, y: fy }, thickness: 0.5, color: lightGrey })
+  fy -= 14
+
+  // Company strip — name + contact
+  page.drawText(COMPANY.name, { x: margin, y: fy, size: 9, font: fontBold, color: black })
+  const telText = `Tel: ${COMPANY.phone}`
+  const emailText = `Email: ${COMPANY.email}`
+  page.drawText(emailText, { x: width - margin - font.widthOfTextAtSize(emailText, 9), y: fy, size: 9, font, color: grey })
+  page.drawText(telText, { x: width - margin - font.widthOfTextAtSize(emailText, 9) - 12 - font.widthOfTextAtSize(telText, 9), y: fy, size: 9, font, color: grey })
+  fy -= 12
+
+  // Bank info
+  const ibanText = `Cont: ${COMPANY.iban}`
+  const bankText = `Banca: ${COMPANY.bankName}`
+  page.drawText(ibanText, { x: margin, y: fy, size: 9, font, color: grey })
+  page.drawText(bankText, { x: width - margin - font.widthOfTextAtSize(bankText, 9), y: fy, size: 9, font, color: grey })
 }
 
 function drawCell(

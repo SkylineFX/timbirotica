@@ -339,7 +339,7 @@ const navigation = computed(() => [
     <USlideover v-model:open="isCartOpen" side="right" title="Cosul meu" :ui="{ body: 'py-0 sm:py-0' }">
       <template #body>
           <div v-if="cartItems.length === 0" class="p-8 text-center text-gray-500">
-            Cosul tau este gol.
+            Cosul este gol.
           </div>
           <div v-else class="w-full">
             <CartItem v-for="item in cartItems" :key="item.id || item.productId" :item="item" />
