@@ -181,17 +181,27 @@ const resetFilters = () => {
         />
       </template>
       <template #footer>
-        <UButton
-          v-if="activeFilterCount > 0"
-          color="error"
-          variant="subtle"
-          block
-          class="rounded-sm p-3 justify-start"
-          icon="i-lucide-x"
-          @click="resetFilters"
-        >
-          Sterge filtrele ({{ activeFilterCount }})
-        </UButton>
+        <div class="flex gap-2 w-full">
+          <UButton
+            color="primary"
+            variant="subtle"
+            trailing-icon="i-lucide-arrow-right"
+            block
+            class="rounded-sm p-3 flex-1 justify-between"
+            @click="isFiltersOpen = false"
+          >
+            Aplica filtrele
+          </UButton>
+          <UButton
+            v-if="activeFilterCount > 0"
+            color="error"
+            variant="subtle"
+            icon="i-lucide-rotate-ccw"
+            aria-label="Sterge filtrele"
+            class="rounded-sm p-3 aspect-square justify-center"
+            @click="resetFilters"
+          />
+        </div>
       </template>
     </USlideover>
 
