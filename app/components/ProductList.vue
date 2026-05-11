@@ -62,7 +62,7 @@ const fetchQuery = computed(() => {
   }
 })
 
-const { data, status, refresh } = await useFetch('/api/products', {
+const { data, status } = await useFetch('/api/products', {
     query: fetchQuery,
     watch: [fetchQuery]
 })
@@ -70,6 +70,48 @@ const { data, status, refresh } = await useFetch('/api/products', {
 const products = computed(() => data.value?.products || [])
 const total = computed(() => data.value?.total || 0)
 const facets = computed(() => data.value?.facets || { price: null, brands: null, subcategories: null })
+
+const normalizePriceQuery = () => {
+  const priceFacet = facets.value.price
+  if (!priceFacet || priceFacet.min >= priceFacet.max) return
+  const { min, max } = priceFacet
+
+  const rawMin = route.query.minPrice
+  const rawMax = route.query.maxPrice
+  if (rawMin == null && rawMax == null) return
+
+  const parsedMin = rawMin != null && rawMin !== '' ? Number(rawMin) : null
+  const parsedMax = rawMax != null && rawMax !== '' ? Number(rawMax) : null
+
+  let nextMin: any = rawMin
+  let nextMax: any = rawMax
+
+  if (parsedMin !== null && (!Number.isFinite(parsedMin) || parsedMin <= min || parsedMin > max)) nextMin = undefined
+  if (parsedMax !== null && (!Number.isFinite(parsedMax) || parsedMax >= max || parsedMax < min)) nextMax = undefined
+  if (
+    nextMin !== undefined && nextMax !== undefined &&
+    parsedMin !== null && parsedMax !== null &&
+    Number.isFinite(parsedMin) && Number.isFinite(parsedMax) &&
+    parsedMin > parsedMax
+  ) {
+    nextMin = undefined
+    nextMax = undefined
+  }
+
+  if (nextMin === rawMin && nextMax === rawMax) return
+
+  const next: Record<string, any> = { ...route.query, minPrice: nextMin, maxPrice: nextMax }
+  for (const k of Object.keys(next)) {
+    if (next[k] === undefined || next[k] === '') delete next[k]
+  }
+  return navigateTo({ query: next }, { replace: true })
+}
+
+watch(
+  () => [facets.value.price?.min, facets.value.price?.max, route.query.minPrice, route.query.maxPrice],
+  () => normalizePriceQuery(),
+  { immediate: true }
+)
 
 const hideBrand = computed(() => !!props.apiQuery.brand)
 const hideSubcategory = computed(() => !props.apiQuery.category)

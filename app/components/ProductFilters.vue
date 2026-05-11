@@ -101,6 +101,10 @@ const onPriceChange = (val: [number, number] | undefined) => {
   }, 400)
 }
 
+onBeforeUnmount(() => {
+  if (priceDebounce) clearTimeout(priceDebounce)
+})
+
 const showBrand = computed(() =>
   !props.hideBrand && !!props.facets.brands && props.facets.brands.length > 0
 )
@@ -141,6 +145,7 @@ const showSub = computed(() =>
           :key="sub.slug"
           :model-value="selectedSubs.includes(sub.slug)"
           :label="`${sub.name} (${sub.count})`"
+          :disabled="sub.count === 0 && !selectedSubs.includes(sub.slug)"
           @update:model-value="toggleSub(sub.slug)"
         />
       </div>
@@ -154,6 +159,7 @@ const showSub = computed(() =>
           :key="brand.slug"
           :model-value="selectedBrands.includes(brand.slug)"
           :label="`${brand.name} (${brand.count})`"
+          :disabled="brand.count === 0 && !selectedBrands.includes(brand.slug)"
           @update:model-value="toggleBrand(brand.slug)"
         />
       </div>
