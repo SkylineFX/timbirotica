@@ -74,9 +74,17 @@ const loggedInItems = computed(() => [
     icon: 'i-lucide-user',
     to: '/user',
   }, {
+    label: 'Adrese',
+    icon: 'i-lucide-map-pin',
+    to: '/user/adrese',
+  }, {
+    label: 'Companii',
+    icon: 'i-lucide-building-2',
+    to: '/user/companii',
+  }, {
     label: 'Comenzile mele',
     icon: 'i-lucide-package',
-    to: '/comenzi',
+    to: '/user/comenzi',
   }],
   [{
     label: 'Deconectare',

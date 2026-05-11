@@ -60,7 +60,7 @@ if (!orderNumber) {
       </div>
 
       <div class="mt-8 flex flex-col gap-2">
-        <NuxtLink to="/comenzi">
+        <NuxtLink to="/user/comenzi">
           <UButton block size="lg" color="primary" variant="subtle" class="rounded-md font-semibold text-sm justify-center w-full">
              Vezi istoricul comenzilor
           </UButton>

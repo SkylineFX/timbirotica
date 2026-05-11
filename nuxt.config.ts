@@ -28,5 +28,8 @@ export default defineNuxtConfig({
   },
   colorMode: {
     preference: 'light'
+  },
+  routeRules: {
+    '/comenzi': { redirect: { to: '/user/comenzi', statusCode: 301 } }
   }
 })

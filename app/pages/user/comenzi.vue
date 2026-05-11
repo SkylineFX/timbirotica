@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 
 definePageMeta({
+  layout: 'account',
   middleware: ['authenticated']
 })
 
@@ -106,8 +107,7 @@ async function performReorder({ replace }: { replace: boolean }) {
 </script>
 
 <template>
-  <UContainer class="py-8 lg:py-12 max-w-5xl">
-    <h1 class="text-2xl lg:text-3xl font-bold mb-4 md:mb-6">Comenzile mele</h1>
+  <div>
     <div class="overflow-hidden">
       <!-- Order History Section -->
          <div v-if="!userOrders || userOrders.length === 0" class="text-center py-12 rounded-md text-gray-500 bg-gray-50 border border-dashed border-gray-200">
@@ -324,5 +324,5 @@ async function performReorder({ replace }: { replace: boolean }) {
         </div>
       </template>
     </UModal>
-  </UContainer>
+  </div>
 </template>
