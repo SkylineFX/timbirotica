@@ -53,20 +53,15 @@ const schema = z.object({
   lastName: z.string('Numele este obligatoriu').min(2, 'Numele trebuie sa aiba cel putin 2 caractere'),
   email: z.email('Adresa de email nu este valida'),
   password: z.string('Parola este obligatorie').min(8, 'Parola trebuie sa aiba cel putin 8 caractere'),
-  passwordConfirm: z.string('Confirmarea parolei este obligatorie').min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
+  passwordConfirm: z.string('Confirmarea parolei este obligatorie')
+}).refine(data => data.password === data.passwordConfirm, {
+  message: 'Parolele nu sunt identice',
+  path: ['passwordConfirm']
 })
 
 type Schema = z.output<typeof schema>
 
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
-  if (payload.data.password !== payload.data.passwordConfirm) {
-    toast.add({
-      title: 'Parolele nu sunt identice',
-      color: 'error',
-    })
-    return
-  }
-
   try {
     await $fetch('/api/register', {
       method: 'POST',

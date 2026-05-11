@@ -85,6 +85,7 @@ async function resendVerification() {
     }
     if (e?.statusCode === 429 && e?.data?.data?.retryAfter) {
       startCooldown(e.data.data.retryAfter)
+      return
     }
     toast.add({ title: 'Eroare', description: e?.data?.message || 'Nu am putut trimite emailul. Incearca din nou.', color: 'error' })
   } finally {

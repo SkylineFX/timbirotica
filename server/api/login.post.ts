@@ -7,9 +7,13 @@ const bodySchema = z.object({
   remember: z.boolean().optional()
 })
 
+// Pre-computed bcrypt hash used to equalize response time when the email
+// isn't found, preventing user enumeration via timing of login attempts.
+const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', 10)
+
 export default defineEventHandler(async (event) => {
   const { email, password, remember } = await readValidatedBody(event, bodySchema.parse)
-  const normalizedEmail = email.toLowerCase()
+  const normalizedEmail = email.trim().toLowerCase()
   const config = useRuntimeConfig()
 
   if (!config.session.password) {
@@ -25,6 +29,8 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!user) {
+    // Equalize timing with the found-user path so attackers can't enumerate emails.
+    await bcrypt.compare(password, DUMMY_HASH)
     throw createError({
       status: 401,
       message: 'Adresa de email sau parola incorecta.',
