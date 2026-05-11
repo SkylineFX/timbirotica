@@ -70,12 +70,14 @@ export default eventHandler(async (event) => {
     }
   }
   const [selectedSubs, selectedBrands] = await Promise.all([
-    subSlugs.length && scopeCategory
+    subSlugs.length
       ? db.query.categories.findMany({
-          where: and(
-            inArray(tables.categories.slug, subSlugs),
-            eq(tables.categories.parentId, scopeCategory.id)
-          )
+          where: scopeCategory
+            ? and(
+                inArray(tables.categories.slug, subSlugs),
+                eq(tables.categories.parentId, scopeCategory.id)
+              )
+            : inArray(tables.categories.slug, subSlugs)
         })
       : Promise.resolve([] as Array<{ id: number }>),
     brandFilterSlugs.length && !scopeBrand
@@ -114,13 +116,13 @@ export default eventHandler(async (event) => {
     ? (subFacetWhere
         ? and(subFacetWhere, eq(tables.categories.parentId, scopeCategory.id))
         : eq(tables.categories.parentId, scopeCategory.id))
-    : undefined
+    : subFacetWhere
 
   const subcategoryScopeWhere = scopeCategory
     ? (scopeOnlyWhere
         ? and(scopeOnlyWhere, eq(tables.categories.parentId, scopeCategory.id))
         : eq(tables.categories.parentId, scopeCategory.id))
-    : undefined
+    : scopeOnlyWhere
 
   type FacetRow = { slug: string; name: string; count: number }
   const emptyFacetRows: FacetRow[] = []
@@ -167,17 +169,15 @@ export default eventHandler(async (event) => {
           .innerJoin(tables.brands, eq(tables.brands.id, tables.products.brandId))
           .where(brandFacetWhere ?? sql`1=1`)
           .groupBy(tables.brands.id, tables.brands.slug, tables.brands.name),
-    scopeCategory && subcategoryFacetWhere
-      ? db.select({
-          slug: tables.categories.slug,
-          name: tables.categories.name,
-          count: sql<number>`count(*)`
-        })
-          .from(tables.products)
-          .innerJoin(tables.categories, eq(tables.categories.id, tables.products.categoryId))
-          .where(subcategoryFacetWhere)
-          .groupBy(tables.categories.id, tables.categories.slug, tables.categories.name)
-      : Promise.resolve(emptyFacetRows),
+    db.select({
+      slug: tables.categories.slug,
+      name: tables.categories.name,
+      count: sql<number>`count(*)`
+    })
+      .from(tables.products)
+      .innerJoin(tables.categories, eq(tables.categories.id, tables.products.categoryId))
+      .where(subcategoryFacetWhere ?? sql`1=1`)
+      .groupBy(tables.categories.id, tables.categories.slug, tables.categories.name),
     scopeBrand
       ? Promise.resolve([] as Array<{ slug: string; name: string }>)
       : db.selectDistinct({
@@ -187,15 +187,13 @@ export default eventHandler(async (event) => {
           .from(tables.products)
           .innerJoin(tables.brands, eq(tables.brands.id, tables.products.brandId))
           .where(scopeOnlyWhere ?? sql`1=1`),
-    scopeCategory && subcategoryScopeWhere
-      ? db.selectDistinct({
-          slug: tables.categories.slug,
-          name: tables.categories.name
-        })
-          .from(tables.products)
-          .innerJoin(tables.categories, eq(tables.categories.id, tables.products.categoryId))
-          .where(subcategoryScopeWhere)
-      : Promise.resolve([] as Array<{ slug: string; name: string }>)
+    db.selectDistinct({
+      slug: tables.categories.slug,
+      name: tables.categories.name
+    })
+      .from(tables.products)
+      .innerJoin(tables.categories, eq(tables.categories.id, tables.products.categoryId))
+      .where(subcategoryScopeWhere ?? sql`1=1`)
   ])
 
   const total = totalRow[0]?.count ?? 0
@@ -217,7 +215,7 @@ export default eventHandler(async (event) => {
     facets: {
       price: priceMin != null && priceMax != null ? { min: priceMin, max: priceMax } : null,
       brands: scopeBrand ? null : mergeFacet(brandScopeRows, brandFacetRows),
-      subcategories: scopeCategory ? mergeFacet(subcategoryScopeRows, subcategoryFacetRows) : null
+      subcategories: mergeFacet(subcategoryScopeRows, subcategoryFacetRows)
     }
   }
 })

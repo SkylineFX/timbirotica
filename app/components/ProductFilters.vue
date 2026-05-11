@@ -9,7 +9,6 @@ type Facets = {
 const props = defineProps<{
   facets: Facets
   hideBrand?: boolean
-  hideSubcategory?: boolean
 }>()
 
 const route = useRoute()
@@ -109,7 +108,7 @@ const showBrand = computed(() =>
   !props.hideBrand && !!props.facets.brands && props.facets.brands.length > 0
 )
 const showSub = computed(() =>
-  !props.hideSubcategory && !!props.facets.subcategories && props.facets.subcategories.length > 0
+  !!props.facets.subcategories && props.facets.subcategories.length > 0
 )
 
 </script>
@@ -138,7 +137,7 @@ const showSub = computed(() =>
     </section>
 
     <section v-if="showSub">
-      <h3 class="text-sm font-semibold mb-3">Subcategorie</h3>
+      <h3 class="text-sm font-semibold mb-3">Categorie</h3>
       <div class="space-y-2 max-h-64 overflow-auto pr-1">
         <UCheckbox
           v-for="sub in facets.subcategories!"

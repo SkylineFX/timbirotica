@@ -114,7 +114,6 @@ watch(
 )
 
 const hideBrand = computed(() => !!props.apiQuery.brand)
-const hideSubcategory = computed(() => !props.apiQuery.category)
 
 const activeFilterCount = computed(() => {
   const q = route.query
@@ -179,7 +178,6 @@ const resetFilters = () => {
         <ProductFilters
           :facets="facets"
           :hide-brand="hideBrand"
-          :hide-subcategory="hideSubcategory"
         />
       </template>
       <template #footer>
