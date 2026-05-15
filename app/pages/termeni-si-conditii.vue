@@ -94,7 +94,7 @@ useHead({
           <p class="mt-4 font-semibold">Opțiunile de plată acceptate sunt:</p>
           <ol class="list-decimal list-inside pl-5 mt-2 space-y-1">
             <li><strong>Plata ramburs:</strong> in numerar (maxim 5000 RON), pentru livrare la adresa, catre curier sau la ridicarea comenzii din sediul nostru.</li>
-            <li><strong>Ordin de plata / virament bancar.</strong> In acest caz, se va emite o factura proforma care se va transmite la adresa de e-mail comunicata de catre client, iar dupa efectuarea platii comanda va fi pregatita pentru livrare.</li>
+            <li><strong>Transfer bancar:</strong> In acest caz, se va emite o factura proforma care se va transmite la adresa de e-mail comunicata de catre client, iar dupa efectuarea platii comanda va fi pregatita pentru livrare.</li>
           </ol>
         </section>
 

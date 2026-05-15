@@ -89,13 +89,13 @@ function fmtDate(d: Date): string {
 }
 
 function paymentLabel(method: string): string {
-  if (method === 'transfer') return 'Transfer bancar (OP)'
+  if (method === 'transfer') return 'Transfer bancar'
   if (method === 'cash') return 'Numerar la livrare'
   return method
 }
 
 function shippingLabel(method: string): string {
-  if (method === 'courier') return 'Curier rapid'
+  if (method === 'courier') return 'Livrare prin curier'
   if (method === 'pickup') return 'Ridicare personală'
   return method
 }
@@ -161,7 +161,16 @@ export async function generateProformaPdf(input: ProformaInput): Promise<Uint8Ar
   const drawLines = (lines: string[], x: number, yStart: number, lineHeight = 12, size = 10): number => {
     let yy = yStart
     for (const ln of lines) {
-      page.drawText(ln, { x, y: yy, size, font, color: black })
+      const sepIdx = ln.indexOf(': ')
+      if (sepIdx === -1) {
+        page.drawText(ln, { x, y: yy, size, font: fontBold, color: black })
+      } else {
+        const label = ln.slice(0, sepIdx + 2)
+        const value = ln.slice(sepIdx + 2)
+        page.drawText(label, { x, y: yy, size, font, color: black })
+        const labelWidth = font.widthOfTextAtSize(label, size)
+        page.drawText(value, { x: x + labelWidth, y: yy, size, font: fontBold, color: black })
+      }
       yy -= lineHeight
     }
     return yy
@@ -172,17 +181,17 @@ export async function generateProformaPdf(input: ProformaInput): Promise<Uint8Ar
 
   const supplierLines = [
     COMPANY.name,
-    `CUI: ${COMPANY.cui}`,
-    `ONRC: ${COMPANY.onrc}`,
-    ...wrapText(`Sediu: ${COMPANY.address}`, font, 10, colWidth),
-    `Tel: ${COMPANY.phone}`,
-    `Email: ${COMPANY.email}`,
+    `CIF: ${COMPANY.cui}`,
+    `Reg. Com.: ${COMPANY.onrc}`,
+    ...wrapText(`Adresa: ${COMPANY.address}`, font, 10, colWidth),
+    'IBAN: RO29 RNCB 0077 0602 3348 0001',
+    'Banca: BANCA COMERCIALA ROMANA'
   ]
 
   const customerLines: string[] = [input.customer.name]
   if (input.customer.type === 'company') {
-    if (input.customer.cui) customerLines.push(`CUI: ${input.customer.cui}`)
-    if (input.customer.onrc) customerLines.push(`ONRC: ${input.customer.onrc}`)
+    if (input.customer.cui) customerLines.push(`CIF: ${input.customer.cui}`)
+    if (input.customer.onrc) customerLines.push(`Reg. Com.: ${input.customer.onrc}`)
     if (input.customer.iban) customerLines.push(`IBAN: ${input.customer.iban}`)
     if (input.customer.bankName) customerLines.push(`Banca: ${input.customer.bankName}`)
   }

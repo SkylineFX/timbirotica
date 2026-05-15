@@ -40,26 +40,34 @@ const featuredCategories = [
     
     <UContainer class="my-6">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2 my-12">
-          <UCard class="text-center rounded-sm">
+        <NuxtLink to="/termeni-si-conditii#livrare" class="block h-full cursor-pointer">
+          <UCard class="h-full text-center rounded-sm">
               <UIcon name="i-heroicons-truck" class="text-4xl text-primary mb-1" />
-              <h3 class="font-bold">Livrare in Bucuresti</h3>
-              <p class="text-sm text-gray-500">Livrare gratuita la comenzi >200 RON</p>
+              <h3 class="font-bold pb-1">Livrare Gratuita</h3>
+              <p class="text-sm text-gray-500">La comenzi >200 RON in Bucuresti si Ilfov</p>
           </UCard>
-          <UCard class="text-center rounded-sm">
+        </NuxtLink>
+        <NuxtLink to="/termeni-si-conditii#plata" class="block h-full cursor-pointer">
+          <UCard class="h-full text-center rounded-sm">
               <UIcon name="i-heroicons-credit-card" class="text-4xl text-primary mb-1" />
-              <h3 class="font-bold">Modalitati de plata</h3>
-              <p class="text-sm text-gray-500">Plata ramburs la livrare sau prin virament bancar</p>
+              <h3 class="font-bold pb-1">Modalitati de plata</h3>
+              <p class="text-sm text-gray-500">Plata ramburs la livrare sau prin transfer bancar</p>
           </UCard>
-          <UCard class="text-center rounded-sm">
+        </NuxtLink>
+        <NuxtLink to="/contact" class="block h-full cursor-pointer">
+          <UCard class="h-full text-center rounded-sm">
               <UIcon name="i-heroicons-information-circle" class="text-4xl text-primary mb-1" />
-              <h3 class="font-bold">Serviciu asistenta</h3>
-              <p class="text-sm text-gray-500">Ai o nelamurire? <NuxtLink to="/contact" class="text-primary underline">Contacteaza-ne!</NuxtLink></p>
+              <h3 class="font-bold pb-1">Suport clienti</h3>
+              <p class="text-sm text-gray-500">Ai o nelamurire? <span class="text-primary underline">Contacteaza-ne!</span></p>
           </UCard>
-          <UCard class="text-center rounded-sm">
+        </NuxtLink>
+        <NuxtLink to="/termeni-si-conditii#retur" class="block h-full cursor-pointer">
+          <UCard class="h-full text-center rounded-sm">
               <UIcon name="i-heroicons-arrow-path" class="text-4xl text-primary mb-1" />
-              <h3 class="font-bold">Retur gratuit</h3>
-              <p class="text-sm text-gray-500">Retur gratuit in 14 zile de la primirea coletului</p>
+              <h3 class="font-bold pb-1">Retur gratuit</h3>
+              <p class="text-sm text-gray-500">In decursul a 14 zile de la primirea coletului</p>
           </UCard>
+        </NuxtLink>
       </div>
     </UContainer>
 
