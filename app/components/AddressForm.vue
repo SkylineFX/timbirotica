@@ -47,7 +47,7 @@ watch(() => address, (newAddr) => {
 // When expanding shipping beyond Bucharest, replace this with the dynamic fetch below:
 // const { data: countiesData } = await useFetch('/api/locations/counties')
 // const countyNames = computed(() => (countiesData.value as any[])?.map(c => c.name) || [])
-const countyNames = ['București', 'Ilfov']
+const countyNames = ['Bucuresti', 'Ilfov']
 const citiesData = ref<string[]>([])
 const isFetchingCities = ref(false)
 

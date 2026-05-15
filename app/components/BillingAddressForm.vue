@@ -17,7 +17,7 @@ const form = ref<Partial<BillingAddress>>({
   onrc: '',
   bankName: '',
   iban: '',
-  county: 'București',
+  county: 'Bucuresti',
   city: '',
   street: '',
   isDefaultBilling: true
@@ -90,10 +90,10 @@ async function submit(event: FormSubmitEvent<BillingAddress>) {
   try {
     if (address?.id) {
       await $fetch(`/api/user/billing-addresses/${address.id}`, { method: 'PUT', body: event.data })
-      toast.add({ title: 'Companie salvată', color: 'success' })
+      toast.add({ title: 'Companie salvata', color: 'success' })
     } else {
       await $fetch('/api/user/billing-addresses', { method: 'POST', body: event.data })
-      toast.add({ title: 'Companie adăugată cu succes', color: 'success' })
+      toast.add({ title: 'Companie adaugata cu succes', color: 'success' })
     }
     emit('saved')
   } catch(err: any) {
@@ -109,16 +109,16 @@ async function submit(event: FormSubmitEvent<BillingAddress>) {
     <div>
       <h4 class="font-bold text-gray-900 mb-4 text-sm mt-2">Detalii companie</h4>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <UFormField label="Nume firmă" name="companyName" required>
+        <UFormField label="Nume firma" name="companyName" required>
            <UInput v-model="form.companyName" size="lg" class="w-full" />
         </UFormField>
-        <UFormField label="Cod unic de Înregistrare" name="cui" required>
+        <UFormField label="Cod unic de Inregistrare" name="cui" required>
            <div class="flex gap-2 w-full">
              <USelect v-model="form.hasRo" :items="hasRoOptions as any[]" value-attribute="value" option-attribute="label" size="lg" class="w-24 shrink-0" />
              <UInput v-model="form.cui" size="lg" class="w-full" />
            </div>
         </UFormField>
-        <UFormField label="Număr de înregistrare în Registrul Comerțului" name="onrc" class="sm:col-span-2" required>
+        <UFormField label="Numar de inregistrare in Registrul Comertului" name="onrc" class="sm:col-span-2" required>
            <UInput v-model="form.onrc" placeholder="ex: J40/1234/2024" size="lg" class="w-full" />
         </UFormField>
         <UFormField label="Banca" name="bankName">
@@ -133,26 +133,26 @@ async function submit(event: FormSubmitEvent<BillingAddress>) {
     <div>
        <h4 class="font-bold text-gray-900 mb-4 text-sm mt-4">Sediu social</h4>
        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          <UFormField label="Județ" name="county" required>
-             <USelectMenu v-model="form.county" :items="countyNames" placeholder="Selectați" size="lg" class="w-full" />
+          <UFormField label="Judet" name="county" required>
+             <USelectMenu v-model="form.county" :items="countyNames" placeholder="Selectati" size="lg" class="w-full" />
           </UFormField>
           <UFormField label="Localitate" name="city" required>
-             <USelectMenu v-model="form.city" :items="citiesData" placeholder="Selectați" size="lg" class="w-full" :disabled="!form.county || isFetchingCities" :loading="isFetchingCities" />
+             <USelectMenu v-model="form.city" :items="citiesData" placeholder="Selectati" size="lg" class="w-full" :disabled="!form.county || isFetchingCities" :loading="isFetchingCities" />
           </UFormField>
        </div>
        <div class="grid grid-cols-1 gap-4">
           <UFormField label="Adresa" name="street" required>
-             <UInput v-model="form.street" placeholder="ex: Strada, număr, bloc, scara, etaj, apartament" size="lg" class="w-full" />
+             <UInput v-model="form.street" placeholder="ex: Strada, numar, bloc, scara, etaj, apartament" size="lg" class="w-full" />
           </UFormField>
        </div>
     </div>
 
     <div class="pt-2 flex flex-col gap-3">
-         <UCheckbox v-model="form.isDefaultBilling" name="isDefaultBilling" label="Setează ca adresă implicită de facturare" />
+         <UCheckbox v-model="form.isDefaultBilling" name="isDefaultBilling" label="Seteaza ca adresa implicita de facturare" />
     </div>
 
     <div class="pt-4 pb-2">
-       <UButton type="submit" color="primary" block size="xl" class="rounded-md font-semibold justify-center" :loading="isLoading">Salvează</UButton>
+       <UButton type="submit" color="primary" block size="xl" class="rounded-md font-semibold justify-center" :loading="isLoading">Salveaza</UButton>
     </div>
   </UForm>
 </template>

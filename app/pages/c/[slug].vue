@@ -7,6 +7,10 @@ const breadcrumbs = computed(() => [
   { label: 'Acasa', to: '/' },
   { label: title.value, to: route.path }
 ])
+
+useSeoMeta({
+  title: () => title.value
+})
 </script>
 
 <template>

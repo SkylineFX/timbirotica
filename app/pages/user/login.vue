@@ -23,7 +23,7 @@ const fields: AuthFormField[] = [{
   required: true
 }, {
   name: 'remember',
-  label: 'Ține-mă minte',
+  label: 'Tine-ma minte',
   type: 'checkbox'
 }]
 

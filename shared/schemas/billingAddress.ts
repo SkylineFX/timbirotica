@@ -9,7 +9,7 @@ export const billingAddressSchema = z.object({
   cui: z.string().regex(CUI_REGEX, 'CUI invalid'),
   hasRo: z.boolean().optional(),
   onrc: z.string().regex(ONRC_REGEX, 'Format invalid'),
-  bankName: z.string().min(2, 'Numele băncii este prea scurt').optional().or(z.literal('')),
+  bankName: z.string().min(2, 'Numele bancii este prea scurt').optional().or(z.literal('')),
   iban: z.string()
     .transform(v => v.replace(/\s+/g, '').toUpperCase())
     .refine(v => v === '' || IBAN_REGEX.test(v), {
@@ -17,9 +17,9 @@ export const billingAddressSchema = z.object({
     })
     .optional()
     .or(z.literal('')),
-  street: z.string().min(5, 'Adresa trebuie să aibă minim 5 caractere'),
-  city: z.string().min(2, 'Selectează localitatea'),
-  county: z.string().min(2, 'Selectează județul'),
+  street: z.string().min(5, 'Adresa trebuie sa aiba minim 5 caractere'),
+  city: z.string().min(2, 'Selecteaza localitatea'),
+  county: z.string().min(2, 'Selecteaza judetul'),
   isDefaultBilling: z.boolean().optional(),
 })
 

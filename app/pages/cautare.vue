@@ -6,9 +6,9 @@ const apiQuery = computed(() => ({ q: searchQuery.value }))
 
 <template>
   <ProductList
-    title="Rezultate căutare:"
+    title="Rezultate cautare:"
     :subtitle="searchQuery"
     :apiQuery="apiQuery"
-    :emptyMessage="`Nu au fost gasite produse pentru căutarea: &quot;${searchQuery}&quot;.`"
+    :emptyMessage="`Nu au fost gasite produse pentru cautarea: &quot;${searchQuery}&quot;.`"
   />
 </template>

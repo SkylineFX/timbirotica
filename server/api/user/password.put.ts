@@ -22,15 +22,15 @@ export default eventHandler(async (event) => {
 
   const isCurrentValid = await bcrypt.compare(currentPassword, user.password)
   if (!isCurrentValid) {
-    throw createError({ statusCode: 401, message: 'Parola curentă este incorectă.' })
+    throw createError({ statusCode: 401, message: 'Parola curenta este incorecta.' })
   }
 
   if (await bcrypt.compare(newPassword, user.password)) {
-    throw createError({ statusCode: 400, message: 'Noua parolă nu poate fi identică cu cea curentă.' })
+    throw createError({ statusCode: 400, message: 'Noua parola nu poate fi identica cu cea curenta.' })
   }
 
   const hashed = await bcrypt.hash(newPassword, 10)
   await db.update(tables.users).set({ password: hashed }).where(eq(tables.users.id, user.id))
 
-  return { message: 'Parola a fost actualizată.' }
+  return { message: 'Parola a fost actualizata.' }
 })

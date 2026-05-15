@@ -33,7 +33,7 @@ function select(id: number) {
        <div class="">
          <div class="space-y-4 mb-6">
             <div v-if="!items || items.length === 0" class="text-center py-8 text-gray-500 bg-gray-50 rounded-md border border-gray-100">
-               {{ emptyMessage || 'Nici o adresă salvată.' }}
+               {{ emptyMessage || 'Nici o adresa salvata.' }}
             </div>
 
             <div v-for="item in items" :key="item.id" class="flex items-start gap-4 p-5 rounded-md border transition-all cursor-pointer group hover:bg-gray-50" :class="selectedId === item.id ? 'border-primary bg-blue-50/20' : 'border-gray-200'" @click="select(item.id)">
@@ -48,7 +48,7 @@ function select(id: number) {
 
          <UButton color="neutral" variant="solid" class="rounded-sm font-bold px-5 py-2.5 bg-gray-900 text-white hover:bg-gray-800" @click="emit('add-new')">
            <UIcon name="i-lucide-plus" class="w-4 h-4 text-white inline align-middle"/> 
-           {{ addButtonText || 'Adaugă' }}
+           {{ addButtonText || 'Adauga' }}
          </UButton>
        </div>
     </template>

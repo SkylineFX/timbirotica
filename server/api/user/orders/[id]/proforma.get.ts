@@ -5,7 +5,7 @@ export default eventHandler(async (event) => {
   const session = await requireUserSession(event)
   const id = parseInt(getRouterParam(event, 'id') ?? '')
   if (isNaN(id)) {
-    throw createError({ statusCode: 400, message: 'ID comandă invalid.' })
+    throw createError({ statusCode: 400, message: 'ID comanda invalid.' })
   }
 
   const db = useDrizzle()
@@ -21,7 +21,7 @@ export default eventHandler(async (event) => {
   })
 
   if (!order) {
-    throw createError({ statusCode: 404, message: 'Comanda nu a fost găsită.' })
+    throw createError({ statusCode: 404, message: 'Comanda nu a fost gasita.' })
   }
 
   const user = await db.query.users.findFirst({
@@ -30,7 +30,7 @@ export default eventHandler(async (event) => {
   })
 
   if (!user) {
-    throw createError({ statusCode: 404, message: 'Utilizatorul nu a fost găsit.' })
+    throw createError({ statusCode: 404, message: 'Utilizatorul nu a fost gasit.' })
   }
 
   const billingSnapshot = order.billingAddressSnapshot ? JSON.parse(order.billingAddressSnapshot) : null

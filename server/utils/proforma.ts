@@ -96,7 +96,7 @@ function paymentLabel(method: string): string {
 
 function shippingLabel(method: string): string {
   if (method === 'courier') return 'Livrare prin curier'
-  if (method === 'pickup') return 'Ridicare personală'
+  if (method === 'pickup') return 'Ridicare personala'
   return method
 }
 
@@ -137,7 +137,7 @@ export async function generateProformaPdf(input: ProformaInput): Promise<Uint8Ar
   let y = height - margin
 
   // Header — title + reference
-  page.drawText('PROFORMĂ', { x: margin, y: y - 18, size: 20, font: fontBold, color: black })
+  page.drawText('PROFORMA', { x: margin, y: y - 18, size: 20, font: fontBold, color: black })
   const refLabel = `Nr. ${input.orderNumber}`
   const refDate = fmtDate(input.orderDate)
   page.drawText(refLabel, { x: width - margin - fontBold.widthOfTextAtSize(refLabel, 12), y: y - 8, size: 12, font: fontBold, color: black })
@@ -227,7 +227,7 @@ export async function generateProformaPdf(input: ProformaInput): Promise<Uint8Ar
   drawCell(page, 'Denumire', colName.x, headerLabelY, colName.width, fontBold, 9, black, colName.align)
   drawCell(page, 'U.M.', colUm.x, headerLabelY, colUm.width, fontBold, 9, black, colUm.align)
   drawCell(page, 'Cant.', colQty.x, headerLabelY, colQty.width, fontBold, 9, black, colQty.align)
-  drawCell(page, 'Preț fără TVA', colPrice.x, headerLabelY, colPrice.width, fontBold, 9, black, colPrice.align)
+  drawCell(page, 'Pret fara TVA', colPrice.x, headerLabelY, colPrice.width, fontBold, 9, black, colPrice.align)
   drawCell(page, 'Valoare', colValue.x, headerLabelY, colValue.width, fontBold, 9, black, colValue.align)
   drawCell(page, 'Valoare TVA', colVat.x, headerLabelY, colVat.width, fontBold, 9, black, colVat.align)
   drawCell(page, 'Lei', colPrice.x, headerSubY, colPrice.width, font, 8, grey, colPrice.align)
@@ -303,7 +303,7 @@ export async function generateProformaPdf(input: ProformaInput): Promise<Uint8Ar
   // Highlighted "Total proforma" bar
   const tpBarHeight = 26
   page.drawRectangle({ x: margin, y: y - tpBarHeight, width: width - margin * 2, height: tpBarHeight, color: lightGrey })
-  const tpLabel = 'Total proformă'
+  const tpLabel = 'Total proforma'
   const tpValue = fmtRon(input.total)
   page.drawText(tpLabel, { x: margin + 10, y: y - 17, size: 11, font: fontBold, color: black })
   const tpValueWidth = fontBold.widthOfTextAtSize(tpValue, 13)
@@ -330,12 +330,12 @@ function drawFooter(
   meta: { payment: string; shipping: string }
 ) {
   let fy = 130
-  page.drawText(`Modalitate de plată: ${meta.payment}`, { x: margin, y: fy, size: 9, font, color: black })
+  page.drawText(`Modalitate de plata: ${meta.payment}`, { x: margin, y: fy, size: 9, font, color: black })
   fy -= 12
   page.drawText(`Modalitate de livrare: ${meta.shipping}`, { x: margin, y: fy, size: 9, font, color: black })
   fy -= 16
 
-  const disclaimer = 'Acest document este o factură proformă și nu reprezintă document fiscal. Factura fiscală va fi emisă la livrarea/încasarea comenzii.'
+  const disclaimer = 'Acest document este o factura proforma si nu reprezinta document fiscal. Factura fiscala va fi emisa la livrarea/incasarea comenzii.'
   const disclaimerLines = wrapText(disclaimer, font, 8, width - margin * 2)
   for (const ln of disclaimerLines) {
     page.drawText(ln, { x: margin, y: fy, size: 8, font, color: grey })

@@ -46,7 +46,7 @@ export default eventHandler(async (event) => {
   if (unavailable.length) {
     throw createError({
       statusCode: 409,
-      message: `Următoarele produse nu mai sunt disponibile: ${unavailable.map(i => i.product.name).join(', ')}.`
+      message: `Urmatoarele produse nu mai sunt disponibile: ${unavailable.map(i => i.product.name).join(', ')}.`
     })
   }
 

@@ -8,7 +8,7 @@ const bodySchema = z.object({
 export default eventHandler(async (event) => {
   const id = parseInt(getRouterParam(event, 'id') ?? '')
   if (isNaN(id)) {
-    throw createError({ statusCode: 400, message: 'ID comandă invalid.' })
+    throw createError({ statusCode: 400, message: 'ID comanda invalid.' })
   }
 
   const { status } = await readValidatedBody(event, bodySchema.parse)
@@ -20,7 +20,7 @@ export default eventHandler(async (event) => {
     .returning()
 
   if (!updated) {
-    throw createError({ statusCode: 404, message: 'Comanda nu a fost găsită.' })
+    throw createError({ statusCode: 404, message: 'Comanda nu a fost gasita.' })
   }
 
   return updated

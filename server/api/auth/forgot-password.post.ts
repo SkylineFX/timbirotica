@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const { email } = await readBody(event)
 
   // Always return the same message to prevent email enumeration
-  const genericResponse = { message: 'Dacă adresa de email există în sistemul nostru, vei primi un link de resetare în câteva minute.' }
+  const genericResponse = { message: 'Daca adresa de email exista in sistemul nostru, vei primi un link de resetare in cateva minute.' }
 
   if (!email || typeof email !== 'string') return genericResponse
 

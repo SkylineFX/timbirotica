@@ -175,22 +175,22 @@ const toast = useToast()
 
 async function submitOrder() {
   if (!isEmailVerified.value) {
-    toast.add({ title: 'Confirmă adresa de email', description: 'Trebuie să confirmi adresa de email înainte de a plasa o comandă.', color: 'error' })
+    toast.add({ title: 'Confirma adresa de email', description: 'Trebuie sa confirmi adresa de email inainte de a plasa o comanda.', color: 'error' })
     return
   }
 
   if (cartItems.value.length === 0) {
-    toast.add({ title: 'Coș gol', description: 'Coșul trebuie să conțină produse.', color: 'error' })
+    toast.add({ title: 'Cos gol', description: 'Cosul trebuie sa contina produse.', color: 'error' })
     return
   }
 
   if (deliveryMethod.value === 'courier' && !selectedAddress.value) {
-    toast.add({ title: 'Adresă lipsă', description: 'Te rugăm să selectezi o adresă de livrare pentru expedierea prin curier.', color: 'error' })
+    toast.add({ title: 'Adresa lipsa', description: 'Te rugam sa selectezi o adresa de livrare pentru expedierea prin curier.', color: 'error' })
     return
   }
 
   if (!billingSameAsShipping.value && !selectedBilling.value) {
-     toast.add({ title: 'Facturare lipsă', description: 'Te rugăm să selectezi datele de facturare.', color: 'error' })
+     toast.add({ title: 'Facturare lipsa', description: 'Te rugam sa selectezi datele de facturare.', color: 'error' })
      return
   }
 
@@ -219,7 +219,7 @@ async function submitOrder() {
       }
     })
   } catch(e: any) {
-    toast.add({ title: 'Eroare la procesare', description: e?.data?.message || e.statusMessage || e.message || 'Te rugăm să incerci din nou.', color: 'error' })
+    toast.add({ title: 'Eroare la procesare', description: e?.data?.message || e.statusMessage || e.message || 'Te rugam sa incerci din nou.', color: 'error' })
   } finally {
     isSubmitting.value = false
   }
@@ -236,7 +236,7 @@ async function submitOrder() {
 
         <!-- Logo / Title -->
         <div class="mb-2">
-           <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">Finalizare comandă</h1>
+           <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">Finalizare comanda</h1>
            <p class="text-gray-500 mt-1">Completeaza detaliile de mai jos.</p>
         </div>
 
@@ -245,8 +245,8 @@ async function submitOrder() {
           color="warning"
           variant="subtle"
           icon="i-lucide-mail-warning"
-          title="Confirmă adresa de email"
-          description="Pentru a putea plasa comanda, te rugăm să confirmi adresa de email."
+          title="Confirma adresa de email"
+          description="Pentru a putea plasa comanda, te rugam sa confirmi adresa de email."
           class="rounded-sm"
         >
           <template #actions>
@@ -267,7 +267,7 @@ async function submitOrder() {
         <!-- 1. Ship to -->
         <div class="flex flex-col gap-3">
           <div class="flex justify-between items-center text-sm font-medium text-gray-700">
-            <span>Adresă de livrare</span>
+            <span>Adresa de livrare</span>
             <button @click="isAddressModalOpen = true" class="text-blue-600 hover:text-blue-700 transition">
                <UIcon name="i-lucide-chevron-down" class="w-4 h-4 ml-1 inline align-middle"/>
             </button>
@@ -283,7 +283,7 @@ async function submitOrder() {
                  <span class="text-gray-600 block">{{ selectedAddress.city }}, {{ selectedAddress.county }}</span>
                </template>
                <template v-else>
-                 <span class="text-gray-500">Alege o adresă de livrare...</span>
+                 <span class="text-gray-500">Alege o adresa de livrare...</span>
                </template>
             </div>
             <UIcon name="i-lucide-chevron-right" class="w-5 h-5 text-gray-400 opacity-50 shrink-0" />
@@ -293,7 +293,7 @@ async function submitOrder() {
         <!-- 2. Shipping method -->
         <div class="flex flex-col gap-3">
           <div class="flex justify-between items-center text-sm font-medium text-gray-700">
-            <span>Metodă de livrare</span>
+            <span>Metoda de livrare</span>
           </div>
           <div class="border border-gray-200 rounded-md overflow-hidden">
             <!-- Courier Option -->
@@ -338,7 +338,7 @@ async function submitOrder() {
 
             <div v-show="deliveryMethod === 'pickup'" class="p-5 bg-gray-50 border-t border-gray-200 text-justify lg:text-left flex flex-col items-center gap-2">
                <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-               <p class="text-sm text-gray-600">Comanda va fi pregatita in maximum 2 zile lucratoare de la confirmare. Te vom anunța pe email când aceasta este gata de ridicare.</p>
+               <p class="text-sm text-gray-600">Comanda va fi pregatita in maximum 2 zile lucratoare de la confirmare. Te vom anunta pe email cand aceasta este gata de ridicare.</p>
             </div>
           </div>
         </div>
@@ -346,8 +346,8 @@ async function submitOrder() {
         <!-- 3. Payment block -->
         <div class="flex flex-col gap-3 mt-2">
           <div>
-            <h3 class="text-xl font-bold text-gray-900">Plată</h3>
-            <!-- <p class="text-sm text-gray-500 mt-1">Toate tranzacțiile sunt securizate și criptate.</p> -->
+            <h3 class="text-xl font-bold text-gray-900">Plata</h3>
+            <!-- <p class="text-sm text-gray-500 mt-1">Toate tranzactiile sunt securizate si criptate.</p> -->
           </div>
           <div class="border border-gray-200 rounded-md overflow-hidden mt-1">
             <!-- Bank Transfer -->
@@ -369,7 +369,7 @@ async function submitOrder() {
             <div v-show="paymentMethod === 'transfer'" class="p-5 bg-gray-50 border-b border-gray-200 space-y-4">
                <div class="text-sm text-gray-600 text-justify lg:text-left flex flex-col items-center gap-2">
                  <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-                 <p> Efectuează plata în contul nostru bancar după primirea facturii proforme pe mail. Te rugăm să specifici numărul comenzii la detalii.</p>
+                 <p> Efectueaza plata in contul nostru bancar dupa primirea facturii proforme pe mail. Te rugam sa specifici numarul comenzii la detalii.</p>
                </div>
             </div>
 
@@ -389,7 +389,7 @@ async function submitOrder() {
             
             <div v-show="paymentMethod === 'cash'" class="p-5 bg-gray-50 border-t border-gray-200 text-justify lg:text-left flex flex-col items-center gap-2">
                <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-               <p class="text-sm text-gray-600">Plata se va face în numerar la primirea coletului. Dupa primirea facturii pe mail, te vom contacta pentru confirmare si pentru stabilirea datei livrarii.</p>
+               <p class="text-sm text-gray-600">Plata se va face in numerar la primirea coletului. Dupa primirea facturii pe mail, te vom contacta pentru confirmare si pentru stabilirea datei livrarii.</p>
             </div>
           </div>
         </div>
@@ -404,14 +404,14 @@ async function submitOrder() {
               <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="billingSameAsShipping ? 'border-primary' : 'border-gray-300'">
                 <div v-if="billingSameAsShipping" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
               </div>
-              <span class="text-sm font-medium text-gray-900">Aceeași cu adresa de livrare</span>
+              <span class="text-sm font-medium text-gray-900">Aceeasi cu adresa de livrare</span>
               <input type="radio" :value="true" v-model="billingSameAsShipping" class="hidden">
             </label>
             <label class="p-4 flex items-center gap-4 cursor-pointer bg-white hover:bg-gray-50" :class="{ 'bg-blue-50/10 hover:bg-blue-50/20': !billingSameAsShipping }">
               <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="!billingSameAsShipping ? 'border-primary' : 'border-gray-300'">
                 <div v-if="!billingSameAsShipping" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
               </div>
-              <span class="text-sm font-medium text-gray-900">Adresă de facturare persoană juridică</span>
+              <span class="text-sm font-medium text-gray-900">Adresa de facturare persoana juridica</span>
               <input type="radio" :value="false" v-model="billingSameAsShipping" class="hidden">
             </label>
             <div v-if="!billingSameAsShipping" class="text-sm p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors" @click="isBillingSelectorOpen = true">
@@ -422,7 +422,7 @@ async function submitOrder() {
                      <span class="text-gray-600 block">{{ selectedBilling.city }}, {{ selectedBilling.county }}</span>
                   </template>
                   <template v-else>
-                     <span class="text-gray-500">Alege o adresă de facturare...</span>
+                     <span class="text-gray-500">Alege o adresa de facturare...</span>
                   </template>
                </div>
                <UIcon name="i-lucide-chevron-right" class="w-5 h-5 text-gray-400 opacity-50 shrink-0" />
@@ -433,7 +433,7 @@ async function submitOrder() {
         <!-- Extra / Submit -->
          <div class="mt-6">
             <UButton :loading="isSubmitting" :disabled="!isEmailVerified" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] hidden lg:flex justify-center">
-               Plasează comanda
+               Plaseaza comanda
             </UButton>
          </div>
       </div>
@@ -484,7 +484,7 @@ async function submitOrder() {
 
         <div class="mt-6">
            <UButton :loading="isSubmitting" :disabled="!isEmailVerified" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] lg:hidden flex justify-center">
-              Plasează comanda
+              Plaseaza comanda
            </UButton>
         </div>
       </div>
@@ -497,9 +497,9 @@ async function submitOrder() {
   <AddressSelectorModal 
     v-model:open="isAddressModalOpen" 
     v-model:selectedId="selectedAddressId" 
-    title="Adresă de livrare" 
+    title="Adresa de livrare" 
     :items="userAddresses" 
-    empty-message="Nu ai nicio adresă salvată în cont."
+    empty-message="Nu ai nicio adresa salvata in cont."
     @add-new="openNewAddress"
   >
     <template #item="{ item }">
@@ -517,7 +517,7 @@ async function submitOrder() {
     v-model:selectedId="selectedBillingId" 
     title="Adresa de facturare (Companie)" 
     :items="userBillingAddresses" 
-    empty-message="Nu ai nicio companie salvată în cont."
+    empty-message="Nu ai nicio companie salvata in cont."
     @add-new="openNewBilling"
   >
     <template #item="{ item }">
@@ -541,7 +541,7 @@ async function submitOrder() {
   </UModal>
 
   <!-- New Billing Form Modal -->
-  <UModal v-model:open="isNewBillingModalOpen" title="Adaugă persoană juridică" :ui="{ content: 'sm:max-w-xl' }" class="rounded-md">
+  <UModal v-model:open="isNewBillingModalOpen" title="Adauga persoana juridica" :ui="{ content: 'sm:max-w-xl' }" class="rounded-md">
     <template #body>
       <BillingAddressForm 
         :is-first-address="!userBillingAddresses || userBillingAddresses.length === 0" 

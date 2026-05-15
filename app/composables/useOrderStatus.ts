@@ -2,11 +2,11 @@ export type OrderStatus = 'processing' | 'confirmed' | 'shipped' | 'completed' |
 type BadgeColor = 'warning' | 'info' | 'success' | 'error' | 'neutral' | 'primary' | 'secondary'
 
 export const ORDER_STATUS_LABEL: Record<string, string> = {
-  processing: 'În procesare',
-  confirmed: 'Confirmată',
-  shipped: 'Expediată',
-  completed: 'Finalizată',
-  cancelled: 'Anulată',
+  processing: 'In procesare',
+  confirmed: 'Confirmata',
+  shipped: 'Expediata',
+  completed: 'Finalizata',
+  cancelled: 'Anulata',
 }
 
 export const ORDER_STATUS_COLOR: Record<string, BadgeColor> = {

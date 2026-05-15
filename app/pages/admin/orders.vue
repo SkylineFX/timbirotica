@@ -19,7 +19,7 @@ type DateRange = 'all' | 'today' | '7d' | '30d'
 const dateRange = ref<DateRange>('all')
 const dateRangeOptions: Array<{ label: string; value: DateRange }> = [
   { label: 'Toate datele', value: 'all' },
-  { label: 'Astăzi', value: 'today' },
+  { label: 'Astazi', value: 'today' },
   { label: 'Ultimele 7 zile', value: '7d' },
   { label: 'Ultimele 30 zile', value: '30d' },
 ]
@@ -120,7 +120,7 @@ async function saveStatus() {
 }
 
 const columns: TableColumn<any>[] = [
-  { accessorKey: 'orderNumber', header: '# Comandă' },
+  { accessorKey: 'orderNumber', header: '# Comanda' },
   { accessorKey: 'customer', header: 'Client' },
   { accessorKey: 'total', header: 'Total' },
   { accessorKey: 'status', header: 'Status' },
@@ -137,13 +137,13 @@ function fmtDate(d: string | Date) {
   <div class="max-w-7xl mx-auto w-full h-full flex flex-col min-h-0">
     <div class="mb-6 flex items-center justify-between flex-shrink-0">
       <h1 class="text-2xl font-semibold font-serif">Comenzi</h1>
-      <p class="text-sm text-gray-500">{{ total }} {{ total === 1 ? 'comandă' : 'comenzi' }}</p>
+      <p class="text-sm text-gray-500">{{ total }} {{ total === 1 ? 'comanda' : 'comenzi' }}</p>
     </div>
 
     <div class="bg-white border border-gray-200 rounded-md p-4 mb-4 flex flex-wrap items-center gap-3 flex-shrink-0">
       <UInput
         v-model="searchQuery"
-        placeholder="Caută după număr comandă sau nume client..."
+        placeholder="Cauta dupa numar comanda sau nume client..."
         icon="i-lucide-search"
         class="flex-1 min-w-[260px]"
       />
@@ -159,7 +159,7 @@ function fmtDate(d: string | Date) {
         class="w-44"
       />
       <UButton variant="ghost" color="neutral" icon="i-lucide-rotate-ccw" @click="resetFilters">
-        Resetează
+        Reseteaza
       </UButton>
     </div>
 
@@ -210,7 +210,7 @@ function fmtDate(d: string | Date) {
       </UTable>
 
       <div v-if="!pending && orders.length === 0" class="py-12 text-center text-sm text-gray-500 flex-shrink-0">
-        Nicio comandă găsită.
+        Nicio comanda gasita.
       </div>
     </div>
 
@@ -219,13 +219,13 @@ function fmtDate(d: string | Date) {
     </div>
 
     <!-- Order Details Modal -->
-    <UModal v-model:open="isModalOpen" title="Detalii comandă" :ui="{ content: 'rounded-md sm:max-w-3xl' }">
+    <UModal v-model:open="isModalOpen" title="Detalii comanda" :ui="{ content: 'rounded-md sm:max-w-3xl' }">
       <template #body>
         <div v-if="selectedOrder" class="px-2 space-y-6">
           <div class="flex justify-between items-start border-b border-gray-100 pb-4">
             <div>
               <h4 class="font-bold text-gray-900 text-xl tracking-tight">#{{ selectedOrder.orderNumber }}</h4>
-              <p class="text-sm text-gray-500 mt-0.5">Plasată pe {{ fmtDate(selectedOrder.createdAt) }}</p>
+              <p class="text-sm text-gray-500 mt-0.5">Plasata pe {{ fmtDate(selectedOrder.createdAt) }}</p>
               <p class="text-sm text-gray-700 mt-1">{{ selectedOrder.user?.firstName }} {{ selectedOrder.user?.lastName }} · {{ selectedOrder.user?.email }}</p>
             </div>
             <UBadge :color="ORDER_STATUS_COLOR[selectedOrder.status as keyof typeof ORDER_STATUS_COLOR] ?? 'neutral'" variant="subtle" size="sm">
@@ -244,7 +244,7 @@ function fmtDate(d: string | Date) {
                 <p class="text-sm text-gray-600 mt-1">{{ parsedShipping.street }}, {{ parsedShipping.city }}, {{ parsedShipping.county }}</p>
               </template>
               <template v-else>
-                <p class="text-sm text-gray-600">Ridicare personală de la sediu.</p>
+                <p class="text-sm text-gray-600">Ridicare personala de la sediu.</p>
               </template>
             </div>
 
@@ -301,7 +301,7 @@ function fmtDate(d: string | Date) {
 
           <!-- Status updater -->
           <div class="bg-stone-50 p-4 rounded-sm border border-gray-100">
-            <h5 class="text-sm font-bold text-gray-900 mb-3">Schimbă statusul</h5>
+            <h5 class="text-sm font-bold text-gray-900 mb-3">Schimba statusul</h5>
             <div class="flex gap-3">
               <USelect
                 v-model="newStatus"
@@ -313,7 +313,7 @@ function fmtDate(d: string | Date) {
                 :loading="isSavingStatus"
                 :disabled="newStatus === selectedOrder.status"
                 @click="saveStatus"
-              >Salvează</UButton>
+              >Salveaza</UButton>
             </div>
           </div>
 
@@ -326,7 +326,7 @@ function fmtDate(d: string | Date) {
               :to="`/api/admin/orders/${selectedOrder.id}/proforma`"
               external
               download
-            >Descarcă proforma</UButton>
+            >Descarca proforma</UButton>
           </div>
         </div>
       </template>

@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
   if (resetToken.expiresAt < Math.floor(Date.now() / 1000)) {
     await db.delete(tables.passwordResetTokens).where(eq(tables.passwordResetTokens.id, resetToken.id))
-    throw createError({ statusCode: 400, statusMessage: 'Link-ul de resetare a expirat. Te rugăm să soliciți unul nou.' })
+    throw createError({ statusCode: 400, statusMessage: 'Link-ul de resetare a expirat. Te rugam sa soliciti unul nou.' })
   }
 
   const hashedPassword = await bcrypt.hash(password, 10)
@@ -29,5 +29,5 @@ export default defineEventHandler(async (event) => {
   await db.update(tables.users).set({ password: hashedPassword }).where(eq(tables.users.id, resetToken.userId))
   await db.delete(tables.passwordResetTokens).where(eq(tables.passwordResetTokens.id, resetToken.id))
 
-  return { message: 'Parola a fost resetată cu succes.' }
+  return { message: 'Parola a fost resetata cu succes.' }
 })

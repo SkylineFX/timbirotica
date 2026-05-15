@@ -68,11 +68,11 @@ async function savePassword() {
   passwordError.value = null
 
   if (!passwordForm.value.currentPassword) {
-    passwordError.value = 'Introdu parola curentă.'
+    passwordError.value = 'Introdu parola curenta.'
     return
   }
   if (passwordForm.value.newPassword.length < 8) {
-    passwordError.value = 'Parola nouă trebuie să aibă cel puțin 8 caractere.'
+    passwordError.value = 'Parola noua trebuie sa aiba cel putin 8 caractere.'
     return
   }
   if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
@@ -80,7 +80,7 @@ async function savePassword() {
     return
   }
   if (passwordForm.value.newPassword === passwordForm.value.currentPassword) {
-    passwordError.value = 'Noua parolă nu poate fi identică cu cea curentă.'
+    passwordError.value = 'Noua parola nu poate fi identica cu cea curenta.'
     return
   }
 
@@ -94,7 +94,7 @@ async function savePassword() {
       }
     })
     passwordForm.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
-    toast.add({ title: 'Parola a fost actualizată', color: 'success' })
+    toast.add({ title: 'Parola a fost actualizata', color: 'success' })
   } catch (err: any) {
     passwordError.value = err?.data?.message || 'Nu am putut actualiza parola.'
   } finally {
@@ -137,7 +137,7 @@ async function savePassword() {
             :loading="isLoading"
             :disabled="!isDirty || isLoading"
           >
-            Salvează
+            Salveaza
           </UButton>
         </div>
       </form>
@@ -145,20 +145,20 @@ async function savePassword() {
 
     <UCard class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
       <div class="mb-6">
-        <h3 class="text-lg font-bold text-gray-900">Schimbă parola</h3>
-        <p class="text-sm text-gray-500 mt-1">Introdu parola curentă, apoi alege una nouă cu cel puțin 8 caractere.</p>
+        <h3 class="text-lg font-bold text-gray-900">Schimba parola</h3>
+        <p class="text-sm text-gray-500 mt-1">Introdu parola curenta, apoi alege una noua cu cel putin 8 caractere.</p>
       </div>
 
       <form @submit.prevent="savePassword" class="space-y-6">
-        <UFormField label="Parola curentă" name="currentPassword">
+        <UFormField label="Parola curenta" name="currentPassword">
           <UInput v-model="passwordForm.currentPassword" type="password" size="lg" class="w-full" autocomplete="current-password" required />
         </UFormField>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <UFormField label="Parola nouă" name="newPassword">
+          <UFormField label="Parola noua" name="newPassword">
             <UInput v-model="passwordForm.newPassword" type="password" size="lg" class="w-full" autocomplete="new-password" required />
           </UFormField>
-          <UFormField label="Confirmare parolă nouă" name="confirmPassword">
+          <UFormField label="Confirmare parola noua" name="confirmPassword">
             <UInput v-model="passwordForm.confirmPassword" type="password" size="lg" class="w-full" autocomplete="new-password" required />
           </UFormField>
         </div>
@@ -174,7 +174,7 @@ async function savePassword() {
             :loading="isPasswordSaving"
             :disabled="!passwordDirty || isPasswordSaving"
           >
-            Actualizează parola
+            Actualizeaza parola
           </UButton>
         </div>
       </form>

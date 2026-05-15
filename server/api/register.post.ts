@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   if (existingUser) {
     throw createError({
       status: 400,
-      message: 'Există deja un cont cu această adresă de email.'
+      message: 'Exista deja un cont cu aceasta adresa de email.'
     })
   }
 
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
   } catch {
     throw createError({
       status: 400,
-      message: 'Există deja un cont cu această adresă de email.'
+      message: 'Exista deja un cont cu aceasta adresa de email.'
     })
   }
 

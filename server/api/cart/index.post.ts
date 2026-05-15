@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     columns: { id: true, stock: true, name: true }
   })
   if (!product) {
-    throw createError({ statusCode: 404, message: 'Produsul nu există.' })
+    throw createError({ statusCode: 404, message: 'Produsul nu exista.' })
   }
   if (product.stock <= 0) {
     throw createError({ statusCode: 409, message: `Produsul "${product.name}" nu este disponibil.` })

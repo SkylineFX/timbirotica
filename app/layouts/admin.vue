@@ -50,7 +50,7 @@ async function logout() {
           icon="i-lucide-arrow-left"
           to="/"
           class="w-full justify-start"
-        >Înapoi la magazin</UButton>
+        >Inapoi la magazin</UButton>
         <UButton
           variant="ghost"
           color="neutral"

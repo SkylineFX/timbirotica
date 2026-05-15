@@ -58,7 +58,7 @@ async function handleAddressSaved() {
     <UCard class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-lg sm:text-xl font-bold text-gray-900">Adresele mele</h3>
-        <UButton @click="openAddAddress" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-md px-2">Adaugă</UButton>
+        <UButton @click="openAddAddress" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-md px-2">Adauga</UButton>
       </div>
 
       <div v-if="userAddresses?.length === 0" class="text-center py-12 text-gray-500 bg-gray-50 rounded-md border border-dashed border-gray-200">

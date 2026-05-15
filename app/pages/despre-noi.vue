@@ -2,7 +2,7 @@
 useHead({
   title: 'Despre Noi',
   meta: [
-    { name: 'description', content: 'Informații despre compania noastră, date de contact și obiect de activitate.' }
+    { name: 'description', content: 'Informatii despre compania noastra, date de contact si obiect de activitate.' }
   ]
 })
 </script>
@@ -12,25 +12,25 @@ useHead({
     <!-- Header -->
     <div class="mb-8 lg:mb-12">
       <h1 class="text-2xl lg:text-3xl font-bold mb-4">Despre Noi</h1>
-      <p class="text-gray-600 max-w-2xl text-md lg:text-lg">Află mai multe despre detaliile companiei.</p>
+      <p class="text-gray-600 max-w-2xl text-md lg:text-lg">Afla mai multe despre detaliile companiei.</p>
     </div>
 
     <!-- Content -->
     <UCard :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
       <div class="space-y-6 text-gray-700 leading-relaxed text-[15px] sm:text-base">
         
-        <p>Serviciul de comert electronic este oferit de <strong class="font-semibold">Eurotimalex SRL</strong>, cu sediul social în Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București, Romania, <strong class="font-semibold">CUI RO18034200</strong>, Nr. inregistrare <strong class="font-semibold">J40/17160/2005</strong>.</p>
-        <p><strong class="font-semibold">Eurotimalex</strong> își propune să ofere clienților din România produse de birotica si papetarie de înaltă calitate, susținute de consultanță specializată și grijă față de client.</p>
+        <p>Serviciul de comert electronic este oferit de <strong class="font-semibold">Eurotimalex SRL</strong>, cu sediul social in Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti, Romania, <strong class="font-semibold">CUI RO18034200</strong>, Nr. inregistrare <strong class="font-semibold">J40/17160/2005</strong>.</p>
+        <p><strong class="font-semibold">Eurotimalex</strong> isi propune sa ofere clientilor din Romania produse de birotica si papetarie de inalta calitate, sustinute de consultanta specializata si grija fata de client.</p>
 
         <div class="p-4 bg-gray-50 rounded-md border border-gray-100">
           <p class="font-semibold text-gray-900 mb-1">Obiect de activitate:</p>
-          <p><strong class="font-semibold">4791</strong> - Comerț cu amănuntul prin intermediul caselor de comenzi sau prin Internet</p>
+          <p><strong class="font-semibold">4791</strong> - Comert cu amanuntul prin intermediul caselor de comenzi sau prin Internet</p>
         </div>
 
         
         <div class="pt-4 border-t border-gray-100">
-          <h3 class="font-bold text-gray-900 mb-3 text-lg">Program și Contact</h3>
-          <p class="mb-2">Preluăm apeluri telefonice de luni până vineri în intervalul orar: <strong class="font-semibold text-gray-900">09:00 - 18:00</strong></p>
+          <h3 class="font-bold text-gray-900 mb-3 text-lg">Program si Contact</h3>
+          <p class="mb-2">Preluam apeluri telefonice de luni pana vineri in intervalul orar: <strong class="font-semibold text-gray-900">09:00 - 18:00</strong></p>
           <div class="flex flex-col gap-2 mt-4">
             <a href="tel:+40751022882" class="flex items-center gap-2 text-gray-900 hover:text-primary transition-colors font-medium w-max">
               <UIcon name="i-lucide-phone" class="w-4 h-4 text-gray-500" />
@@ -44,12 +44,12 @@ useHead({
         </div>
 
         <div class="py-4 border-t border-gray-100 text-gray-700" id="locatie">
-          <h3 class="font-bold text-gray-900 mb-3 text-lg">Locație & Activitate</h3>
+          <h3 class="font-bold text-gray-900 mb-3 text-lg">Locatie & Activitate</h3>
           <p>Comenzile pot fi ridicate de la sediul nostru central:</p>
           <div class="mt-6 flex flex-col lg:flex-row gap-6 items-start">
             <div class="flex-shrink-0 lg:w-1/3">
                <p class="font-semibold text-gray-900 leading-tight">Eurotimalex S.R.L.</p>
-               <p class="text-gray-600 mt-1">Strada Drumul Taberei Nr. 92<br/>Bloc C7, Sc. F, Et. 4, Ap. 216<br/>Sector 6, 061406<br/>București, România</p>
+               <p class="text-gray-600 mt-1">Strada Drumul Taberei Nr. 92<br/>Bloc C7, Sc. F, Et. 4, Ap. 216<br/>Sector 6, 061406<br/>Bucuresti, Romania</p>
             </div>
             
             <div class="w-full lg:w-2/3 h-64 sm:h-80 rounded-sm overflow-hidden border border-gray-200">
@@ -66,7 +66,7 @@ useHead({
         </div>
 
         <div class="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p class="text-sm text-gray-500">Ai nevoie de mai multe informații?</p>
+          <p class="text-sm text-gray-500">Ai nevoie de mai multe informatii?</p>
           <UButton to="/contact" color="neutral" variant="solid" class="rounded-sm font-bold px-5 py-2.5 bg-gray-900 text-white hover:bg-gray-800 w-full sm:w-auto justify-center">
             Formular de contact
           </UButton>

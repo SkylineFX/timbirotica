@@ -10,7 +10,9 @@ if (!product.value) {
 
 // Simple SEO
 useSeoMeta({
-  title: product.value.name,
+  title: product.value.category?.name
+    ? `${product.value.category.name} > ${product.value.name}`
+    : product.value.name,
   description: product.value.description
 })
 

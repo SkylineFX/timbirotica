@@ -61,7 +61,7 @@ async function savePrice(p: any) {
   if (draft === undefined) return
   const parsed = parseFloat(draft)
   if (isNaN(parsed) || parsed <= 0) {
-    toast.add({ title: 'Preț invalid', description: 'Prețul trebuie să fie mai mare decât 0.', color: 'error' })
+    toast.add({ title: 'Pret invalid', description: 'Pretul trebuie sa fie mai mare decat 0.', color: 'error' })
     delete priceDrafts.value[p.id]
     return
   }
@@ -74,9 +74,9 @@ async function savePrice(p: any) {
     await $fetch(`/api/admin/products/${p.id}`, { method: 'PATCH', body: { price: parsed } })
     delete priceDrafts.value[p.id]
     await refresh()
-    toast.add({ title: 'Preț actualizat', description: `${parsed.toFixed(2)} RON`, color: 'success' })
+    toast.add({ title: 'Pret actualizat', description: `${parsed.toFixed(2)} RON`, color: 'success' })
   } catch (e: any) {
-    toast.add({ title: 'Eroare', description: e?.data?.message ?? 'Nu am putut actualiza prețul.', color: 'error' })
+    toast.add({ title: 'Eroare', description: e?.data?.message ?? 'Nu am putut actualiza pretul.', color: 'error' })
   } finally {
     savingId.value = null
   }
@@ -87,7 +87,7 @@ const columns: TableColumn<any>[] = [
   { accessorKey: 'name', header: 'Nume' },
   { accessorKey: 'sku', header: 'SKU' },
   { accessorKey: 'category', header: 'Categorie' },
-  { accessorKey: 'price', header: 'Preț (RON)' },
+  { accessorKey: 'price', header: 'Pret (RON)' },
   { accessorKey: 'stock', header: 'Disponibil' },
 ]
 </script>
@@ -102,7 +102,7 @@ const columns: TableColumn<any>[] = [
     <div class="bg-white border border-gray-200 rounded-md p-4 mb-4 flex flex-wrap items-center gap-3 flex-shrink-0">
       <UInput
         v-model="searchQuery"
-        placeholder="Caută după nume sau SKU..."
+        placeholder="Cauta dupa nume sau SKU..."
         icon="i-lucide-search"
         class="flex-1 min-w-[260px]"
       />
@@ -160,7 +160,7 @@ const columns: TableColumn<any>[] = [
       </UTable>
 
       <div v-if="!pending && products.length === 0" class="py-12 text-center text-sm text-gray-500 flex-shrink-0">
-        Niciun produs găsit.
+        Niciun produs gasit.
       </div>
     </div>
 

@@ -46,7 +46,7 @@ async function cancelOrder() {
     await $fetch(`/api/user/orders/${selectedOrder.value.id}`, { method: 'PATCH' })
     await refreshOrders()
     selectedOrder.value = { ...selectedOrder.value, status: 'cancelled' }
-    toast.add({ title: 'Comanda a fost anulată', color: 'success' })
+    toast.add({ title: 'Comanda a fost anulata', color: 'success' })
   } catch (err: any) {
     toast.add({ title: 'Eroare la anularea comenzii', description: err.data?.message, color: 'error' })
   } finally {
@@ -71,7 +71,7 @@ async function performReorder({ replace }: { replace: boolean }) {
       try {
         await clearServerCart()
       } catch {
-        toast.add({ title: 'Nu am putut goli coșul', color: 'error' })
+        toast.add({ title: 'Nu am putut goli cosul', color: 'error' })
         return
       }
     }
@@ -93,12 +93,12 @@ async function performReorder({ replace }: { replace: boolean }) {
     if (skipped.length === items.length) {
       toast.add({ title: 'Produsele nu sunt disponibile', description: skipped.join(', '), color: 'error' })
     } else if (skipped.length) {
-      toast.add({ title: 'Unele produse nu sunt disponibile', description: `Sărite: ${skipped.join(', ')}`, color: 'warning' })
+      toast.add({ title: 'Unele produse nu sunt disponibile', description: `Sarite: ${skipped.join(', ')}`, color: 'warning' })
     } else {
-      toast.add({ title: replace ? 'Coșul a fost înlocuit' : 'Produsele au fost adăugate în coș', color: 'success' })
+      toast.add({ title: replace ? 'Cosul a fost inlocuit' : 'Produsele au fost adaugate in cos', color: 'success' })
     }
   } catch {
-    toast.add({ title: 'Eroare la adăugarea în coș', color: 'error' })
+    toast.add({ title: 'Eroare la adaugarea in cos', color: 'error' })
   } finally {
     isReorderLoading.value = false
     isReorderConfirmOpen.value = false
@@ -111,7 +111,7 @@ async function performReorder({ replace }: { replace: boolean }) {
     <div class="overflow-hidden">
       <!-- Order History Section -->
          <div v-if="!userOrders || userOrders.length === 0" class="text-center py-12 rounded-md text-gray-500 bg-gray-50 border border-dashed border-gray-200">
-            Nu aveți nicio comandă plasată momentan.
+            Nu aveti nicio comanda plasata momentan.
          </div>
 
          <div v-else class="grid grid-cols-1 gap-5">
@@ -120,7 +120,7 @@ async function performReorder({ replace }: { replace: boolean }) {
               <div>
                 <div class="flex items-center justify-between pb-2 border-b border-gray-100">
                  <div class="flex flex-col">
-                    <p class="text-gray-900 tracking-wider">Nr. comandă: 
+                    <p class="text-gray-900 tracking-wider">Nr. comanda: 
                       <span class="font-bold text-md text-gray-900">#{{ order.orderNumber }}</span>
                     </p>
                     <div class="flex items-center gap-2">
@@ -163,7 +163,7 @@ async function performReorder({ replace }: { replace: boolean }) {
                   <span class="capitalize">Produse: <span class="font-medium text-gray-700">{{ (order.total - order.shippingCost).toFixed(2) }} RON</span></span>
                 </span>
                 <div class="flex flex-col items-end gap-2">
-                  <UButton color="neutral" variant="outline" size="sm" class="justify-center w-full" @click="openOrderDetails(order)">Detalii comandă</UButton>
+                  <UButton color="neutral" variant="outline" size="sm" class="justify-center w-full" @click="openOrderDetails(order)">Detalii comanda</UButton>
                 </div>
               </div>
               
@@ -172,13 +172,13 @@ async function performReorder({ replace }: { replace: boolean }) {
     </div>
 
     <!-- Order Details Modal -->
-    <UModal v-model:open="isOrderModalOpen" title="Detalii Comandă" :ui="{ content: 'rounded-md shadow-none sm:max-w-3xl' }">
+    <UModal v-model:open="isOrderModalOpen" title="Detalii Comanda" :ui="{ content: 'rounded-md shadow-none sm:max-w-3xl' }">
       <template #body>
          <div v-if="selectedOrder" class="px-2 space-y-6">
             <div class="flex justify-between items-center border-b border-gray-100 pb-4">
                <div>
                   <h4 class="font-bold text-gray-900 text-xl tracking-tight">#{{ selectedOrder.orderNumber }}</h4>
-                  <p class="text-sm text-gray-500 mt-0.5">Plasată pe {{ new Date(selectedOrder.createdAt).toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' }) }}</p>
+                  <p class="text-sm text-gray-500 mt-0.5">Plasata pe {{ new Date(selectedOrder.createdAt).toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' }) }}</p>
                </div>
                <div class="text-right">
                   <UBadge :color="statusColor[selectedOrder.status] ?? 'neutral'" variant="subtle" size="sm">{{ statusLabel[selectedOrder.status] ?? selectedOrder.status }}</UBadge>
@@ -199,7 +199,7 @@ async function performReorder({ replace }: { replace: boolean }) {
                      <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedShippingAddress.street }}, {{ parsedShippingAddress.city }}, {{ parsedShippingAddress.county }}</p>
                   </template>
                   <template v-else>
-                     <p class="text-sm text-gray-600">Comanda poate fi ridicată de la <a href="/despre-noi#locatie" class="text-primary font-medium">sediul nostru</a>. Vei primi un email cand aceasta va fi gata de ridicare.</p>
+                     <p class="text-sm text-gray-600">Comanda poate fi ridicata de la <a href="/despre-noi#locatie" class="text-primary font-medium">sediul nostru</a>. Vei primi un email cand aceasta va fi gata de ridicare.</p>
                   </template>
                </div>
 
@@ -271,7 +271,7 @@ async function performReorder({ replace }: { replace: boolean }) {
                     :to="`/api/user/orders/${selectedOrder.id}/proforma`"
                     external
                     download
-                >Descarcă proforma</UButton>
+                >Descarca proforma</UButton>
                 <UButton
                     color="neutral"
                     size="xl"
@@ -279,7 +279,7 @@ async function performReorder({ replace }: { replace: boolean }) {
                     class="flex-1 justify-center text-sm"
                     :loading="isReorderLoading"
                     @click="orderAgain"
-                >Comandă din nou</UButton>
+                >Comanda din nou</UButton>
               </div>
               <UButton
                 v-if="selectedOrder.status === 'processing'"
@@ -289,16 +289,16 @@ async function performReorder({ replace }: { replace: boolean }) {
                 class="flex-1 justify-center text-sm"
                 :loading="isCancelLoading"
                 @click="cancelOrder"
-              >Anulează comanda</UButton>
+              >Anuleaza comanda</UButton>
             </div>
          </div>
       </template>
     </UModal>
 
-    <UModal v-model:open="isReorderConfirmOpen" title="Coșul nu este gol" :ui="{ content: 'rounded-md sm:max-w-md' }">
+    <UModal v-model:open="isReorderConfirmOpen" title="Cosul nu este gol" :ui="{ content: 'rounded-md sm:max-w-md' }">
       <template #body>
         <p class="text-sm text-gray-600">
-          Coșul tău conține deja produse. Cum vrei să adaugi produsele din această comandă?
+          Cosul tau contine deja produse. Cum vrei sa adaugi produsele din aceasta comanda?
         </p>
       </template>
       <template #footer>
@@ -310,7 +310,7 @@ async function performReorder({ replace }: { replace: boolean }) {
             :loading="isReorderLoading"
             @click="performReorder({ replace: true })"
           >
-            Înlocuiește coșul
+            Inlocuieste cosul
           </UButton>
           <UButton
             color="primary"
@@ -319,7 +319,7 @@ async function performReorder({ replace }: { replace: boolean }) {
             :loading="isReorderLoading"
             @click="performReorder({ replace: false })"
           >
-            Adaugă la coș
+            Adauga la cos
           </UButton>
         </div>
       </template>

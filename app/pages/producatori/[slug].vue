@@ -9,6 +9,6 @@ const apiQuery = computed(() => ({ brand: brandSlug.value }))
   <ProductList
     :title="title"
     :apiQuery="apiQuery"
-    emptyMessage="Nu au fost gasite produse pentru acest producător."
+    emptyMessage="Nu au fost gasite produse pentru acest producator."
   />
 </template>

@@ -5,7 +5,7 @@ const bodySchema = z.object({
   price: z.number().positive().optional(),
   stock: z.union([z.literal(0), z.literal(1)]).optional(),
 }).refine(b => b.price !== undefined || b.stock !== undefined, {
-  message: 'Trebuie să trimiți cel puțin un câmp.'
+  message: 'Trebuie sa trimiti cel putin un camp.'
 })
 
 export default eventHandler(async (event) => {
@@ -26,7 +26,7 @@ export default eventHandler(async (event) => {
     .returning()
 
   if (!updated) {
-    throw createError({ statusCode: 404, message: 'Produsul nu a fost găsit.' })
+    throw createError({ statusCode: 404, message: 'Produsul nu a fost gasit.' })
   }
 
   return updated

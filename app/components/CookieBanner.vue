@@ -31,11 +31,11 @@ function accept() {
     >
       <div class="mx-auto max-w-3xl pointer-events-auto bg-white rounded-sm shadow-lg border border-gray-200 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
         <p class="text-sm text-gray-700 leading-relaxed flex-1">
-          Folosim doar cookie-uri strict necesare pentru funcționarea site-ului (autentificare, coș de cumpărături). Nu utilizăm cookie-uri de analiză sau publicitate.
+          Folosim doar cookie-uri strict necesare pentru functionarea site-ului (autentificare, cos de cumparaturi). Nu utilizam cookie-uri de analiza sau publicitate.
           <NuxtLink to="/politica-de-confidentialitate#cookies" class="text-primary hover:underline font-medium">Detalii</NuxtLink>
         </p>
         <UButton color="primary" size="sm" class="rounded-sm justify-center" @click="accept">
-          Am înțeles
+          Am inteles
         </UButton>
       </div>
     </div>

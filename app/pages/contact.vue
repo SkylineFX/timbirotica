@@ -10,10 +10,10 @@ useHead({
 })
 
 const schema = z.object({
-  name: z.string().min(2, 'Numele trebuie să aibă cel puțin 2 caractere'),
-  email: z.email('Adresă de email invalidă'),
-  subject: z.string().min(5, 'Subiectul trebuie să aibă cel puțin 5 caractere'),
-  message: z.string().min(10, 'Mesajul trebuie să aibă cel puțin 10 caractere')
+  name: z.string().min(2, 'Numele trebuie sa aiba cel putin 2 caractere'),
+  email: z.email('Adresa de email invalida'),
+  subject: z.string().min(5, 'Subiectul trebuie sa aiba cel putin 5 caractere'),
+  message: z.string().min(10, 'Mesajul trebuie sa aiba cel putin 10 caractere')
 })
 
 type Schema = z.output<typeof schema>
@@ -52,13 +52,13 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   <UContainer class="py-8 lg:py-12">
     <!-- Header -->
     <div class="mb-8 lg:mb-12">
-      <h1 class="text-3xl lg:text-3xl font-bold mb-2 md:mb-4">Contactează-ne</h1>
-      <p class="text-gray-600 max-w-2xl text-md lg:text-lg">Ai o întrebare sau ai nevoie de asistență? <br/> Completează formularul sau folosește detaliile de contact de mai jos.</p>
+      <h1 class="text-3xl lg:text-3xl font-bold mb-2 md:mb-4">Contacteaza-ne</h1>
+      <p class="text-gray-600 max-w-2xl text-md lg:text-lg">Ai o intrebare sau ai nevoie de asistenta? <br/> Completeaza formularul sau foloseste detaliile de contact de mai jos.</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
       
-      <!-- Stânga: Formular de contact -->
+      <!-- Stanga: Formular de contact -->
       <div class="lg:col-span-2 h-full flex flex-col">
         <UCard class="flex-1 flex flex-col" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8 flex-1 flex flex-col' }">
           <template #header>
@@ -66,7 +66,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               <UIcon name="i-lucide-mail" class="w-6 h-6 text-primary" />
               Trimite-ne un mesaj
             </h2>
-            <p class="text-sm text-gray-500 mt-1">Timp estimat de răspuns: 24h.</p>
+            <p class="text-sm text-gray-500 mt-1">Timp estimat de raspuns: 24h.</p>
           </template>
 
           <UForm :schema="schema" :state="state" @submit="onSubmit" class="space-y-6 flex-1 flex flex-col">
@@ -74,23 +74,23 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               <UFormField label="Nume complet" name="name" required>
                 <UInput v-model="state.name" placeholder="Popescu Ion" class="w-full" />
               </UFormField>
-              <UFormField label="Adresă de email" name="email" required>
+              <UFormField label="Adresa de email" name="email" required>
                 <UInput v-model="state.email" type="email" placeholder="email@exemplu.ro" class="w-full" />
               </UFormField>
             </div>
             <UFormField label="Subiect" name="subject" required>
-              <UInput v-model="state.subject" placeholder="Ex: Informații comandă #1234" class="w-full" />
+              <UInput v-model="state.subject" placeholder="Ex: Informatii comanda #1234" class="w-full" />
             </UFormField>
             
             <div class="flex-1 flex flex-col">
-              <UFormField label="Mesajul tău" name="message" required class="flex-1 flex flex-col" :ui="{ container: 'flex-1 mt-1 flex flex-col' }">
+              <UFormField label="Mesajul tau" name="message" required class="flex-1 flex flex-col" :ui="{ container: 'flex-1 mt-1 flex flex-col' }">
                 <UTextarea v-model="state.message" :rows="6" placeholder="Cu ce te putem ajuta?" class="flex-1 flex flex-col w-full" :ui="{ base: 'flex-1 resize-none' }" />
               </UFormField>
             </div>
 
             <!-- Status mesaje -->
-            <UAlert v-if="submitStatus === 'success'" icon="i-lucide-check-circle" color="primary" variant="soft" title="Mesaj trimis cu succes!" description="Îți vom răspunde în cel mai scurt timp posibil." />
-            <UAlert v-if="submitStatus === 'error'" icon="i-lucide-alert-circle" color="error" variant="soft" title="A apărut o eroare" description="Te rugăm să încerci din nou mai târziu." />
+            <UAlert v-if="submitStatus === 'success'" icon="i-lucide-check-circle" color="primary" variant="soft" title="Mesaj trimis cu succes!" description="Iti vom raspunde in cel mai scurt timp posibil." />
+            <UAlert v-if="submitStatus === 'error'" icon="i-lucide-alert-circle" color="error" variant="soft" title="A aparut o eroare" description="Te rugam sa incerci din nou mai tarziu." />
 
             <div class="pt-2">
               <UButton type="submit" color="primary" size="lg" :loading="isLoading" block>
@@ -101,7 +101,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         </UCard>
       </div>
 
-      <!-- Dreapta: Informații -->
+      <!-- Dreapta: Informatii -->
       <div class="space-y-6">
         
         <!-- Suport Clienti -->
@@ -109,7 +109,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           <template #header>
             <h3 class="text-lg font-bold flex items-center gap-2">
               <UIcon name="i-lucide-headset" class="w-5 h-5 text-primary" />
-              Suport Clienți
+              Suport Clienti
             </h3>
           </template>
           <div class="space-y-4">
@@ -124,7 +124,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               <UIcon name="i-lucide-at-sign" class="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
               <div>
                 <p class="font-medium hover:text-primary transition-colors"><a href="mailto:eurotimalex@yahoo.com">eurotimalex@yahoo.com</a></p>
-                <p class="text-sm text-gray-500">Răspuns în 24-48 ore lucrătoare</p>
+                <p class="text-sm text-gray-500">Raspuns in 24-48 ore lucratoare</p>
               </div>
             </div>
           </div>
@@ -144,7 +144,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               <span class="font-medium">Eurotimalex</span>
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
-              <span class="text-gray-500">Denumire Legală</span>
+              <span class="text-gray-500">Denumire Legala</span>
               <span class="font-medium text-right">EUROTIMALEX S.R.L.</span>
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
@@ -152,16 +152,16 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               <span class="font-medium">RO18034200</span>
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
-              <span class="text-gray-500">Nr. Înreg. (Reg. Com.)</span>
+              <span class="text-gray-500">Nr. Inreg. (Reg. Com.)</span>
               <span class="font-medium">J40/17160/2005</span>
             </div>
             <div class="flex flex-col gap-1 border-b border-gray-200 pb-2">
-              <span class="text-gray-500">Adresă Sediu Social</span>
-              <span class="font-medium">Strada Drumul Tabrei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, București</span>
+              <span class="text-gray-500">Adresa Sediu Social</span>
+              <span class="font-medium">Strada Drumul Tabrei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-gray-500">Țară Înregistrare</span>
-              <span class="font-medium">România</span>
+              <span class="text-gray-500">Tara Inregistrare</span>
+              <span class="font-medium">Romania</span>
             </div>
           </div>
         </UCard>

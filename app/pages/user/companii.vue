@@ -29,10 +29,10 @@ const currentBilling = computed(() => {
 })
 
 async function removeBilling(id: number) {
-  if (!confirm('Sigur dorești să ștergi această companie?')) return
+  if (!confirm('Sigur doresti sa stergi aceasta companie?')) return
   await $fetch(`/api/user/billing-addresses/${id}`, { method: 'DELETE' })
   await refreshBillingAddresses()
-  useToast().add({ title: 'Companie ștearsă', color: 'success' })
+  useToast().add({ title: 'Companie stearsa', color: 'success' })
 }
 
 async function handleBillingSaved() {
@@ -46,11 +46,11 @@ async function handleBillingSaved() {
     <UCard class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-lg sm:text-xl font-bold text-gray-900">Persoane Juridice</h3>
-        <UButton @click="openAddBilling" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-md px-2">Adaugă</UButton>
+        <UButton @click="openAddBilling" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-md px-2">Adauga</UButton>
       </div>
 
       <div v-if="userBillingAddresses?.length === 0" class="text-center py-12 text-gray-500 bg-gray-50 rounded-md border border-dashed border-gray-200">
-        Nici o companie salvată în cont.
+        Nici o companie salvata in cont.
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -76,7 +76,7 @@ async function handleBillingSaved() {
       </div>
     </UCard>
 
-    <UModal v-model:open="isBillingModalOpen" :title="billingModalMode === 'add' ? 'Adaugă persoană juridică' : 'Editează persoană juridică'" :ui="{ content: 'sm:max-w-xl' }">
+    <UModal v-model:open="isBillingModalOpen" :title="billingModalMode === 'add' ? 'Adauga persoana juridica' : 'Editeaza persoana juridica'" :ui="{ content: 'sm:max-w-xl' }">
       <template #body>
         <BillingAddressForm
           :is-first-address="!userBillingAddresses || userBillingAddresses.length === 0"

@@ -34,8 +34,8 @@ const page = computed({
 
 const sortOptions = [
   { label: 'Cele mai noi', value: 'default' },
-  { label: 'Preț crescător', value: 'price-asc' },
-  { label: 'Preț descrescător', value: 'price-desc' },
+  { label: 'Pret crescator', value: 'price-asc' },
+  { label: 'Pret descrescator', value: 'price-desc' },
   { label: 'Nume: A-Z', value: 'name-asc' },
   { label: 'Nume: Z-A', value: 'name-desc' }
 ]

@@ -21,10 +21,10 @@ if (!orderNumber) {
         <UIcon name="i-lucide-check" class="h-10 w-10 text-green-600" />
       </div>
       
-      <h2 class="mt-6 text-3xl font-extrabold text-gray-900 tracking-tight">Comandă plasată!</h2>
+      <h2 class="mt-6 text-3xl font-extrabold text-gray-900 tracking-tight">Comanda plasata!</h2>
       
       <p class="mt-2 text-sm lg:text-base text-gray-600">
-        Îți mulțumim pentru comandă. Numărul comenzii tale este:
+        Iti multumim pentru comanda. Numarul comenzii tale este:
       </p>
       
       <div class="mt-4 p-4 bg-gray-50 rounded-sm border border-gray-200 inline-block w-full">
@@ -36,8 +36,8 @@ if (!orderNumber) {
           <div class="flex items-start gap-3">
              <UIcon name="i-lucide-info" class="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
              <div class="flex flex-col gap-1">
-                <p><strong>Următorul pas:</strong> Vei primi pe email factura proformă cu detaliile contului bancar pentru a efectua plata prin transfer.</p>
-                <!-- <p class="text-sm">Te rugăm să specifici numărul comenzii la detaliile plății.</p> -->
+                <p><strong>Urmatorul pas:</strong> Vei primi pe email factura proforma cu detaliile contului bancar pentru a efectua plata prin transfer.</p>
+                <!-- <p class="text-sm">Te rugam sa specifici numarul comenzii la detaliile platii.</p> -->
              </div>
           </div>
         </template>
@@ -45,7 +45,7 @@ if (!orderNumber) {
           <div class="flex items-start gap-3">
              <UIcon name="i-lucide-info" class="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
              <div class="flex flex-col gap-1">
-                <p><strong>Următorul pas:</strong> Plata se va efectua în numerar la livrare. Te vom contacta în curând telefonic pentru confirmare și detaliile de expediere.</p>
+                <p><strong>Urmatorul pas:</strong> Plata se va efectua in numerar la livrare. Te vom contacta in curand telefonic pentru confirmare si detaliile de expediere.</p>
              </div>
           </div>
         </template>
@@ -53,7 +53,7 @@ if (!orderNumber) {
           <div class="flex items-start gap-3">
              <UIcon name="i-lucide-info" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
              <div class="flex flex-col gap-1">
-                <p>Te vom contacta în curând pentru confirmare și detalii.</p>
+                <p>Te vom contacta in curand pentru confirmare si detalii.</p>
              </div>
           </div>
         </template>
@@ -68,7 +68,7 @@ if (!orderNumber) {
 
         <NuxtLink to="/">
           <UButton block size="xl" color="primary" variant="solid" class="rounded-md font-semibold text-lg justify-center w-full">
-             Întoarce-te la magazin
+             Intoarce-te la magazin
           </UButton>
         </NuxtLink>
       </div>
