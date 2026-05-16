@@ -50,7 +50,7 @@ const featuredCategories = [
         <NuxtLink to="/termeni-si-conditii#plata" class="block h-full cursor-pointer">
           <UCard class="h-full text-center rounded-sm">
               <UIcon name="i-heroicons-credit-card" class="text-4xl text-primary mb-1" />
-              <h3 class="font-bold pb-1">Modalitati de plata</h3>
+              <h3 class="font-bold pb-1">Moduri de plata</h3>
               <p class="text-sm text-gray-500">Plata ramburs la livrare sau prin transfer bancar</p>
           </UCard>
         </NuxtLink>
