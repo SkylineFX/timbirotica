@@ -17,7 +17,7 @@ const form = ref<Partial<BillingAddress>>({
   onrc: '',
   bankName: '',
   iban: '',
-  county: 'Bucuresti',
+  county: 'București',
   city: '',
   street: '',
   isDefaultBilling: true

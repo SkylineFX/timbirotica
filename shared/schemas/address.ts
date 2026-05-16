@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-const COUNTIES = ['Bucuresti', 'Ilfov'] as const
+const COUNTIES = ['București', 'Ilfov'] as const
 const NAME_REGEX = /^[\p{L}\s'-]{2,}$/u
 const POSTAL_REGEX = /^\d{6}$/
 const FORM_PHONE_REGEX = /^\d{3}\s?\d{3}\s?\d{3}$/   // form input: 9 digits, optional spaces
