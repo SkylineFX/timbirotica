@@ -31,7 +31,7 @@ useHead({
         <!-- Cookie Policy Section -->
         <section id="cookies" class="pb-8 scroll-mt-24">
           <h2 class="text-2xl font-semibold mb-4 font-serif">II. Politica de Cookies</h2>
-          <p>Un modul cookie este un fisier text de mici dimensiuni salvat pe computerul dumneavoastra. Platforma noastra utilizeaza exclusiv cookie-uri <strong>strict necesare</strong> pentru functionarea site-ului, fara a elabora profile sau a colecta date pentru publicitate.</p>
+          <p>Un modul cookie este un fisier text de mici dimensiuni salvat pe computerul dumneavoastra. Platforma noastra utilizeaza exclusiv cookie-uri <strong>strict necesare</strong> pentru functionarea site-ului, fara a crea profile personalizate sau a colecta date pentru publicitate.</p>
           <ul class="list-disc pl-5 mt-2 space-y-2">
             <li><strong>Cookie de sesiune (autentificare):</strong> un cookie HTTP-only criptat, setat dupa autentificarea in cont. Permite mentinerea conectarii intre pagini. Expira la inchiderea browserului sau, daca bifati &quot;Tine-ma minte&quot;, dupa 30 de zile.</li>
             <li><strong>Cookie de confirmare (&bdquo;cookie-consent&quot;):</strong> retine faptul ca ati luat la cunostinta utilizarea cookie-urilor, pentru a nu va mai afisa banner-ul informativ. Valabilitate 1 an.</li>
@@ -104,7 +104,7 @@ useHead({
             <li><strong>Dreptul de a va adresa</strong> Autoritatii Nationale de Supraveghere a Prelucrarii Datelor cu Caracter Personal (<a href="https://www.dataprotection.ro/" target="_blank" class="text-primary font-medium hover:underline">ANSPDCP</a>) sau instantelor competente.</li>
           </ul>
 
-          <p class="mt-4">Pentru exercitarea oricaruia dintre drepturile de mai sus, ne puteti contacta la <a href="mailto:eurotimalex@yahoo.com" class="text-primary hover:underline">eurotimalex@yahoo.com</a>. Raspundem solicitarilor in maximum 30 de zile.</p>
+          <p class="mt-4">Pentru exercitarea oricaruia dintre drepturile de mai sus, ne puteti contacta la <a href="mailto:eurotimalex@yahoo.com" class="text-primary hover:underline">eurotimalex@yahoo.com</a> sau prin <a href="/contact" class="text-primary hover:underline">formularul de contact</a>. Raspundem solicitarilor in maximum 30 de zile.</p>
         </section>
 
       </div>
