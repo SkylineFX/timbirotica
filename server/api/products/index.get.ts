@@ -60,7 +60,8 @@ export default eventHandler(async (event) => {
   if (scopeCategoryIds.length) scopeConditions.push(inArray(tables.products.categoryId, scopeCategoryIds))
   if (scopeBrand) scopeConditions.push(eq(tables.products.brandId, scopeBrand.id))
   if (searchQ) {
-    const searchTerms = searchQ.trim().split(/\s+/).filter(Boolean)
+    const stripDiacritics = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '')
+    const searchTerms = stripDiacritics(searchQ).trim().split(/\s+/).filter(Boolean)
     if (searchTerms.length > 0) {
       const termConditions = searchTerms.map(term => or(
         like(tables.products.name, `%${term}%`),
