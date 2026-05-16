@@ -175,6 +175,7 @@ const termsAccepted = ref(false)
 const toast = useToast()
 
 async function submitOrder() {
+  if (isSubmitting.value) return
   if (!isEmailVerified.value) {
     toast.add({ title: 'Confirma adresa de email', description: 'Trebuie sa confirmi adresa de email inainte de a plasa o comanda.', color: 'error' })
     return
@@ -444,7 +445,7 @@ async function submitOrder() {
                 </span>
               </template>
             </UCheckbox>
-            <UButton :loading="isSubmitting" :disabled="!isEmailVerified || !termsAccepted" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] flex justify-center">
+            <UButton :loading="isSubmitting" :disabled="!isEmailVerified || !termsAccepted || isSubmitting" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] flex justify-center">
                Plaseaza comanda
             </UButton>
          </div>
@@ -502,7 +503,7 @@ async function submitOrder() {
                </span>
              </template>
            </UCheckbox>
-           <UButton :loading="isSubmitting" :disabled="!isEmailVerified || !termsAccepted" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] flex justify-center">
+           <UButton :loading="isSubmitting" :disabled="!isEmailVerified || !termsAccepted || isSubmitting" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] flex justify-center">
               Plaseaza comanda
            </UButton>
         </div>
