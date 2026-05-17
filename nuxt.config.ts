@@ -7,8 +7,19 @@ export default defineNuxtConfig({
     'nuxt-auth-utils',
     '@nuxthub/core',
     '@nuxt/image',
-    'nuxt-email-renderer'
+    'nuxt-email-renderer',
+    '@nuxtjs/robots'
   ],
+  robots: {
+    disallow: [
+      '/admin',
+      '/user',
+      '/checkout',
+      '/comanda-finalizata',
+      '/cautare',
+      '/api'
+    ]
+  },
   runtimeConfig: {
     resendApiKey: process.env.RESEND_API_KEY,
     //!! remove whole session section 
