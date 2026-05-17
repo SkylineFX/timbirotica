@@ -8,8 +8,13 @@ export default defineNuxtConfig({
     '@nuxthub/core',
     '@nuxt/image',
     'nuxt-email-renderer',
-    '@nuxtjs/robots'
+    '@nuxtjs/robots',
+    '@nuxtjs/sitemap'
   ],
+  site: {
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://eurotimalex.ro',
+    name: 'Eurotimalex'
+  },
   robots: {
     disallow: [
       '/admin',
@@ -19,6 +24,10 @@ export default defineNuxtConfig({
       '/cautare',
       '/api'
     ]
+  },
+  sitemap: {
+    sources: ['/api/__sitemap__/urls'],
+    exclude: ['/admin/**', '/user/**', '/checkout', '/comanda-finalizata', '/cautare']
   },
   runtimeConfig: {
     resendApiKey: process.env.RESEND_API_KEY,
