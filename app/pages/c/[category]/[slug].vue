@@ -11,7 +11,7 @@ if (!product.value) {
 // Simple SEO
 useSeoMeta({
   title: product.value.category?.name
-    ? `${product.value.category.name} > ${product.value.name}`
+    ? `${product.value.category.name} / ${product.value.name}`
     : product.value.name,
   description: product.value.description
 })
@@ -64,7 +64,7 @@ const accordionItems = [
 
 <template>
   <UContainer class="py-6">
-    <UBreadcrumb :items="breadcrumbs" class="mb-6 [&_ol]:flex-nowrap [&_ol]:overflow-hidden [&_li]:shrink-0 [&_li:last-child]:shrink-1 [&_li:last-child]:min-w-0" />
+    <UBreadcrumb :items="breadcrumbs" :ui="{ separatorIcon: 'w-4 h-4' }" class="mb-6 [&_ol]:flex-nowrap [&_ol]:overflow-hidden [&_li]:shrink-0 [&_li:last-child]:shrink-1 [&_li:last-child]:min-w-0" />
     <div v-if="product" class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
         <div class="w-full md:col-span-7">
             <!-- Mobile Header (hidden on desktop) -->

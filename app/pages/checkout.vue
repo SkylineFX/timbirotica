@@ -423,7 +423,7 @@ async function submitOrder() {
             <div v-if="!billingSameAsShipping" class="text-sm p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors" @click="isBillingSelectorOpen = true">
                <div>
                   <template v-if="selectedBilling">
-                     <span class="font-bold inline mb-1">{{ selectedBilling.companyName }}</span><span class="text-gray-500 inline ml-2">· {{ selectedBilling.hasRo ? 'RO ' : '' }}{{ selectedBilling.cui }}</span>
+                     <span class="font-bold inline mb-1">{{ selectedBilling.companyName }}</span><span class="text-gray-500 inline ml-2">· {{ selectedBilling.hasRo ? 'RO' : '' }}{{ selectedBilling.cui }}</span>
                      <span class="text-gray-600 block">{{ selectedBilling.street }}</span> 
                      <span class="text-gray-600 block">{{ selectedBilling.city }}, {{ selectedBilling.county }}</span>
                   </template>
@@ -541,10 +541,11 @@ async function submitOrder() {
     @add-new="openNewBilling"
   >
     <template #item="{ item }">
-      <div class="flex justify-between items-start">
-         <p class="font-bold mb-1 text-gray-900 text-base group-hover:text-primary transition-colors">{{ item.companyName }}</p>
+      <div class="flex justify-starty items-center gap-2">
+        <p class="font-bold mb-1 text-gray-900 text-base group-hover:text-primary transition-colors">{{ item.companyName }}</p>
+        <p class="text-gray-600 text-sm leading-relaxed">· {{ item.hasRo ? 'RO' : '' }}{{ item.cui }}</p>
       </div>
-      <p class="text-gray-600 text-sm leading-relaxed">CUI: {{ item.hasRo ? 'RO ' : '' }}{{ item.cui }} | ONRC: {{ item.onrc }}</p>
+      <p class="text-gray-600 text-sm leading-relaxed">Reg. Com.: {{ item.onrc }}</p>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
     </template>

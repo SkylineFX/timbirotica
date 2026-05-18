@@ -36,7 +36,7 @@ defineProps<Props>()
           </ESection>
 
           <EText style="font-size: 14px; line-height: 24px; color: #8898aa;">
-            Dacă nu ai solicitat resetarea parolei, poți ignora acest email în siguranță. Contul tău rămâne protejat.
+            Dacă nu ai solicitat resetarea parolei, poți ignora acest email în siguranță.
           </EText>
 
           <EText style="font-size: 13px; line-height: 22px; color: #aab7c4; word-break: break-all;">

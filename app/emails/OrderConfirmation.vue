@@ -69,14 +69,14 @@ const formattedPaymentMethod = computed(() => {
           </EHeading>
           
           <EHeading style="font-size: 24px; line-height: 1.3; font-weight: 700; color: #484848; margin-top: 48px;">
-            Iti multumim pentru comanda!
+            Îți mulțumim pentru comandă!
           </EHeading>
 
           <EText style="font-size: 16px; line-height: 24px; color: #525f7f;">
             Salut {{ customerName }},
           </EText>
           <EText style="font-size: 16px; line-height: 24px; color: #525f7f;">
-            Am inregistrat comanda ta cu numarul <strong>#{{ orderNumber }}</strong>.
+            Am înregistrat comanda ta cu numărul <strong>#{{ orderNumber }}</strong>.
             <span v-if="shippingMethod === 'courier'">
               În curând o vom pregăti pentru expediere.
             </span>

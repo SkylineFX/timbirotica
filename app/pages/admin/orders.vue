@@ -255,7 +255,7 @@ function fmtDate(d: string | Date) {
               </div>
               <template v-if="parsedBilling.companyName">
                 <p class="font-medium text-sm text-gray-900">{{ parsedBilling.companyName }} · {{ parsedBilling.onrc }}</p>
-                <p class="text-sm text-gray-600 mt-1">{{ parsedBilling.hasRo ? 'RO ' : '' }}{{ parsedBilling.cui }}</p>
+                <p class="text-sm text-gray-600 mt-1">{{ parsedBilling.hasRo ? 'RO' : '' }}{{ parsedBilling.cui }}</p>
                 <p class="text-sm text-gray-600 mt-1">{{ parsedBilling.street }}, {{ parsedBilling.city }}, {{ parsedBilling.county }}</p>
               </template>
               <template v-else-if="parsedShipping.firstName">

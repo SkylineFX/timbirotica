@@ -67,8 +67,8 @@ async function handleBillingSaved() {
 
           <div class="mb-4">
             <p class="font-bold text-gray-900 inline">{{ addr.companyName }}</p>
-            <p class="text-sm text-gray-600 inline ml-1">· {{ addr.onrc }}</p>
-            <p class="text-sm text-gray-600 mt-1">CUI: {{ addr.hasRo ? 'RO ' : '' }}{{ addr.cui }}</p>
+            <p class="text-sm text-gray-600 inline ml-1">· {{ addr.hasRo ? 'RO' : '' }}{{ addr.cui }}</p>
+            <p class="text-sm text-gray-600 mt-1">Reg. Com.: {{ addr.onrc }}</p>
             <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.street }}</p>
             <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.city }}, {{ addr.county }}</p>
           </div>
