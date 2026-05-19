@@ -51,5 +51,10 @@ export default defineNuxtConfig({
   },
   routeRules: {
     '/comenzi': { redirect: { to: '/user/comenzi', statusCode: 301 } }
+  },
+  vite: {
+    server: {
+      allowedHosts: ['.trycloudflare.com', '.ngrok.io', '.ngrok-free.app']
+    }
   }
 })

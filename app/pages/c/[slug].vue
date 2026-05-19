@@ -8,8 +8,19 @@ const breadcrumbs = computed(() => [
   { label: title.value, to: route.path }
 ])
 
+const description = computed(() =>
+  `Descopera ${title.value.toLowerCase()} la preturi avantajoase. Cumpara online cu livrare rapida in Bucuresti. - Eurotimalex`
+)
+
 useSeoMeta({
-  title: () => title.value
+  title: () => title.value + " - Eurotimalex.ro",
+  description: () => description.value,
+  ogTitle: () => title.value,
+  ogDescription: () => description.value,
+  ogType: 'website',
+  twitterCard: 'summary',
+  twitterTitle: () => title.value,
+  twitterDescription: () => description.value
 })
 </script>
 

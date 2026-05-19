@@ -6,6 +6,19 @@ const breadcrumbs = computed(() => [
   { label: 'Acasa', to: '/' },
   { label: title, to: route.path }
 ])
+
+const description = 'Selectia noastra de produse recomandate la preturi avantajoase.'
+
+useSeoMeta({
+  title: () => title + " - Eurotimalex.ro",
+  description,
+  ogTitle: title,
+  ogDescription: description,
+  ogType: 'website',
+  twitterCard: 'summary',
+  twitterTitle: title,
+  twitterDescription: description
+})
 </script>
 
 <template>

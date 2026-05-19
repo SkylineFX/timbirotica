@@ -8,12 +8,30 @@ if (!product.value) {
   throw createError({ statusCode: 404, message: 'Product not found' })
 }
 
-// Simple SEO
+const site = useSiteConfig()
+const truncate = (s: string | undefined | null, n = 155) =>
+  s ? (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s) : undefined
+
+const pageTitle = product.value.category?.name
+  ? `${product.value.category.name} / ${product.value.name}`
+  : product.value.name
+const pageDescription = truncate(product.value.description)
+const productImage = product.value.images?.[0]
+const absoluteImage = productImage
+  ? (productImage.startsWith('http') ? productImage : `${site.url}${productImage}`)
+  : undefined
+
 useSeoMeta({
-  title: product.value.category?.name
-    ? `${product.value.category.name} / ${product.value.name}`
-    : product.value.name,
-  description: product.value.description
+  title: pageTitle,
+  description: pageDescription,
+  ogTitle: pageTitle,
+  ogDescription: pageDescription,
+  ogType: 'website',
+  ogImage: absoluteImage,
+  twitterCard: absoluteImage ? 'summary_large_image' : 'summary',
+  twitterTitle: pageTitle,
+  twitterDescription: pageDescription,
+  twitterImage: absoluteImage
 })
 
 const breadcrumbs = computed(() => {
