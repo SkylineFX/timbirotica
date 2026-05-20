@@ -1,0 +1,16 @@
+import * as Sentry from "@sentry/nuxt";
+
+Sentry.init({
+  dsn: "https://0eeb62d30c982bd85cc7ba6e7a4599ca@o4511418226114560.ingest.de.sentry.io/4511418227884112",
+
+  // We recommend adjusting this value in production, or using tracesSampler
+  // for finer control
+  tracesSampleRate: 1.0,
+
+  // Disabled to honor privacy policy.
+  // https://docs.sentry.io/platforms/javascript/guides/nuxt/configuration/options/#sendDefaultPii
+  sendDefaultPii: false,
+
+  // Setting this option to true will print useful information to the console while you're setting up Sentry.
+  debug: false,
+});

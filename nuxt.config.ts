@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+
   modules: [
     '@nuxt/ui',
     'nuxt-auth-utils',
@@ -9,12 +10,15 @@ export default defineNuxtConfig({
     '@nuxt/image',
     'nuxt-email-renderer',
     '@nuxtjs/robots',
-    '@nuxtjs/sitemap'
+    '@nuxtjs/sitemap',
+    '@sentry/nuxt/module'
   ],
+
   site: {
     url: process.env.NUXT_PUBLIC_SITE_URL || 'https://eurotimalex.ro',
     name: 'Eurotimalex'
   },
+
   robots: {
     disallow: [
       '/admin',
@@ -25,10 +29,12 @@ export default defineNuxtConfig({
       '/api'
     ]
   },
+
   sitemap: {
     sources: ['/api/__sitemap__/urls'],
     exclude: ['/admin/**', '/user/**', '/checkout', '/comanda-finalizata', '/cautare']
   },
+
   runtimeConfig: {
     resendApiKey: process.env.RESEND_API_KEY,
     //!! remove whole session section 
@@ -39,22 +45,37 @@ export default defineNuxtConfig({
       }
     }
   },
+
   nuxtEmailRenderer: {
     emailsDir: process.cwd() + '/app/emails'
   },
+
   css: ['~/assets/main.css'],
+
   hub: {
     db: 'sqlite'
   },
+
   colorMode: {
     preference: 'light'
   },
+
   routeRules: {
     '/comenzi': { redirect: { to: '/user/comenzi', statusCode: 301 } }
   },
+
   vite: {
     server: {
       allowedHosts: ['.trycloudflare.com', '.ngrok.io', '.ngrok-free.app']
     }
+  },
+
+  sentry: {
+    org: 'eurotimalex-et',
+    project: 'javascript-nuxt'
+  },
+
+  sourcemap: {
+    client: 'hidden'
   }
 })
