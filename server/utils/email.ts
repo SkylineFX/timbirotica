@@ -65,7 +65,7 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
   const htmlContent = typeof template === 'string' ? template : template.html
 
   const { error } = await resend.emails.send({
-    from: 'Timbirotica <onboarding@resend.dev>', // Temporary verified domain provided by Resend
+    from: 'Timbirotica <comenzi@timbirotica.ro>',
     to: data.customerEmail,
     subject: `Confirmare înregistrare comandă #${data.orderNumber}`,
     html: htmlContent,
@@ -101,7 +101,7 @@ export async function sendEmailVerification(data: { email: string; firstName: st
   const htmlContent = typeof template === 'string' ? template : template.html
 
   const { error } = await resend.emails.send({
-    from: 'Timbirotica <onboarding@resend.dev>',
+    from: 'Timbirotica <noreply@timbirotica.ro>',
     to: data.email,
     subject: 'Confirmare adresă email - Timbirotica',
     html: htmlContent
@@ -140,7 +140,7 @@ export async function sendContactMessage(data: ContactMessageData): Promise<void
   const htmlContent = typeof template === 'string' ? template : template.html
 
   const { error } = await resend.emails.send({
-    from: 'Timbirotica <onboarding@resend.dev>',
+    from: 'Timbirotica <noreply@timbirotica.ro>',
     to: config.adminEmail,
     replyTo: data.email, // Replies go straight to the person who wrote in
     subject: `[Contact] ${data.subject}`,
@@ -173,7 +173,7 @@ export async function sendPasswordReset(data: { email: string; firstName: string
   const htmlContent = typeof template === 'string' ? template : template.html
 
   const { error } = await resend.emails.send({
-    from: 'Timbirotica <onboarding@resend.dev>',
+    from: 'Timbirotica <noreply@timbirotica.ro>',
     to: data.email,
     subject: 'Resetare parolă - Timbirotica',
     html: htmlContent

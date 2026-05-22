@@ -1,6 +1,9 @@
 import * as Sentry from "@sentry/nuxt";
 
 Sentry.init({
+  // Only send events from production builds — keeps localhost/dev noise out of the dashboard.
+  enabled: import.meta.env.PROD,
+
   dsn: "https://0eeb62d30c982bd85cc7ba6e7a4599ca@o4511418226114560.ingest.de.sentry.io/4511418227884112",
 
   // We recommend adjusting this value in production, or using tracesSampler
