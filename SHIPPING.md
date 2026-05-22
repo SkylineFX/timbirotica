@@ -13,8 +13,12 @@ All required on the host (NuxtHub dashboard, Cloudflare Workers secret, or your 
 | `NUXT_SESSION_PASSWORD` | Encrypts session cookies. **Must be ≥32 chars, random, never the dev value.** If leaked, any user session can be forged. | `openssl rand -base64 48` |
 | `RESEND_API_KEY` | Sends order, verification, reset emails. Dev keys only deliver to verified test addresses — prod keys are tied to your verified sending domain. | Resend dashboard → API keys → create for prod domain |
 | `NODE_ENV` | Must be `production` so `secure: true` cookie flag turns on (see `nuxt.config.ts`). | Set by host automatically in most cases — verify. |
+| `SENTRY_AUTH_TOKEN` | **Build-time only.** Lets the build upload source maps to Sentry so prod stack traces map back to TypeScript. Without it, errors still get captured but stack traces are minified. | Sentry → Settings → Auth Tokens. Stored locally in `.env.sentry-build-plugin` (gitignored); set in NuxtHub build env for prod. |
+| `NUXT_PUBLIC_SITE_URL` | Canonical site URL used by sitemap, robots, and OG tags. Set per environment so staging doesn't claim to be prod. | `https://timbirotica.ro` for prod; the staging/tunnel URL otherwise |
 
 DB URL is auto-provisioned by NuxtHub (Cloudflare D1). If self-hosting, set the libSQL/Turso URL.
+
+The Sentry DSN is currently hardcoded in `sentry.client.config.ts` / `sentry.server.config.ts` (public-safe value). If you later move it to env, add `NUXT_PUBLIC_SENTRY_DSN` here and update both config files to read `useRuntimeConfig().public.sentry.dsn`.
 
 **Verification — EVERY DEPLOY:**
 - After deploying, open Resend logs and confirm a verification email actually goes out (register a test account).
@@ -46,7 +50,9 @@ Walk every golden path before promoting to prod. Use a real phone alongside the 
 
 ## 3. Operational safety nets
 
-- [ ] **Error monitoring** — Sentry / LogRocket / equivalent wired up. Without this, prod bugs are invisible until customers complain.
+- [x] **Error monitoring** — Sentry wired up (`@sentry/nuxt`), client + server capture, PII disabled.
+  - **EVERY DEPLOY**: confirm `SENTRY_AUTH_TOKEN` is set in the build env so source maps upload (otherwise prod stack traces are minified).
+  - After first deploy, trigger one real error and confirm it lands in the Sentry dashboard.
 - [ ] **Database backups** — daily snapshots, ≥14 day retention. **Verify a restore actually works** before you need it.
 - [ ] **Weekly stock/price sync cron** scheduled (`npx tsx scripts/update-product-prices-stock.ts`). Add a `lastSyncedAt` table or log so silently-failed syncs are visible.
 - [ ] **Cloudflare bot mitigation** enabled on the origin to cover the auth endpoints we deliberately don't rate-limit at the app layer.
@@ -55,10 +61,11 @@ Walk every golden path before promoting to prod. Use a real phone alongside the 
 
 ## 4. SEO + analytics (day-one)
 
-- [ ] `robots.txt` allows crawlers on public routes, disallows `/user/*`, `/admin/*`, `/checkout`, `/cautare`
-- [ ] Sitemap generated (consider `@nuxtjs/sitemap`)
-- [ ] Privacy-friendly analytics in place (Plausible, Umami, Cloudflare Web Analytics)
-- [ ] Open Graph / Twitter card meta on product + category pages (currently only `title` + `description` are set)
+- [x] `robots.txt` via `@nuxtjs/robots` — disallows `/admin`, `/user`, `/checkout`, `/comanda-finalizata`, `/cautare`, `/api`; auto-noindexes non-prod deploys.
+- [x] Dynamic sitemap via `@nuxtjs/sitemap` at `/sitemap.xml` — pulls categories/products/brands from the DB at request time.
+- [x] Open Graph / Twitter card meta on product, category, brand, and recommended pages.
+- [ ] **Submit sitemap to Google Search Console** after first prod deploy (one-time): add property for `timbirotica.ro`, submit `https://timbirotica.ro/sitemap.xml`.
+- [ ] **Enable Cloudflare Web Analytics** (dashboard-only, cookieless, no consent banner needed): CF dashboard → Web Analytics → Add a site → select `timbirotica.ro`. CF auto-injects the tracking beacon on proxied sites. Gives pageviews, top pages, referrers, country/device breakdown. Upgrade to Plausible/Umami later if you need funnels or custom events.
 
 ---
 

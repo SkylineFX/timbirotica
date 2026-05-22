@@ -21,7 +21,7 @@ async function logout() {
     <aside class="w-60 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
       <div class="px-5 py-6 border-b border-gray-200">
         <NuxtLink to="/admin/orders" class="font-inter text-lg font-semibold tracking-tight flex flex-col items-end">
-          <img src="/logo.svg" alt="Eurotimalex" class="w-full" />
+          <img src="/logo.svg" alt="Timbirotica" class="w-full" />
           <p class="font-bold text-gray-900 text-xl">Administrator</p>
         </NuxtLink>
       </div>

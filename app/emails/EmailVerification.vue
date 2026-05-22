@@ -10,13 +10,11 @@ defineProps<Props>()
 <template>
   <EHtml>
     <EHead />
-    <EPreview>Eurotimalex - Confirmă adresa de email pentru a putea plasa comenzi.</EPreview>
+    <EPreview>Timbirotica - Confirmă adresa de email pentru a putea plasa comenzi.</EPreview>
     <EBody style="background-color: #f6f9fc; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Ubuntu,sans-serif;">
       <EContainer style="background-color: #ffffff; margin: 0 auto; padding: 10px 0 48px; max-width: 600px;">
         <ESection style="padding: 0 24px;">
-          <EHeading style="font-size: 32px; line-height: 1.3; font-weight: 700; color: #484848;">
-            Eurotimalex
-          </EHeading>
+          <img src="https://timbirotica.ro/logo.png" alt="Timbirotica" width="213" height="40" style="height: 40px; width: 213px; display: block; border: 0; outline: none; text-decoration: none;" />
 
           <EHeading style="font-size: 24px; line-height: 1.3; font-weight: 700; color: #484848; margin-top: 48px;">
             Confirmă adresa de email
@@ -26,7 +24,7 @@ defineProps<Props>()
             Salut {{ firstName }},
           </EText>
           <EText style="font-size: 16px; line-height: 24px; color: #525f7f;">
-            Îți mulțumim că ți-ai creat un cont la Eurotimalex. Pentru a putea plasa comenzi, te rugăm să confirmi adresa de email apăsând butonul de mai jos. Link-ul este valabil timp de <strong>24 de ore</strong>.
+            Îți mulțumim că ți-ai creat un cont la Timbirotica. Pentru a putea plasa comenzi, te rugăm să confirmi adresa de email apăsând butonul de mai jos. Link-ul este valabil timp de <strong>24 de ore</strong>.
           </EText>
 
           <ESection style="text-align: center; margin-top: 32px; margin-bottom: 32px;">

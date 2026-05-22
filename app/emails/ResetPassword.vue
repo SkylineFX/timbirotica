@@ -10,13 +10,11 @@ defineProps<Props>()
 <template>
   <EHtml>
     <EHead />
-    <EPreview>Eurotimalex - Resetare parolă. Folosește linkul din email pentru a-ți seta o nouă parolă.</EPreview>
+    <EPreview>Timbirotica - Resetare parolă. Folosește linkul din email pentru a-ți seta o nouă parolă.</EPreview>
     <EBody style="background-color: #f6f9fc; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Ubuntu,sans-serif;">
       <EContainer style="background-color: #ffffff; margin: 0 auto; padding: 10px 0 48px; max-width: 600px;">
         <ESection style="padding: 0 24px;">
-          <EHeading style="font-size: 32px; line-height: 1.3; font-weight: 700; color: #484848;">
-            Eurotimalex
-          </EHeading>
+          <img src="https://timbirotica.ro/logo.png" alt="Timbirotica" width="213" height="40" style="height: 40px; width: 213px; display: block; border: 0; outline: none; text-decoration: none;" />
 
           <EHeading style="font-size: 24px; line-height: 1.3; font-weight: 700; color: #484848; margin-top: 48px;">
             Resetare parolă

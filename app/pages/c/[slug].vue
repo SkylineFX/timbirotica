@@ -9,11 +9,11 @@ const breadcrumbs = computed(() => [
 ])
 
 const description = computed(() =>
-  `Descopera ${title.value.toLowerCase()} la preturi avantajoase. Cumpara online cu livrare rapida in Bucuresti. - Eurotimalex`
+  `Descopera ${title.value.toLowerCase()} la preturi avantajoase. Cumpara online cu livrare rapida in Bucuresti. - Timbirotica`
 )
 
 useSeoMeta({
-  title: () => title.value + " - Eurotimalex.ro",
+  title: () => title.value + " - Timbirotica",
   description: () => description.value,
   ogTitle: () => title.value,
   ogDescription: () => description.value,

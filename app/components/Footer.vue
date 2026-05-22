@@ -7,7 +7,7 @@ const columns: FooterColumn[] = [
     children: [
       {
         label: 'Eurotimalex SRL',
-        to: 'https://eurotimalex.ro',
+        to: 'https://timbirotica.ro',
         target: '_blank'
       },
       {

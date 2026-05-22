@@ -2,7 +2,7 @@
 useHead({
   title: 'Termeni si Conditii',
   meta: [
-    { name: 'description', content: 'Termenii si conditiile de utilizare a magazinului online Eurotimalex.' }
+    { name: 'description', content: 'Termenii si conditiile de utilizare a magazinului online Timbirotica.' }
   ]
 })
 </script>
@@ -21,7 +21,7 @@ useHead({
 
         <section class="pb-8">
           <h2 class="text-2xl font-semibold mb-4 font-serif">I. Despre Noi</h2>
-          <p>Serviciul de comert electronic este oferit de <strong>Eurotimalex SRL</strong>, denumit in continuare "Vanzator", cu sediul in <strong>Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti</strong>, inmatriculata in Registrul Comertului sub nr. <strong>J40/17160/2005</strong>, avand cod unic de inregistrare <strong>RO18034200</strong>.</p>
+          <p><strong class="font-semibold">Timbirotica</strong> este numele comercial al serviciului de comert electronic oferit de <strong>Eurotimalex SRL</strong>, denumit in continuare "Vanzator", cu sediul in <strong>Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti</strong>, inmatriculata in Registrul Comertului sub nr. <strong>J40/17160/2005</strong>, avand cod unic de inregistrare <strong>RO18034200</strong>.</p>
 
           <div class="flex flex-col gap-4 mt-4">
             <p>Folosirea acestui site de catre orice persoana (atat fizica cat si juridica) in scopul de a se informa sau de a achizitiona produsele, denumit in continuare "Utilizator" / "Cumparator", reprezinta acordul acestuia fara limitari sau rezerve a prezentilor Termeni si Conditii.</p>

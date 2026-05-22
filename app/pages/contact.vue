@@ -5,7 +5,7 @@ import type { FormSubmitEvent } from '#ui/types'
 useHead({
   title: 'Contact',
   meta: [
-    { name: 'description', content: 'Contacteaza echipa Eurotimalex. Vezi datele companiei, variantele de contact si programul de suport.' }
+    { name: 'description', content: 'Contacteaza echipa Timbirotica. Vezi datele companiei, variantele de contact si programul de suport.' }
   ]
 })
 
@@ -25,23 +25,34 @@ const state = reactive({
   message: ''
 })
 
+const toast = useToast()
 const isLoading = ref(false)
-const submitStatus = ref<'idle' | 'success' | 'error'>('idle')
 
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   isLoading.value = true
-  submitStatus.value = 'idle'
 
   try {
-    // Aici se poate adauga logica de trimitere a formularului (ex: fetch catre /api/contact)
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    submitStatus.value = 'success'
+    await $fetch('/api/contact', {
+      method: 'POST',
+      body: event.data
+    })
+    toast.add({
+      title: 'Mesaj trimis cu succes!',
+      description: 'Iti vom raspunde in cel mai scurt timp posibil.',
+      icon: 'i-lucide-check-circle',
+      color: 'success'
+    })
     state.name = ''
     state.email = ''
     state.subject = ''
     state.message = ''
   } catch (err) {
-    submitStatus.value = 'error'
+    toast.add({
+      title: 'A aparut o eroare',
+      description: 'Te rugam sa incerci din nou mai tarziu.',
+      icon: 'i-lucide-alert-circle',
+      color: 'error'
+    })
   } finally {
     isLoading.value = false
   }
@@ -87,10 +98,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
                 <UTextarea v-model="state.message" :rows="6" placeholder="Cu ce te putem ajuta?" class="flex-1 flex flex-col w-full" :ui="{ base: 'flex-1 resize-none' }" />
               </UFormField>
             </div>
-
-            <!-- Status mesaje -->
-            <UAlert v-if="submitStatus === 'success'" icon="i-lucide-check-circle" color="primary" variant="soft" title="Mesaj trimis cu succes!" description="Iti vom raspunde in cel mai scurt timp posibil." />
-            <UAlert v-if="submitStatus === 'error'" icon="i-lucide-alert-circle" color="error" variant="soft" title="A aparut o eroare" description="Te rugam sa incerci din nou mai tarziu." />
 
             <div class="pt-2">
               <UButton type="submit" color="primary" size="lg" :loading="isLoading" block>
@@ -141,7 +148,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           <div class="space-y-3 text-sm">
             <div class="flex justify-between border-b border-gray-200 pb-2">
               <span class="text-gray-500">Nume Brand</span>
-              <span class="font-medium">Eurotimalex</span>
+              <span class="font-medium">Timbirotica</span>
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
               <span class="text-gray-500">Denumire Legala</span>

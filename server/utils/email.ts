@@ -65,7 +65,7 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
   const htmlContent = typeof template === 'string' ? template : template.html
 
   const { error } = await resend.emails.send({
-    from: 'Eurotimalex <onboarding@resend.dev>', // Temporary verified domain provided by Resend
+    from: 'Timbirotica <onboarding@resend.dev>', // Temporary verified domain provided by Resend
     to: data.customerEmail,
     subject: `Confirmare înregistrare comandă #${data.orderNumber}`,
     html: htmlContent,
@@ -101,9 +101,9 @@ export async function sendEmailVerification(data: { email: string; firstName: st
   const htmlContent = typeof template === 'string' ? template : template.html
 
   const { error } = await resend.emails.send({
-    from: 'Eurotimalex <onboarding@resend.dev>',
+    from: 'Timbirotica <onboarding@resend.dev>',
     to: data.email,
-    subject: 'Confirmare adresă email - Eurotimalex',
+    subject: 'Confirmare adresă email - Timbirotica',
     html: htmlContent
   })
 
@@ -111,6 +111,48 @@ export async function sendEmailVerification(data: { email: string; firstName: st
     console.error('Resend API Error:', error)
     throw new Error(error.message)
   }
+}
+
+export interface ContactMessageData {
+  name: string
+  email: string
+  subject: string
+  message: string
+}
+
+export async function sendContactMessage(data: ContactMessageData): Promise<void> {
+  const config = useRuntimeConfig()
+
+  if (!config.resendApiKey) {
+    console.warn('RESEND_API_KEY is not set. Skipping email dispatch.')
+    return
+  }
+
+  const resend = new Resend(config.resendApiKey)
+
+  const template = await renderEmailComponent('ContactMessage', {
+    name: data.name,
+    email: data.email,
+    subject: data.subject,
+    message: data.message
+  })
+
+  const htmlContent = typeof template === 'string' ? template : template.html
+
+  const { error } = await resend.emails.send({
+    from: 'Timbirotica <onboarding@resend.dev>',
+    to: config.adminEmail,
+    replyTo: data.email, // Replies go straight to the person who wrote in
+    subject: `[Contact] ${data.subject}`,
+    html: htmlContent
+  })
+
+  if (error) {
+    console.error('Resend API Error:', error)
+    throw new Error(error.message)
+  }
+
+  console.log(`Contact message from ${data.email} sent to ${config.adminEmail}`)
 }
 
 export async function sendPasswordReset(data: { email: string; firstName: string; resetLink: string }): Promise<void> {
@@ -131,9 +173,9 @@ export async function sendPasswordReset(data: { email: string; firstName: string
   const htmlContent = typeof template === 'string' ? template : template.html
 
   const { error } = await resend.emails.send({
-    from: 'Eurotimalex <onboarding@resend.dev>',
+    from: 'Timbirotica <onboarding@resend.dev>',
     to: data.email,
-    subject: 'Resetare parolă - Eurotimalex',
+    subject: 'Resetare parolă - Timbirotica',
     html: htmlContent
   })
 

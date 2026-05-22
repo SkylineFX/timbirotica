@@ -159,8 +159,8 @@ async function performReorder({ replace }: { replace: boolean }) {
 
               <div class="mt-2 flex justify-between items-center">
                 <span class="text-sm text-gray-500 flex flex-col">
-                  <span>Livrare: <span class="font-medium text-gray-700">{{ (order.shippingCost ?? 0).toFixed(2) }} RON</span></span>
                   <span class="capitalize">Produse: <span class="font-medium text-gray-700">{{ (order.total - order.shippingCost).toFixed(2) }} RON</span></span>
+                  <span>Livrare: <span class="font-medium text-gray-700">{{ (order.shippingCost ?? 0).toFixed(2) }} RON</span></span>
                 </span>
                 <div class="flex flex-col items-end gap-2">
                   <UButton color="neutral" variant="outline" size="sm" class="justify-center w-full" @click="openOrderDetails(order)">Detalii comanda</UButton>

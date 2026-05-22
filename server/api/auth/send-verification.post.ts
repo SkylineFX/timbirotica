@@ -34,9 +34,13 @@ export default defineEventHandler(async (event) => {
 
   try {
     await issueVerificationToken(event, { id: user.id, email: user.email, firstName: user.firstName })
-  } catch (e: any) {
+  } catch (e) {
     console.error('Failed to send verification email', e)
-    throw createError({ statusCode: 500, message: e?.message || 'Nu am putut trimite emailul de confirmare. Incearca din nou in cateva minute.' })
+    throw createError({
+      statusCode: 500,
+      message: 'Nu am putut trimite emailul de confirmare. Incearca din nou in cateva minute.',
+      cause: e
+    })
   }
 
   return { sent: true }

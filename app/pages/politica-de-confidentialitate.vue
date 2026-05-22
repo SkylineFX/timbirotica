@@ -2,7 +2,7 @@
 useHead({
   title: 'Politica de Confidentialitate',
   meta: [
-    { name: 'description', content: 'Politica de confidentialitate si utilizare a datelor cu caracter personal pentru Eurotimalex, conform normelor GDPR.' }
+    { name: 'description', content: 'Politica de confidentialitate si utilizare a datelor cu caracter personal pentru Timbirotica, conform normelor GDPR.' }
   ]
 })
 </script>

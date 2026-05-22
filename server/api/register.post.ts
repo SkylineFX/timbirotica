@@ -38,10 +38,19 @@ export default defineEventHandler(async (event) => {
       lastName: trimmedLastName,
       createdAt: new Date()
     }).returning().get()
-  } catch {
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('UNIQUE constraint')) {
+      throw createError({
+        status: 400,
+        message: 'Exista deja un cont cu aceasta adresa de email.'
+      })
+    }
+    // Unexpected failure (DB down, etc.) — don't mislabel it as a duplicate; preserve the cause for Sentry
+    console.error('Failed to create user', err)
     throw createError({
-      status: 400,
-      message: 'Exista deja un cont cu aceasta adresa de email.'
+      statusCode: 500,
+      message: 'Nu am putut crea contul. Incearca din nou.',
+      cause: err
     })
   }
 

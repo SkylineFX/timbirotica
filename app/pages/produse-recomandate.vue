@@ -10,7 +10,7 @@ const breadcrumbs = computed(() => [
 const description = 'Selectia noastra de produse recomandate la preturi avantajoase.'
 
 useSeoMeta({
-  title: () => title + " - Eurotimalex.ro",
+  title: () => title + " - Timbirotica",
   description,
   ogTitle: title,
   ogDescription: description,
