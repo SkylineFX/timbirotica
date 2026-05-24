@@ -54,7 +54,12 @@ export default defineNuxtConfig({
   css: ['~/assets/main.css'],
 
   hub: {
-    db: 'sqlite'
+    // driver omitted on purpose: @nuxthub/core auto-resolves to 'd1' in the
+    // Cloudflare production build and to local libsql (.data/db/sqlite.db) in dev.
+    db: {
+      dialect: 'sqlite',
+      connection: { databaseId: '27d55403-b147-4c49-a203-cb48aad26355' }
+    }
   },
 
   colorMode: {
