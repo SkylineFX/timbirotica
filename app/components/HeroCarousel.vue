@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const items = [
-  { image: '/uploads/banners/bg_banner_faber.webp', link: '/producatori/faber-castell' },
-  { image: '/uploads/banners/bg_banner_fellowes.webp', link: '/producatori/fellowes' },
-  { image: '/uploads/banners/bg_banner_leuchtturm.webp', link: '/producatori/leuchtturm' },
+  { image: 'https://cdn.timbirotica.ro/uploads/banners/bg_banner_faber.webp', link: '/producatori/faber-castell' },
+  { image: 'https://cdn.timbirotica.ro/uploads/banners/bg_banner_fellowes.webp', link: '/producatori/fellowes' },
+  { image: 'https://cdn.timbirotica.ro/uploads/banners/bg_banner_leuchtturm.webp', link: '/producatori/leuchtturm' },
 ]
 </script>
 
