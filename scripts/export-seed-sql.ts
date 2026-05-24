@@ -47,8 +47,17 @@ function sqlValue(v: unknown): string {
 
 const rewriteImages = (val: string): string => val.replaceAll('/uploads/', `${CDN_BASE}/uploads/`)
 
+// Tables whose rows must be ordered for FK safety (self-references / dependencies).
+// categories self-references parent_id, so parents (lower id) must be inserted first.
+const ORDER_BY: Record<string, string> = {
+  categories: 'ORDER BY id'
+}
+
 async function main() {
-  const out: string[] = ['PRAGMA foreign_keys=OFF;', 'BEGIN TRANSACTION;']
+  // No BEGIN/COMMIT or PRAGMA: D1 wraps file execution in its own transaction and
+  // rejects explicit transaction statements. Rows are emitted in dependency order
+  // (parent tables before child tables; categories parent-first) so this is FK-safe.
+  const out: string[] = []
   const summary: string[] = []
 
   for (const table of TABLES) {
@@ -61,7 +70,7 @@ async function main() {
     const imgCols = new Set(IMAGE_COLUMNS[table] ?? [])
     const colList = cols.map(c => `"${c}"`).join(', ')
 
-    const res = await client.execute(`SELECT * FROM "${table}"`)
+    const res = await client.execute(`SELECT * FROM "${table}" ${ORDER_BY[table] ?? ''}`.trim())
     for (const row of res.rows) {
       const vals = cols.map(c => {
         let v = (row as Record<string, unknown>)[c]
@@ -73,7 +82,7 @@ async function main() {
     summary.push(`  ${table}: ${res.rows.length}`)
   }
 
-  out.push('COMMIT;', 'PRAGMA foreign_keys=ON;', '')
+  out.push('')
   await writeFile('seed.sql', out.join('\n'))
 
   console.log('Wrote seed.sql')
