@@ -32,9 +32,9 @@ useHead({
           <h3 class="font-bold text-gray-900 mb-3 text-lg">Program si Contact</h3>
           <p class="mb-2">Preluam apeluri telefonice de luni pana vineri in intervalul orar: <strong class="font-semibold text-gray-900">09:00 - 18:00</strong></p>
           <div class="flex flex-col gap-2 mt-4">
-            <a href="tel:+40751022882" class="flex items-center gap-2 text-gray-900 hover:text-primary transition-colors font-medium w-max">
+            <a href="tel:0751022882" class="flex items-center gap-2 text-gray-900 hover:text-primary transition-colors font-medium w-max">
               <UIcon name="i-lucide-phone" class="w-4 h-4 text-gray-500" />
-              +40 751 022 882
+              0751 022 882
             </a>
             <a href="mailto:eurotimalex@yahoo.com" class="flex items-center gap-2 text-gray-900 hover:text-primary transition-colors font-medium w-max">
               <UIcon name="i-lucide-mail" class="w-4 h-4 text-gray-500" />

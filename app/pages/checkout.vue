@@ -310,7 +310,7 @@ async function submitOrder() {
                 </div>
                 <div>
                    <div class="font-semibold text-gray-900 text-sm">Livrare prin Curier</div>
-                   <div class="text-gray-500 text-xs mt-0.5">Cu masinile noastre, doar in Bucuresti si Ilfov.</div>
+                   <div class="text-gray-500 text-xs mt-0.5">Doar in Bucuresti si Ilfov</div>
                 </div>
               </div>
               <div class="text-sm font-semibold min-w-fit" :class="courierShippingCost === 0 ? 'text-green-600' : 'text-gray-900'">
@@ -320,9 +320,9 @@ async function submitOrder() {
             </label>
 
             <div v-show="deliveryMethod === 'courier'" class="p-5 bg-gray-50 border-b border-gray-200 space-y-4">
-               <div class="text-sm text-gray-600 text-justify flex flex-col items-center gap-2">
+               <div class="text-sm text-gray-600 text-left flex flex-col items-center gap-2">
                 <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-                <p class="text-sm text-gray-600"> Livrarea se face in 2-3 zile lucratoare de la primirea facturii pe mail si dupa ce comanda a fost confirmata telefonic.</p>
+                <p class="text-sm text-gray-600"> Livrarea se face in 2-3 zile lucratoare de la primirea facturii proforme pe mail si dupa ce comanda a fost confirmata telefonic.</p>
                </div>
             </div>
 
@@ -342,7 +342,7 @@ async function submitOrder() {
             </label>
 
 
-            <div v-show="deliveryMethod === 'pickup'" class="p-5 bg-gray-50 border-t border-gray-200 text-justify lg:text-left flex flex-col items-center gap-2">
+            <div v-show="deliveryMethod === 'pickup'" class="p-5 bg-gray-50 border-t border-gray-200 text-left lg:text-left flex flex-col items-center gap-2">
                <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
                <p class="text-sm text-gray-600">Comanda va fi pregatita in maximum 2 zile lucratoare de la confirmare. Te vom anunta pe email cand aceasta este gata de ridicare.</p>
             </div>
@@ -373,9 +373,9 @@ async function submitOrder() {
             
             <!-- Bank transfer info -->
             <div v-show="paymentMethod === 'transfer'" class="p-5 bg-gray-50 border-b border-gray-200 space-y-4">
-               <div class="text-sm text-gray-600 text-justify lg:text-left flex flex-col items-center gap-2">
+               <div class="text-sm text-gray-600 text-left lg:text-left flex flex-col items-center gap-2">
                  <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-                 <p> Efectueaza plata in contul nostru bancar dupa primirea facturii proforme pe mail. Te rugam sa specifici numarul comenzii la detalii.</p>
+                 <p> Efectueaza plata in contul nostru bancar dupa primirea facturii proforme pe mail.</p>
                </div>
             </div>
 
@@ -393,9 +393,11 @@ async function submitOrder() {
               <input type="radio" value="cash" v-model="paymentMethod" class="hidden">
             </label>
             
-            <div v-show="paymentMethod === 'cash'" class="p-5 bg-gray-50 border-t border-gray-200 text-justify lg:text-left flex flex-col items-center gap-2">
-               <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-               <p class="text-sm text-gray-600">Plata se va face in numerar la primirea coletului. Dupa primirea facturii pe mail, te vom contacta pentru confirmare si pentru stabilirea datei livrarii.</p>
+            <div v-show="paymentMethod === 'cash'" class="p-5 bg-gray-50 border-t border-gray-200 text-left lg:text-left">
+               <p class="text-sm text-gray-600">
+                 Plata se va face in numerar la primirea coletului. Vei primi factura proforma pe mail, apoi te vom contacta pentru confirmarea comenzii
+                 <template v-if="deliveryMethod === 'courier'">si stabilirea datei de livrare.</template>
+               </p>
             </div>
           </div>
         </div>

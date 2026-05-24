@@ -184,8 +184,8 @@ export async function generateProformaPdf(input: ProformaInput): Promise<Uint8Ar
     `CIF: ${COMPANY.cui}`,
     `Reg. Com.: ${COMPANY.onrc}`,
     ...wrapText(`Adresa: ${COMPANY.address}`, font, 10, colWidth),
-    'IBAN: RO29 RNCB 0077 0602 3348 0001',
-    'Banca: BANCA COMERCIALA ROMANA'
+    `IBAN: ${COMPANY.iban}`,
+    `Banca: ${COMPANY.bankName}`
   ]
 
   const customerLines: string[] = [input.customer.name]

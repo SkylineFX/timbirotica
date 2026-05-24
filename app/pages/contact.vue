@@ -123,7 +123,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             <div class="flex items-start gap-3">
               <UIcon name="i-lucide-phone" class="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
               <div>
-                <p class="font-medium hover:text-primary transition-colors"><a href="tel:+40751022882">+40 751 022 882</a></p>
+                <p class="font-medium hover:text-primary transition-colors"><a href="tel:0751022882">0751 022 882</a></p>
                 <p class="text-sm text-gray-500">Luni - Vineri: 09:00 - 18:00</p>
               </div>
             </div>
@@ -159,12 +159,12 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               <span class="font-medium">RO18034200</span>
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
-              <span class="text-gray-500">Nr. Inreg. (Reg. Com.)</span>
+              <span class="text-gray-500">Registrul Comertului</span>
               <span class="font-medium">J40/17160/2005</span>
             </div>
             <div class="flex flex-col gap-1 border-b border-gray-200 pb-2">
               <span class="text-gray-500">Adresa Sediu Social</span>
-              <span class="font-medium">Strada Drumul Tabrei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti</span>
+              <span class="font-medium">Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-500">Tara Inregistrare</span>

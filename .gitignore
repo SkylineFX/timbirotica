@@ -30,3 +30,4 @@ public/uploads
 
 # Generated D1 seed (large, regenerate via scripts/export-seed-sql.ts)
 seed.sql
+schema.sql

@@ -31,7 +31,7 @@ useHead({
               <ul class="list-disc list-inside ml-2 mt-2 space-y-1">
                 <li>direct de pe site-ul Vanzatorului</li>
                 <li><strong>Prin e-mail la:</strong> <a class="text-primary hover:underline" href="mailto:eurotimalex@yahoo.com">eurotimalex@yahoo.com</a></li>
-                <li><strong>Prin telefon la:</strong> <a class="text-primary hover:underline" href="tel:+40751022882">+40 751 022 882</a>.</li>
+                <li><strong>Prin telefon la:</strong> <a class="text-primary hover:underline" href="tel:0751022882">0751 022 882</a>.</li>
               </ul>
             </div>
 
