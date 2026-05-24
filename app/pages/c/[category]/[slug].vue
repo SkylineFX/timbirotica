@@ -70,12 +70,14 @@ const accordionItems = [
   {
     label: 'Livrare',
     icon: 'i-lucide-truck',
-    content: 'Livrarea se face in 24-48 de ore de la confirmarea comenzii. Costul transportului este de 30 RON pentru comenzile sub 200 RON, si gratuit pentru cele care depasesc aceasta suma.'
+    text: 'Livrarea se face doar in Bucuresti si Ilfov, in 24-48 de ore de la confirmarea comenzii. Costul transportului este de 30 RON pentru comenzile sub 200 RON. Afla mai multe detalii:',
+    link: { to: '/termeni-si-conditii#livrare', label: 'Livrare' },
   },
   {
     label: 'Retur',
     icon: 'i-lucide-rotate-ccw',
-    content: 'Ai la dispozitie 14 zile calendaristice pentru a returna produsul. Acesta trebuie sa fie in aceeasi stare in care a fost livrat, in ambalajul original.',
+    text: 'Ai la dispozitie 14 zile calendaristice pentru a returna produsul. Acesta trebuie sa fie in aceeasi stare in care a fost livrat, in ambalajul original. Afla mai multe detalii:',
+    link: { to: '/termeni-si-conditii#retur', label: 'Retur' },
   }
 ]
 </script>
@@ -181,8 +183,8 @@ const accordionItems = [
                     </div>
                     <div class="flex items-center">
                         <p class="text-sm text-gray-500 flex items-center gap-1">
-                            <span>Sau poti comanda</span>
-                            <a href="tel:+40751022882" class="font-bold underline">telefonic</a>
+                            <span>Sau comanda</span>
+                            <a href="tel:+40751022882" class="font-bold underline cursor-pointer">telefonic</a>
                             <UIcon name="i-lucide-phone" class="w-4 h-4" />
                         </p>
                     </div>
@@ -190,7 +192,12 @@ const accordionItems = [
                 
                 <!-- Additional Info -->
                 <div class="mt-auto w-full">
-                    <UAccordion :items="accordionItems" color="primary" variant="soft" size="md" default-value="0"  />
+                    <UAccordion :items="accordionItems" color="primary" variant="soft" size="md" default-value="0">
+                        <template #body="{ item }">
+                            {{ item.text }}
+                            <NuxtLink :to="item.link.to" class="underline text-primary">{{ item.link.label }}</NuxtLink>.
+                        </template>
+                    </UAccordion>
                 </div>
             </div>
         </div>

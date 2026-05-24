@@ -22,7 +22,7 @@ useHead({
         <!-- Operator Data -->
         <section class="pb-8">
           <h2 class="text-2xl font-semibold mb-4 font-serif">I. Operatorul responsabil</h2>
-          <p class="mb-2">In relatia cu datele dumneavoastra cu caracter personal, responsabilul este societatea comerciala <strong>Eurotimalex SRL</strong>, cu sediul in <strong>Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti</strong>. Compania noastra functioneaza legal pe teritoriul Romaniei, fiind inregistrata la Registrul Comertului sub numarul <strong>J40/17160/2005</strong>, cu Codul Unic de Inregistrare <strong>RO18034200</strong>.</p>
+          <p class="mb-2">In relatia cu datele dumneavoastra cu caracter personal, responsabilul este societatea comerciala <strong>Eurotimalex SRL</strong>, cu sediul in <strong>Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti</strong>. Compania noastra functioneaza pe teritoriul Romaniei, fiind inregistrata la Registrul Comertului sub numarul <strong>J40/17160/2005</strong>, cu Codul Unic de Inregistrare <strong>RO18034200</strong>.</p>
           <p class="mb-2">Ne angajam sa implementam masuri tehnice si organizatorice adecvate pentru a proteja datele personale ale tuturor utilizatorilor nostri impotriva distrugerii accidentale sau ilegale, a pierderii, modificarii, dezvaluirii sau accesului neautorizat.</p>
           <p class="mb-2">Acest document are rolul de a va informa detaliat cu privire la prelucrarea datelor dumneavoastra cu caracter personal, in contextul utilizarii acestui site web si a plasarii de comenzi pentru produsele pe care le comercializam. Aceasta politica functioneaza cumulativ cu sectiunea de <NuxtLink to="/termeni-si-conditii" class="text-primary hover:underline">Termeni si Conditii</NuxtLink>.</p>
           <p>Pentru orice intrebari sau pentru exercitarea drepturilor descrise mai jos, ne puteti contacta la <a href="mailto:eurotimalex@yahoo.com" class="text-primary hover:underline">eurotimalex@yahoo.com</a>.</p>
@@ -80,7 +80,7 @@ useHead({
         <!-- Terte parti si transferuri -->
         <section class="pb-8">
           <h2 class="text-2xl font-semibold mb-4 font-serif">V. Destinatari si transferuri catre terti</h2>
-          <p>Nu vindem si nu inchiriem datele dumneavoastra. Le impartasim exclusiv cu furnizorii care fac posibila functionarea magazinului online:</p>
+          <p>Nu vindem si nu inchiriem datele dumneavoastra. Impartasim strict informatiile necesare, in scopul functionarii optime a magazinului online:</p>
           <ul class="list-disc pl-5 mt-2 space-y-3">
             <li><strong>Resend</strong> (furnizor servicii e-mail).</li>
             <li><strong>Agentii de curierat</strong>, atunci cand alegeti livrarea prin curier: numele, telefonul si adresa de livrare necesare expedierii.</li>

@@ -189,36 +189,40 @@ async function performReorder({ replace }: { replace: boolean }) {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
                <!-- Livrare Box -->
                <div class="bg-gray-50/70 p-4 rounded-sm border border-gray-100">
-                  <div class="flex justify-between mb-2">
+                  <div class="flex justify-between">
                      <h5 class="text-sm font-bold text-gray-900 flex items-center gap-1.5"><UIcon name="i-lucide-truck" class="w-4 h-4"/> Livrare</h5>
                      <UBadge color="primary" variant="subtle" size="sm" class="capitalize">{{ selectedOrder.shippingMethod === 'courier' ? 'Curier' : 'Ridicare personala' }}</UBadge>
                   </div>
                   
-                  <template v-if="selectedOrder.shippingMethod === 'courier'">
-                     <p class="font-medium text-sm text-gray-900">{{ parsedShippingAddress.firstName }} {{ parsedShippingAddress.lastName }} · {{ parsedShippingAddress.phone.replace('+40', '0') }}</p>
-                     <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedShippingAddress.street }}, {{ parsedShippingAddress.city }}, {{ parsedShippingAddress.county }}</p>
-                  </template>
-                  <template v-else>
-                     <p class="text-sm text-gray-600">Comanda poate fi ridicata de la <a href="/despre-noi#locatie" class="text-primary font-medium">sediul nostru</a>. Vei primi un email cand aceasta va fi gata de ridicare.</p>
-                  </template>
+                  <div class="mt-2">
+                    <template v-if="selectedOrder.shippingMethod === 'courier'">
+                      <p class="font-medium text-sm text-gray-900">{{ parsedShippingAddress.firstName }} {{ parsedShippingAddress.lastName }} · {{ parsedShippingAddress.phone.replace('+40', '0') }}</p>
+                      <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedShippingAddress.street }}, {{ parsedShippingAddress.city }}, {{ parsedShippingAddress.county }}</p>
+                    </template>
+                    <template v-else>
+                      <p class="text-sm text-gray-600">Comanda poate fi ridicata de la <a href="/despre-noi#locatie" class="text-primary font-medium">sediul nostru</a>. Vei primi un email cand aceasta va fi gata de ridicare.</p>
+                    </template>
+                  </div>
                </div>
 
                <!-- Facturare Box -->
                <div class="bg-gray-50/70 p-4 rounded-sm border border-gray-100">
-                  <div class="flex justify-between mb-2">
+                  <div class="flex justify-between">
                      <h5 class="text-sm font-bold text-gray-900 flex items-center gap-1.5"><UIcon name="i-lucide-receipt-text" class="w-4 h-4"/> Facturare</h5>
                      <UBadge color="primary" variant="subtle" size="sm" class="capitalize">{{ selectedOrder.paymentMethod === 'cash' ? 'Ramburs' : 'Transfer Bancar' }}</UBadge>
                   </div>
 
-                  <template v-if="parsedBillingAddress.companyName">
-                     <p class="font-medium text-sm text-gray-900">{{ parsedBillingAddress.companyName }} · {{ parsedBillingAddress.onrc }}</p>
-                     <!-- <p class="text-sm text-gray-600 mt-1">{{ parsedBillingAddress.hasRo ? 'RO ' : '' }}{{ parsedBillingAddress.cui }}</p> -->
-                     <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedBillingAddress.street }}, {{ parsedBillingAddress.city }}, {{ parsedBillingAddress.county }}</p>
-                  </template>
-                  <template v-else-if="parsedShippingAddress.firstName">
-                     <p class="font-medium text-sm text-gray-900">{{ parsedShippingAddress.firstName }} {{ parsedShippingAddress.lastName }} · {{ parsedShippingAddress.phone.replace('+40', '0') }}</p>
-                     <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedShippingAddress.street }}, {{ parsedShippingAddress.city }}, {{ parsedShippingAddress.county }}</p>
-                  </template>
+                  <div class="mt-2">
+                    <template v-if="parsedBillingAddress.companyName">
+                        <p class="font-medium text-sm text-gray-900">{{ parsedBillingAddress.companyName }} · {{ parsedBillingAddress.onrc }}</p>
+                        <!-- <p class="text-sm text-gray-600 mt-1">{{ parsedBillingAddress.hasRo ? 'RO ' : '' }}{{ parsedBillingAddress.cui }}</p> -->
+                        <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedBillingAddress.street }}, {{ parsedBillingAddress.city }}, {{ parsedBillingAddress.county }}</p>
+                    </template>
+                    <template v-else-if="parsedShippingAddress.firstName">
+                        <p class="font-medium text-sm text-gray-900">{{ parsedShippingAddress.firstName }} {{ parsedShippingAddress.lastName }} · {{ parsedShippingAddress.phone.replace('+40', '0') }}</p>
+                        <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedShippingAddress.street }}, {{ parsedShippingAddress.city }}, {{ parsedShippingAddress.county }}</p>
+                    </template>
+                  </div>
                </div>
             </div>
 

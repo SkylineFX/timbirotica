@@ -35,7 +35,6 @@ useHead({
               </ul>
             </div>
 
-            <p>Prin lansarea unei comenzi pe site, Cumparatorul este de acord cu forma de comunicare (e-mail, SMS, telefon) prin care Vanzatorul isi deruleaza operatiunile pe site si isi exprima acordul privind incheierea contractului.</p>
             <p>Vanzatorul va informa Cumparatorul preluarea comenzii, respectiv confirmarea comenzii. Daca Vanzatorul confirma explicit o comanda, acest lucru va implica o acceptare completa a termenilor comenzii. Acceptarea comenzii de catre Vanzator se considera finalizata atunci cand exista o confirmare scrisa (e-mail, SMS) din partea Vanzatorului catre Cumparator, fara a necesita o confirmare de primire din partea acestuia din urma. Comanda se considera valida numai dupa confirmarea de catre Vanzator a disponibilitatii stocului, a pretului precum si a caracteristicilor produselor respectiv a serviciilor solicitate de Cumparator.</p>
           </div>
         </section>
@@ -68,10 +67,12 @@ useHead({
           <p>Pentru a cumpara si intra in posesia produselor oferite spre vanzare este necesara parcurgerea urmatoarelor etape:</p>
           <ul class="list-disc pl-5 mt-2 space-y-1">
             <li>Identificarea si alegerea produselor, finalizand adaugarea lor in Cos.</li>
-            <li>Efectuarea platii produselor (transfer bancar pe baza facturii sau numerar la livrare).</li>
+            <li>Efectuarea platii produselor (transfer bancar pe baza facturii proforme sau numerar la livrare).</li>
             <li>Livrarea produselor comandate.</li>
           </ul>
-          <p class="mt-4">Prin lansarea unei comenzi electronice, sunteti de acord cu forma de comunicare prin care Site-ul isi deruleaza operatiunile.</p>
+          <p class="mt-4">Prin lansarea unei comenzi pe site, Cumparatorul este de acord cu forma de comunicare (e-mail, telefon) prin care Vanzatorul isi deruleaza operatiunile pe site si isi exprima acordul privind incheierea contractului.</p> 
+
+          <p class="mt-2">Comanda poate fi anulata oricand de catre Cumparator inainte de confirmarea acesteia de catre Vanzator din sectiunea <NuxtLink to="/user/comenzi" class="text-primary hover:underline underline-offset-4">Comenzi</NuxtLink>. In cazul in care comanda a fost confirmata, Cumparatorul poate solicita anularea comenzii prin formularul de <NuxtLink href="/contact" class="text-primary hover:underline underline-offset-4">Contact</NuxtLink>, e-mail sau telefonic. </p>
         </section>
 
         <section class="pb-8">
@@ -88,8 +89,8 @@ useHead({
 
         <section id="plata" class="pb-8 scroll-mt-24">
           <h2 class="text-2xl font-semibold mb-4 font-serif">VII. Preturile si Plata</h2>
-          <p>Cu exceptia cazurilor in care este prevazut altfel, preturile produselor afisate reprezinta preturile finale de cumparare si <strong>includ TVA</strong> (taxa pe valoare adaugata valabila in Romania conform codului fiscal curent).</p>
-          <p>Daca adresa de livrare nu este aceeasi cu adresa de facturare, aveti posibilitatea de a le distinge direct in sectiunea de Checkout (Finalizare comanda). Informatiile transmise trebuie sa fie integral corecte, altfel comanda poate fi intarziata sau neonorata.</p>
+          <p>Cu exceptia cazurilor in care este specificat altfel, preturile produselor afisate reprezinta preturile finale de cumparare si <strong>includ TVA</strong>.</p>
+          <p class="mt-2">Daca adresa de livrare difera de adresa de facturare, aveti posibilitatea de a le distinge direct in sectiunea de Checkout (Finalizare comanda). Informatiile transmise trebuie sa fie integral corecte, altfel comanda poate fi intarziata.</p>
 
           <p class="mt-4 font-semibold">Optiunile de plata acceptate sunt:</p>
           <ol class="list-decimal list-inside pl-5 mt-2 space-y-1">
