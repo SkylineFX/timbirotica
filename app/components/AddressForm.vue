@@ -22,19 +22,22 @@ const form = ref<Partial<AddressForm>>({
   isDefaultShipping: true
 })
 
+// Account holder's saved details, used to prefill a brand-new address
+const { data: userProfile } = await useFetch('/api/user')
+
 watch(() => address, (newAddr) => {
   if (newAddr) {
     form.value = {
       ...newAddr,
-      phone: newAddr.phone ? newAddr.phone.replace(/^\+40/, '').replace(/\s+/g, '') : '',
+      phone: newAddr.phone ? newAddr.phone.replace(/\s+/g, '') : '',
       postalCode: newAddr.postalCode || '',
       isDefaultShipping: newAddr.isDefaultShipping ?? false
     }
   } else {
     form.value = {
-      firstName: '',
-      lastName: '',
-      phone: '',
+      firstName: userProfile.value?.firstName || '',
+      lastName: userProfile.value?.lastName || '',
+      phone: userProfile.value?.phone || '',
       county: undefined,
       city: '',
       street: '',
@@ -84,7 +87,7 @@ async function submit(event: FormSubmitEvent<AddressForm>) {
 
   const payload = {
     ...event.data,
-    phone: '+40' + event.data.phone.replace(/\s+/g, '')
+    phone: event.data.phone.replace(/\s+/g, '')
   }
 
   try {
@@ -116,11 +119,7 @@ async function submit(event: FormSubmitEvent<AddressForm>) {
            <UInput v-model="form.lastName" size="lg" class="w-full" />
         </UFormField>
         <UFormField label="Numar de telefon" name="phone" class="sm:col-span-2" required>
-           <UInput v-model="form.phone" v-maska="'### ### ###'" size="lg" class="w-full" type="tel" :ui="{base: 'ps-11'}">
-            <template #leading>
-               <span class="text-gray-500">+40</span>
-            </template>
-           </UInput>
+           <UInput v-model="form.phone" v-maska="'#### ### ###'" size="lg" class="w-full" type="tel" autocomplete="tel" />
         </UFormField>
       </div>
     </div>
@@ -139,7 +138,7 @@ async function submit(event: FormSubmitEvent<AddressForm>) {
           <UFormField label="Adresa" name="street" required>
              <UInput v-model="form.street" placeholder="Strada, numar, bloc, scara, etaj, apartament" size="lg" class="w-full" :ui="{base: 'text-sm'}" />
           </UFormField>
-          <UFormField label="Cod Postal" name="postalCode" required>
+          <UFormField label="Cod Postal" name="postalCode">
              <UInput v-model="form.postalCode" size="lg" class="w-full" />
           </UFormField>
        </div>

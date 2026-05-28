@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
+import { shippingMethodLabel, paymentMethodLabel } from '~~/shared/constants/order'
 
 definePageMeta({
   layout: 'admin',
@@ -237,10 +238,10 @@ function fmtDate(d: string | Date) {
             <div class="bg-gray-50/70 p-4 rounded-sm border border-gray-100">
               <div class="flex justify-between mb-2">
                 <h5 class="text-sm font-bold text-gray-900 flex items-center gap-1.5"><UIcon name="i-lucide-truck" class="w-4 h-4"/> Livrare</h5>
-                <UBadge color="primary" variant="subtle" size="sm">{{ selectedOrder.shippingMethod === 'courier' ? 'Curier' : 'Ridicare' }}</UBadge>
+                <UBadge color="primary" variant="subtle" size="sm">{{ shippingMethodLabel(selectedOrder.shippingMethod) }}</UBadge>
               </div>
               <template v-if="selectedOrder.shippingMethod === 'courier' && parsedShipping.firstName">
-                <p class="font-medium text-sm text-gray-900">{{ parsedShipping.firstName }} {{ parsedShipping.lastName }} · {{ parsedShipping.phone?.replace('+40', '0') }}</p>
+                <p class="font-medium text-sm text-gray-900">{{ parsedShipping.firstName }} {{ parsedShipping.lastName }} · {{ parsedShipping.phone }}</p>
                 <p class="text-sm text-gray-600 mt-1">{{ parsedShipping.street }}, {{ parsedShipping.city }}, {{ parsedShipping.county }}</p>
               </template>
               <template v-else>
@@ -251,16 +252,22 @@ function fmtDate(d: string | Date) {
             <div class="bg-gray-50/70 p-4 rounded-sm border border-gray-100">
               <div class="flex justify-between mb-2">
                 <h5 class="text-sm font-bold text-gray-900 flex items-center gap-1.5"><UIcon name="i-lucide-receipt-text" class="w-4 h-4"/> Facturare</h5>
-                <UBadge color="primary" variant="subtle" size="sm">{{ selectedOrder.paymentMethod === 'cash' ? 'Ramburs' : 'Transfer' }}</UBadge>
+                <UBadge color="primary" variant="subtle" size="sm">{{ paymentMethodLabel(selectedOrder.paymentMethod) }}</UBadge>
               </div>
               <template v-if="parsedBilling.companyName">
-                <p class="font-medium text-sm text-gray-900">{{ parsedBilling.companyName }} · {{ parsedBilling.onrc }}</p>
+                <p class="font-medium text-sm text-gray-900">{{ parsedBilling.companyName }}<template v-if="parsedBilling.onrc"> · {{ parsedBilling.onrc }}</template></p>
                 <p class="text-sm text-gray-600 mt-1">{{ parsedBilling.hasRo ? 'RO' : '' }}{{ parsedBilling.cui }}</p>
                 <p class="text-sm text-gray-600 mt-1">{{ parsedBilling.street }}, {{ parsedBilling.city }}, {{ parsedBilling.county }}</p>
+                <!-- Contact phone for the company billing — prefer the billing record's own phone; fall back to the account phone for legacy rows. -->
+                <p v-if="parsedBilling.phone || selectedOrder.user?.phone" class="text-sm text-gray-600 mt-1">Telefon: {{ parsedBilling.phone || selectedOrder.user.phone }}</p>
               </template>
-              <template v-else-if="parsedShipping.firstName">
-                <p class="font-medium text-sm text-gray-900">{{ parsedShipping.firstName }} {{ parsedShipping.lastName }}</p>
-                <p class="text-sm text-gray-600 mt-1">{{ parsedShipping.street }}, {{ parsedShipping.city }}, {{ parsedShipping.county }}</p>
+              <template v-else-if="parsedBilling.firstName">
+                <p class="font-medium text-sm text-gray-900">{{ parsedBilling.firstName }} {{ parsedBilling.lastName }}<template v-if="parsedBilling.phone"> · {{ parsedBilling.phone }}</template></p>
+                <p class="text-sm text-gray-600 mt-1">{{ parsedBilling.street }}, {{ parsedBilling.city }}, {{ parsedBilling.county }}</p>
+              </template>
+              <template v-else-if="selectedOrder.user">
+                <p class="font-medium text-sm text-gray-900">{{ selectedOrder.user.firstName }} {{ selectedOrder.user.lastName }}<template v-if="selectedOrder.user.phone"> · {{ selectedOrder.user.phone }}</template></p>
+                <p class="text-sm text-gray-600 mt-1">{{ selectedOrder.user.email }}</p>
               </template>
             </div>
           </div>

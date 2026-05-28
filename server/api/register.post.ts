@@ -7,10 +7,11 @@ const registerSchema = z.object({
   password: z.string().min(8),
   firstName: z.string().min(2),
   lastName: z.string().min(2),
+  phone: z.string().regex(/^0\d{9}$/),
 })
 
 export default defineEventHandler(async (event) => {
-  const { email, password, firstName, lastName } = await readValidatedBody(event, registerSchema.parse)
+  const { email, password, firstName, lastName, phone } = await readValidatedBody(event, registerSchema.parse)
   const normalizedEmail = email.trim().toLowerCase()
   const trimmedFirstName = firstName.trim()
   const trimmedLastName = lastName.trim()
@@ -36,6 +37,7 @@ export default defineEventHandler(async (event) => {
       password: hashedPassword,
       firstName: trimmedFirstName,
       lastName: trimmedLastName,
+      phone,
       createdAt: new Date()
     }).returning().get()
   } catch (err) {

@@ -21,6 +21,12 @@ const fields: AuthFormField[] = [{
   placeholder: 'Introduceti numele',
   required: true
 }, {
+  name: 'phone',
+  type: 'text',
+  label: 'Numar de telefon',
+  placeholder: '07xxxxxxxx',
+  required: true
+}, {
   name: 'email',
   type: 'email',
   label: 'Email',
@@ -49,8 +55,9 @@ const providers = [{
 }]
 
 const schema = z.object({
-  firstName: z.string('Prenumele este obligatoriu').min(2, 'Prenumele trebuie sa aiba cel putin 2 caractere'),
-  lastName: z.string('Numele este obligatoriu').min(2, 'Numele trebuie sa aiba cel putin 2 caractere'),
+  firstName: z.string('Prenumele este obligatoriu').min(2, 'Prenumele prea scurt'),
+  lastName: z.string('Numele este obligatoriu').min(2, 'Numele prea scurt'),
+  phone: z.string('Numarul de telefon este obligatoriu').regex(/^0\d{3}\s?\d{3}\s?\d{3}$/, 'Numar de telefon invalid'),
   email: z.email('Adresa de email nu este valida'),
   password: z.string('Parola este obligatorie').min(8, 'Parola trebuie sa aiba cel putin 8 caractere'),
   passwordConfirm: z.string('Confirmarea parolei este obligatorie')
@@ -68,6 +75,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       body: {
         firstName: payload.data.firstName,
         lastName: payload.data.lastName,
+        phone: payload.data.phone.replace(/\s+/g, ''),
         email: payload.data.email,
         password: payload.data.password,
       },
@@ -100,6 +108,9 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         icon="i-lucide-user"
         :fields="fields"
         :providers="providers"
+        separator="sau"
+        :submit="{ label: 'Creeaza cont' }"
+        :ui="{ form: 'grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5 space-y-0 sm:[&>*]:col-span-2 sm:[&>*:nth-child(1)]:col-span-1 sm:[&>*:nth-child(2)]:col-span-1' }"
         @submit="onSubmit"
       >
         <template #description>

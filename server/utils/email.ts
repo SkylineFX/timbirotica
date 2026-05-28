@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import * as Sentry from '@sentry/nuxt'
 
 export interface Address {
   fullName: string
@@ -28,6 +29,7 @@ export interface OrderEmailData {
   orderNumber: string
   customerName: string
   customerEmail: string
+  customerPhone?: string
   total: number
   shippingCost: number
   items: Array<{ name: string; quantity: number; price: number }>
@@ -76,7 +78,7 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
   })
 
   if (error) {
-    console.error('Resend API Error:', error)
+    console.error('Resend API Error:', { statusCode: error.statusCode, name: error.name, message: error.message })
     throw new Error(error.message)
   }
 
@@ -108,8 +110,76 @@ export async function sendEmailVerification(data: { email: string; firstName: st
   })
 
   if (error) {
-    console.error('Resend API Error:', error)
+    console.error('Resend API Error:', { statusCode: error.statusCode, name: error.name, message: error.message })
     throw new Error(error.message)
+  }
+}
+
+export async function sendNewOrderAdminNotification(data: OrderEmailData): Promise<void> {
+  const config = useRuntimeConfig()
+
+  if (!config.resendApiKey) {
+    console.warn('RESEND_API_KEY is not set. Skipping email dispatch.')
+    return
+  }
+
+  const resend = new Resend(config.resendApiKey)
+
+  const template = await renderEmailComponent('OrderAdminNotification', {
+    orderNumber: data.orderNumber,
+    customerName: data.customerName,
+    customerEmail: data.customerEmail,
+    customerPhone: data.customerPhone,
+    total: data.total,
+    shippingCost: data.shippingCost,
+    items: data.items,
+    shippingAddress: data.shippingAddress,
+    billingAddress: data.billingAddress,
+    orderDate: data.orderDate,
+    paymentMethod: data.paymentMethod,
+    shippingMethod: data.shippingMethod
+  })
+
+  const htmlContent = typeof template === 'string' ? template : template.html
+
+  const { error } = await resend.emails.send({
+    from: 'Timbirotica <comenzi@timbirotica.ro>',
+    to: config.adminEmail,
+    replyTo: data.customerEmail, // Admin can reply straight to the customer
+    subject: `Comanda noua #${data.orderNumber}`,
+    html: htmlContent,
+    attachments: data.attachment ? [{
+      filename: data.attachment.filename,
+      content: Buffer.from(data.attachment.content)
+    }] : undefined
+  })
+
+  if (error) {
+    console.error('Resend API Error:', { statusCode: error.statusCode, name: error.name, message: error.message })
+    throw new Error(error.message)
+  }
+
+  console.log(`Admin order notification sent to ${config.adminEmail} for order ${data.orderNumber}`)
+}
+
+/**
+ * Send both order emails (customer confirmation + admin notification) in parallel.
+ * Failures of one don't drop the other, and rejections are captured to Sentry
+ * (tagged with the orderNumber) so they're never silently swallowed.
+ *
+ * Intended to be wrapped in `event.waitUntil(...)` by the caller so the serverless
+ * runtime doesn't kill the process before sends complete.
+ */
+export async function dispatchOrderEmails(data: OrderEmailData): Promise<void> {
+  const results = await Promise.allSettled([
+    sendOrderConfirmation(data),
+    sendNewOrderAdminNotification(data)
+  ])
+  for (const r of results) {
+    if (r.status === 'rejected') {
+      console.error('Background order email dispatch failed:', r.reason)
+      Sentry.captureException(r.reason, { tags: { area: 'order-email', orderNumber: data.orderNumber } })
+    }
   }
 }
 
@@ -148,7 +218,7 @@ export async function sendContactMessage(data: ContactMessageData): Promise<void
   })
 
   if (error) {
-    console.error('Resend API Error:', error)
+    console.error('Resend API Error:', { statusCode: error.statusCode, name: error.name, message: error.message })
     throw new Error(error.message)
   }
 
@@ -180,7 +250,7 @@ export async function sendPasswordReset(data: { email: string; firstName: string
   })
 
   if (error) {
-    console.error('Resend API Error:', error)
+    console.error('Resend API Error:', { statusCode: error.statusCode, name: error.name, message: error.message })
     throw new Error(error.message)
   }
 }

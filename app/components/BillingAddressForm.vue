@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { vMaska } from 'maska/vue'
 import { billingAddressSchema, type BillingAddress } from '~~/shared/schemas/billingAddress'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
@@ -17,17 +18,24 @@ const form = ref<Partial<BillingAddress>>({
   onrc: '',
   bankName: '',
   iban: '',
+  phone: '',
   county: 'București',
   city: '',
   street: '',
   isDefaultBilling: true
 })
 
+// Account holder's saved phone — used to prefill the contact phone on a new
+// billing record. Existing records may also lack a phone (legacy rows pre-dating
+// the column), in which case we prefill from the account here as well.
+const { data: userProfile } = await useFetch('/api/user')
+
 watch(() => address, (newAddr) => {
   if (newAddr) {
     form.value = {
       ...newAddr,
       hasRo: newAddr.hasRo ?? true,
+      phone: newAddr.phone || userProfile.value?.phone || '',
       isDefaultBilling: newAddr.isDefaultBilling ?? false
     }
   } else {
@@ -38,6 +46,7 @@ watch(() => address, (newAddr) => {
       onrc: '',
       bankName: '',
       iban: '',
+      phone: userProfile.value?.phone || '',
       county: '',
       city: '',
       street: '',
@@ -118,7 +127,7 @@ async function submit(event: FormSubmitEvent<BillingAddress>) {
              <UInput v-model="form.cui" size="lg" class="w-full" />
            </div>
         </UFormField>
-        <UFormField label="Numar de inregistrare in Registrul Comertului" name="onrc" class="sm:col-span-2" required>
+        <UFormField label="Numar de inregistrare in Registrul Comertului" name="onrc" class="sm:col-span-2">
            <UInput v-model="form.onrc" placeholder="ex: J40/1234/2024" size="lg" class="w-full" />
         </UFormField>
         <UFormField label="Banca" name="bankName">
@@ -145,6 +154,13 @@ async function submit(event: FormSubmitEvent<BillingAddress>) {
              <UInput v-model="form.street" placeholder="ex: Strada, numar, bloc, scara, etaj, apartament" size="lg" class="w-full" />
           </UFormField>
        </div>
+    </div>
+
+    <div>
+       <h4 class="font-bold text-gray-900 mb-4 text-sm mt-4">Contact</h4>
+       <UFormField label="Numar de telefon" name="phone" required>
+          <UInput v-model="form.phone" v-maska="'#### ### ###'" placeholder="07XX XXX XXX" type="tel" autocomplete="tel" size="lg" class="w-full" />
+       </UFormField>
     </div>
 
     <div class="pt-2 flex flex-col gap-3">

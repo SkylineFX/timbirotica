@@ -8,6 +8,7 @@ definePageMeta({
 const route = useRoute()
 const orderNumber = route.query.order
 const paymentMethod = route.query.payment
+const shippingMethod = route.query.shipping
 
 if (!orderNumber) {
   navigateTo('/')
@@ -45,7 +46,8 @@ if (!orderNumber) {
           <div class="flex items-start gap-3">
              <UIcon name="i-lucide-info" class="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
              <div class="flex flex-col gap-1">
-                <p><strong>Urmatorul pas:</strong> Plata se va efectua in numerar la livrare. Te vom contacta in curand telefonic pentru confirmare si detaliile de expediere.</p>
+                <p v-if="shippingMethod === 'pickup'"><strong>Urmatorul pas:</strong> Plata se va efectua in numerar la ridicare. Te vom contacta pe email cand comanda este gata.</p>
+                <p v-else><strong>Urmatorul pas:</strong> Plata se va efectua in numerar la livrare. Te vom contacta in curand telefonic pentru confirmare si detaliile de expediere.</p>
              </div>
           </div>
         </template>

@@ -3,18 +3,18 @@ import { z } from 'zod'
 const COUNTIES = ['București', 'Ilfov'] as const
 const NAME_REGEX = /^[\p{L}\s'-]{2,}$/u
 const POSTAL_REGEX = /^\d{6}$/
-const FORM_PHONE_REGEX = /^\d{3}\s?\d{3}\s?\d{3}$/   // form input: 9 digits, optional spaces
-const PAYLOAD_PHONE_REGEX = /^\+40\d{9}$/             // server: prefixed with +40
+const FORM_PHONE_REGEX = /^0\d{3}\s?\d{3}\s?\d{3}$/   // form input: 10 digits (0XXX XXX XXX), optional spaces
+const PAYLOAD_PHONE_REGEX = /^0\d{9}$/                // server: national format, 10 digits
 
 // Form-side schema (what AddressForm collects)
 export const addressFormSchema = z.object({
   firstName: z.string().regex(NAME_REGEX, 'Prenume prea scurt'),
   lastName: z.string().regex(NAME_REGEX, 'Nume prea scurt'),
-  phone: z.string().regex(FORM_PHONE_REGEX, 'Telefonul trebuie sa aiba 9 cifre'),
+  phone: z.string().regex(FORM_PHONE_REGEX, 'Numar de telefon invalid'),
   county: z.enum(COUNTIES, { message: 'Selecteaza judetul' }),
   city: z.string().min(2, 'Selecteaza localitatea'),
   street: z.string().min(5, 'Adresa trebuie sa aiba minim 5 caractere'),
-  postalCode: z.string().regex(POSTAL_REGEX, 'Cod postal invalid'),
+  postalCode: z.string().regex(POSTAL_REGEX, 'Cod postal invalid').optional().or(z.literal('')),
   isDefaultShipping: z.boolean().optional(),
 })
 

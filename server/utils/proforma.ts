@@ -26,10 +26,11 @@ export interface ProformaInput {
 export interface BillingSnapshot {
   companyName?: string
   cui?: string
-  hasRo?: boolean
-  onrc?: string
-  bankName?: string
-  iban?: string
+  hasRo?: boolean | null
+  onrc?: string | null
+  bankName?: string | null
+  iban?: string | null
+  phone?: string | null
   street?: string
   city?: string
   county?: string
@@ -54,9 +55,9 @@ export function resolveProformaCustomer(
       type: 'company',
       name: billingSnapshot.companyName,
       cui: (billingSnapshot.hasRo ? 'RO' : '') + billingSnapshot.cui,
-      onrc: billingSnapshot.onrc,
-      iban: billingSnapshot.iban,
-      bankName: billingSnapshot.bankName,
+      onrc: billingSnapshot.onrc ?? undefined,
+      iban: billingSnapshot.iban ?? undefined,
+      bankName: billingSnapshot.bankName ?? undefined,
       address: billingSnapshot.street ?? '—',
       city: billingSnapshot.city ?? '—',
       county: billingSnapshot.county ?? '—',
@@ -192,14 +193,20 @@ export async function generateProformaPdf(input: ProformaInput): Promise<Uint8Ar
   if (input.customer.type === 'company') {
     if (input.customer.cui) customerLines.push(`CIF: ${input.customer.cui}`)
     if (input.customer.onrc) customerLines.push(`Reg. Com.: ${input.customer.onrc}`)
+  }
+  // Address + locality as one wrapped block, mirroring the FURNIZOR column layout
+  const locality = [input.customer.city, input.customer.county].filter(v => v && v !== '—').join(', ')
+  const addressBlock = [
+    input.customer.address && input.customer.address !== '—' ? input.customer.address : null,
+    locality || null,
+  ].filter(Boolean).join(', ')
+  if (addressBlock) {
+    customerLines.push(...wrapText(addressBlock, font, 10, colWidth))
+  }
+  if (input.customer.type === 'company') {
     if (input.customer.iban) customerLines.push(`IBAN: ${input.customer.iban}`)
     if (input.customer.bankName) customerLines.push(`Banca: ${input.customer.bankName}`)
   }
-  if (input.customer.address && input.customer.address !== '—') {
-    customerLines.push(...wrapText(input.customer.address, font, 10, colWidth))
-  }
-  const locality = [input.customer.city, input.customer.county].filter(v => v && v !== '—').join(', ')
-  if (locality) customerLines.push(locality)
 
   const supplierEnd = drawLines(supplierLines, supplierX, y - 14)
   const customerEnd = drawLines(customerLines, customerX, y - 14)
@@ -211,9 +218,9 @@ export async function generateProformaPdf(input: ProformaInput): Promise<Uint8Ar
 
   // Items table — A4 with 36pt margins. Columns mirror the printed proforma sample.
   const colIdx = { x: margin, width: 22, align: 'left' as const }
-  const colName = { x: margin + 22, width: 210, align: 'left' as const }
-  const colUm = { x: margin + 232, width: 38, align: 'center' as const }
-  const colQty = { x: margin + 270, width: 38, align: 'center' as const }
+  const colName = { x: margin + 22, width: 194, align: 'left' as const }
+  const colUm = { x: margin + 216, width: 38, align: 'center' as const }
+  const colQty = { x: margin + 254, width: 38, align: 'center' as const }
   const colPrice = { x: margin + 308, width: 65, align: 'right' as const }
   const colValue = { x: margin + 373, width: 70, align: 'right' as const }
   const colVat = { x: margin + 443, width: 80, align: 'right' as const }

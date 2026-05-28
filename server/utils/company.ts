@@ -1,3 +1,8 @@
+// VAT_RATE lives in `shared/constants/company.ts` so checkout and proforma
+// reference the same value. Re-exported here so existing server-side imports
+// keep working.
+export { VAT_RATE } from '~~/shared/constants/company'
+
 export const COMPANY = {
   name: 'Eurotimalex SRL',
   cui: 'RO18034200',
@@ -8,5 +13,3 @@ export const COMPANY = {
   iban: 'RO29RNCB0077060233480001',
   bankName: 'BANCA COMERCIALA ROMANA',
 } as const
-
-export const VAT_RATE = 21
