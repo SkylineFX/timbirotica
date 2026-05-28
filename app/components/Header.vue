@@ -3,7 +3,7 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 
 const { loggedIn, clear, user } = useUserSession()
-const { cartItems, removeFromCart, updateQuantity, total, fetchCart, isCartOpen, isLoading } = useCart()
+const { cartItems, total, fetchCart, isCartOpen, isLoading } = useCart()
 
 const { isFavoritesOpen, favorites } = useFavorites()
 const isNavOpen = ref(false)
@@ -99,21 +99,16 @@ const dropdownItems = computed<any[][]>(() => loggedIn.value ? loggedInItems.val
 const { data: categoryTree } = useFetch('/api/categories/tree')
 const { data: brands } = useFetch('/api/brands')
 
+// Top-level menu entries shown above the inlined category list in the slideover.
 const navigation = computed(() => [
   {
-    label: 'Categorii produse',
-    to: '/c',
-    children: categoryTree.value || [],
-    open: true,
+    label: 'Produse recomandate',
+    to: '/produse-recomandate'
   },
   {
     label: 'Producatori',
     to: '/producatori',
     children: brands.value || []
-  },
-  {
-    label: 'Produse recomandate',
-    to: '/produse-recomandate'
   }
 ])
 </script>
@@ -201,9 +196,10 @@ const navigation = computed(() => [
     </UContainer>
 
     <!-- Navigation Slideover (Left) -->
-    <USlideover v-model:open="isNavOpen" side="left" title="Meniu" @update:open="(val) => { if (!val) activeMenus = [] }">
+    <USlideover v-model:open="isNavOpen" side="left" title="Oferta produse" @update:open="(val) => { if (!val) activeMenus = [] }">
       <template #body>
         <div class="flex flex-col gap-1">
+          <!-- Top-level: Producatori + Produse recomandate -->
           <template v-for="item in navigation" :key="item.label">
             <UButton
               v-if="item.children && item.children.length > 0"
@@ -224,6 +220,44 @@ const navigation = computed(() => [
               @click="closeAll"
             >
               <span class="truncate">{{ item.label }}</span>
+            </UButton>
+          </template>
+
+          <!-- Categories inlined (avoids the extra "Categorii produse" hop) -->
+          <template v-if="categoryTree && categoryTree.length > 0">
+            <div class="border-t border-gray-200 my-2" />
+            <template v-for="cat in categoryTree" :key="cat.label">
+              <UButton
+                v-if="cat.children && cat.children.length > 0"
+                color="neutral"
+                variant="ghost"
+                class="justify-between w-full"
+                trailing-icon="i-lucide-chevron-right"
+                @click="activeMenus.push(cat)"
+              >
+                <span class="truncate">{{ cat.label }}</span>
+              </UButton>
+              <UButton
+                v-else
+                color="neutral"
+                variant="ghost"
+                :to="cat.to"
+                class="w-full"
+                @click="closeAll"
+              >
+                <span class="truncate">{{ cat.label }}</span>
+              </UButton>
+            </template>
+            <UButton
+              to="/c"
+              color="primary"
+              variant="subtle"
+              trailing-icon="i-lucide-arrow-right"
+              block
+              class="rounded-sm justify-between mt-2"
+              @click="closeAll"
+            >
+              Vezi toate categoriile
             </UButton>
           </template>
         </div>
