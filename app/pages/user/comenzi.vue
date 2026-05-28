@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { shippingMethodLabel, paymentMethodLabel } from '~~/shared/constants/order'
 
 definePageMeta({
   layout: 'account',
@@ -188,15 +189,15 @@ async function performReorder({ replace }: { replace: boolean }) {
             <!-- Context Info grids -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
                <!-- Livrare Box -->
-               <div class="bg-gray-50/70 p-4 rounded-sm border border-gray-100">
+               <div class="bg-gray-50/00 p-4 rounded-sm border border-gray-200">
                   <div class="flex justify-between">
                      <h5 class="text-sm font-bold text-gray-900 flex items-center gap-1.5"><UIcon name="i-lucide-truck" class="w-4 h-4"/> Livrare</h5>
-                     <UBadge color="primary" variant="subtle" size="sm" class="capitalize">{{ selectedOrder.shippingMethod === 'courier' ? 'Curier' : 'Ridicare personala' }}</UBadge>
+                     <UBadge color="primary" variant="subtle" size="sm" class="capitalize">{{ shippingMethodLabel(selectedOrder.shippingMethod) }}</UBadge>
                   </div>
                   
                   <div class="mt-2">
                     <template v-if="selectedOrder.shippingMethod === 'courier'">
-                      <p class="font-medium text-sm text-gray-900">{{ parsedShippingAddress.firstName }} {{ parsedShippingAddress.lastName }} · {{ parsedShippingAddress.phone.replace('+40', '0') }}</p>
+                      <p class="font-medium text-sm text-gray-900">{{ parsedShippingAddress.firstName }} {{ parsedShippingAddress.lastName }} · {{ parsedShippingAddress.phone }}</p>
                       <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedShippingAddress.street }}, {{ parsedShippingAddress.city }}, {{ parsedShippingAddress.county }}</p>
                     </template>
                     <template v-else>
@@ -206,21 +207,25 @@ async function performReorder({ replace }: { replace: boolean }) {
                </div>
 
                <!-- Facturare Box -->
-               <div class="bg-gray-50/70 p-4 rounded-sm border border-gray-100">
+               <div class="bg-gray-50/00 p-4 rounded-sm border border-gray-200">
                   <div class="flex justify-between">
-                     <h5 class="text-sm font-bold text-gray-900 flex items-center gap-1.5"><UIcon name="i-lucide-receipt-text" class="w-4 h-4"/> Facturare</h5>
-                     <UBadge color="primary" variant="subtle" size="sm" class="capitalize">{{ selectedOrder.paymentMethod === 'cash' ? 'Ramburs' : 'Transfer Bancar' }}</UBadge>
+                     <h5 class="text-sm font-bold text-gray-900 flex items-center gap-1.5"><UIcon name="i-lucide-receipt-text" class="w-4 h-4"/> Plata & Facturare</h5>
+                     <UBadge color="primary" variant="subtle" size="sm" class="capitalize">{{ paymentMethodLabel(selectedOrder.paymentMethod) }}</UBadge>
                   </div>
 
                   <div class="mt-2">
                     <template v-if="parsedBillingAddress.companyName">
-                        <p class="font-medium text-sm text-gray-900">{{ parsedBillingAddress.companyName }} · {{ parsedBillingAddress.onrc }}</p>
+                        <p class="font-medium text-sm text-gray-900">{{ parsedBillingAddress.companyName }}<template v-if="parsedBillingAddress.onrc"> · {{ parsedBillingAddress.onrc }}</template></p>
                         <!-- <p class="text-sm text-gray-600 mt-1">{{ parsedBillingAddress.hasRo ? 'RO ' : '' }}{{ parsedBillingAddress.cui }}</p> -->
                         <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedBillingAddress.street }}, {{ parsedBillingAddress.city }}, {{ parsedBillingAddress.county }}</p>
+                        <p v-if="parsedBillingAddress.phone" class="text-sm text-gray-600 mt-1">Telefon: {{ parsedBillingAddress.phone }}</p>
                     </template>
-                    <template v-else-if="parsedShippingAddress.firstName">
-                        <p class="font-medium text-sm text-gray-900">{{ parsedShippingAddress.firstName }} {{ parsedShippingAddress.lastName }} · {{ parsedShippingAddress.phone.replace('+40', '0') }}</p>
-                        <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedShippingAddress.street }}, {{ parsedShippingAddress.city }}, {{ parsedShippingAddress.county }}</p>
+                    <template v-else-if="parsedBillingAddress.firstName">
+                        <p class="font-medium text-sm text-gray-900">{{ parsedBillingAddress.firstName }} {{ parsedBillingAddress.lastName }} · {{ parsedBillingAddress.phone }}</p>
+                        <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedBillingAddress.street }}, {{ parsedBillingAddress.city }}, {{ parsedBillingAddress.county }}</p>
+                    </template>
+                    <template v-else-if="selectedOrder.user">
+                        <p class="font-medium text-sm text-gray-900">{{ selectedOrder.user.firstName }} {{ selectedOrder.user.lastName }}<template v-if="selectedOrder.user.phone"> · {{ selectedOrder.user.phone }}</template></p>
                     </template>
                   </div>
                </div>
@@ -271,7 +276,7 @@ async function performReorder({ replace }: { replace: boolean }) {
                     color="neutral"
                     size="xl"
                     variant="soft"
-                    class="flex-1 justify-center text-sm"
+                    class="flex-1 justify-center text-sm rounded-sm"
                     :to="`/api/user/orders/${selectedOrder.id}/proforma`"
                     external
                     download
@@ -280,7 +285,7 @@ async function performReorder({ replace }: { replace: boolean }) {
                     color="neutral"
                     size="xl"
                     variant="outline"
-                    class="flex-1 justify-center text-sm"
+                    class="flex-1 justify-center text-sm rounded-sm"
                     :loading="isReorderLoading"
                     @click="orderAgain"
                 >Comanda din nou</UButton>
@@ -290,7 +295,7 @@ async function performReorder({ replace }: { replace: boolean }) {
                 color="error"
                 size="xl"
                 variant="outline"
-                class="flex-1 justify-center text-sm"
+                class="flex-1 justify-center text-sm rounded-sm"
                 :loading="isCancelLoading"
                 @click="cancelOrder"
               >Anuleaza comanda</UButton>

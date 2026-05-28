@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, watchEffect, onMounted, onUnmounted } from 'vue'
 import { useCart } from '~/composables/useCart'
+import { getCourierShippingCost } from '~~/shared/constants/order'
+import { vatPortionOfGross } from '~~/shared/constants/company'
 
 definePageMeta({
   middleware: ['authenticated'],
 })
 
 // Cart integration
-const { cartItems, total, fetchCart, removeFromCart, updateQuantity } = useCart()
+const { cartItems, total, fetchCart } = useCart()
 
 // Only fetch from DB when the cart state is empty (e.g. hard page refresh).
 // If cartItems already has entries — e.g. carried over from the login/sync flow —
@@ -79,6 +81,10 @@ onUnmounted(() => document.removeEventListener('visibilitychange', onVisibility)
 
 const selectedAddressId = ref<number | null>(null)
 const selectedBillingId = ref<number | null>(null)
+// Individual invoice address (Persoana fizica) — for courier it defaults to the delivery address but can be changed
+const selectedBillingAddressId = ref<number | null>(null)
+// Which selector the "add new address" flow should assign to
+const newAddressTarget = ref<'shipping' | 'billing'>('shipping')
 
 watchEffect(() => {
   const addresses = userAddresses.value
@@ -96,12 +102,28 @@ watchEffect(() => {
   }
 })
 
+// Individual invoice address follows the delivery/personal address *until the
+// user explicitly picks a different one* in the billing modal. Concretely:
+// if billing is still uninitialized, or still equals the previous shipping
+// (so the user hasn't diverged yet), we mirror new shipping; once the values
+// diverge we leave billing alone.
+watch(selectedAddressId, (newId, oldId) => {
+  if (!newId) return
+  if (selectedBillingAddressId.value === null || selectedBillingAddressId.value === oldId) {
+    selectedBillingAddressId.value = newId
+  }
+}, { immediate: true })
+
 const selectedAddress = computed(() => {
   return (userAddresses.value || []).find(a => a.id === selectedAddressId.value) || null
 })
 
 const selectedBilling = computed(() => {
   return (userBillingAddresses.value || []).find(a => a.id === selectedBillingId.value) || null
+})
+
+const selectedBillingAddress = computed(() => {
+  return (userAddresses.value || []).find(a => a.id === selectedBillingAddressId.value) || null
 })
 
 // State for sections
@@ -115,6 +137,7 @@ const isNewAddressModalOpen = ref(false)
 
 const isBillingSelectorOpen = ref(false)
 const isNewBillingModalOpen = ref(false)
+const isBillingAddressSelectorOpen = ref(false)
 
 async function handleAddressSaved() {
   const oldIds = new Set((userAddresses.value || []).map(a => a.id))
@@ -122,14 +145,23 @@ async function handleAddressSaved() {
   
   const newAddr = (userAddresses.value || []).find(a => !oldIds.has(a.id))
   if (newAddr) {
-    selectedAddressId.value = newAddr.id
+    if (newAddressTarget.value === 'billing') selectedBillingAddressId.value = newAddr.id
+    else selectedAddressId.value = newAddr.id
   }
-  
+
+  newAddressTarget.value = 'shipping'
   isNewAddressModalOpen.value = false
 }
 
 function openNewAddress() {
+  newAddressTarget.value = 'shipping'
   isAddressModalOpen.value = false
+  isNewAddressModalOpen.value = true
+}
+
+function openNewBillingAddress() {
+  newAddressTarget.value = 'billing'
+  isBillingAddressSelectorOpen.value = false
   isNewAddressModalOpen.value = true
 }
 
@@ -150,18 +182,8 @@ function openNewBilling() {
   isNewBillingModalOpen.value = true
 }
 
-// Payment mock data
-const cardDetails = ref({
-  number: '',
-  expiry: '',
-  cvv: '',
-  name: ''
-})
-
-const subscribeNews = ref(false)
-
 // Computed totals
-const courierShippingCost = computed(() => total.value >= 200 ? 0 : 30)
+const courierShippingCost = computed(() => getCourierShippingCost(total.value))
 
 const orderSummaryShippingCost = computed(() => {
   return deliveryMethod.value === 'courier' ? courierShippingCost.value : 0
@@ -190,8 +212,9 @@ async function submitOrder() {
     return
   }
 
-  if (deliveryMethod.value === 'courier' && !selectedAddress.value) {
-    toast.add({ title: 'Adresa lipsa', description: 'Te rugam sa selectezi o adresa de livrare pentru expedierea prin curier.', color: 'error' })
+  // Personal address is required for courier delivery, or as the individual invoice (persoana fizica)
+  if ((deliveryMethod.value === 'courier' || billingSameAsShipping.value) && !selectedAddress.value) {
+    toast.add({ title: 'Adresa lipsa', description: 'Te rugam sa selectezi o adresa.', color: 'error' })
     return
   }
 
@@ -200,13 +223,25 @@ async function submitOrder() {
      return
   }
 
+  if (billingSameAsShipping.value && deliveryMethod.value === 'courier' && !selectedBillingAddress.value) {
+     toast.add({ title: 'Adresa de facturare lipsa', description: 'Te rugam sa selectezi adresa de facturare.', color: 'error' })
+     return
+  }
+
   isSubmitting.value = true
 
   const payload = {
     shippingMethod: deliveryMethod.value,
     paymentMethod: paymentMethod.value,
-    shippingAddress: deliveryMethod.value === 'courier' ? selectedAddress.value : null,
-    billingAddress: billingSameAsShipping.value ? (deliveryMethod.value === 'courier' ? selectedAddress.value : null) : selectedBilling.value
+    shippingAddressId: (deliveryMethod.value === 'courier' || billingSameAsShipping.value) ? selectedAddressId.value : null,
+    billingSameAsShipping: billingSameAsShipping.value,
+    billingAddressId: billingSameAsShipping.value ? null : selectedBillingId.value,
+    billingPersonalAddressId: (billingSameAsShipping.value && deliveryMethod.value === 'courier') ? selectedBillingAddressId.value : null,
+    termsAccepted: true as const,
+    priceSnapshots: cartItems.value.map(item => ({
+      productId: item.productId,
+      price: item.product?.price ?? 0
+    }))
   }
 
   try {
@@ -221,10 +256,18 @@ async function submitOrder() {
       path: '/comanda-finalizata',
       query: {
         order: res.orderNumber,
-        payment: paymentMethod.value
+        payment: paymentMethod.value,
+        shipping: deliveryMethod.value
       }
-    })
+    }, { replace: true })
   } catch(e: any) {
+    // Price-change retry path: refresh the cart so the right column reflects
+    // the new prices and the user can re-confirm.
+    if (e?.statusCode === 409 && e?.data?.data?.priceChanged) {
+      await fetchCart()
+      toast.add({ title: 'Preturi actualizate', description: 'Verifica suma totala si reincearca.', color: 'warning' })
+      return
+    }
     toast.add({ title: 'Eroare la procesare', description: e?.data?.message || e.statusMessage || e.message || 'Te rugam sa incerci din nou.', color: 'error' })
   } finally {
     isSubmitting.value = false
@@ -238,7 +281,7 @@ async function submitOrder() {
     <div class="w-full max-w-6xl flex flex-col lg:flex-row">
       
       <!-- Left Column (Checkout Form) -->
-      <div class="w-full lg:w-3/5 px-4 sm:px-6 lg:px-8 py-8 lg:py-12 flex flex-col gap-8 bg-white border-r border-gray-100">
+      <div class="w-full lg:w-1/2 px-4 sm:px-6 lg:px-8 py-8 lg:py-12 flex flex-col gap-8 bg-white border-r border-gray-100">
 
         <!-- Logo / Title -->
         <div class="mb-2">
@@ -270,33 +313,7 @@ async function submitOrder() {
           </template>
         </UAlert>
 
-        <!-- 1. Ship to -->
-        <div class="flex flex-col gap-3">
-          <div class="flex justify-between items-center text-sm font-medium text-gray-700">
-            <span>Adresa de livrare</span>
-            <button @click="isAddressModalOpen = true" class="text-blue-600 hover:text-blue-700 transition">
-               <UIcon name="i-lucide-chevron-down" class="w-4 h-4 ml-1 inline align-middle"/>
-            </button>
-          </div>
-          <div 
-            class="text-sm text-gray-900 leading-relaxed border border-gray-200 rounded-md p-4 cursor-pointer hover:border-gray-300 transition-colors bg-white flex justify-between items-center" 
-            @click="isAddressModalOpen = true"
-          >
-            <div>
-               <template v-if="selectedAddress">
-                 <span class="font-bold inline mb-1">{{ selectedAddress.firstName }} {{ selectedAddress.lastName }}</span><span class="text-gray-500 inline ml-2">· {{ selectedAddress.phone.replace('+40', '0')}}</span>
-                 <span class="text-gray-600 block">{{ selectedAddress.street }}</span> 
-                 <span class="text-gray-600 block">{{ selectedAddress.city }}, {{ selectedAddress.county }}</span>
-               </template>
-               <template v-else>
-                 <span class="text-gray-500">Alege o adresa de livrare...</span>
-               </template>
-            </div>
-            <UIcon name="i-lucide-chevron-right" class="w-5 h-5 text-gray-400 opacity-50 shrink-0" />
-          </div>
-        </div>
-
-        <!-- 2. Shipping method -->
+        <!-- 1. Shipping method -->
         <div class="flex flex-col gap-3">
           <div class="flex justify-between items-center text-sm font-medium text-gray-700">
             <span>Metoda de livrare</span>
@@ -349,6 +366,32 @@ async function submitOrder() {
           </div>
         </div>
 
+        <!-- 2. Delivery address (courier only; pickup collects it under Facturare) -->
+        <div v-show="deliveryMethod === 'courier'" class="flex flex-col gap-3">
+          <div class="flex justify-between items-center text-sm font-medium text-gray-700">
+            <span>Adresa de livrare</span>
+            <button @click="isAddressModalOpen = true" class="text-blue-600 hover:text-blue-700 transition">
+               <UIcon name="i-lucide-chevron-down" class="w-4 h-4 ml-1 inline align-middle"/>
+            </button>
+          </div>
+          <div
+            class="text-sm text-gray-900 leading-relaxed border border-gray-200 rounded-md p-4 cursor-pointer hover:border-gray-300 transition-colors bg-white flex justify-between items-center"
+            @click="isAddressModalOpen = true"
+          >
+            <div>
+               <template v-if="selectedAddress">
+                 <span class="font-bold inline mb-1">{{ selectedAddress.firstName }} {{ selectedAddress.lastName }}</span><span class="text-gray-500 inline ml-2">· {{ selectedAddress.phone }}</span>
+                 <span class="text-gray-600 block">{{ selectedAddress.street }}</span>
+                 <span class="text-gray-600 block">{{ selectedAddress.city }}, {{ selectedAddress.county }}</span>
+               </template>
+               <template v-else>
+                 <span class="text-gray-500">Alege o adresa...</span>
+               </template>
+            </div>
+            <UIcon name="i-lucide-chevron-right" class="w-5 h-5 text-gray-400 opacity-50 shrink-0" />
+          </div>
+        </div>
+
         <!-- 3. Payment block -->
         <div class="flex flex-col gap-3 mt-2">
           <div>
@@ -375,7 +418,7 @@ async function submitOrder() {
             <div v-show="paymentMethod === 'transfer'" class="p-5 bg-gray-50 border-b border-gray-200 space-y-4">
                <div class="text-sm text-gray-600 text-left lg:text-left flex flex-col items-center gap-2">
                  <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-                 <p> Efectueaza plata in contul nostru bancar dupa primirea facturii proforme pe mail.</p>
+                 <p>Dupa plasarea comenzii iti vom trimite pe email factura proforma cu toate detaliile de plata.</p>
                </div>
             </div>
 
@@ -394,9 +437,11 @@ async function submitOrder() {
             </label>
             
             <div v-show="paymentMethod === 'cash'" class="p-5 bg-gray-50 border-t border-gray-200 text-left lg:text-left">
-               <p class="text-sm text-gray-600">
-                 Plata se va face in numerar la primirea coletului. Vei primi factura proforma pe mail, apoi te vom contacta pentru confirmarea comenzii
-                 <template v-if="deliveryMethod === 'courier'">si stabilirea datei de livrare.</template>
+               <p v-if="deliveryMethod === 'courier'" class="text-sm text-gray-600">
+                 Plata se face in numerar la primirea coletului. Vei primi factura proforma pe mail, apoi te vom contacta pentru confirmarea comenzii si stabilirea datei de livrare.
+               </p>
+               <p v-else class="text-sm text-gray-600">
+                 Plata se face in numerar la ridicarea comenzii. Vei primi factura proforma pe mail, apoi te vom contacta cand comanda este gata.
                </p>
             </div>
           </div>
@@ -412,14 +457,14 @@ async function submitOrder() {
               <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="billingSameAsShipping ? 'border-primary' : 'border-gray-300'">
                 <div v-if="billingSameAsShipping" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
               </div>
-              <span class="text-sm font-medium text-gray-900">Aceeasi cu adresa de livrare</span>
+              <span class="text-sm font-medium text-gray-900">Persoana fizica</span>
               <input type="radio" :value="true" v-model="billingSameAsShipping" class="hidden">
             </label>
             <label class="p-4 flex items-center gap-4 cursor-pointer bg-white hover:bg-gray-50" :class="{ 'bg-blue-50/10 hover:bg-blue-50/20': !billingSameAsShipping }">
               <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="!billingSameAsShipping ? 'border-primary' : 'border-gray-300'">
                 <div v-if="!billingSameAsShipping" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
               </div>
-              <span class="text-sm font-medium text-gray-900">Adresa de facturare persoana juridica</span>
+              <span class="text-sm font-medium text-gray-900">Persoana juridica</span>
               <input type="radio" :value="false" v-model="billingSameAsShipping" class="hidden">
             </label>
             <div v-if="!billingSameAsShipping" class="text-sm p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors" @click="isBillingSelectorOpen = true">
@@ -435,26 +480,52 @@ async function submitOrder() {
                </div>
                <UIcon name="i-lucide-chevron-right" class="w-5 h-5 text-gray-400 opacity-50 shrink-0" />
             </div>
+            <!-- Persoana fizica: for pickup, pick the personal/invoice address here (courier reuses the delivery address) -->
+            <div v-if="billingSameAsShipping && deliveryMethod === 'pickup'" class="text-sm p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors" @click="isAddressModalOpen = true">
+               <div>
+                  <template v-if="selectedAddress">
+                     <span class="font-bold inline mb-1">{{ selectedAddress.firstName }} {{ selectedAddress.lastName }}</span><span class="text-gray-500 inline ml-2">· {{ selectedAddress.phone }}</span>
+                     <span class="text-gray-600 block">{{ selectedAddress.street }}</span>
+                     <span class="text-gray-600 block">{{ selectedAddress.city }}, {{ selectedAddress.county }}</span>
+                  </template>
+                  <template v-else>
+                     <span class="text-gray-500">Alege o adresa...</span>
+                  </template>
+               </div>
+               <UIcon name="i-lucide-chevron-right" class="w-5 h-5 text-gray-400 opacity-50 shrink-0" />
+            </div>
+            <!-- Persoana fizica + courier: invoice address (defaults to the delivery address; can be changed) -->
+            <div v-if="billingSameAsShipping && deliveryMethod === 'courier'" class="text-sm p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors" @click="isBillingAddressSelectorOpen = true">
+               <div>
+                  <template v-if="selectedBillingAddress && selectedBillingAddressId === selectedAddressId">
+                     <span class="text-gray-500">Folosesc adresa de livrare. Apasa pentru a alege alta.</span>
+                  </template>
+                  <template v-else-if="selectedBillingAddress">
+                     <span class="font-bold inline mb-1">{{ selectedBillingAddress.firstName }} {{ selectedBillingAddress.lastName }}</span><span class="text-gray-500 inline ml-2">· {{ selectedBillingAddress.phone }}</span>
+                     <span class="text-gray-600 block">{{ selectedBillingAddress.street }}</span>
+                     <span class="text-gray-600 block">{{ selectedBillingAddress.city }}, {{ selectedBillingAddress.county }}</span>
+                  </template>
+                  <template v-else>
+                     <span class="text-gray-500">Alege adresa de facturare...</span>
+                  </template>
+               </div>
+               <UIcon name="i-lucide-chevron-right" class="w-5 h-5 text-gray-400 opacity-50 shrink-0" />
+            </div>
           </div>
         </div>
 
-        <!-- Extra / Submit -->
-         <div class="mt-6 hidden lg:block">
-            <UCheckbox v-model="termsAccepted" class="mb-4">
-              <template #label>
-                <span class="text-sm text-gray-700">
-                  Sunt de acord cu <NuxtLink to="/termeni-si-conditii" target="_blank" class="text-primary underline font-medium">termenii si conditiile</NuxtLink> si <NuxtLink to="/politica-de-confidentialitate" target="_blank" class="text-primary underline font-medium">politica de confidentialitate</NuxtLink>.
-                </span>
-              </template>
-            </UCheckbox>
-            <UButton :loading="isSubmitting" :disabled="!isEmailVerified || !termsAccepted || isSubmitting" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] flex justify-center">
-               Plaseaza comanda
-            </UButton>
-         </div>
+        <!-- Extra / Submit (desktop) -->
+         <CheckoutSubmit
+           v-model:terms-accepted="termsAccepted"
+           :is-submitting="isSubmitting"
+           :is-email-verified="isEmailVerified"
+           class="mt-6 hidden lg:block"
+           @submit="submitOrder"
+         />
       </div>
 
       <!-- Right Column (Order Summary) -->
-      <div class="w-full lg:w-2/5 bg-gray-50/50 p-6 lg:p-12 lg:pl-10 border-b lg:border-b-0 lg:border-l border-gray-200 flex flex-col gap-6">
+      <div class="w-full lg:w-1/2 bg-gray-50/50 p-6 lg:p-12 lg:pl-10 border-b lg:border-b-0 lg:border-l border-gray-200 flex flex-col gap-6">
         <!-- Summary -->
         <div>
           <h3 class="text-xl font-bold text-gray-900">Sumar comanda</h3>
@@ -478,9 +549,9 @@ async function submitOrder() {
             <div class="flex justify-between items-center text-base text-gray-600">
               <span class="flex items-center gap-1">
                 Livrare 
-                <a class="cursor-pointer flex items-center" href="/termeni-si-conditii#livrare-si-retur" @click.prevent="navigateTo('/termeni-si-conditii#livrare-si-retur')">
+                <NuxtLink to="/termeni-si-conditii#livrare" class="cursor-pointer flex items-center">
                   <UIcon name="i-lucide-help-circle" class="w-3.5 h-3.5 text-gray-400 hover:text-primary transition-colors"/>
-                </a>
+                </NuxtLink>
               </span>
               <span class="font-bold text-gray-800 tracking-tight">{{ orderSummaryShippingCost.toFixed(2) }} RON</span>
             </div>
@@ -490,25 +561,21 @@ async function submitOrder() {
          <div class="pt-6 flex justify-between items-end mt-4 border-t border-gray-300 border-dashed">
             <div class="flex flex-col">
                <span class="text-xl font-extrabold text-gray-900">Total</span>
-               <span class="text-xs text-gray-500 mt-0.5" v-if="finalTotal > 0">Include TVA de {{ (finalTotal * 0.21).toFixed(2) }} RON</span>
+               <span class="text-xs text-gray-500 mt-0.5" v-if="finalTotal > 0">Include TVA de {{ vatPortionOfGross(finalTotal).toFixed(2) }} RON</span>
             </div>
             <div class="flex items-end gap-2 mb-0.5">
                <span class="text-2xl sm:text-3xl leading-none tracking-tight font-extrabold text-gray-900">{{ finalTotal.toFixed(2) }} RON</span>
             </div>
          </div>
 
-        <div class="mt-6 lg:hidden">
-           <UCheckbox v-model="termsAccepted" class="mb-4">
-             <template #label>
-               <span class="text-sm text-gray-700">
-                 Sunt de acord cu <NuxtLink to="/termeni-si-conditii" target="_blank" class="text-primary underline font-medium">termenii si conditiile</NuxtLink> si <NuxtLink to="/politica-de-confidentialitate" target="_blank" class="text-primary underline font-medium">politica de confidentialitate</NuxtLink>.
-               </span>
-             </template>
-           </UCheckbox>
-           <UButton :loading="isSubmitting" :disabled="!isEmailVerified || !termsAccepted || isSubmitting" @click="submitOrder" block size="xl" class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] flex justify-center">
-              Plaseaza comanda
-           </UButton>
-        </div>
+        <!-- Extra / Submit (mobile) -->
+        <CheckoutSubmit
+          v-model:terms-accepted="termsAccepted"
+          :is-submitting="isSubmitting"
+          :is-email-verified="isEmailVerified"
+          class="mt-6 lg:hidden"
+          @submit="submitOrder"
+        />
       </div>
 
     </div>
@@ -526,7 +593,7 @@ async function submitOrder() {
   >
     <template #item="{ item }">
       <div class="flex justify-between items-start">
-         <p class="font-bold mb-1 text-gray-900 text-base group-hover:text-primary transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone.replace('+40', '0')}}</p>
+         <p class="font-bold mb-1 text-gray-900 text-base group-hover:text-primary transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone }}</p>
       </div>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
@@ -548,6 +615,24 @@ async function submitOrder() {
         <p class="text-gray-600 text-sm leading-relaxed">· {{ item.hasRo ? 'RO' : '' }}{{ item.cui }}</p>
       </div>
       <p class="text-gray-600 text-sm leading-relaxed">Reg. Com.: {{ item.onrc }}</p>
+      <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
+      <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
+    </template>
+  </AddressSelectorModal>
+
+  <!-- Individual billing address selector (Persoana fizica, alta adresa) -->
+  <AddressSelectorModal
+    v-model:open="isBillingAddressSelectorOpen"
+    v-model:selectedId="selectedBillingAddressId"
+    title="Adresa de facturare"
+    :items="userAddresses"
+    empty-message="Nu ai nicio adresa salvata in cont."
+    @add-new="openNewBillingAddress"
+  >
+    <template #item="{ item }">
+      <div class="flex justify-between items-start">
+         <p class="font-bold mb-1 text-gray-900 text-base group-hover:text-primary transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone }}</p>
+      </div>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
     </template>

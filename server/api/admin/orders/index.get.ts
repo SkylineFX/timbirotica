@@ -51,7 +51,7 @@ export default eventHandler(async (event) => {
       with: {
         items: { with: { product: true } },
         user: {
-          columns: { id: true, firstName: true, lastName: true, email: true }
+          columns: { id: true, firstName: true, lastName: true, email: true, phone: true }
         }
       }
     }),

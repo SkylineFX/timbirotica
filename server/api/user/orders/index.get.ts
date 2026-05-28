@@ -20,7 +20,8 @@ export default eventHandler(async (event) => {
             }
           }
         }
-      }
+      },
+      user: { columns: { firstName: true, lastName: true, phone: true } }
     }
   })
 

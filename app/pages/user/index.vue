@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { vMaska } from 'maska/vue'
 
 definePageMeta({
   layout: 'account',
@@ -14,19 +15,22 @@ const isLoading = ref(false)
 
 const form = ref({
   firstName: userProfile.value?.firstName || '',
-  lastName: userProfile.value?.lastName || ''
+  lastName: userProfile.value?.lastName || '',
+  phone: userProfile.value?.phone || ''
 })
 
 watchEffect(() => {
   if (userProfile.value) {
     form.value.firstName = userProfile.value.firstName
     form.value.lastName = userProfile.value.lastName
+    form.value.phone = userProfile.value.phone || ''
   }
 })
 
 const isDirty = computed(() =>
   form.value.firstName !== (userProfile.value?.firstName ?? '') ||
-  form.value.lastName !== (userProfile.value?.lastName ?? '')
+  form.value.lastName !== (userProfile.value?.lastName ?? '') ||
+  form.value.phone.replace(/\s+/g, '') !== (userProfile.value?.phone ?? '')
 )
 
 const fullName = computed(() =>
@@ -35,17 +39,32 @@ const fullName = computed(() =>
 
 async function saveProfile() {
   if (!isDirty.value) return
+  const firstName = form.value.firstName.trim()
+  const lastName = form.value.lastName.trim()
+  if (firstName.length < 2) {
+    toast.add({ title: 'Prenume prea scurt', description: 'Prenumele trebuie sa aiba cel putin 2 caractere', color: 'error' })
+    return
+  }
+  if (lastName.length < 2) {
+    toast.add({ title: 'Nume prea scurt', description: 'Numele trebuie sa aiba cel putin 2 caractere', color: 'error' })
+    return
+  }
+  const phone = form.value.phone.replace(/\s+/g, '')
+  if (phone && !/^0\d{9}$/.test(phone)) {
+    toast.add({ title: 'Numar de telefon invalid', color: 'error' })
+    return
+  }
   isLoading.value = true
   try {
     await $fetch('/api/user', {
       method: 'PUT',
-      body: form.value
+      body: { firstName, lastName, phone }
     })
     await refreshProfile()
     await refreshSession()
     toast.add({ title: 'Profil actualizat cu succes', color: 'success' })
   } catch (err: any) {
-    toast.add({ title: 'Eroare la actualizarea profilului', description: err.message, color: 'error' })
+    toast.add({ title: 'Eroare la actualizarea profilului', description: err?.data?.message || 'Te rugam sa incerci din nou.', color: 'error' })
   } finally {
     isLoading.value = false
   }
@@ -104,7 +123,7 @@ async function savePassword() {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-4 sm:space-y-6">
     <UCard class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
       <div class="flex items-center gap-5 pb-6 border-b border-gray-100 mb-6">
         <UAvatar :alt="fullName || 'Cont'" size="3xl" class="ring-2 ring-white shadow-sm" />
@@ -115,8 +134,8 @@ async function savePassword() {
       </div>
 
       <form @submit.prevent="saveProfile" class="space-y-6">
-        <UFormField label="Email" name="email" help="Email-ul nu poate fi modificat.">
-          <UInput :model-value="userProfile?.email" disabled size="lg" class="w-full" />
+        <UFormField label="Numar de telefon" name="phone">
+          <UInput v-model="form.phone" v-maska="'#### ### ###'" type="tel" autocomplete="tel" size="lg" class="w-full" />
         </UFormField>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

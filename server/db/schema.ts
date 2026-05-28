@@ -5,6 +5,7 @@ export const users = sqliteTable('users', {
   id: integer().primaryKey({ autoIncrement: true }),
   firstName: text('first_name').notNull(),
   lastName: text('last_name').notNull().default(''),
+  phone: text(), // national format 0XXXXXXXXX; nullable for OAuth signups & pre-existing rows
   email: text().notNull().unique(),
   password: text().notNull(),
   role: text().notNull().default('user'),
@@ -153,6 +154,9 @@ export const orders = sqliteTable('orders', {
   shippingCost: real('shipping_cost').notNull().default(0),
   shippingAddressSnapshot: text('shipping_address_snapshot'),
   billingAddressSnapshot: text('billing_address_snapshot'),
+  // Server-side proof of T&C consent at order time (B2C requirement). Nullable
+  // for orders placed before this column existed.
+  termsAcceptedAt: integer('terms_accepted_at', { mode: 'timestamp' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 })
 
@@ -189,9 +193,12 @@ export const billingAddresses = sqliteTable('billing_addresses', {
   companyName: text('company_name').notNull(),
   cui: text('cui').notNull(),
   hasRo: integer('has_ro', { mode: 'boolean' }).default(false),
-  onrc: text('onrc').notNull(),
+  onrc: text('onrc'),
   bankName: text('bank_name'),
   iban: text('iban'),
+  // Contact phone for this billing record (national format 0XXXXXXXXX). Nullable
+  // for pre-existing rows; the form requires it for new/updated billing addresses.
+  phone: text('phone'),
   street: text('street').notNull(),
   city: text('city').notNull(),
   county: text('county').notNull(),
