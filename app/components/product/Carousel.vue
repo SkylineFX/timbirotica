@@ -15,7 +15,7 @@ const activeIndex = ref(0)
         class="w-full"
         @select="activeIndex = $event"
         arrows
-        :ui="{arrows: 'absolute top-1/2 -left-4 -right-4 sm:left-0 sm:right-0'}"
+        :ui="{arrows: 'hidden sm:block absolute top-1/2 -left-4 -right-4 sm:left-0 sm:right-0'}"
       >
         <NuxtImg :src="item" class="w-full aspect-square object-contain select-none block mx-auto pointer-events-none rounded-sm" draggable="false" alt="Imagine Produs"> </NuxtImg>
       </UCarousel>

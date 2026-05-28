@@ -24,7 +24,7 @@ const orientation = computed<'horizontal' | 'vertical'>(() => isDesktop.value ? 
 
 <template>
   <NuxtLayout name="default">
-    <UContainer class="py-8 lg:py-12 max-w-5xl">
+    <UContainer class="py-8 lg:py-12 max-w-5xl flex-1 flex flex-col w-full">
       <h1 class="text-2xl lg:text-3xl font-bold mb-6">Contul meu</h1>
       <UTabs
         v-model="activeTab"

@@ -42,35 +42,35 @@ async function handleBillingSaved() {
 </script>
 
 <template>
-  <div>
-    <UCard class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
+  <div class="flex-1 flex flex-col">
+    <UCard class="flex-1 flex flex-col overflow-hidden" :ui="{ root: 'rounded-md flex-1 flex flex-col', body: 'p-6 sm:p-8 flex-1 flex flex-col' }">
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-lg sm:text-xl font-bold text-gray-900">Persoane Juridice</h3>
-        <UButton @click="openAddBilling" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-md px-2">Adauga</UButton>
+        <UButton @click="openAddBilling" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-sm px-2">Adauga</UButton>
       </div>
 
-      <div v-if="userBillingAddresses?.length === 0" class="text-center py-12 text-gray-500 bg-gray-50 rounded-md border border-dashed border-gray-200">
+      <div v-if="userBillingAddresses?.length === 0" class="flex-1 flex flex-col items-center justify-center text-center py-12 text-gray-500 bg-gray-50 rounded-sm border border-dashed border-gray-200">
         Nici o companie salvata in cont.
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div v-for="addr in userBillingAddresses" :key="addr.id" class="p-5 rounded-sm border border-gray-200 bg-white relative hover:border-gray-300 transition-all">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex gap-2 items-center">
-              <UBadge v-if="addr.isDefaultBilling" color="primary" size="xs">Facturare</UBadge>
-            </div>
-            <div class="flex gap-1">
-              <UButton color="neutral" variant="ghost" size="sm" icon="i-lucide-pencil" class="font-medium" @click="openEditBilling(addr)" />
-              <UButton color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" class="font-medium" @click="removeBilling(addr.id)" />
-            </div>
-          </div>
-
           <div class="mb-4">
             <p class="font-bold text-gray-900 inline">{{ addr.companyName }}</p>
             <p class="text-sm text-gray-600 inline ml-1">· {{ addr.hasRo ? 'RO' : '' }}{{ addr.cui }}</p>
             <p class="text-sm text-gray-600 mt-1">Reg. Com.: {{ addr.onrc }}</p>
             <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.street }}</p>
             <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.city }}, {{ addr.county }}</p>
+          </div>
+
+          <div class="flex items-center justify-between pt-4 border-t border-gray-200 mt-4">
+            <div class="flex gap-2 items-center">
+              <UBadge v-if="addr.isDefaultBilling" color="neutral" variant="subtle" size="sm">Adresa implicita</UBadge>
+            </div>
+            <div class="flex gap-1">
+              <UButton color="neutral" variant="ghost" size="sm" icon="i-lucide-pencil" class="font-medium" @click="openEditBilling(addr)" />
+              <UButton color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" class="font-medium" @click="removeBilling(addr.id)" />
+            </div>
           </div>
         </div>
       </div>

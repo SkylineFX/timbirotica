@@ -38,7 +38,7 @@ const columns: FooterColumn[] = [
       },
       {
         label: 'Livrare si retur',
-        to: '/termeni-si-conditii#livrare-si-retur',
+        to: '/termeni-si-conditii#livrare',
         exactHash: true
       },
       {
@@ -62,10 +62,10 @@ const columns: FooterColumn[] = [
         <template #right>
           <div class="flex flex-col gap-5">
             <div class="flex flex-col">
-              <a class="text-sm font-semibold underline" href="/contact">Contact</a>
+              <NuxtLink class="text-sm font-semibold underline" to="/contact">Contact</NuxtLink>
               <div class="flex flex-col mt-4 space-y-2">
                 <span class="text-sm text-muted">Telefon:
-                  <a href="tel:+40751022882" class="text-sm hover:text-primary transition-colors">+40 751 022 882</a>
+                  <a href="tel:0751022882" class="text-sm hover:text-primary transition-colors">0751 022 882</a>
                 </span>
                 <span class="text-sm text-muted">Email:
                   <a href="mailto:eurotimalex@yahoo.com" class="text-sm hover:text-primary transition-colors">eurotimalex@yahoo.com</a>

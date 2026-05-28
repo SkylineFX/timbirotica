@@ -45,7 +45,7 @@ useHead({
 
         <div class="py-4 border-t border-gray-100 text-gray-700" id="locatie">
           <h3 class="font-bold text-gray-900 mb-3 text-lg">Locatie & Activitate</h3>
-          <p>Comenzile pot fi ridicate de la sediul nostru central:</p>
+          <p>Comenzile pot fi ridicate de la sediul nostru:</p>
           <div class="mt-6 flex flex-col lg:flex-row gap-6 items-start">
             <div class="flex-shrink-0 lg:w-1/3">
                <p class="font-semibold text-gray-900 leading-tight">Eurotimalex S.R.L.</p>

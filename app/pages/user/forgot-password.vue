@@ -40,7 +40,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   <div class="flex flex-col items-center justify-center gap-4 p-4">
     <UPageCard class="w-full max-w-md">
       <template v-if="submitted">
-        <div class="flex flex-col items-center gap-4 py-6 px-2 text-center">
+        <div class="flex flex-col flex-1 items-center gap-4 py-6 px-2 text-center">
           <UIcon name="i-lucide-mail-check" class="w-12 h-12 text-primary" />
           <h2 class="text-xl font-bold text-gray-900">Verifica-ti emailul</h2>
           <p class="text-gray-500 text-sm">
@@ -58,7 +58,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
           title="Resetare parola"
           icon="i-lucide-lock-keyhole"
           :fields="fields"
-          submit-label="Trimite link de resetare"
+          :submit="{ label: 'Continua' }"
           @submit="onSubmit"
         >
           <template #description>

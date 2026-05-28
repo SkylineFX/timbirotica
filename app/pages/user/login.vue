@@ -73,6 +73,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         icon="i-lucide-user"
         :fields="fields"
         :providers="providers"
+        separator="sau"
+        :submit="{ label: 'Autentificare' }"
         @submit="onSubmit"
       >
         <template #description>

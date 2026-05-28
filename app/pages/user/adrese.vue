@@ -54,34 +54,34 @@ async function handleAddressSaved() {
 </script>
 
 <template>
-  <div>
-    <UCard class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
+  <div class="flex-1 flex flex-col">
+    <UCard class="flex-1 flex flex-col overflow-hidden" :ui="{ root: 'rounded-md flex-1 flex flex-col', body: 'p-6 sm:p-8 flex-1 flex flex-col' }">
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-lg sm:text-xl font-bold text-gray-900">Adresele mele</h3>
-        <UButton @click="openAddAddress" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-md px-2">Adauga</UButton>
+        <UButton @click="openAddAddress" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-sm px-2">Adauga</UButton>
       </div>
 
-      <div v-if="userAddresses?.length === 0" class="text-center py-12 text-gray-500 bg-gray-50 rounded-md border border-dashed border-gray-200">
+      <div v-if="userAddresses?.length === 0" class="flex-1 flex flex-col items-center justify-center text-center py-12 text-gray-500 bg-gray-50 rounded-sm border border-dashed border-gray-200">
         Nici o adresa salvata in cont.
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div v-for="addr in userAddresses" :key="addr.id" class="p-5 rounded-sm border border-gray-200 bg-white relative hover:border-gray-300 transition-all">
-          <div class="flex items-center justify-between mb-2">
+          <div class="mb-4">
+            <p class="font-bold text-gray-900 inline">{{ addr.firstName + ' ' + addr.lastName }}</p>
+            <p class="text-gray-500 text-sm inline ml-1" v-if="addr.phone">· {{ addr.phone }}</p>
+            <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.street }}</p>
+            <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.city }}, {{ addr.county }} <span v-if="addr.postalCode">({{ addr.postalCode }})</span></p>
+          </div>
+
+          <div class="flex items-center justify-between pt-4 border-t border-gray-200 mt-">
             <div class="flex gap-2 items-center">
-              <UBadge v-if="addr.isDefaultShipping" color="primary" size="xs">Livrare</UBadge>
+              <UBadge v-if="addr.isDefaultShipping" color="neutral" variant="subtle" size="sm">Adresa implicita</UBadge>
             </div>
             <div class="flex gap-1">
               <UButton color="neutral" variant="ghost" size="sm" icon="i-lucide-pencil" class="font-medium" @click="openEditAddress(addr)" />
               <UButton color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" class="font-medium" @click="removeAddress(addr.id)" />
             </div>
-          </div>
-
-          <div>
-            <p class="font-bold text-gray-900 inline">{{ addr.firstName + ' ' + addr.lastName }}</p>
-            <p class="text-gray-500 text-sm inline ml-1" v-if="addr.phone">· {{ addr.phone.replace('+40', '0') }}</p>
-            <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.street }}</p>
-            <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.city }}, {{ addr.county }} <span v-if="addr.postalCode">({{ addr.postalCode }})</span></p>
           </div>
         </div>
       </div>
