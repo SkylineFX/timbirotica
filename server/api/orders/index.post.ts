@@ -201,8 +201,10 @@ export default eventHandler(async (event) => {
     price: item.product.price
   }))
 
-  // Only courier orders have a delivery address to show; pickup reuses the same
-  // record purely as contact/invoice data, so don't render it as a delivery address.
+  // Render the "Adresa de livrare" email block only for courier orders. For
+  // pickup + Persoana fizica the shipping record still exists (it's the
+  // personal/invoice address picked under Persoana fizica), but it isn't a
+  // delivery address — it's already surfaced via the billing snapshot.
   const emailShippingAddress = (shippingAddress && body.shippingMethod === 'courier') ? {
     fullName: `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim(),
     address: shippingAddress.street || '',
