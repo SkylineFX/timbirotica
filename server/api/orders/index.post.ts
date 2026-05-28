@@ -252,10 +252,12 @@ export default eventHandler(async (event) => {
     orderNumber,
     customerName: shippingAddress?.firstName || session.user.firstName || 'Client',
     customerEmail: userRecord.email,
-    // Priority: when a company is billed (Persoana juridica) the company's own
-    // contact phone wins; otherwise the personal/delivery address phone; account
-    // phone only as a last-resort fallback.
-    customerPhone: billingAddress?.phone || shippingAddress?.phone || userRecord.phone || '',
+    // The order's contact phone is the BILLING snapshot's phone — whichever billing
+    // source resolved (company → different individual addr → shipping/personal addr).
+    // Shipping's phone is kept separately in the shipping snapshot for the Livrare
+    // box on the admin page. Account phone is a last-resort fallback for legacy
+    // orders whose billing snapshot has no phone.
+    customerPhone: (billingAddress ?? billingPersonalAddress ?? shippingAddress)?.phone || userRecord.phone || '',
     orderDate: date.toISOString(),
     paymentMethod: body.paymentMethod,
     shippingMethod: body.shippingMethod,
