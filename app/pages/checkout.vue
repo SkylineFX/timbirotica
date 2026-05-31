@@ -608,7 +608,7 @@ async function submitOrder() {
         <p class="font-bold mb-1 text-gray-900 text-base group-hover:text-primary transition-colors">{{ item.companyName }}</p>
         <p class="text-gray-600 text-sm leading-relaxed">· {{ item.hasRo ? 'RO' : '' }}{{ item.cui }}</p>
       </div>
-      <p class="text-gray-600 text-sm leading-relaxed">Reg. Com.: {{ item.onrc }}</p>
+      <p v-if="item.onrc" class="text-gray-600 text-sm leading-relaxed">Reg. Com.: {{ item.onrc }}</p>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
     </template>
