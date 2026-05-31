@@ -162,7 +162,7 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
             <EText style="font-size: 16px; line-height: 24px; color: #525f7f; margin-top: 12px;">
               <strong>{{ billingAddress.companyName }}</strong><br />
               CUI: {{ billingAddress.cui }}<br />
-              Reg. Com.: {{ billingAddress.onrc }}<br />
+              <template v-if="billingAddress.onrc">Reg. Com.: {{ billingAddress.onrc }}<br /></template>
               <template v-if="billingAddress.bankName">Banca: {{ billingAddress.bankName }}<br /></template>
               <template v-if="billingAddress.iban">IBAN: {{ billingAddress.iban }}<br /></template>
               {{ billingAddress.address }}<br />
