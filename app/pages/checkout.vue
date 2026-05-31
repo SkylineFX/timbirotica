@@ -102,16 +102,13 @@ watchEffect(() => {
   }
 })
 
-// Individual invoice address follows the delivery/personal address *until the
-// user explicitly picks a different one* in the billing modal. Concretely:
-// if billing is still uninitialized, or still equals the previous shipping
-// (so the user hasn't diverged yet), we mirror new shipping; once the values
-// diverge we leave billing alone.
-watch(selectedAddressId, (newId, oldId) => {
-  if (!newId) return
-  if (selectedBillingAddressId.value === null || selectedBillingAddressId.value === oldId) {
-    selectedBillingAddressId.value = newId
-  }
+// Default: billing follows shipping. Whenever the delivery/personal address
+// changes, the invoice address syncs to it. Picking a different invoice
+// address in the billing modal only changes billing (the modal's v-model
+// writes selectedBillingAddressId directly and doesn't trigger this watch),
+// and that choice holds until the user changes the shipping address again.
+watch(selectedAddressId, (newId) => {
+  if (newId) selectedBillingAddressId.value = newId
 }, { immediate: true })
 
 const selectedAddress = computed(() => {
@@ -497,10 +494,7 @@ async function submitOrder() {
             <!-- Persoana fizica + courier: invoice address (defaults to the delivery address; can be changed) -->
             <div v-if="billingSameAsShipping && deliveryMethod === 'courier'" class="text-sm p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors" @click="isBillingAddressSelectorOpen = true">
                <div>
-                  <template v-if="selectedBillingAddress && selectedBillingAddressId === selectedAddressId">
-                     <span class="text-gray-500">Folosesc adresa de livrare. Apasa pentru a alege alta.</span>
-                  </template>
-                  <template v-else-if="selectedBillingAddress">
+                  <template v-if="selectedBillingAddress">
                      <span class="font-bold inline mb-1">{{ selectedBillingAddress.firstName }} {{ selectedBillingAddress.lastName }}</span><span class="text-gray-500 inline ml-2">· {{ selectedBillingAddress.phone }}</span>
                      <span class="text-gray-600 block">{{ selectedBillingAddress.street }}</span>
                      <span class="text-gray-600 block">{{ selectedBillingAddress.city }}, {{ selectedBillingAddress.county }}</span>
