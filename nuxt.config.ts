@@ -11,8 +11,15 @@ export default defineNuxtConfig({
     'nuxt-email-renderer',
     '@nuxtjs/robots',
     '@nuxtjs/sitemap',
+    '@nuxtjs/turnstile',
     '@sentry/nuxt/module'
   ],
+
+  // Cloudflare Turnstile site key (public). Secret key is read from
+  // NUXT_TURNSTILE_SECRET_KEY automatically by the module.
+  turnstile: {
+    siteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY
+  },
 
   site: {
     url: process.env.NUXT_PUBLIC_SITE_URL || 'https://timbirotica.ro',

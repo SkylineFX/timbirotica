@@ -7,6 +7,7 @@ definePageMeta({
 })
 
 const toast = useToast()
+const turnstileToken = ref('')
 
 const fields: AuthFormField[] = [{
   name: 'firstName',
@@ -78,6 +79,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         phone: payload.data.phone.replace(/\s+/g, ''),
         email: payload.data.email,
         password: payload.data.password,
+        turnstileToken: turnstileToken.value,
       },
     })
     toast.add({
@@ -118,6 +120,9 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         </template>
       </UAuthForm>
     </UPageCard>
+      <div class="flex justify-center mt-2">
+        <NuxtTurnstile v-model="turnstileToken" />
+      </div>
   </div>
 </template>
 

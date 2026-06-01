@@ -8,10 +8,23 @@ const registerSchema = z.object({
   firstName: z.string().min(2),
   lastName: z.string().min(2),
   phone: z.string().regex(/^0\d{9}$/),
+  turnstileToken: z.string().min(1, 'Verificare antibot lipsa. Reincarca pagina si incearca din nou.'),
 })
 
 export default defineEventHandler(async (event) => {
-  const { email, password, firstName, lastName, phone } = await readValidatedBody(event, registerSchema.parse)
+  const result = registerSchema.safeParse(await readBody(event))
+  if (!result.success) {
+    // First validation issue becomes the user-facing message — avoids leaking
+    // the raw ZodError JSON to the client (which h3's readValidatedBody does).
+    throw createError({ statusCode: 400, message: result.error.issues[0]?.message || 'Date invalide.' })
+  }
+  const { email, password, firstName, lastName, phone, turnstileToken } = result.data
+
+  // Cloudflare Turnstile verification — rejects bots/abuse before any DB work.
+  const turnstile = await verifyTurnstileToken(turnstileToken)
+  if (!turnstile.success) {
+    throw createError({ statusCode: 400, message: 'Verificare antibot esuata. Reincarca pagina si incearca din nou.' })
+  }
   const normalizedEmail = email.trim().toLowerCase()
   const trimmedFirstName = firstName.trim()
   const trimmedLastName = lastName.trim()
