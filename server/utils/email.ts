@@ -10,11 +10,16 @@ export interface Address {
 }
 
 export interface BillingAddress {
-  companyName: string
-  cui: string
-  onrc: string
+  // Company billing fields (present when Persoana juridica)
+  companyName?: string
+  cui?: string
+  onrc?: string
   bankName?: string
   iban?: string
+  // Individual billing fields (present when Persoana fizica)
+  firstName?: string
+  lastName?: string
+  // Common
   address: string
   city: string
   county: string
@@ -28,6 +33,7 @@ export interface EmailAttachment {
 export interface OrderEmailData {
   orderNumber: string
   customerName: string
+  customerFullName?: string
   customerEmail: string
   customerPhone?: string
   total: number
@@ -128,6 +134,7 @@ export async function sendNewOrderAdminNotification(data: OrderEmailData): Promi
   const template = await renderEmailComponent('OrderAdminNotification', {
     orderNumber: data.orderNumber,
     customerName: data.customerName,
+    customerFullName: data.customerFullName,
     customerEmail: data.customerEmail,
     customerPhone: data.customerPhone,
     total: data.total,

@@ -213,6 +213,10 @@ export default eventHandler(async (event) => {
     phone: shippingAddress.phone || ''
   } : undefined
 
+  // Always render the "Date de facturare" block — pick whichever billing source
+  // resolved: company billing (Persoana juridica) → different individual billing
+  // → shipping/personal address.
+  const individualBilling = billingPersonalAddress ?? shippingAddress
   const emailBillingAddress = billingAddress ? {
     companyName: billingAddress.companyName,
     cui: (billingAddress.hasRo ? 'RO' : '') + (billingAddress.cui || ''),
@@ -222,6 +226,12 @@ export default eventHandler(async (event) => {
     address: billingAddress.street || '',
     city: billingAddress.city || '',
     county: billingAddress.county || ''
+  } : individualBilling ? {
+    firstName: individualBilling.firstName || '',
+    lastName: individualBilling.lastName || '',
+    address: individualBilling.street || '',
+    city: individualBilling.city || '',
+    county: individualBilling.county || ''
   } : undefined
 
   // 8. Generate the proforma PDF (best-effort — order succeeds even if PDF fails)
@@ -253,6 +263,7 @@ export default eventHandler(async (event) => {
   const emailData = {
     orderNumber,
     customerName: shippingAddress?.firstName || session.user.firstName || 'Client',
+    customerFullName: `${shippingAddress?.firstName || session.user.firstName || ''} ${shippingAddress?.lastName || session.user.lastName || ''}`.trim() || 'Client',
     customerEmail: userRecord.email,
     // The order's contact phone is the BILLING snapshot's phone — whichever billing
     // source resolved (company → different individual addr → shipping/personal addr).

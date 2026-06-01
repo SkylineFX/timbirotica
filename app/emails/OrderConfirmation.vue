@@ -17,11 +17,16 @@ interface Address {
 }
 
 interface BillingAddress {
-  companyName: string
-  cui: string
-  onrc: string
+  // Company billing fields (present when Persoana juridica)
+  companyName?: string
+  cui?: string
+  onrc?: string
   bankName?: string
   iban?: string
+  // Individual billing fields (present when Persoana fizica)
+  firstName?: string
+  lastName?: string
+  // Common
   address: string
   city: string
   county: string
@@ -58,7 +63,7 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
     <EHead />
     <EPreview>Timbirotica - Îți mulțumim pentru comandă! Detaliile și statusul comenzii sunt în acest email.</EPreview>
     <EBody style="background-color: #f6f9fc; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Ubuntu,sans-serif;">
-      <EContainer style="background-color: #ffffff; margin: 0 auto; padding: 10px 0 12px; margin-bottom: 32px; max-width: 600px;">
+      <EContainer style="background-color: #ffffff; margin: 0 auto; padding: 24px 0 12px; margin-bottom: 32px; max-width: 600px;">
         <ESection style="padding: 0 24px;">
           <img src="https://cdn.timbirotica.ro/uploads/logo.png" alt="Timbirotica" width="213" height="40" style="height: 40px; width: 213px; display: block; border: 0; outline: none; text-decoration: none;" />
 
@@ -147,9 +152,9 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
               Adresa de livrare
             </EHeading>
             <EText style="font-size: 16px; line-height: 24px; color: #525f7f; margin-top: 12px;">
-              {{ shippingAddress.fullName }}<br />
               {{ shippingAddress.address }}<br />
               {{ shippingAddress.city }}, {{ shippingAddress.county }}<br />
+              {{ shippingAddress.fullName }}<br />
               Telefon: {{ shippingAddress.phone }}
             </EText>
           </template>
@@ -160,11 +165,16 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
               Date de facturare
             </EHeading>
             <EText style="font-size: 16px; line-height: 24px; color: #525f7f; margin-top: 12px;">
-              <strong>{{ billingAddress.companyName }}</strong><br />
-              CUI: {{ billingAddress.cui }}<br />
-              <template v-if="billingAddress.onrc">Reg. Com.: {{ billingAddress.onrc }}<br /></template>
-              <template v-if="billingAddress.bankName">Banca: {{ billingAddress.bankName }}<br /></template>
-              <template v-if="billingAddress.iban">IBAN: {{ billingAddress.iban }}<br /></template>
+              <template v-if="billingAddress.companyName">
+                <strong>{{ billingAddress.companyName }}</strong><br />
+                CUI: {{ billingAddress.cui }}<br />
+                <template v-if="billingAddress.onrc">Reg. Com.: {{ billingAddress.onrc }}<br /></template>
+                <template v-if="billingAddress.bankName">Banca: {{ billingAddress.bankName }}<br /></template>
+                <template v-if="billingAddress.iban">IBAN: {{ billingAddress.iban }}<br /></template>
+              </template>
+              <template v-else>
+                <strong>{{ billingAddress.firstName }} {{ billingAddress.lastName }}</strong><br />
+              </template>
               {{ billingAddress.address }}<br />
               {{ billingAddress.city }}, {{ billingAddress.county }}
             </EText>

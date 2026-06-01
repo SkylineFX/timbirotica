@@ -215,10 +215,10 @@ async function performReorder({ replace }: { replace: boolean }) {
 
                   <div class="mt-2">
                     <template v-if="parsedBillingAddress.companyName">
-                        <p class="font-medium text-sm text-gray-900">{{ parsedBillingAddress.companyName }}<template v-if="parsedBillingAddress.onrc"> · {{ parsedBillingAddress.onrc }}</template></p>
-                        <!-- <p class="text-sm text-gray-600 mt-1">{{ parsedBillingAddress.hasRo ? 'RO ' : '' }}{{ parsedBillingAddress.cui }}</p> -->
+                        <p class="font-medium text-sm text-gray-900">{{ parsedBillingAddress.companyName }} · {{ parsedBillingAddress.hasRo ? 'RO ' : '' }}{{ parsedBillingAddress.cui }}</p>
+                        <p v-if="parsedBillingAddress.onrc" class="text-sm text-gray-600 mt-1">{{ parsedBillingAddress.onrc }}</p>
                         <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ parsedBillingAddress.street }}, {{ parsedBillingAddress.city }}, {{ parsedBillingAddress.county }}</p>
-                        <p v-if="parsedBillingAddress.phone" class="text-sm text-gray-600 mt-1">Telefon: {{ parsedBillingAddress.phone }}</p>
+                        <!-- <p v-if="parsedBillingAddress.phone" class="text-sm text-gray-600 mt-1">Telefon: {{ parsedBillingAddress.phone }}</p> -->
                     </template>
                     <template v-else-if="parsedBillingAddress.firstName">
                         <p class="font-medium text-sm text-gray-900">{{ parsedBillingAddress.firstName }} {{ parsedBillingAddress.lastName }} · {{ parsedBillingAddress.phone }}</p>
