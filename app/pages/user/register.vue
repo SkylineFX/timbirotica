@@ -59,7 +59,7 @@ const schema = z.object({
   lastName: z.string('Numele este obligatoriu').min(2, 'Numele prea scurt'),
   phone: z.string('Numarul de telefon este obligatoriu').regex(/^0\d{3}\s?\d{3}\s?\d{3}$/, 'Numar de telefon invalid'),
   email: z.email('Adresa de email nu este valida'),
-  password: z.string('Parola este obligatorie').min(8, 'Parola trebuie sa aiba cel putin 8 caractere'),
+  password: z.string('Parola este obligatorie').min(10, 'Parola trebuie sa aiba cel putin 10 caractere'),
   passwordConfirm: z.string('Confirmarea parolei este obligatorie')
 }).refine(data => data.password === data.passwordConfirm, {
   message: 'Parolele nu sunt identice',

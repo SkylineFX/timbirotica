@@ -33,7 +33,7 @@ const fields: AuthFormField[] = [{
 }]
 
 const schema = z.object({
-  password: z.string().min(8, 'Parola trebuie sa aiba cel putin 8 caractere'),
+  password: z.string().min(10, 'Parola trebuie sa aiba cel putin 10 caractere'),
   confirmPassword: z.string()
 }).refine(data => data.password === data.confirmPassword, {
   message: 'Parolele nu coincid',
