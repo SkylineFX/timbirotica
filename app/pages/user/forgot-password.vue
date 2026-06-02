@@ -8,6 +8,7 @@ definePageMeta({
 
 const toast = useToast()
 const submitted = ref(false)
+const turnstileToken = ref('')
 
 const fields: AuthFormField[] = [{
   name: 'email',
@@ -27,11 +28,11 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
     await $fetch('/api/auth/forgot-password', {
       method: 'POST',
-      body: { email: payload.data.email }
+      body: { email: payload.data.email, turnstileToken: turnstileToken.value },
     })
     submitted.value = true
-  } catch {
-    toast.add({ title: 'Eroare', description: 'A aparut o eroare. Te rugam sa incerci din nou.', color: 'error' })
+  } catch (err: any) {
+    toast.add({ title: 'Eroare', description: err?.data?.message || 'A aparut o eroare. Te rugam sa incerci din nou.', color: 'error' })
   }
 }
 </script>
@@ -70,5 +71,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         </UAuthForm>
       </template>
     </UPageCard>
+    <div v-if="!submitted" class="flex justify-center mt-2">
+      <NuxtTurnstile v-model="turnstileToken" />
+    </div>
   </div>
 </template>
