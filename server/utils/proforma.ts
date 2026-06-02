@@ -101,22 +101,23 @@ function shippingLabel(method: string): string {
   return method
 }
 
+const FONT_CDN_BASE = 'https://cdn.timbirotica.ro/fonts'
 let cachedFonts: { regular: Uint8Array; bold: Uint8Array } | null = null
 
 async function loadFonts(): Promise<{ regular: Uint8Array; bold: Uint8Array }> {
+  // Fonts live on the R2 CDN instead of being bundled into the Worker — keeps
+  // the bundle ~2 MiB smaller. Cold-start cost is one parallel fetch (~50ms);
+  // subsequent requests in the same isolate reuse the cache below.
   if (cachedFonts) return cachedFonts
-  const storage = useStorage('assets:server')
-  const regular = await storage.getItemRaw('fonts/DejaVuSans-Regular.ttf')
-  const bold = await storage.getItemRaw('fonts/DejaVuSans-Bold.ttf')
-  if (!regular || !bold) {
-    throw new Error('Font files missing in server/assets/fonts')
+  const [regularRes, boldRes] = await Promise.all([
+    fetch(`${FONT_CDN_BASE}/DejaVuSans-Regular.ttf`),
+    fetch(`${FONT_CDN_BASE}/DejaVuSans-Bold.ttf`),
+  ])
+  if (!regularRes.ok || !boldRes.ok) {
+    throw new Error(`Failed to fetch DejaVuSans fonts from CDN (regular: ${regularRes.status}, bold: ${boldRes.status})`)
   }
-  const toU8 = (buf: unknown): Uint8Array => {
-    if (buf instanceof Uint8Array) return buf
-    if (buf instanceof ArrayBuffer) return new Uint8Array(buf)
-    throw new Error('Unexpected font asset type')
-  }
-  cachedFonts = { regular: toU8(regular), bold: toU8(bold) }
+  const [regular, bold] = await Promise.all([regularRes.arrayBuffer(), boldRes.arrayBuffer()])
+  cachedFonts = { regular: new Uint8Array(regular), bold: new Uint8Array(bold) }
   return cachedFonts
 }
 
