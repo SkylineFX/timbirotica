@@ -1,9 +1,9 @@
 <script setup lang="ts">
-useHead({
+useSeoMeta({
   title: 'Termeni si Conditii',
-  meta: [
-    { name: 'description', content: 'Termenii si conditiile de utilizare a magazinului online Timbirotica.' }
-  ]
+  description: 'Termenii si conditiile de utilizare a magazinului online.',
+  ogTitle: 'Termeni si Conditii · Timbirotica',
+  ogDescription: 'Termenii si conditiile de utilizare a magazinului online.',
 })
 </script>
 

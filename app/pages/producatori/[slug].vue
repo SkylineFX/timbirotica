@@ -9,18 +9,14 @@ const breadcrumbs = computed(() => [
 ])
 
 const description = computed(() =>
-  `Produse marca ${title.value} la preturi avantajoase. Comanda online cu livrare rapida in Bucuresti. - Timbirotica`
+  `Produse marca ${title.value} la preturi avantajoase. Comanda online cu livrare rapida in Bucuresti.`
 )
 
 useSeoMeta({
-  title: () => "Produse " + title.value + " - Timbirotica",
+  title: () => `Produse ${title.value}`,
   description: () => description.value,
-  ogTitle: () => title.value,
+  ogTitle: () => `Produse ${title.value} · Timbirotica`,
   ogDescription: () => description.value,
-  ogType: 'website',
-  twitterCard: 'summary',
-  twitterTitle: () => title.value,
-  twitterDescription: () => description.value
 })
 </script>
 

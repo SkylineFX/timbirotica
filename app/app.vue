@@ -1,8 +1,21 @@
 <script setup>
 useHead({
+  titleTemplate: (title) =>
+    title ? `${title} · Timbirotica` : 'Timbirotica · Articole de birotica si papetarie',
   bodyAttrs: {
     class: 'bg-stone-100 min-h-screen'
   }
+})
+
+useSeoMeta({
+  description: 'Produse de birotica si papetarie la preturi avantajoase. Cumpara online cu livrare rapida in Bucuresti.',
+  ogSiteName: 'Timbirotica',
+  ogType: 'website',
+  ogLocale: 'ro_RO',
+  ogImage: 'https://timbirotica.ro/og-image.jpg',
+  ogImageWidth: 1200,
+  ogImageHeight: 630,
+  twitterCard: 'summary_large_image',
 })
 
 const { loggedIn } = useUserSession()

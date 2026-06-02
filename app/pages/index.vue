@@ -1,4 +1,9 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Articole de birotica si papetarie',
+  ogTitle: 'Timbirotica · Articole de birotica si papetarie',
+})
+
 const { data: categoryTree } = useFetch('/api/categories/tree')
 const { data: brands } = useFetch('/api/brands')
 

@@ -10,14 +10,10 @@ const breadcrumbs = computed(() => [
 const description = 'Selectia noastra de produse recomandate la preturi avantajoase.'
 
 useSeoMeta({
-  title: () => title + " - Timbirotica",
+  title,
   description,
-  ogTitle: title,
+  ogTitle: `${title} · Timbirotica`,
   ogDescription: description,
-  ogType: 'website',
-  twitterCard: 'summary',
-  twitterTitle: title,
-  twitterDescription: description
 })
 </script>
 

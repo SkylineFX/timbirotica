@@ -2,11 +2,11 @@
 import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 
-useHead({
+useSeoMeta({
   title: 'Contact',
-  meta: [
-    { name: 'description', content: 'Contacteaza echipa Timbirotica. Vezi datele companiei, variantele de contact si programul de suport.' }
-  ]
+  description: 'Contacteaza echipa Timbirotica. Vezi datele companiei si programul de suport.',
+  ogTitle: 'Contact · Timbirotica',
+  ogDescription: 'Contacteaza echipa Timbirotica. Vezi datele companiei si programul de suport.',
 })
 
 const schema = z.object({
@@ -40,7 +40,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     toast.add({
       title: 'Mesaj trimis cu succes!',
       description: 'Iti vom raspunde in cel mai scurt timp posibil.',
-      icon: 'i-lucide-check-circle',
+      // icon: 'i-lucide-check-circle',
       color: 'success'
     })
     state.name = ''
@@ -100,7 +100,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               </UFormField>
             </div>
 
-            <div class="flex justify-center pt-2">
+            <div class="flex justify-center pt-2 m-0">
               <NuxtTurnstile v-model="turnstileToken" />
             </div>
 

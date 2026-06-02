@@ -1,9 +1,9 @@
 <script setup lang="ts">
-useHead({
+useSeoMeta({
   title: 'Despre Noi',
-  meta: [
-    { name: 'description', content: 'Informatii despre compania noastra, date de contact si obiect de activitate.' }
-  ]
+  description: 'Informatii despre compania noastra, date de contact si obiect de activitate.',
+  ogTitle: 'Despre Noi · Timbirotica',
+  ogDescription: 'Informatii despre compania noastra, date de contact si obiect de activitate.',
 })
 </script>
 

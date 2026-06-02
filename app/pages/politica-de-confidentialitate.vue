@@ -1,9 +1,9 @@
 <script setup lang="ts">
-useHead({
+useSeoMeta({
   title: 'Politica de Confidentialitate',
-  meta: [
-    { name: 'description', content: 'Politica de confidentialitate si utilizare a datelor cu caracter personal pentru Timbirotica, conform normelor GDPR.' }
-  ]
+  description: 'Politica de confidentialitate si utilizare a datelor cu caracter personal.',
+  ogTitle: 'Politica de Confidentialitate · Timbirotica',
+  ogDescription: 'Politica de confidentialitate si utilizare a datelor cu caracter personal.',
 })
 </script>
 
