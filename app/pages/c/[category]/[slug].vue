@@ -182,11 +182,15 @@ const accordionItems = [
                         />
                     </div>
                     <div class="flex items-center">
-                        <p class="text-sm text-gray-500 flex items-center gap-1">
-                            <span>Sau comanda</span>
-                            <a href="tel:+40751022882" class="font-bold underline cursor-pointer">telefonic</a>
-                            <UIcon name="i-lucide-phone" class="w-4 h-4" />
-                        </p>
+                        <div class="mt-2 flex items-start gap-3 rounded-sm bg-white border border-gray-200 px-4 py-3">
+                            <UIcon name="i-lucide-phone-call" class="w-5 h-5 text-primary mt-0.5 shrink-0" />
+                            <div class="flex flex-col text-sm">
+                                <span class="text-gray-500">Sau comanda telefonic</span>
+                                <a href="tel:0751022882" class="font-bold text-gray-900 hover:text-primary transition-colors">0751 022 882</a>
+                                <span class="text-xs text-gray-400 mt-0.5">Luni - Vineri · 09:00 - 18:00</span>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
                 
