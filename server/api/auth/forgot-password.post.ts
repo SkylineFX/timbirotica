@@ -7,11 +7,11 @@ export default defineEventHandler(async (event) => {
   // It's safe to error loudly here (unlike the email-existence check below):
   // the rejection reveals nothing about whether the email is registered.
   if (!turnstileToken || typeof turnstileToken !== 'string') {
-    throw createError({ statusCode: 400, message: 'Verificare antibot lipsa. Reincarca pagina si incearca din nou.' })
+    throw createError({ statusCode: 400, message: 'Verificare lipsa. Reincarca pagina si incearca din nou.' })
   }
   const turnstile = await verifyTurnstileToken(turnstileToken)
   if (!turnstile.success) {
-    throw createError({ statusCode: 400, message: 'Verificare antibot esuata. Reincarca pagina si incearca din nou.' })
+    throw createError({ statusCode: 400, message: 'Verificare esuata. Reincarca pagina si incearca din nou.' })
   }
 
   // Always return the same message to prevent email enumeration

@@ -6,7 +6,7 @@ const contactSchema = z.object({
   email: z.email(),
   subject: z.string().min(5).max(200),
   message: z.string().min(10).max(5000),
-  turnstileToken: z.string().min(1, 'Verificare antibot lipsa. Reincarca pagina si incearca din nou.'),
+  turnstileToken: z.string().min(1, 'Verificare lipsa. Reincarca pagina si incearca din nou.'),
 })
 
 export default defineEventHandler(async (event) => {
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   // Cloudflare Turnstile verification — rejects bots before sending an email.
   const turnstile = await verifyTurnstileToken(result.data.turnstileToken)
   if (!turnstile.success) {
-    throw createError({ statusCode: 400, message: 'Verificare antibot esuata. Reincarca pagina si incearca din nou.' })
+    throw createError({ statusCode: 400, message: 'Verificare esuata. Reincarca pagina si incearca din nou.' })
   }
 
   const { turnstileToken: _turnstileToken, ...payload } = result.data

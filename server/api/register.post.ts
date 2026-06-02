@@ -8,7 +8,7 @@ const registerSchema = z.object({
   firstName: z.string().min(2),
   lastName: z.string().min(2),
   phone: z.string().regex(/^0\d{9}$/),
-  turnstileToken: z.string().min(1, 'Verificare antibot lipsa. Reincarca pagina si incearca din nou.'),
+  turnstileToken: z.string().min(1, 'Verificare lipsa. Reincarca pagina si incearca din nou.'),
 })
 
 export default defineEventHandler(async (event) => {
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   // Cloudflare Turnstile verification — rejects bots/abuse before any DB work.
   const turnstile = await verifyTurnstileToken(turnstileToken)
   if (!turnstile.success) {
-    throw createError({ statusCode: 400, message: 'Verificare antibot esuata. Reincarca pagina si incearca din nou.' })
+    throw createError({ statusCode: 400, message: 'Verificare esuata. Reincarca pagina si incearca din nou.' })
   }
   const normalizedEmail = email.trim().toLowerCase()
   const trimmedFirstName = firstName.trim()
