@@ -74,11 +74,11 @@ const columns: FooterColumn[] = [
             </div>
 
             <div class="flex flex-col gap-4">
-              <a href="https://netopia-payments.com/" target="_blank">
+              <!-- <a href="https://netopia-payments.com/" target="_blank">
                 <div class="flex gap-2">
                     <img src="https://cdn.timbirotica.ro/uploads/footer/np-black-0.svg" alt="Netopia Payments" class="h-8" />
                 </div>
-              </a>
+              </a> -->
               <a href="https://reclamatiisal.anpc.ro/" target="_blank">
                 <div class="flex gap-2">
                     <img src="https://cdn.timbirotica.ro/uploads/footer/sal.webp" alt="SAL" class="h-8" />
