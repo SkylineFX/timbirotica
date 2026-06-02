@@ -27,6 +27,7 @@ const state = reactive({
 
 const toast = useToast()
 const isLoading = ref(false)
+const turnstileToken = ref('')
 
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   isLoading.value = true
@@ -34,7 +35,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   try {
     await $fetch('/api/contact', {
       method: 'POST',
-      body: event.data
+      body: { ...event.data, turnstileToken: turnstileToken.value },
     })
     toast.add({
       title: 'Mesaj trimis cu succes!',
@@ -46,10 +47,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     state.email = ''
     state.subject = ''
     state.message = ''
-  } catch (err) {
+  } catch (err: any) {
     toast.add({
       title: 'A aparut o eroare',
-      description: 'Te rugam sa incerci din nou mai tarziu.',
+      description: err?.data?.message || 'Te rugam sa incerci din nou mai tarziu.',
       icon: 'i-lucide-alert-circle',
       color: 'error'
     })
@@ -97,6 +98,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               <UFormField label="Mesajul tau" name="message" required class="flex-1 flex flex-col" :ui="{ container: 'flex-1 mt-1 flex flex-col' }">
                 <UTextarea v-model="state.message" :rows="6" placeholder="Cu ce te putem ajuta?" class="flex-1 flex flex-col w-full" :ui="{ base: 'flex-1 resize-none' }" />
               </UFormField>
+            </div>
+
+            <div class="flex justify-center pt-2">
+              <NuxtTurnstile v-model="turnstileToken" />
             </div>
 
             <div class="pt-2">
