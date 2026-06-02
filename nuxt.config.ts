@@ -83,7 +83,7 @@ export default defineNuxtConfig({
   },
 
   sentry: {
-    org: 'eurotimalex-et',
+    org: 'timbirotica',
     project: 'javascript-nuxt'
   },
 
