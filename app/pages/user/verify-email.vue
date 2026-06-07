@@ -108,7 +108,7 @@ onUnmounted(() => {
       </div>
 
       <div v-else-if="status === 'success'" class="flex flex-col items-center gap-4 py-6 px-2 text-center">
-        <UIcon name="i-lucide-circle-check" class="w-12 h-12 text-green-500" />
+        <UIcon name="i-lucide-mail-check" class="w-12 h-12 text-primary" />
         <h2 class="text-xl font-bold text-gray-900">Adresa de email confirmata</h2>
         <p v-if="loggedIn" class="text-gray-500 text-sm">
           Iti multumim. Vei fi redirectionat catre finalizarea comenzii in {{ redirectIn }} {{ redirectIn === 1 ? 'secunda' : 'secunde' }}.
@@ -122,7 +122,7 @@ onUnmounted(() => {
       </div>
 
       <div v-else-if="status === 'already-verified'" class="flex flex-col items-center gap-4 py-6 px-2 text-center">
-        <UIcon name="i-lucide-badge-check" class="w-12 h-12 text-green-500" />
+        <UIcon name="i-lucide-mail-check" class="w-12 h-12 text-primary" />
         <h2 class="text-xl font-bold text-gray-900">Contul este deja confirmat</h2>
         <p v-if="loggedIn" class="text-gray-500 text-sm">
           Adresa de email a fost deja confirmata. Vei fi redirectionat catre finalizarea comenzii in {{ redirectIn }} {{ redirectIn === 1 ? 'secunda' : 'secunde' }}.

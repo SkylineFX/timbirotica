@@ -126,6 +126,8 @@ const selectedBillingAddress = computed(() => {
 // State for sections
 const deliveryMethod = ref('courier') // 'courier' or 'pickup'
 const paymentMethod = ref('transfer') // 'transfer' or 'cash'
+// Temporarily disabled: 'Ramburs la curier' (cash on delivery). Flip to true to re-enable.
+const cashPaymentEnabled = false
 const billingSameAsShipping = ref(true)
 
 // Modals State
@@ -336,7 +338,7 @@ async function submitOrder() {
             <div v-show="deliveryMethod === 'courier'" class="p-5 bg-gray-50 border-b border-gray-200 space-y-4">
                <div class="text-sm text-gray-600 text-left flex flex-col items-center gap-2">
                 <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-                <p class="text-sm text-gray-600"> Livrarea se face in 2-3 zile lucratoare de la primirea facturii proforme pe mail si dupa ce comanda a fost confirmata telefonic.</p>
+                <p class="text-sm text-gray-600"> Livrarea se face in 2-3 zile lucratoare de la primirea facturii proforme pe mail, dupa ce comanda a fost confirmata.</p>
                </div>
             </div>
 
@@ -358,7 +360,7 @@ async function submitOrder() {
 
             <div v-show="deliveryMethod === 'pickup'" class="p-5 bg-gray-50 border-t border-gray-200 text-left lg:text-left flex flex-col items-center gap-2">
                <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-               <p class="text-sm text-gray-600">Comanda va fi pregatita in maximum 2 zile lucratoare de la confirmare. Te vom anunta pe email cand aceasta este gata de ridicare.</p>
+               <p class="text-sm text-gray-600">Comanda va fi pregatita in maximum 2 zile lucratoare de la confirmare. Te vom anunta cand aceasta este gata de ridicare.</p>
             </div>
           </div>
         </div>
@@ -405,14 +407,14 @@ async function submitOrder() {
                 </div>
                 <span class="text-sm font-semibold text-gray-900">Transfer bancar</span>
               </div>
-              <div class="flex items-center gap-2">
+              <!-- <div class="flex items-center gap-2">
                  <UIcon name="i-lucide-building-2" class="w-6 h-6 text-gray-400" />
-              </div>
+              </div> -->
               <input type="radio" value="transfer" v-model="paymentMethod" class="hidden">
             </label>
             
             <!-- Bank transfer info -->
-            <div v-show="paymentMethod === 'transfer'" class="p-5 bg-gray-50 border-b border-gray-200 space-y-4">
+            <div v-show="paymentMethod === 'transfer'" class="p-5 bg-gray-50 border-gray-200 space-y-4"> <!-- border-b -->
                <div class="text-sm text-gray-600 text-left lg:text-left flex flex-col items-center gap-2">
                  <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
                  <p>Dupa plasarea comenzii iti vom trimite pe email factura proforma cu toate detaliile de plata.</p>
@@ -420,32 +422,34 @@ async function submitOrder() {
             </div>
 
             <!-- Cash on Delivery Option -->
-            <label class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50 transition-colors"
-                   :class="{ 'bg-blue-50/10': paymentMethod === 'cash' }">
-              <div class="flex items-center gap-4">
-                <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="paymentMethod === 'cash' ? 'border-primary' : 'border-gray-300'">
-                  <div v-if="paymentMethod === 'cash'" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
+            <template v-if="cashPaymentEnabled">
+              <label class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50 transition-colors"
+                     :class="{ 'bg-blue-50/10': paymentMethod === 'cash' }">
+                <div class="flex items-center gap-4">
+                  <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="paymentMethod === 'cash' ? 'border-primary' : 'border-gray-300'">
+                    <div v-if="paymentMethod === 'cash'" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
+                  </div>
+                  <span class="text-sm font-semibold text-gray-900">Ramburs la curier</span>
                 </div>
-                <span class="text-sm font-semibold text-gray-900">Ramburs la curier</span>
+                <!-- Money icon -->
+                <UIcon name="i-lucide-banknote" class="w-6 h-6 text-gray-400"></UIcon>
+                <input type="radio" value="cash" v-model="paymentMethod" class="hidden">
+              </label>
+
+              <div v-show="paymentMethod === 'cash'" class="p-5 bg-gray-50 border-t border-gray-200 text-left lg:text-left">
+                 <p v-if="deliveryMethod === 'courier'" class="text-sm text-gray-600">
+                   Plata se face in numerar la primirea coletului. Vei primi factura proforma pe mail, apoi te vom contacta pentru confirmarea comenzii si stabilirea datei de livrare.
+                 </p>
+                 <p v-else class="text-sm text-gray-600">
+                   Plata se face in numerar la ridicarea comenzii. Vei primi factura proforma pe mail, apoi te vom contacta cand comanda este gata.
+                 </p>
               </div>
-              <!-- Money icon -->
-              <UIcon name="i-lucide-banknote" class="w-6 h-6 text-gray-400"></UIcon>
-              <input type="radio" value="cash" v-model="paymentMethod" class="hidden">
-            </label>
-            
-            <div v-show="paymentMethod === 'cash'" class="p-5 bg-gray-50 border-t border-gray-200 text-left lg:text-left">
-               <p v-if="deliveryMethod === 'courier'" class="text-sm text-gray-600">
-                 Plata se face in numerar la primirea coletului. Vei primi factura proforma pe mail, apoi te vom contacta pentru confirmarea comenzii si stabilirea datei de livrare.
-               </p>
-               <p v-else class="text-sm text-gray-600">
-                 Plata se face in numerar la ridicarea comenzii. Vei primi factura proforma pe mail, apoi te vom contacta cand comanda este gata.
-               </p>
-            </div>
+            </template>
           </div>
         </div>
 
         <!-- 4. Billing Address block -->
-        <div class="flex flex-col gap-3 mt-4"> 
+        <div class="flex flex-col gap-3 mt-2"> 
           <div>
             <h3 class="text-xl font-bold text-gray-900">Facturare</h3>
           </div>
@@ -587,7 +591,7 @@ async function submitOrder() {
   >
     <template #item="{ item }">
       <div class="flex justify-between items-start">
-         <p class="font-bold mb-1 text-gray-900 text-base group-hover:text-primary transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone }}</p>
+         <p class="font-bold mb-1 text-gray-900 text-base transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone }}</p>
       </div>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
@@ -605,7 +609,7 @@ async function submitOrder() {
   >
     <template #item="{ item }">
       <div class="flex justify-starty items-center gap-2">
-        <p class="font-bold mb-1 text-gray-900 text-base group-hover:text-primary transition-colors">{{ item.companyName }}</p>
+        <p class="font-bold mb-1 text-gray-900 text-base transition-colors">{{ item.companyName }}</p>
         <p class="text-gray-600 text-sm leading-relaxed">· {{ item.hasRo ? 'RO' : '' }}{{ item.cui }}</p>
       </div>
       <p v-if="item.onrc" class="text-gray-600 text-sm leading-relaxed">Reg. Com.: {{ item.onrc }}</p>
@@ -625,7 +629,7 @@ async function submitOrder() {
   >
     <template #item="{ item }">
       <div class="flex justify-between items-start">
-         <p class="font-bold mb-1 text-gray-900 text-base group-hover:text-primary transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone }}</p>
+         <p class="font-bold mb-1 text-gray-900 text-base transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone }}</p>
       </div>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
       <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
