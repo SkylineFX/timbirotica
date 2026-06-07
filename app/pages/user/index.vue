@@ -90,8 +90,16 @@ async function savePassword() {
     passwordError.value = 'Introdu parola curenta.'
     return
   }
-  if (passwordForm.value.newPassword.length < 10) {
-    passwordError.value = 'Parola noua trebuie sa aiba cel putin 10 caractere.'
+  if (passwordForm.value.newPassword.length < 8) {
+    passwordError.value = 'Parola noua trebuie sa aiba cel putin 8 caractere.'
+    return
+  }
+  if (!/[A-Z]/.test(passwordForm.value.newPassword)) {
+    passwordError.value = 'Parola noua trebuie sa contina cel putin o litera mare.'
+    return
+  }
+  if (!/[0-9]/.test(passwordForm.value.newPassword)) {
+    passwordError.value = 'Parola noua trebuie sa contina cel putin o cifra.'
     return
   }
   if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
@@ -165,7 +173,7 @@ async function savePassword() {
     <UCard class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
       <div class="mb-6">
         <h3 class="text-lg font-bold text-gray-900">Schimba parola</h3>
-        <p class="text-sm text-gray-500 mt-1">Introdu parola curenta, apoi alege una noua cu cel putin 10 caractere.</p>
+        <p class="text-sm text-gray-500 mt-1">Introdu parola curenta, apoi alege una noua cu cel putin 8 caractere, o litera mare si o cifra.</p>
       </div>
 
       <form @submit.prevent="savePassword" class="space-y-6">

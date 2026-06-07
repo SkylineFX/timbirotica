@@ -22,19 +22,20 @@ const fields: AuthFormField[] = [{
   name: 'password',
   type: 'password',
   label: 'Parola noua',
-  placeholder: 'Minimum 8 caractere',
   required: true
 }, {
   name: 'confirmPassword',
   type: 'password',
   label: 'Confirma parola',
-  placeholder: 'Repetati parola noua',
   required: true
 }]
 
 const schema = z.object({
-  password: z.string().min(10, 'Parola trebuie sa aiba cel putin 10 caractere'),
-  confirmPassword: z.string()
+  password: z.string('Parola este obligatorie')
+    .min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
+    .regex(/[A-Z]/, 'Parola trebuie sa contina cel putin o litera mare')
+    .regex(/[0-9]/, 'Parola trebuie sa contina cel putin o cifra'),
+  confirmPassword: z.string('Confirmarea parolei este obligatorie')
 }).refine(data => data.password === data.confirmPassword, {
   message: 'Parolele nu coincid',
   path: ['confirmPassword']
@@ -89,6 +90,14 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         >
           <template #description>
             Introdu noua parola pentru contul tau.
+          </template>
+
+          <template #password-field="{ state }">
+            <PasswordInput v-model="state.password" placeholder="Introduceti parola noua" />
+          </template>
+
+          <template #confirmPassword-field="{ state }">
+            <PasswordInput v-model="state.confirmPassword" placeholder="Repetati parola noua" />
           </template>
         </UAuthForm>
       </template>

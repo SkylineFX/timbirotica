@@ -4,8 +4,12 @@ import bcrypt from 'bcryptjs'
 export default defineEventHandler(async (event) => {
   const { token, password } = await readBody(event)
 
-  if (!token || typeof token !== 'string' || !password || typeof password !== 'string' || password.length < 8) {
+  if (!token || typeof token !== 'string' || !password || typeof password !== 'string') {
     throw createError({ statusCode: 400, statusMessage: 'Date invalide.' })
+  }
+
+  if (password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+    throw createError({ statusCode: 400, statusMessage: 'Parola trebuie sa aiba cel putin 8 caractere, o litera mare si o cifra.' })
   }
 
   const tokenHash = createHash('sha256').update(token).digest('hex')

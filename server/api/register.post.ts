@@ -4,7 +4,10 @@ import { issueVerificationToken } from '../utils/emailVerification'
 
 const registerSchema = z.object({
   email: z.email(),
-  password: z.string().min(10),
+  password: z.string()
+    .min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
+    .regex(/[A-Z]/, 'Parola trebuie sa contina cel putin o litera mare')
+    .regex(/[0-9]/, 'Parola trebuie sa contina cel putin o cifra'),
   firstName: z.string().min(2),
   lastName: z.string().min(2),
   phone: z.string().regex(/^0\d{9}$/),

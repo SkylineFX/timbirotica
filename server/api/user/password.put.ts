@@ -4,7 +4,10 @@ import bcrypt from 'bcryptjs'
 
 const bodySchema = z.object({
   currentPassword: z.string().min(1),
-  newPassword: z.string().min(10),
+  newPassword: z.string()
+    .min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
+    .regex(/[A-Z]/, 'Parola trebuie sa contina cel putin o litera mare')
+    .regex(/[0-9]/, 'Parola trebuie sa contina cel putin o cifra'),
 })
 
 export default eventHandler(async (event) => {

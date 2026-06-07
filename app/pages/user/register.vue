@@ -37,13 +37,11 @@ const fields: AuthFormField[] = [{
   name: 'password',
   label: 'Parola',
   type: 'password',
-  placeholder: 'Introduceti parola',
   required: true
 }, {
   name: 'passwordConfirm',
   label: 'Confirmare parola',
   type: 'password',
-  placeholder: 'Confirmati parola',
   required: true
 }]
 
@@ -60,7 +58,10 @@ const schema = z.object({
   lastName: z.string('Numele este obligatoriu').min(2, 'Numele prea scurt'),
   phone: z.string('Numarul de telefon este obligatoriu').regex(/^0\d{3}\s?\d{3}\s?\d{3}$/, 'Numar de telefon invalid'),
   email: z.email('Adresa de email nu este valida'),
-  password: z.string('Parola este obligatorie').min(10, 'Parola trebuie sa aiba cel putin 10 caractere'),
+  password: z.string('Parola este obligatorie')
+    .min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
+    .regex(/[A-Z]/, 'Parola trebuie sa contina cel putin o litera mare')
+    .regex(/[0-9]/, 'Parola trebuie sa contina cel putin o cifra'),
   passwordConfirm: z.string('Confirmarea parolei este obligatorie')
 }).refine(data => data.password === data.passwordConfirm, {
   message: 'Parolele nu sunt identice',
@@ -117,6 +118,14 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       >
         <template #description>
           Ai deja un cont? <ULink to="/user/login" class="text-primary font-medium">Autentificare</ULink>.
+        </template>
+
+        <template #password-field="{ state }">
+          <PasswordInput v-model="state.password" placeholder="Introduceti parola" />
+        </template>
+
+        <template #passwordConfirm-field="{ state }">
+          <PasswordInput v-model="state.passwordConfirm" placeholder="Confirmati parola" />
         </template>
       </UAuthForm>
     </UPageCard>
