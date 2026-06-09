@@ -79,6 +79,7 @@ async function handleBillingSaved() {
     <UModal v-model:open="isBillingModalOpen" :title="billingModalMode === 'add' ? 'Adauga persoana juridica' : 'Editeaza persoana juridica'" :ui="{ content: 'sm:max-w-xl' }">
       <template #body>
         <BillingAddressForm
+          :key="billingModalMode === 'edit' ? `edit-${currentBillingId}` : 'add'"
           :is-first-address="!userBillingAddresses || userBillingAddresses.length === 0"
           :address="billingModalMode === 'edit' ? currentBilling : null"
           @saved="handleBillingSaved"

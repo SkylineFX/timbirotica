@@ -35,6 +35,11 @@ watch(() => address, (newAddr) => {
     form.value = {
       ...newAddr,
       hasRo: newAddr.hasRo ?? true,
+      // Optional fields are stored as NULL when left blank. The form and schema
+      // represent "empty" as '', and the schema rejects null — so normalize on load.
+      onrc: newAddr.onrc ?? '',
+      bankName: newAddr.bankName ?? '',
+      iban: newAddr.iban ?? '',
       phone: newAddr.phone || userProfile.value?.phone || '',
       isDefaultBilling: newAddr.isDefaultBilling ?? false
     }
