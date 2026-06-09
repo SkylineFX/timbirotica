@@ -19,7 +19,7 @@ useSeoMeta({
     <UCard :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
       <div class="space-y-6 text-gray-700 leading-relaxed text-[15px] sm:text-base">
         
-        <p><strong class="font-semibold">Timbirotica</strong> este numele comercial al serviciului de comert electronic oferit de <strong class="font-semibold">Eurotimalex SRL</strong>, cu sediul social in Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti, Romania, <strong class="font-semibold">CUI RO18034200</strong>, Nr. inregistrare <strong class="font-semibold">J40/17160/2005</strong>.</p>
+        <p><strong class="font-semibold">Timbirotica</strong> este numele comercial al serviciului de comert electronic oferit de <strong class="font-semibold">Eurotimalex SRL</strong>, cu sediul social in Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti, Romania, <strong class="font-semibold">CUI RO18034200</strong>, Nr. inregistrare <strong class="font-semibold">J2005017160400</strong>.</p>
         <p><strong class="font-semibold">Timbirotica</strong> isi propune sa ofere clientilor din Romania produse de birotica si papetarie de inalta calitate la preturi competitive, sustinute de consultanta specializata si grija fata de client.</p>
 
         <div class="p-4 bg-gray-50 rounded-md border border-gray-100">

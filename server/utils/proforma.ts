@@ -311,7 +311,7 @@ export async function generateProformaPdf(input: ProformaInput): Promise<Uint8Ar
   // Highlighted "Total proforma" bar
   const tpBarHeight = 26
   page.drawRectangle({ x: margin, y: y - tpBarHeight, width: width - margin * 2, height: tpBarHeight, color: lightGrey })
-  const tpLabel = 'Total proforma'
+  const tpLabel = 'Total'
   const tpValue = fmtRon(input.total)
   page.drawText(tpLabel, { x: margin + 10, y: y - 17, size: 11, font: fontBold, color: black })
   const tpValueWidth = fontBold.widthOfTextAtSize(tpValue, 13)

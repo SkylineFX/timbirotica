@@ -14,7 +14,7 @@ const columns: FooterColumn[] = [
         label: 'RO18034200',
       },
       {
-        label: 'J40/17160/2005',
+        label: 'J2005017160400',
       },
       {
         label: 'Strada Drumul Taberei Nr. 92',

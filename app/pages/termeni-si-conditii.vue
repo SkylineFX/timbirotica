@@ -21,7 +21,7 @@ useSeoMeta({
 
         <section class="pb-8">
           <h2 class="text-2xl font-semibold mb-4 font-serif">I. Despre Noi</h2>
-          <p><strong class="font-semibold">Timbirotica</strong> este numele comercial al serviciului de comert electronic oferit de <strong>Eurotimalex SRL</strong>, denumit in continuare "Vanzator", cu sediul in <strong>Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti</strong>, inmatriculata in Registrul Comertului sub nr. <strong>J40/17160/2005</strong>, avand cod unic de inregistrare <strong>RO18034200</strong>.</p>
+          <p><strong class="font-semibold">Timbirotica</strong> este numele comercial al serviciului de comert electronic oferit de <strong>Eurotimalex SRL</strong>, denumit in continuare "Vanzator", cu sediul in <strong>Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti</strong>, inmatriculata in Registrul Comertului sub nr. <strong>J2005017160400</strong>, avand cod unic de inregistrare <strong>RO18034200</strong>.</p>
 
           <div class="flex flex-col gap-4 mt-4">
             <p>Folosirea acestui site de catre orice persoana (atat fizica cat si juridica) in scopul de a se informa sau de a achizitiona produsele, denumit in continuare "Utilizator" / "Cumparator", reprezinta acordul acestuia fara limitari sau rezerve a prezentilor Termeni si Conditii.</p>
@@ -35,7 +35,7 @@ useSeoMeta({
               </ul>
             </div>
 
-            <p>Vanzatorul va informa Cumparatorul preluarea comenzii, respectiv confirmarea comenzii. Daca Vanzatorul confirma explicit o comanda, acest lucru va implica o acceptare completa a termenilor comenzii. Acceptarea comenzii de catre Vanzator se considera finalizata atunci cand exista o confirmare scrisa (e-mail, SMS) din partea Vanzatorului catre Cumparator, fara a necesita o confirmare de primire din partea acestuia din urma. Comanda se considera valida numai dupa confirmarea de catre Vanzator a disponibilitatii stocului, a pretului precum si a caracteristicilor produselor respectiv a serviciilor solicitate de Cumparator.</p>
+            <p>Vanzatorul va informa Cumparatorul preluarea comenzii, respectiv confirmarea comenzii. Daca Vanzatorul confirma explicit o comanda, acest lucru va implica o acceptare completa a termenilor comenzii. Acceptarea comenzii de catre Vanzator se considera finalizata atunci cand exista o confirmare (e-mail, telefonic sau SMS) din partea Vanzatorului catre Cumparator, fara a necesita o confirmare de primire din partea acestuia din urma. Comanda se considera valida numai dupa confirmarea de catre Vanzator a disponibilitatii stocului, a pretului precum si a caracteristicilor produselor respectiv a serviciilor solicitate de Cumparator.</p>
           </div>
         </section>
 

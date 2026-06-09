@@ -165,7 +165,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
               <span class="text-gray-500">Registrul Comertului</span>
-              <span class="font-medium">J40/17160/2005</span>
+              <span class="font-medium">J2005017160400</span>
             </div>
             <div class="flex flex-col gap-1 border-b border-gray-200 pb-2">
               <span class="text-gray-500">Adresa Sediu Social</span>

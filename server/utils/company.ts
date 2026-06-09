@@ -6,7 +6,7 @@ export { VAT_RATE } from '~~/shared/constants/company'
 export const COMPANY = {
   name: 'Eurotimalex SRL',
   cui: 'RO18034200',
-  onrc: 'J40/17160/2005',
+  onrc: 'J2005017160400',
   address: 'Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti',
   phone: '+40 751 022 882',
   email: 'eurotimalex@yahoo.com',

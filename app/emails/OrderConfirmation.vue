@@ -185,7 +185,7 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
           <EText style="font-size: 14px; line-height: 24px; color: #8898aa;">
             Eurotimalex SRL<br />
             Strada Drumul Taberei Nr. 92, București<br />
-            J40/17160/2005
+            J2005017160400
           </EText>
         </ESection>
       </EContainer>
