@@ -106,7 +106,7 @@ useSeoMeta({
             <p>Livrarea comenzilor se poate face in urmatoarele moduri:</p>
             <ol class="list-decimal pl-5 space-y-2">
               <li><strong>Ridicare de la <a href="/despre-noi/#locatie" class="text-primary hover:underline">sediul nostru:</a></strong> Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti.</li>
-              <li><strong>Cu masinile proprii</strong>: Momentan, livrarile se efectueaza doar in Bucuresti si Ilfov.</li>
+              <li><strong>Prin intermediul firmelor de curierat</strong>: in orice localitate din Romania.</li>
             </ol>
           </div>
 
@@ -124,7 +124,7 @@ useSeoMeta({
 
           <p class="mt-4 font-semibold">Transport GRATUIT pentru comenzile eligibile:</p>
           <ul class="list-disc pl-5 mt-2 space-y-1">
-            <li>Transport gratuit pentru comenzile de peste 200 lei, livrate in Bucuresti si Ilfov. </li>
+            <li>Transport gratuit pentru comenzile de peste 200 lei.</li>
           </ul>
         </section>
 

@@ -49,7 +49,7 @@ const featuredCategories = [
           <UCard class="h-full text-center rounded-sm">
               <UIcon name="i-heroicons-truck" class="text-4xl text-primary mb-1" />
               <h3 class="font-bold pb-1">Livrare Gratuita</h3>
-              <p class="text-sm text-gray-500">La comenzi >200 RON in Bucuresti si Ilfov</p>
+              <p class="text-sm text-gray-500">La comenzi >200 RON, in toata tara</p>
           </UCard>
         </NuxtLink>
         <NuxtLink to="/termeni-si-conditii#plata" class="block h-full cursor-pointer">

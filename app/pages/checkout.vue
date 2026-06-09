@@ -326,7 +326,7 @@ async function submitOrder() {
                 </div>
                 <div>
                    <div class="font-semibold text-gray-900 text-sm">Livrare prin Curier</div>
-                   <div class="text-gray-500 text-xs mt-0.5">Doar in Bucuresti si Ilfov</div>
+                   <!-- <div class="text-gray-500 text-xs mt-0.5">Doar in Bucuresti si Ilfov</div> -->
                 </div>
               </div>
               <div class="text-sm font-semibold min-w-fit" :class="courierShippingCost === 0 ? 'text-green-600' : 'text-gray-900'">

@@ -33,8 +33,8 @@ export const billingAddressSchema = z.object({
       message: 'Numar de telefon invalid'
     }),
   street: z.string().min(5, 'Adresa trebuie sa aiba minim 5 caractere'),
-  city: z.string().min(2, 'Selecteaza localitatea'),
-  county: z.string().min(2, 'Selecteaza judetul'),
+  city: z.string({ error: 'Selecteaza localitatea' }).min(2, 'Selecteaza localitatea'),
+  county: z.string({ error: 'Selecteaza judetul' }).min(2, 'Selecteaza judetul'),
   isDefaultBilling: z.boolean().optional(),
 })
 
