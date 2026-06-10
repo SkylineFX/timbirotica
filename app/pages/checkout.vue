@@ -290,7 +290,7 @@ async function submitOrder() {
 
         <UAlert
           v-if="!isEmailVerified"
-          color="warning"
+          color="primary"
           variant="subtle"
           icon="i-lucide-mail-warning"
           title="Confirma adresa de email"
@@ -299,7 +299,7 @@ async function submitOrder() {
         >
           <template #actions>
             <UButton
-              color="warning"
+              color="primary"
               variant="solid"
               size="sm"
               :loading="isResendingVerification"
