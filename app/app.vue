@@ -45,7 +45,7 @@ watch(loggedIn, (isLoggedIn) => {
 </script>
 
 <template>
-  <UApp>
+  <UApp :toaster="{ duration: 2500 }">
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
