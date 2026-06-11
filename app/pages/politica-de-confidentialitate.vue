@@ -46,7 +46,7 @@ useSeoMeta({
 
           <p class="mt-4"><strong>A. Date de cont si identificare</strong></p>
           <ul class="list-disc pl-5 mt-2 space-y-1 mb-4">
-            <li><strong>La inregistrare:</strong> prenume, nume, adresa de e-mail, parola (stocata sub forma de hash).</li>
+            <li><strong>La inregistrare:</strong> prenume, nume, adresa de e-mail, numar de telefon.</li>
           </ul>
 
           <p><strong>B. Date de comanda, livrare si facturare</strong></p>
