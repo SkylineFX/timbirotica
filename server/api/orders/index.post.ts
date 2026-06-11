@@ -160,39 +160,38 @@ export default eventHandler(async (event) => {
       ? JSON.stringify(billingPersonalAddress)
       : shippingAddressSnapshot
 
-  // 5. Atomically create the order row, its items, and clear the cart.
-  //    Throwing inside the transaction rolls all three back together — no orphan
-  //    orders, no orphaned cart items, no half-clear.
-  await db.transaction(async (tx) => {
-    const [created] = await tx.insert(tables.orders).values({
-      userId: session.user.id,
-      orderNumber,
-      total,
-      status: 'processing',
-      shippingMethod: body.shippingMethod,
-      paymentMethod: body.paymentMethod,
-      shippingCost,
-      shippingAddressSnapshot,
-      billingAddressSnapshot,
-      termsAcceptedAt: new Date(),
-      createdAt: new Date(),
-    }).returning()
+  // 5. Create the order row, its items, and clear the cart sequentially.
+  //    D1 doesn't support BEGIN/COMMIT transactions, so we run the three writes
+  //    one after another. In the rare event step 2 or 3 fails after step 1, we'll
+  //    see it in Sentry and clean up the orphan order manually.
+  const [created] = await db.insert(tables.orders).values({
+    userId: session.user.id,
+    orderNumber,
+    total,
+    status: 'processing',
+    shippingMethod: body.shippingMethod,
+    paymentMethod: body.paymentMethod,
+    shippingCost,
+    shippingAddressSnapshot,
+    billingAddressSnapshot,
+    termsAcceptedAt: new Date(),
+    createdAt: new Date(),
+  }).returning()
 
-    if (!created?.id) {
-      throw createError({ statusCode: 500, message: 'Eroare la generarea comenzii.' })
-    }
+  if (!created?.id) {
+    throw createError({ statusCode: 500, message: 'Eroare la generarea comenzii.' })
+  }
 
-    await tx.insert(tables.orderItems).values(
-      cart.items.map((item: OrderCartItem) => ({
-        orderId: created.id,
-        productId: item.productId,
-        quantity: item.quantity,
-        priceAtBuy: item.product.price
-      }))
-    )
+  await db.insert(tables.orderItems).values(
+    cart.items.map((item: OrderCartItem) => ({
+      orderId: created.id,
+      productId: item.productId,
+      quantity: item.quantity,
+      priceAtBuy: item.product.price
+    }))
+  )
 
-    await tx.delete(tables.cartItems).where(eq(tables.cartItems.cartId, cart.id))
-  })
+  await db.delete(tables.cartItems).where(eq(tables.cartItems.cartId, cart.id))
 
   // 7. Dispatch the order confirmation email asynchronously
   const emailItems = cart.items.map((item: OrderCartItem) => ({
