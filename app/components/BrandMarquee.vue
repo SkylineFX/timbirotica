@@ -4,7 +4,7 @@ const { data: brands } = useFetch('/api/brands')
 
 <template>
   <div class="w-full bg-white py-2 rounded-sm border border-gray-200">
-    <UMarquee pause-on-hover :overlay="false" :ui="{ root: '[--duration:60s]', content: 'gap-2' }">
+    <UMarquee pause-on-hover :overlay="false" :ui="{ root: '[--duration:180s]', content: 'gap-2' }">
       <NuxtLink 
         v-for="brand in brands" 
         :key="brand.to" 
