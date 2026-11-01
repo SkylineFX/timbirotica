@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   const { email, password, firstName, lastName, phone, turnstileToken } = result.data
 
   // Cloudflare Turnstile verification — rejects bots/abuse before any DB work.
-  const turnstile = await verifyTurnstileToken(turnstileToken)
+  const turnstile = await verifyTurnstileToken(turnstileToken, event)
   if (!turnstile.success) {
     throw createError({ statusCode: 400, message: 'Verificare esuata. Reincarca pagina si incearca din nou.' })
   }

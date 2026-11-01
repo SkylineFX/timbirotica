@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   if (!turnstileToken || typeof turnstileToken !== 'string') {
     throw createError({ statusCode: 400, message: 'Verificare lipsa. Reincarca pagina si incearca din nou.' })
   }
-  const turnstile = await verifyTurnstileToken(turnstileToken)
+  const turnstile = await verifyTurnstileToken(turnstileToken, event)
   if (!turnstile.success) {
     throw createError({ statusCode: 400, message: 'Verificare esuata. Reincarca pagina si incearca din nou.' })
   }

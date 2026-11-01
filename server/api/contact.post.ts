@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Cloudflare Turnstile verification — rejects bots before sending an email.
-  const turnstile = await verifyTurnstileToken(result.data.turnstileToken)
+  const turnstile = await verifyTurnstileToken(result.data.turnstileToken, event)
   if (!turnstile.success) {
     throw createError({ statusCode: 400, message: 'Verificare esuata. Reincarca pagina si incearca din nou.' })
   }

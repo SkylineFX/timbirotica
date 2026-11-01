@@ -28,6 +28,7 @@ const state = reactive({
 const toast = useToast()
 const isLoading = ref(false)
 const turnstileToken = ref('')
+const turnstile = useTemplateRef('turnstile')
 
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   isLoading.value = true
@@ -55,6 +56,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       color: 'error'
     })
   } finally {
+    turnstileToken.value = ''
+    turnstile.value?.reset()
     isLoading.value = false
   }
 }
@@ -101,7 +104,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             </div>
 
             <div class="flex justify-center pt-2 m-0">
-              <NuxtTurnstile v-model="turnstileToken" />
+              <NuxtTurnstile ref="turnstile" v-model="turnstileToken" />
             </div>
 
             <div class="pt-2">

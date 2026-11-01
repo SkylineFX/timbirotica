@@ -4,7 +4,8 @@ import bcrypt from 'bcryptjs'
 const bodySchema = z.object({
   email: z.email(),
   password: z.string().min(1),
-  remember: z.boolean().optional()
+  remember: z.boolean().optional(),
+  turnstileToken: z.string().min(1, 'Verificare lipsa. Reincarca pagina si incearca din nou.'),
 })
 
 // Pre-computed bcrypt hash used to equalize response time when the email
@@ -12,7 +13,20 @@ const bodySchema = z.object({
 const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', 10)
 
 export default defineEventHandler(async (event) => {
-  const { email, password, remember } = await readValidatedBody(event, bodySchema.parse)
+  const result = bodySchema.safeParse(await readBody(event))
+  if (!result.success) {
+    // First validation issue becomes the user-facing message — avoids leaking
+    // the raw ZodError JSON to the client (which h3's readValidatedBody does).
+    throw createError({ statusCode: 400, message: result.error.issues[0]?.message || 'Date invalide.' })
+  }
+  const { email, password, remember, turnstileToken } = result.data
+
+  // Cloudflare Turnstile verification — rejects bots/credential-stuffing before DB or bcrypt work.
+  const turnstile = await verifyTurnstileToken(turnstileToken, event)
+  if (!turnstile.success) {
+    throw createError({ statusCode: 400, message: 'Verificare esuata. Reincarca pagina si incearca din nou.' })
+  }
+
   const normalizedEmail = email.trim().toLowerCase()
   const config = useRuntimeConfig()
 

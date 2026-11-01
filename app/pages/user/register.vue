@@ -8,6 +8,7 @@ definePageMeta({
 
 const toast = useToast()
 const turnstileToken = ref('')
+const turnstile = useTemplateRef('turnstile')
 
 const fields: AuthFormField[] = [{
   name: 'firstName',
@@ -91,6 +92,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     await fetch()
     await navigateTo('/')
   } catch (err: any) {
+    turnstileToken.value = ''
+    turnstile.value?.reset()
     toast.add({
       title: 'Inregistrare esuata',
       description: err.data?.message || 'Eroare la inregistrare.',
@@ -130,7 +133,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       </UAuthForm>
     </UPageCard>
       <div class="flex justify-center mt-2">
-        <NuxtTurnstile v-model="turnstileToken" />
+        <NuxtTurnstile ref="turnstile" v-model="turnstileToken" />
       </div>
   </div>
 </template>

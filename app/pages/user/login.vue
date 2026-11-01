@@ -8,6 +8,8 @@ definePageMeta({
 
 const { fetch } = useUserSession()
 const toast = useToast()
+const turnstileToken = ref('')
+const turnstile = useTemplateRef('turnstile')
 
 const fields: AuthFormField[] = [{
   name: 'email',
@@ -47,13 +49,15 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
     await $fetch('/api/login', {
       method: 'POST',
-      body: payload.data
+      body: { ...payload.data, turnstileToken: turnstileToken.value }
     })
     await fetch()
     await useCart().syncCart()
     toast.add({ title: 'Autentificare reusita', color: 'success' })
     await navigateTo('/')
   } catch (err: any) {
+    turnstileToken.value = ''
+    turnstile.value?.reset()
     toast.add({
       title: 'Autentificare esuata',
       description: err.data?.message || 'Datele introduse nu sunt valide',
@@ -85,6 +89,9 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         </template>
       </UAuthForm>
     </UPageCard>
+    <div class="flex justify-center mt-2">
+      <NuxtTurnstile ref="turnstile" v-model="turnstileToken" />
+    </div>
   </div>
 </template>
 
