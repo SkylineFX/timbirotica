@@ -37,6 +37,33 @@ export const getCourierShippingCost = (subtotal: number): number =>
 export const getShippingCost = (method: ShippingMethod, subtotal: number): number =>
   method === 'courier' ? getCourierShippingCost(subtotal) : 0
 
+export interface OrderLineItem {
+  quantity: number
+  price: number
+}
+
+export interface OrderTotals {
+  subtotal: number
+  shippingCost: number
+  total: number
+}
+
+/**
+ * Order totals from line items + shipping method. Single source of truth shared by
+ * the order endpoint so the stored total can never drift from the summed line items.
+ */
+export const computeOrderTotals = (
+  items: OrderLineItem[],
+  shippingMethod: ShippingMethod,
+): OrderTotals => {
+  let subtotal = 0
+  for (const item of items) {
+    subtotal += item.price * item.quantity
+  }
+  const shippingCost = getShippingCost(shippingMethod, subtotal)
+  return { subtotal, shippingCost, total: subtotal + shippingCost }
+}
+
 // Payload accepted by POST /api/orders. Addresses are passed as IDs only and
 // re-resolved server-side; the courier-needs-an-address rule is enforced in the
 // handler (it requires a DB lookup anyway).

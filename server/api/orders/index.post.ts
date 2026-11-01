@@ -3,7 +3,7 @@ import { randomBytes } from 'crypto'
 import * as Sentry from '@sentry/nuxt'
 import { dispatchOrderEmails } from '../../utils/email'
 import { generateProformaPdf, resolveProformaCustomer } from '../../utils/proforma'
-import { orderPayloadSchema, getShippingCost } from '~~/shared/constants/order'
+import { orderPayloadSchema, computeOrderTotals } from '~~/shared/constants/order'
 
 // CSRF posture: state-changing endpoints rely on nuxt-auth-utils' session cookie
 // with SameSite=Lax (h3 default; nuxt.config only overrides `secure` for dev LAN).
@@ -139,15 +139,13 @@ export default eventHandler(async (event) => {
     }
   }
 
-  // 3. Compute accurate totals strictly from the server's database prices
-  let subtotal = 0
-  for (const item of cart.items) {
-    subtotal += item.product.price * item.quantity
-  }
-
-  // Shipping cost from the shared rule (pickup is always free)
-  const shippingCost = getShippingCost(body.shippingMethod, subtotal)
-  const total = subtotal + shippingCost
+  // 3. Compute accurate totals strictly from the server's database prices.
+  //    Totals (incl. the pickup-is-free shipping rule) come from the shared
+  //    computeOrderTotals so they can't drift from the summed line items.
+  const { shippingCost, total } = computeOrderTotals(
+    cart.items.map((item: OrderCartItem) => ({ quantity: item.quantity, price: item.product.price })),
+    body.shippingMethod
+  )
 
   // 4. Generate a unique order number for this order
   const date = new Date()

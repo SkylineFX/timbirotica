@@ -13,12 +13,10 @@ node_modules
 logs
 *.log
 
-# Misc
-.DS_Store
-.fleet
-.idea
-public/products
-public/uploads
+# Testing & Coverage
+coverage/
+*.lcov
+.nyc_output/
 
 # Local env files
 .env
@@ -28,6 +26,50 @@ public/uploads
 # Sentry Config File
 .env.sentry-build-plugin
 
-# Generated D1 seed (large, regenerate via scripts/export-seed-sql.ts)
+# Generated D1 seed / sync SQL (large, regenerate via scripts/export-*.ts)
 seed.sql
+sync.sql
 schema.sql
+
+# Scraper & catalog data files (keep folder via .gitkeep and README.md)
+scripts/data/*
+!scripts/data/.gitkeep
+!scripts/data/README.md
+
+# Uploads & temporary public assets
+public/products
+public/uploads
+public/temporary
+
+# Temporary & backup files
+*.bak
+*.old
+*.tmp
+*.temp
+*~
+
+# AI Assistant & IDE State
+.claude/
+.gemini/
+.cursor/
+.windsurf/
+skills/
+project_analysis.md
+
+# OS & Editor metadata
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.fleet
+.idea
+
+# Local databases (outside .data)
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm

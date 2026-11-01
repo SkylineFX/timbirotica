@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { mergeCartItems } from '~~/shared/utils/cart'
 
 const syncCartSchema = z.object({
   items: z.array(z.object({
@@ -32,26 +33,35 @@ export default defineEventHandler(async (event) => {
     }).returning()
     cart = newCart
   }
+  if (!cart) {
+    throw createError({ status: 500, message: 'Nu am putut crea cosul.' })
+  }
+  const cartId = cart.id
 
-  // 2. Merge items
-  // Strategy: For each item in guest cart, if exists in user cart, add quantities. If not, insert.
-  for (const item of items) {
-    const existingItem = await db.query.cartItems.findFirst({
-      where: and(
-        eq(tables.cartItems.cartId, cart.id),
-        eq(tables.cartItems.productId, item.productId)
-      )
-    })
+  // 2. Merge the guest cart into the user's cart: quantities for products already
+  // present are summed, new products are inserted. The consolidation is a pure
+  // function (mergeCartItems) so it can be unit tested without a database.
+  const existingItems = await db.query.cartItems.findMany({
+    where: eq(tables.cartItems.cartId, cartId)
+  })
+  const existingByProduct = new Map(existingItems.map(i => [i.productId, i]))
 
+  const merged = mergeCartItems(
+    existingItems.map(i => ({ productId: i.productId, quantity: i.quantity })),
+    items
+  )
+
+  for (const line of merged) {
+    const existingItem = existingByProduct.get(line.productId)
     if (existingItem) {
       await db.update(tables.cartItems)
-        .set({ quantity: existingItem.quantity + item.quantity })
+        .set({ quantity: line.quantity })
         .where(eq(tables.cartItems.id, existingItem.id))
     } else {
       await db.insert(tables.cartItems).values({
-        cartId: cart.id,
-        productId: item.productId,
-        quantity: item.quantity
+        cartId,
+        productId: line.productId,
+        quantity: line.quantity
       })
     }
   }
