@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, type AnySQLiteColumn, real } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, index, type AnySQLiteColumn, real } from 'drizzle-orm/sqlite-core'
 import { relations } from 'drizzle-orm'
 
 export const users = sqliteTable('users', {
@@ -19,7 +19,10 @@ export const categories = sqliteTable('categories', {
   slug: text().notNull(),
   parentId: integer('parent_id').references((): AnySQLiteColumn => categories.id),
   image: text()
-})
+}, (t) => [
+  index('categories_parent_id_idx').on(t.parentId),
+  index('categories_slug_idx').on(t.slug),
+])
 
 export const brands = sqliteTable('brands', {
   id: integer().primaryKey({ autoIncrement: true }),
@@ -42,7 +45,14 @@ export const products = sqliteTable('products', {
   stock: integer().notNull().default(1),
   isRecommended: integer({ mode: 'boolean' }).default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-})
+}, (t) => [
+  // Avoid full table scans on catalog pages, brand pages and homepage carousels
+  // (D1 bills every row inspected). Plain (non-partial) index on isRecommended
+  // because Drizzle binds `true` as a parameter, which a partial index can't match.
+  index('products_category_id_idx').on(t.categoryId),
+  index('products_brand_id_idx').on(t.brandId),
+  index('products_is_recommended_idx').on(t.isRecommended),
+])
 
 export const productsRelations = relations(products, ({ one }) => ({
   category: one(categories, {
@@ -83,7 +93,9 @@ export const cartItems = sqliteTable('cart_items', {
   cartId: integer('cart_id').references(() => carts.id).notNull(),
   productId: integer('product_id').references(() => products.id).notNull(),
   quantity: integer().notNull().default(1),
-})
+}, (t) => [
+  index('cart_items_cart_id_idx').on(t.cartId),
+])
 
 export const cartsRelations = relations(carts, ({ one, many }) => ({
   user: one(users, {
@@ -109,7 +121,9 @@ export const favorites = sqliteTable('favorites', {
   userId: integer('user_id').references(() => users.id).notNull(),
   productId: integer('product_id').references(() => products.id).notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-})
+}, (t) => [
+  index('favorites_user_id_idx').on(t.userId),
+])
 
 export const favoritesRelations = relations(favorites, ({ one }) => ({
   user: one(users, {
@@ -134,7 +148,9 @@ export const addresses = sqliteTable('addresses', {
   postalCode: text(),
   isDefaultShipping: integer({ mode: 'boolean' }).default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-})
+}, (t) => [
+  index('addresses_user_id_idx').on(t.userId),
+])
 
 export const addressesRelations = relations(addresses, ({ one }) => ({
   user: one(users, {
@@ -158,7 +174,9 @@ export const orders = sqliteTable('orders', {
   // for orders placed before this column existed.
   termsAcceptedAt: integer('terms_accepted_at', { mode: 'timestamp' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-})
+}, (t) => [
+  index('orders_user_id_idx').on(t.userId),
+])
 
 export const orderItems = sqliteTable('order_items', {
   id: integer().primaryKey({ autoIncrement: true }),
@@ -166,7 +184,9 @@ export const orderItems = sqliteTable('order_items', {
   productId: integer('product_id').references(() => products.id).notNull(),
   quantity: integer().notNull(),
   priceAtBuy: real('price_at_buy').notNull(),
-})
+}, (t) => [
+  index('order_items_order_id_idx').on(t.orderId),
+])
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   user: one(users, {
@@ -204,7 +224,9 @@ export const billingAddresses = sqliteTable('billing_addresses', {
   county: text('county').notNull(),
   isDefaultBilling: integer('is_default_billing', { mode: 'boolean' }).default(false),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-})
+}, (t) => [
+  index('billing_addresses_user_id_idx').on(t.userId),
+])
 
 export const billingAddressesRelations = relations(billingAddresses, ({ one }) => ({
   user: one(users, {
@@ -239,7 +261,9 @@ export const cities = sqliteTable('cities', {
   id: integer().primaryKey(),
   countyId: integer('county_id').references(() => counties.id).notNull(),
   name: text('name').notNull(),
-})
+}, (t) => [
+  index('cities_county_id_idx').on(t.countyId),
+])
 
 export const countiesRelations = relations(counties, ({ many }) => ({
   cities: many(cities),
