@@ -138,6 +138,7 @@ export default eventHandler(async (event) => {
     subcategoryScopeRows
   ] = await Promise.all([
     db.query.products.findMany({
+      columns: { description: false },
       where: fullWhere,
       limit,
       offset,
