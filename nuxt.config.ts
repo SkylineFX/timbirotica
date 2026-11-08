@@ -72,6 +72,25 @@ export default defineNuxtConfig({
     colorMode: false
   },
 
+  // Pre-bundle only the icons actually used in the app and @nuxt/ui at build time.
+  // Without this, @nuxt/icon defaults to `serverBundle: 'remote'` on Cloudflare
+  // Workers, downloading and JSON.parsing ~600 KB icon sets from cdn.jsdelivr.net
+  // on cold starts (~250-500 ms of Worker CPU time per request).
+  icon: {
+    provider: 'iconify',
+    serverBundle: false,
+    clientBundle: {
+      scan: {
+        globInclude: [
+          'app/**/*.{vue,ts,js}',
+          'shared/**/*.{vue,ts,js}',
+          'node_modules/@nuxt/ui/dist/**/*.{js,mjs,vue}'
+        ],
+        globExclude: ['dist', 'build', 'coverage', 'test', 'tests']
+      }
+    }
+  },
+
   routeRules: {
     '/comenzi': { redirect: { to: '/user/comenzi', statusCode: 301 } }
   },
