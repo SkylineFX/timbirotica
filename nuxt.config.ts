@@ -68,6 +68,16 @@ export default defineNuxtConfig({
     }
   },
 
+  nitro: {
+    cloudflare: {
+      wrangler: {
+        name: 'timbirotica',
+        workers_dev: false,
+        preview_urls: true
+      }
+    }
+  },
+
   ui: {
     colorMode: false
   },
