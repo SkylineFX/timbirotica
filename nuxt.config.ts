@@ -43,7 +43,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    resendApiKey: process.env.RESEND_API_KEY,
+    resendApiKey: '',
     adminEmail: process.env.NUXT_ADMIN_EMAIL || 'eurotimalex@yahoo.com',
     session: {
       password: process.env.NUXT_SESSION_PASSWORD || '',
