@@ -73,7 +73,14 @@ export default defineNuxtConfig({
       wrangler: {
         name: 'timbirotica',
         workers_dev: false,
-        preview_urls: true
+        preview_urls: true,
+        // Workers Logs: keep console output, errors and invocation logs for 7 days
+        // (Workers > timbirotica > Observability). Set here, not in the dashboard,
+        // so a Workers Builds deploy can't turn it back off.
+        observability: {
+          enabled: true,
+          head_sampling_rate: 1
+        }
       }
     }
   },
