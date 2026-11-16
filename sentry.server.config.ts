@@ -2,7 +2,9 @@ import * as Sentry from "@sentry/nuxt";
 
 Sentry.init({
   // Only send events from production builds — keeps localhost/dev noise out of the dashboard.
-  enabled: import.meta.env.PROD,
+  // Use import.meta.dev, not import.meta.env.PROD: Nitro compiles import.meta.env to
+  // process.env on the server, where PROD is never set, so that guard was always undefined.
+  enabled: !import.meta.dev,
 
   dsn: "https://0eeb62d30c982bd85cc7ba6e7a4599ca@o4511418226114560.ingest.de.sentry.io/4511418227884112",
 
