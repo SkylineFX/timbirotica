@@ -37,9 +37,17 @@ onMounted(async () => {
 // then adds a new item as a guest, the watcher would persist the entire
 // cartItems array (DB items + new item) to localStorage, causing those DB
 // items to be re-synced (and their quantities doubled) on the next login.
+//
+// When the browser learns the user is signed in, merge the guest cart. This
+// covers every way of signing in without a page load: the login form,
+// registration, and a tab that still showed the guest view until a protected
+// page refreshed the session. Without it, products added as a guest stay only
+// in this browser and the order fails because the server cart is empty.
 watch(loggedIn, (isLoggedIn) => {
   if (!isLoggedIn) {
     clearCart()
+  } else {
+    syncCart()
   }
 })
 </script>

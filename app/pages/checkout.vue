@@ -9,14 +9,12 @@ definePageMeta({
 })
 
 // Cart integration
-const { cartItems, total, fetchCart } = useCart()
+const { cartItems, total, fetchCart, syncCart } = useCart()
 
-// Only fetch from DB when the cart state is empty (e.g. hard page refresh).
-// If cartItems already has entries — e.g. carried over from the login/sync flow —
-// don't overwrite them with a potentially stale or empty DB response.
-if (import.meta.client && cartItems.value.length === 0) {
-  fetchCart()
-}
+// Always show the server's cart, because the order is built from it. Merge any
+// guest products first: a tab that showed the guest view can hold products the
+// server doesn't know about yet.
+onMounted(() => { syncCart() })
 
 type Address = {
   id: number
@@ -206,6 +204,10 @@ async function submitOrder() {
     return
   }
 
+  // Make sure any guest products are merged before ordering, so the cart shown
+  // here is the cart the server will order.
+  await syncCart()
+
   if (cartItems.value.length === 0) {
     toast.add({ title: 'Cos gol', description: 'Cosul trebuie sa contina produse.', color: 'error' })
     return
@@ -268,6 +270,9 @@ async function submitOrder() {
       return
     }
     toast.add({ title: 'Eroare la procesare', description: e?.data?.message || e.statusMessage || e.message || 'Te rugam sa incerci din nou.', color: 'error' })
+    // Show the server's cart after a failure (e.g. a product just became
+    // unavailable), so the page never keeps showing a cart that can't be ordered.
+    await fetchCart()
   } finally {
     isSubmitting.value = false
   }
