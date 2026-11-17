@@ -13,6 +13,7 @@ export default defineOAuthGoogleEventHandler({
       where: eq(tables.users.email, user.email)
     })
 
+    const isNewUser = !dbUser
     if (!dbUser) {
       // Auto-register them
       dbUser = await db.insert(tables.users).values({
@@ -45,7 +46,9 @@ export default defineOAuthGoogleEventHandler({
       maxAge: 60 * 60 * 24 * 30
     })
 
-    return sendRedirect(event, '/')
+    // The query parameter lets app.vue confirm the sign-in with a toast, like
+    // the login and register forms do. There is no client handler here.
+    return sendRedirect(event, isNewUser ? '/?login=google-new' : '/?login=google')
   },
   onError(event, error) {
     console.error('Google OAuth error:', error)

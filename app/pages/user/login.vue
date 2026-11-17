@@ -8,8 +8,22 @@ definePageMeta({
 
 const { fetch } = useUserSession()
 const toast = useToast()
+const route = useRoute()
+const router = useRouter()
 const turnstileToken = ref('')
 const turnstile = useTemplateRef('turnstile')
+
+// A failed Google sign-in redirects here with ?error=oauth_failed.
+onMounted(() => {
+  if (route.query.error !== 'oauth_failed') return
+  toast.add({
+    title: 'Autentificare esuata',
+    description: 'Autentificarea cu Google nu a reusit. Incearca din nou.',
+    color: 'error'
+  })
+  const { error: _, ...query } = route.query
+  router.replace({ query })
+})
 
 const fields: AuthFormField[] = [{
   name: 'email',

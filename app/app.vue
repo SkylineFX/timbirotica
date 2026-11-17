@@ -20,6 +20,26 @@ useSeoMeta({
 
 const { loggedIn } = useUserSession()
 const { syncCart, clearCart } = useCart()
+const route = useRoute()
+const router = useRouter()
+const toast = useToast()
+
+// Google sign-in ends with a server redirect to /?login=google (or
+// google-new for a new account), so no form handler is there to confirm it.
+// Show the same toast as the login and register forms, then drop the
+// parameter so a reload doesn't repeat it. A link that carries the parameter
+// shows nothing to a visitor who isn't signed in.
+function announceGoogleLogin() {
+  const login = route.query.login
+  if (login !== 'google' && login !== 'google-new') return
+  if (loggedIn.value) {
+    toast.add(login === 'google-new'
+      ? { title: 'Inregistrare reusita', description: 'Contul tau a fost creat cu Google.', color: 'success' }
+      : { title: 'Autentificare reusita', color: 'success' })
+  }
+  const { login: _, ...query } = route.query
+  router.replace({ query })
+}
 
 // Sync any guest-cart items that accumulated before this page loaded.
 // This covers OAuth flows (e.g. Google) where the server sets the session and
@@ -27,6 +47,7 @@ const { syncCart, clearCart } = useCart()
 // For email/password login, syncCart() is already called in the form submit
 // handler and app.vue is never remounted during that client-side navigation.
 onMounted(async () => {
+  announceGoogleLogin()
   if (loggedIn.value && localStorage.getItem('guest-cart')) {
     await syncCart()
   }
