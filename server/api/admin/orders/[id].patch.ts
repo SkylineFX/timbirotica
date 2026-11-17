@@ -6,6 +6,8 @@ const bodySchema = z.object({
 })
 
 export default eventHandler(async (event) => {
+  await requireAdminSession(event)
+
   const id = parseInt(getRouterParam(event, 'id') ?? '')
   if (isNaN(id)) {
     throw createError({ statusCode: 400, message: 'ID comanda invalid.' })

@@ -1,6 +1,8 @@
 import { and, asc, eq, like, or, sql } from 'drizzle-orm'
 
 export default eventHandler(async (event) => {
+  await requireAdminSession(event)
+
   const query = getQuery(event)
   const page = Math.max(1, parseInt(String(query.page ?? '1')))
   const limit = Math.min(100, Math.max(1, parseInt(String(query.limit ?? '25'))))
