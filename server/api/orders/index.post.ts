@@ -209,6 +209,15 @@ export default eventHandler(async (event) => {
       cartId: cart.id,
     }))
   } catch (err) {
+    // An emptied cart means another submit of this cart (a second tab, a retry)
+    // saved the order first, and buildOrderWrites refused to order it twice.
+    const cartStillHasItems = await db.query.cartItems.findFirst({
+      where: eq(tables.cartItems.cartId, cart.id),
+      columns: { id: true }
+    }).catch(() => true)
+    if (!cartStillHasItems) {
+      throw createError({ statusCode: 409, message: 'Comanda pentru acest cos a fost deja plasata. O gasesti in Comenzile mele.' })
+    }
     console.error(`Saving order ${orderNumber} failed; nothing was saved.`, err)
     Sentry.captureException(err, { tags: { area: 'order-create', orderNumber } })
     throw createError({ statusCode: 500, message: 'Nu am putut plasa comanda. Te rugam sa incerci din nou.' })
