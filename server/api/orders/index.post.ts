@@ -3,6 +3,7 @@ import { randomBytes } from 'crypto'
 import * as Sentry from '@sentry/nuxt'
 import { dispatchOrderEmails } from '../../utils/email'
 import { generateProformaPdf, resolveProformaCustomer } from '../../utils/proforma'
+import { buildOrderWrites } from '../../utils/orderWrites'
 import { orderPayloadSchema, computeOrderTotals } from '~~/shared/constants/order'
 import { cartQuantitySchema } from '~~/shared/schemas/cart'
 
@@ -46,13 +47,14 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 403, message: 'Trebuie sa confirmi adresa de email inainte de a plasa o comanda.' })
   }
 
-  // 1. Fetch the user's cart holding the products
+  // 1. Fetch the user's cart holding the products. Only the product columns the
+  //    order needs: a large cart would otherwise read every long description.
   const cart = await db.query.carts.findFirst({
     where: eq(tables.carts.userId, session.user.id),
     with: {
       items: {
         with: {
-          product: true
+          product: { columns: { name: true, price: true, stock: true } }
         }
       }
     }
@@ -179,38 +181,38 @@ export default eventHandler(async (event) => {
       ? JSON.stringify(billingPersonalAddress)
       : shippingAddressSnapshot
 
-  // 5. Create the order row, its items, and clear the cart sequentially.
-  //    D1 doesn't support BEGIN/COMMIT transactions, so we run the three writes
-  //    one after another. In the rare event step 2 or 3 fails after step 1, we'll
-  //    see it in Sentry and clean up the orphan order manually.
-  const [created] = await db.insert(tables.orders).values({
-    userId: session.user.id,
-    orderNumber,
-    total,
-    status: 'processing',
-    shippingMethod: body.shippingMethod,
-    paymentMethod: body.paymentMethod,
-    shippingCost,
-    shippingAddressSnapshot,
-    billingAddressSnapshot,
-    termsAcceptedAt: new Date(),
-    createdAt: new Date(),
-  }).returning()
-
-  if (!created?.id) {
-    throw createError({ statusCode: 500, message: 'Eroare la generarea comenzii.' })
-  }
-
-  await db.insert(tables.orderItems).values(
-    cart.items.map((item: OrderCartItem) => ({
-      orderId: created.id,
-      productId: item.productId,
-      quantity: item.quantity,
-      priceAtBuy: item.product.price
+  // 5. Save the order row, its lines and the cart clearing in one batch. D1
+  //    rejects BEGIN/COMMIT but runs a batch as one transaction, so a failure
+  //    saves nothing and the customer can simply try again. buildOrderWrites
+  //    splits the lines to fit D1's limit of 100 parameters per statement, so
+  //    the number of products in an order is not limited.
+  try {
+    await db.batch(buildOrderWrites(db, {
+      order: {
+        userId: session.user.id,
+        orderNumber,
+        total,
+        status: 'processing',
+        shippingMethod: body.shippingMethod,
+        paymentMethod: body.paymentMethod,
+        shippingCost,
+        shippingAddressSnapshot,
+        billingAddressSnapshot,
+        termsAcceptedAt: date,
+        createdAt: date,
+      },
+      lines: cart.items.map((item: OrderCartItem) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        priceAtBuy: item.product.price
+      })),
+      cartId: cart.id,
     }))
-  )
-
-  await db.delete(tables.cartItems).where(eq(tables.cartItems.cartId, cart.id))
+  } catch (err) {
+    console.error(`Saving order ${orderNumber} failed; nothing was saved.`, err)
+    Sentry.captureException(err, { tags: { area: 'order-create', orderNumber } })
+    throw createError({ statusCode: 500, message: 'Nu am putut plasa comanda. Te rugam sa incerci din nou.' })
+  }
 
   // 7. Dispatch the order confirmation email asynchronously
   const emailItems = cart.items.map((item: OrderCartItem) => ({
