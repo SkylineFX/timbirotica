@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
-import { generateProformaPdf, paginateRows, type PaginationSpace, type ProformaInput } from '~~/server/utils/proforma'
+import { generateProformaPdf, paginateRows, proformaCustomerFromSnapshots, type PaginationSpace, type ProformaInput } from '~~/server/utils/proforma'
 
 describe('paginateRows', () => {
   const space: PaginationSpace = { firstPage: 100, otherPages: 200, totals: 30 }
@@ -86,5 +86,33 @@ describe('generateProformaPdf', () => {
   it('handles a product name with a word longer than the name column', async () => {
     const longWord = 'X'.repeat(80)
     expect(await pageCount(proforma(3, () => `PRODUS ${longWord} TEST`))).toBe(1)
+  })
+})
+
+describe('proformaCustomerFromSnapshots', () => {
+  const user = { firstName: 'Cont', lastName: 'Client' }
+  const home = { firstName: 'Ion', lastName: 'Popescu', street: 'Strada Livrarii 1', city: 'Sector 1', county: 'Bucuresti', phone: '0700000001' }
+  const otherAddress = { firstName: 'Ana', lastName: 'Ionescu', street: 'Strada Facturii 2', city: 'Cluj-Napoca', county: 'Cluj', phone: '0700000002' }
+  const company = { companyName: 'Firma SRL', cui: '123456', hasRo: true, onrc: 'J40/1/2020', iban: 'RO49AAAA1B31007593840000', bankName: 'Banca', street: 'Bulevardul Firmei 3', city: 'Sector 2', county: 'Bucuresti' }
+  const json = (v: unknown) => JSON.stringify(v)
+
+  it('bills an individual to the other address picked at checkout, not the delivery address', () => {
+    expect(proformaCustomerFromSnapshots(json(otherAddress), json(home), user)).toEqual({
+      type: 'individual', name: 'Ana Ionescu', address: 'Strada Facturii 2', city: 'Cluj-Napoca', county: 'Cluj',
+    })
+  })
+
+  it('bills an individual to the delivery address when billing copies it', () => {
+    expect(proformaCustomerFromSnapshots(json(home), json(home), user)).toMatchObject({ type: 'individual', name: 'Ion Popescu', address: 'Strada Livrarii 1' })
+  })
+
+  it('bills a company, also for a pickup order without a delivery address', () => {
+    expect(proformaCustomerFromSnapshots(json(company), '{}', user)).toMatchObject({ type: 'company', name: 'Firma SRL', cui: 'RO123456', address: 'Bulevardul Firmei 3' })
+  })
+
+  it('falls back to the delivery address when the billing snapshot is missing, empty or unreadable', () => {
+    for (const billing of [null, '{}', 'not json']) {
+      expect(proformaCustomerFromSnapshots(billing, json(home), user)).toMatchObject({ name: 'Ion Popescu', address: 'Strada Livrarii 1' })
+    }
   })
 })
