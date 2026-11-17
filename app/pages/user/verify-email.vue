@@ -2,6 +2,7 @@
 const route = useRoute()
 const toast = useToast()
 const { loggedIn } = useUserSession()
+const { cartItems } = useCart()
 
 const token = computed(() => {
   const q = route.query.token
@@ -12,14 +13,22 @@ const status = ref<'pending' | 'success' | 'already-verified' | 'invalid' | 'err
 const redirectIn = ref(5)
 let redirectTimer: ReturnType<typeof setInterval> | null = null
 
+// Checkout only makes sense with products in the cart. The header loads the
+// cart when the page mounts, so it is known well before the countdown ends.
+const goesToCheckout = computed(() => loggedIn.value && cartItems.value.length > 0)
+const redirectTarget = computed(() => {
+  if (!loggedIn.value) return '/user/login'
+  return goesToCheckout.value ? '/checkout' : '/'
+})
+const redirectDestination = computed(() => goesToCheckout.value ? 'catre finalizarea comenzii' : 'catre pagina principala')
+
 function startRedirect() {
-  const target = loggedIn.value ? '/checkout' : '/user/login'
   redirectIn.value = loggedIn.value ? 5 : 10
   redirectTimer = setInterval(() => {
     redirectIn.value -= 1
     if (redirectIn.value <= 0) {
       if (redirectTimer) clearInterval(redirectTimer)
-      navigateTo(target)
+      navigateTo(redirectTarget.value)
     }
   }, 1000)
 }
@@ -111,12 +120,12 @@ onUnmounted(() => {
         <UIcon name="i-lucide-mail-check" class="w-12 h-12 text-primary" />
         <h2 class="text-xl font-bold text-gray-900">Adresa de email confirmata</h2>
         <p v-if="loggedIn" class="text-gray-500 text-sm">
-          Iti multumim. Vei fi redirectionat catre finalizarea comenzii in {{ redirectIn }} {{ redirectIn === 1 ? 'secunda' : 'secunde' }}.
+          Iti multumim. Vei fi redirectionat {{ redirectDestination }} in {{ redirectIn }} {{ redirectIn === 1 ? 'secunda' : 'secunde' }}.
         </p>
         <p v-else class="text-gray-500 text-sm">
           Iti multumim. Poti inchide aceasta fereastra, sau poti continua aici dupa autentificare. Vei fi redirectionat in {{ redirectIn }} {{ redirectIn === 1 ? 'secunda' : 'secunde' }}.
         </p>
-        <UButton :to="loggedIn ? '/checkout' : '/user/login'" color="primary" variant="solid" class="rounded-sm mt-2">
+        <UButton :to="redirectTarget" color="primary" variant="solid" class="rounded-sm mt-2">
           {{ loggedIn ? 'Continua acum' : 'Autentifica-te' }}
         </UButton>
       </div>
@@ -125,12 +134,12 @@ onUnmounted(() => {
         <UIcon name="i-lucide-mail-check" class="w-12 h-12 text-primary" />
         <h2 class="text-xl font-bold text-gray-900">Contul este deja confirmat</h2>
         <p v-if="loggedIn" class="text-gray-500 text-sm">
-          Adresa de email a fost deja confirmata. Vei fi redirectionat catre finalizarea comenzii in {{ redirectIn }} {{ redirectIn === 1 ? 'secunda' : 'secunde' }}.
+          Adresa de email a fost deja confirmata. Vei fi redirectionat {{ redirectDestination }} in {{ redirectIn }} {{ redirectIn === 1 ? 'secunda' : 'secunde' }}.
         </p>
         <p v-else class="text-gray-500 text-sm">
           Adresa de email a fost deja confirmata. Poti inchide aceasta fereastra, sau poti continua aici dupa autentificare. Vei fi redirectionat in {{ redirectIn }} {{ redirectIn === 1 ? 'secunda' : 'secunde' }}.
         </p>
-        <UButton :to="loggedIn ? '/checkout' : '/user/login'" color="primary" variant="solid" class="rounded-sm mt-2">
+        <UButton :to="redirectTarget" color="primary" variant="solid" class="rounded-sm mt-2">
           {{ loggedIn ? 'Continua acum' : 'Autentifica-te' }}
         </UButton>
       </div>
