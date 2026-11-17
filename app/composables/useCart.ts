@@ -1,4 +1,5 @@
 import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
+import { roundToBani } from '~~/shared/constants/order'
 
 // The guest-cart merge currently running in this browser, shared by every
 // useCart() caller. Two merges at once would add the guest quantities twice.
@@ -220,11 +221,11 @@ export const useCart = () => {
     }
   }
 
-  const total = computed(() => {
-    return cartItems.value.reduce((acc, item) => {
-      return acc + (item.product?.price || 0) * item.quantity
-    }, 0)
-  })
+  // Rounded to bani like the order's subtotal on the server, so checkout shows
+  // the same free-shipping decision the order is charged with.
+  const total = computed(() => roundToBani(cartItems.value.reduce((acc, item) => {
+    return acc + (item.product?.price || 0) * item.quantity
+  }, 0)))
 
   return {
     cartItems,
