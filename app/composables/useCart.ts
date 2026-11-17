@@ -1,3 +1,5 @@
+import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
+
 export const useCart = () => {
   const { loggedIn } = useUserSession()
   const cartItems = useState<any[]>('cart-items', () => [])
@@ -81,15 +83,16 @@ export const useCart = () => {
         })
         await fetchCart()
       } else {
-        // Guest Logic
+        // Guest Logic. Cap at the same maximum the server applies to a
+        // logged-in cart, so a guest line never exceeds it.
         const existing = cartItems.value.find(item => item.productId === product.id)
         if (existing) {
-          existing.quantity += quantity
+          existing.quantity = Math.min(existing.quantity + quantity, CART_MAX_QUANTITY)
         } else {
           cartItems.value.push({
             id: Date.now(), // Temp ID
             productId: product.id,
-            quantity,
+            quantity: Math.min(quantity, CART_MAX_QUANTITY),
             product: product
           })
         }
@@ -133,6 +136,7 @@ export const useCart = () => {
     const item = cartItems.value.find(i => i.id === itemId)
     if (!item) return
 
+    quantity = Math.min(quantity, CART_MAX_QUANTITY)
     const previousQuantity = item.quantity
     item.quantity = quantity
 
@@ -146,8 +150,7 @@ export const useCart = () => {
       } catch (e) {
         console.error('Failed to update quantity', e)
         item.quantity = previousQuantity
-        const toast = useToast()
-        toast.add({ title: 'Nu s-a putut actualiza cantitatea', color: 'error' })
+        toast.add({ title: 'Nu s-a putut actualiza cantitatea', description: (e as any)?.data?.message, color: 'error' })
       }
     }
   }

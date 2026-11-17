@@ -1,8 +1,9 @@
 import { z } from 'zod'
+import { cartQuantitySchema } from '~~/shared/schemas/cart'
 
 const updateCartItemSchema = z.object({
-  quantity: z.number().min(1)
-})
+  quantity: cartQuantitySchema
+}, { error: 'Date invalide.' })
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -11,11 +12,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const itemId = getRouterParam(event, 'id')
-  const { quantity } = await readValidatedBody(event, updateCartItemSchema.parse)
+  const { quantity } = await readBodyWithSchema(event, updateCartItemSchema)
   const db = useDrizzle()
 
-  // Security: Check if the item belongs to the user's cart
-  // (Simplified for now - strictly we should join with carts and check userId)
+  // Only the owner of the cart may change its lines.
   const item = await db.query.cartItems.findFirst({
     where: eq(tables.cartItems.id, Number(itemId)),
     with: {

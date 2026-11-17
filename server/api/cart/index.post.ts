@@ -1,9 +1,10 @@
 import { z } from 'zod'
+import { cartQuantitySchema, productIdSchema, CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
 
 const addToCartSchema = z.object({
-  productId: z.number(),
-  quantity: z.number().min(1).default(1)
-})
+  productId: productIdSchema,
+  quantity: cartQuantitySchema.default(1)
+}, { error: 'Date invalide.' })
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 401, message: 'Unauthorized' })
   }
 
-  const { productId, quantity } = await readValidatedBody(event, addToCartSchema.parse)
+  const { productId, quantity } = await readBodyWithSchema(event, addToCartSchema)
   const userId = session.user.id
   const db = useDrizzle()
 
@@ -27,18 +28,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // 1. Get or Create Cart
-  let cart = await db.query.carts.findFirst({
-    where: eq(tables.carts.userId, userId)
-  })
-
-  if (!cart) {
-    const [newCart] = await db.insert(tables.carts).values({
-      userId,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }).returning()
-    cart = newCart
-  }
+  const cart = await getOrCreateCart(userId)
 
   // 2. Check if item exists in cart
   const existingItem = await db.query.cartItems.findFirst({
@@ -50,8 +40,9 @@ export default defineEventHandler(async (event) => {
 
   if (existingItem) {
     // Update quantity
+    // Cap so repeated adds can't push the line past the allowed maximum.
     await db.update(tables.cartItems)
-      .set({ quantity: existingItem.quantity + quantity })
+      .set({ quantity: Math.min(existingItem.quantity + quantity, CART_MAX_QUANTITY) })
       .where(eq(tables.cartItems.id, existingItem.id))
   } else {
     // Insert new item
