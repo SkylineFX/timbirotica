@@ -3,6 +3,7 @@ import {
   getCourierShippingCost,
   getShippingCost,
   computeOrderTotals,
+  roundToBani,
   shippingMethodLabel,
   paymentMethodLabel,
   orderPayloadSchema,
@@ -79,6 +80,27 @@ describe('computeOrderTotals', () => {
 
   it('returns zeroed totals for an empty cart', () => {
     expect(computeOrderTotals([], 'courier')).toEqual({ subtotal: 0, shippingCost: COURIER_SHIPPING_COST, total: COURIER_SHIPPING_COST })
+  })
+
+  it('rounds the totals to whole bani', () => {
+    // 3 x 9.99 sums to 29.970000000000002 in floating point
+    const { subtotal, total } = computeOrderTotals([{ quantity: 1, price: 9.99 }, { quantity: 1, price: 9.99 }, { quantity: 1, price: 9.99 }, { quantity: 1, price: 0.1 }, { quantity: 1, price: 0.2 }], 'pickup')
+    expect(subtotal).toBe(30.27)
+    expect(total).toBe(30.27)
+  })
+
+  it('gives free shipping to a cart of exactly 200 lei that floating point sums just below it', () => {
+    // 0.01 + 129.14 + 70.85 is 199.99999999999997 in floating point
+    const cart = [{ quantity: 1, price: 0.01 }, { quantity: 1, price: 129.14 }, { quantity: 1, price: 70.85 }]
+    expect(computeOrderTotals(cart, 'courier')).toEqual({ subtotal: 200, shippingCost: 0, total: 200 })
+  })
+})
+
+describe('roundToBani', () => {
+  it('removes floating-point tails', () => {
+    expect(roundToBani(9244.300000000003)).toBe(9244.3)
+    expect(roundToBani(0.1 + 0.2)).toBe(0.3)
+    expect(roundToBani(199.99999999999997)).toBe(200)
   })
 })
 

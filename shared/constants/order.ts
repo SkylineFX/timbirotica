@@ -49,6 +49,13 @@ export interface OrderTotals {
 }
 
 /**
+ * An amount in lei rounded to whole bani. Summing prices in floating point leaves
+ * tails such as 9244.300000000003; prices have at most two decimals, so the exact
+ * sum is always a whole number of bani and rounding restores it.
+ */
+export const roundToBani = (amount: number): number => Math.round(amount * 100) / 100
+
+/**
  * Order totals from line items + shipping method. Single source of truth shared by
  * the order endpoint so the stored total can never drift from the summed line items.
  */
@@ -56,12 +63,13 @@ export const computeOrderTotals = (
   items: OrderLineItem[],
   shippingMethod: ShippingMethod,
 ): OrderTotals => {
-  let subtotal = 0
+  let sum = 0
   for (const item of items) {
-    subtotal += item.price * item.quantity
+    sum += item.price * item.quantity
   }
+  const subtotal = roundToBani(sum)
   const shippingCost = getShippingCost(shippingMethod, subtotal)
-  return { subtotal, shippingCost, total: subtotal + shippingCost }
+  return { subtotal, shippingCost, total: roundToBani(subtotal + shippingCost) }
 }
 
 // Payload accepted by POST /api/orders. Addresses are passed as IDs only and
