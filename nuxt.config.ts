@@ -45,6 +45,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     resendApiKey: '',
     adminEmail: process.env.NUXT_ADMIN_EMAIL || 'eurotimalex@yahoo.com',
+    // Prepended to every email subject. Set to "[TEST] " on previews (see nitro.cloudflare.wrangler.previews).
+    emailSubjectPrefix: '',
     session: {
       password: process.env.NUXT_SESSION_PASSWORD || '',
       cookie: {
@@ -80,6 +82,31 @@ export default defineNuxtConfig({
         observability: {
           enabled: true,
           head_sampling_rate: 1
+        },
+        // Previews (staging): Workers Builds builds every branch other than master
+        // with `wrangler preview`. Previews don't inherit production settings, so
+        // they get their own database and test settings here and never touch
+        // production data. Their secrets, NUXT_SESSION_PASSWORD (must differ from
+        // production) and NUXT_RESEND_API_KEY, are set with
+        // `npx wrangler preview base-config secret put <NAME>`.
+        // @ts-expect-error `previews` is newer than the Wrangler types bundled with Nitro; Nitro copies it into the generated wrangler.json unchanged.
+        previews: {
+          d1_databases: [
+            {
+              binding: 'DB',
+              database_name: 'timbirotica-staging',
+              database_id: '6a95ada0-a2c4-436b-a36e-c4a2c7b8a45b'
+            }
+          ],
+          vars: {
+            // Resend's test inbox: accepted and discarded, visible in the Resend dashboard.
+            NUXT_ADMIN_EMAIL: 'delivered@resend.dev',
+            // Marks every email sent from a preview as a test.
+            NUXT_EMAIL_SUBJECT_PREFIX: '[TEST] ',
+            // Cloudflare's public Turnstile test keys: the check always passes on preview hostnames.
+            NUXT_PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
+            NUXT_TURNSTILE_SECRET_KEY: '1x0000000000000000000000000000000AA'
+          }
         }
       }
     }
