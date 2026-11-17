@@ -50,6 +50,7 @@ public/temporary
 
 # AI Assistant & IDE State
 .claude/
+CLAUDE.md
 .gemini/
 .cursor/
 .windsurf/
