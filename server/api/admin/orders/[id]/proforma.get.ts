@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { generateProformaPdf, resolveProformaCustomer } from '../../../../utils/proforma'
+import { generateProformaPdf, proformaCustomerFromSnapshots } from '../../../../utils/proforma'
 
 export default eventHandler(async (event) => {
   await requireAdminSession(event)
@@ -22,13 +22,7 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Comanda nu a fost gasita.' })
   }
 
-  const billingSnapshot = order.billingAddressSnapshot ? JSON.parse(order.billingAddressSnapshot) : null
-  const shippingSnapshot = order.shippingAddressSnapshot ? JSON.parse(order.shippingAddressSnapshot) : null
-  const customer = resolveProformaCustomer(
-    billingSnapshot && billingSnapshot.companyName ? billingSnapshot : null,
-    shippingSnapshot,
-    order.user
-  )
+  const customer = proformaCustomerFromSnapshots(order.billingAddressSnapshot, order.shippingAddressSnapshot, order.user)
 
   const pdf = await generateProformaPdf({
     orderNumber: order.orderNumber,

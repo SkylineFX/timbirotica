@@ -74,6 +74,37 @@ export function resolveProformaCustomer(
   }
 }
 
+function parseSnapshot<T>(json: string | null | undefined): T | null {
+  if (!json) return null
+  try {
+    return JSON.parse(json) as T
+  } catch {
+    return null
+  }
+}
+
+/**
+ * The proforma customer of a saved order, read from its address snapshots.
+ *
+ * The billing snapshot holds whoever the invoice is for: the company, the other
+ * personal address picked under "Persoana fizica", or a copy of the delivery
+ * address. A missing or empty billing snapshot falls back to the delivery one.
+ * Used by the proforma downloads so they match the proforma emailed with the order.
+ */
+export function proformaCustomerFromSnapshots(
+  billingSnapshotJson: string | null | undefined,
+  shippingSnapshotJson: string | null | undefined,
+  user: { firstName: string; lastName: string }
+): ProformaInput['customer'] {
+  const billing = parseSnapshot<BillingSnapshot & ShippingSnapshot>(billingSnapshotJson)
+  const shipping = parseSnapshot<ShippingSnapshot>(shippingSnapshotJson)
+  return resolveProformaCustomer(
+    billing?.companyName ? billing : null,
+    billing?.street ? billing : shipping,
+    user
+  )
+}
+
 function paymentLabel(method: string): string {
   if (method === 'transfer') return 'Transfer bancar'
   if (method === 'cash') return 'Numerar la livrare'
