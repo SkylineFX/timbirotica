@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { shippingMethodLabel, paymentMethodLabel } from '~~/shared/constants/order'
+import { formatRon, formatShopDateTime } from '~~/shared/utils/format'
 
 interface OrderItem {
   name: string
@@ -51,7 +52,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const formattedDate = computed(() => {
   if (!props.orderDate) return ''
-  return new Date(props.orderDate).toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' })
+  return formatShopDateTime(props.orderDate)
 })
 
 const formattedShippingMethod = computed(() => shippingMethodLabel(props.shippingMethod))
@@ -106,12 +107,12 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
                   {{ item.name }}
                 </EText>
                 <EText style="font-size: 14px; margin: 4px 0 0; color: #8898aa;">
-                  Cantitate: {{ item.quantity }}
+                  Cantitate: {{ item.quantity }} x {{ formatRon(item.price) }}
                 </EText>
               </EColumn>
               <EColumn style="width: 30%; text-align: right;">
                 <EText style="font-size: 16px; margin: 0; color: #525f7f; font-weight: 500;">
-                  {{ Number(item.price.toFixed(2)) }} RON
+                  {{ formatRon(item.price * item.quantity) }}
                 </EText>
               </EColumn>
             </ERow>
@@ -124,7 +125,7 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
               <EText style="font-size: 16px; margin: 0; color: #525f7f;">Subtotal</EText>
             </EColumn>
             <EColumn style="width: 30%; text-align: right;">
-              <EText style="font-size: 16px; margin: 0; color: #525f7f;">{{ Number((total - shippingCost).toFixed(2)) }} RON</EText>
+              <EText style="font-size: 16px; margin: 0; color: #525f7f;">{{ formatRon(total - shippingCost) }}</EText>
             </EColumn>
           </ERow>
 
@@ -133,7 +134,7 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
               <EText style="font-size: 16px; margin: 0; color: #525f7f;">Cost livrare</EText>
             </EColumn>
             <EColumn style="width: 30%; text-align: right;">
-              <EText style="font-size: 16px; margin: 0; color: #525f7f;">{{ Number(shippingCost.toFixed(2)) }} RON</EText>
+              <EText style="font-size: 16px; margin: 0; color: #525f7f;">{{ formatRon(shippingCost) }}</EText>
             </EColumn>
           </ERow>
 
@@ -142,7 +143,7 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
               <EText style="font-size: 18px; margin: 0; font-weight: 700; color: #484848;">Total</EText>
             </EColumn>
             <EColumn style="width: 30%; text-align: right;">
-              <EText style="font-size: 18px; margin: 0; font-weight: 700; color: #484848;">{{ Number(total.toFixed(2)) }} RON</EText>
+              <EText style="font-size: 18px; margin: 0; font-weight: 700; color: #484848;">{{ formatRon(total) }}</EText>
             </EColumn>
           </ERow>
 

@@ -10,6 +10,9 @@ const r = (p: string) => fileURLToPath(new URL(p, import.meta.url))
 export default defineConfig({
   test: {
     environment: 'node',
+    // Run in UTC like Cloudflare Workers, so time zone bugs show up in tests
+    // even on a machine set to Romanian time.
+    env: { TZ: 'UTC' },
     include: ['test/**/*.test.ts'],
     coverage: {
       provider: 'v8',

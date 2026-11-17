@@ -1,6 +1,7 @@
 import { PDFDocument, rgb, type PDFFont, type PDFPage, type StandardFonts } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
 import { COMPANY, VAT_RATE } from './company'
+import { formatAmount, formatRon, formatShopDate } from '~~/shared/utils/format'
 
 export interface ProformaInput {
   orderNumber: string
@@ -71,22 +72,6 @@ export function resolveProformaCustomer(
     city: src.city ?? '—',
     county: src.county ?? '—',
   }
-}
-
-const ronFmt = new Intl.NumberFormat('ro-RO', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-})
-
-function fmtRon(n: number): string {
-  return `${ronFmt.format(n)} RON`
-}
-
-function fmtDate(d: Date): string {
-  const dd = String(d.getDate()).padStart(2, '0')
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const yyyy = d.getFullYear()
-  return `${dd}.${mm}.${yyyy}`
 }
 
 function paymentLabel(method: string): string {
@@ -326,7 +311,7 @@ function drawFirstPageHeader(page: PDFPage, { font, fontBold }: Fonts, input: Pr
   page.drawText('PROFORMA', { x: MARGIN, y: y - 18, size: 20, font: fontBold, color: BLACK })
   const refLabel = `Nr. ${input.orderNumber}`
   page.drawText(refLabel, { x: width - MARGIN - fontBold.widthOfTextAtSize(refLabel, 12), y: y - 8, size: 12, font: fontBold, color: BLACK })
-  const dateText = `Data: ${fmtDate(input.orderDate)}`
+  const dateText = `Data: ${formatShopDate(input.orderDate)}`
   page.drawText(dateText, { x: width - MARGIN - font.widthOfTextAtSize(dateText, 10), y: y - 24, size: 10, font, color: GREY })
 
   y -= 50
@@ -385,7 +370,7 @@ function drawContinuationHeader(page: PDFPage, { font, fontBold }: Fonts, input:
   const title = `PROFORMA Nr. ${input.orderNumber}`
   page.drawText(title, { x: MARGIN, y: top - 12, size: 12, font: fontBold, color: BLACK })
   page.drawText('(continuare)', { x: MARGIN + fontBold.widthOfTextAtSize(title, 12) + 6, y: top - 12, size: 10, font, color: GREY })
-  const dateText = `Data: ${fmtDate(input.orderDate)}`
+  const dateText = `Data: ${formatShopDate(input.orderDate)}`
   page.drawText(dateText, { x: width - MARGIN - font.widthOfTextAtSize(dateText, 10), y: top - 12, size: 10, font, color: GREY })
 
   return top - CONTINUATION_HEADER_HEIGHT
@@ -424,9 +409,9 @@ function drawRow(page: PDFPage, { font }: Fonts, row: TableRow, y: number): numb
   })
   drawCell(page, 'BUC', COLUMNS.um, contentTop, font, 10, BLACK)
   drawCell(page, row.qty, COLUMNS.qty, contentTop, font, 10, BLACK)
-  drawCell(page, ronFmt.format(row.unitNet), COLUMNS.price, contentTop, font, 10, BLACK)
-  drawCell(page, ronFmt.format(row.lineNet), COLUMNS.value, contentTop, font, 10, BLACK)
-  drawCell(page, ronFmt.format(row.lineVat), COLUMNS.vat, contentTop, font, 10, BLACK)
+  drawCell(page, formatAmount(row.unitNet), COLUMNS.price, contentTop, font, 10, BLACK)
+  drawCell(page, formatAmount(row.lineNet), COLUMNS.value, contentTop, font, 10, BLACK)
+  drawCell(page, formatAmount(row.lineVat), COLUMNS.vat, contentTop, font, 10, BLACK)
 
   const bottom = y - rowHeight(row.nameLines.length)
   page.drawLine({ start: { x: MARGIN, y: bottom + 2 }, end: { x: width - MARGIN, y: bottom + 2 }, thickness: 0.3, color: LIGHT_GREY })
@@ -440,14 +425,14 @@ function drawTotals(page: PDFPage, { fontBold }: Fonts, y: number, subtotalNet: 
   y -= 8
   const totalLabelX = COLUMNS.value.x - 6
   page.drawText('Total', { x: totalLabelX - fontBold.widthOfTextAtSize('Total', 10), y, size: 10, font: fontBold, color: BLACK })
-  drawCell(page, ronFmt.format(subtotalNet), COLUMNS.value, y, fontBold, 10, BLACK)
-  drawCell(page, ronFmt.format(subtotalVat), COLUMNS.vat, y, fontBold, 10, BLACK)
+  drawCell(page, formatAmount(subtotalNet), COLUMNS.value, y, fontBold, 10, BLACK)
+  drawCell(page, formatAmount(subtotalVat), COLUMNS.vat, y, fontBold, 10, BLACK)
   y -= 20
 
   const barHeight = 26
   page.drawRectangle({ x: MARGIN, y: y - barHeight, width: width - MARGIN * 2, height: barHeight, color: LIGHT_GREY })
   page.drawText('Total', { x: MARGIN + 10, y: y - 17, size: 11, font: fontBold, color: BLACK })
-  const totalText = fmtRon(total)
+  const totalText = formatRon(total)
   page.drawText(totalText, { x: width - MARGIN - 10 - fontBold.widthOfTextAtSize(totalText, 13), y: y - 18, size: 13, font: fontBold, color: BLACK })
 }
 
