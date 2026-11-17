@@ -8,6 +8,8 @@ const SORTABLE_COLUMNS = {
 type SortKey = keyof typeof SORTABLE_COLUMNS
 
 export default eventHandler(async (event) => {
+  await requireAdminSession(event)
+
   const query = getQuery(event)
   const page = Math.max(1, parseInt(String(query.page ?? '1')))
   const limit = Math.min(100, Math.max(1, parseInt(String(query.limit ?? '25'))))
