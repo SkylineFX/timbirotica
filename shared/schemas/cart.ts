@@ -4,10 +4,10 @@ import { z } from 'zod'
 // re-checked when an order is placed. The UI inputs cap at the same maximum.
 export const CART_MAX_QUANTITY = 9999
 
-// Most distinct products accepted from one guest-cart merge. The merge looks the
-// products up with one `IN (...)` query, and D1 allows at most 100 bound
-// parameters per query.
-export const CART_SYNC_MAX_PRODUCTS = 100
+// Most distinct products accepted from one guest-cart merge. This is only a
+// safety bound against oversized requests, far above any real cart. The merge
+// itself splits its queries to fit D1's limits (server/utils/cartMerge.ts).
+export const CART_SYNC_MAX_PRODUCTS = 1000
 
 export const cartQuantitySchema = z
   .number({ error: 'Cantitate invalida.' })
