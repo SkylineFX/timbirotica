@@ -2,7 +2,9 @@ import { z } from 'zod'
 
 // Single rule for a cart line quantity, enforced by every cart endpoint and
 // re-checked when an order is placed. The UI inputs cap at the same maximum.
-export const CART_MAX_QUANTITY = 9999
+// Far above real orders (the largest line so far is 20), low enough to catch
+// typing mistakes such as an extra zero.
+export const CART_MAX_QUANTITY = 250
 
 // Most distinct products accepted from one guest-cart merge. This is only a
 // safety bound against oversized requests, far above any real cart. The merge
