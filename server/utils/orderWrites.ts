@@ -27,6 +27,12 @@ export interface OrderLineWrite {
  *
  * The lines find their order through its unique order number, because the new
  * order's id doesn't exist until the batch runs.
+ *
+ * The order is saved only while its cart still holds products. Two submits of
+ * the same cart at once (two tabs, a retry) both pass the handler's checks, but
+ * D1 runs their batches one after the other: the second one finds the cart
+ * already emptied, its user_id becomes NULL, the NOT NULL constraint fails and
+ * the whole batch is rolled back. So a cart is ordered once.
  */
 export function buildOrderWrites(
   db: LibSQLDatabase<typeof schema>,
@@ -46,8 +52,10 @@ export function buildOrderWrites(
     db.insert(schema.orderItems).values(chunk.map(line => ({ ...line, orderId })))
   )
 
+  const userIdWhileCartHasItems = sql<number>`(select ${order.userId} where exists (select 1 from ${schema.cartItems} where ${schema.cartItems.cartId} = ${cartId}))`
+
   return [
-    db.insert(schema.orders).values(order),
+    db.insert(schema.orders).values({ ...order, userId: userIdWhileCartHasItems }),
     ...lineInserts,
     db.delete(schema.cartItems).where(eq(schema.cartItems.cartId, cartId)),
   ]

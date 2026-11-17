@@ -56,11 +56,35 @@ describe('buildOrderWrites', () => {
 
   it('links the lines to the new order when other orders exist', async () => {
     await db.batch(buildOrderWrites(db, { order: order('FIRST001'), lines: linesFor(3), cartId: TEST_CART_ID }))
+    // the customer fills the cart again for a new order
+    await db.insert(schema.cartItems).values([{ cartId: TEST_CART_ID, productId: 1, quantity: 2 }, { cartId: TEST_CART_ID, productId: 2, quantity: 2 }])
     await db.batch(buildOrderWrites(db, { order: order('SECOND01'), lines: linesFor(2), cartId: TEST_CART_ID }))
 
     const second = await db.query.orders.findFirst({ where: eq(schema.orders.orderNumber, 'SECOND01'), with: { items: true } })
     expect(second?.items).toHaveLength(2)
     expect(await rowCount(schema.orderItems)).toBe(5)
+  })
+
+  it('orders a cart once when it is submitted twice', async () => {
+    // Both requests read the full cart before either saves, as with two tabs or a retry.
+    const first = buildOrderWrites(db, { order: order('FIRST001'), lines: linesFor(PRODUCT_COUNT), cartId: TEST_CART_ID })
+    const second = buildOrderWrites(db, { order: order('SECOND01'), lines: linesFor(PRODUCT_COUNT), cartId: TEST_CART_ID })
+
+    const results = await Promise.allSettled([db.batch(first), db.batch(second)])
+
+    expect(results.map(r => r.status).sort()).toEqual(['fulfilled', 'rejected'])
+    expect(await rowCount(schema.orders)).toBe(1)
+    expect(await rowCount(schema.orderItems)).toBe(PRODUCT_COUNT)
+    expect(await rowCount(schema.cartItems)).toBe(0)
+  })
+
+  it('saves nothing when the cart was emptied meanwhile', async () => {
+    await db.delete(schema.cartItems)
+
+    await expect(db.batch(buildOrderWrites(db, { order: order(), lines: linesFor(2), cartId: TEST_CART_ID }))).rejects.toThrow()
+
+    expect(await rowCount(schema.orders)).toBe(0)
+    expect(await rowCount(schema.orderItems)).toBe(0)
   })
 
   it('saves nothing when a line in a later chunk fails', async () => {
