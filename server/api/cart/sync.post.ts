@@ -1,5 +1,6 @@
 import { mergeCartItems } from '~~/shared/utils/cart'
-import { parseCartLines, CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
+import { parseCartLines } from '~~/shared/schemas/cart'
+import { buildProductLookups, buildCartMergeWrites } from '../../utils/cartMerge'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -18,13 +19,12 @@ export default defineEventHandler(async (event) => {
 
   // Drop products that no longer exist (deleted from the catalog since the guest
   // added them). Inserting them would fail the cart_items foreign key on D1.
-  // parseCartLines keeps at most CART_SYNC_MAX_PRODUCTS ids, which keeps this
-  // IN list within D1's limit of 100 bound parameters per query.
+  // The lookup is split into queries that fit D1's parameter limit and sent as
+  // one batch, so the size of the guest cart doesn't matter.
   const productIds = [...new Set(validLines.map(l => l.productId))]
-  const existingProducts = await db.select({ id: tables.products.id })
-    .from(tables.products)
-    .where(inArray(tables.products.id, productIds))
-  const knownIds = new Set(existingProducts.map(p => p.id))
+  const [firstLookup, ...moreLookups] = buildProductLookups(db, productIds)
+  const found = firstLookup ? await db.batch([firstLookup, ...moreLookups]) : []
+  const knownIds = new Set(found.flat().map(p => p.id))
   const items = validLines.filter(l => knownIds.has(l.productId))
   if (items.length === 0) return { success: true }
 
@@ -32,34 +32,25 @@ export default defineEventHandler(async (event) => {
   const { id: cartId } = await getOrCreateCart(userId)
 
   // 2. Merge the guest cart into the user's cart: quantities for products already
-  // present are summed, new products are inserted. The consolidation is a pure
+  // present are summed, new products are added. The consolidation is a pure
   // function (mergeCartItems) so it can be unit tested without a database.
   const existingItems = await db.query.cartItems.findMany({
-    where: eq(tables.cartItems.cartId, cartId)
+    where: eq(tables.cartItems.cartId, cartId),
+    columns: { id: true, productId: true, quantity: true }
   })
-  const existingByProduct = new Map(existingItems.map(i => [i.productId, i]))
-
   const merged = mergeCartItems(
     existingItems.map(i => ({ productId: i.productId, quantity: i.quantity })),
     items
   )
 
-  for (const line of merged) {
-    // Summing guest + existing quantities can exceed the per-line maximum.
-    const quantity = Math.min(line.quantity, CART_MAX_QUANTITY)
-    const existingItem = existingByProduct.get(line.productId)
-    if (existingItem) {
-      await db.update(tables.cartItems)
-        .set({ quantity })
-        .where(eq(tables.cartItems.id, existingItem.id))
-    } else {
-      await db.insert(tables.cartItems).values({
-        cartId,
-        productId: line.productId,
-        quantity
-      })
-    }
-  }
+  // 3. Save the merge in one batch: one transaction, so a failure changes
+  // nothing and the client keeps the guest cart to try again.
+  const [firstWrite, ...moreWrites] = buildCartMergeWrites(db, {
+    cartId,
+    merged,
+    existingItemIdByProduct: new Map(existingItems.map(i => [i.productId, i.id])),
+  })
+  if (firstWrite) await db.batch([firstWrite, ...moreWrites])
 
   return { success: true }
 })
