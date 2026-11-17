@@ -10,6 +10,6 @@ export const COMPANY = {
   address: 'Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti',
   phone: '+40 751 022 882',
   email: 'eurotimalex@yahoo.com',
-  iban: 'RO29RNCB0077060233480001',
-  bankName: 'BANCA COMERCIALA ROMANA',
+  iban: 'RO12INGB0000999920472642',
+  bankName: 'ING BANK NV',
 } as const
