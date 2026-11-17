@@ -44,11 +44,19 @@ interface Props {
   orderDate: string
   paymentMethod: string
   shippingMethod: string
+  // True when the proforma PDF is attached. It lists every product, so a long
+  // order shows only its first lines here.
+  hasProforma?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  items: () => []
+  items: () => [],
+  hasProforma: false
 })
+
+const EMAIL_ITEM_LIMIT = 10
+const shownItems = computed(() => props.hasProforma ? props.items.slice(0, EMAIL_ITEM_LIMIT) : props.items)
+const hiddenItemCount = computed(() => props.items.length - shownItems.value.length)
 
 const formattedDate = computed(() => {
   if (!props.orderDate) return ''
@@ -100,7 +108,7 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
 
           <EHr style="border-color: #e6ebf1; margin: 20px 0;" />
 
-          <ESection v-for="(item, index) in items" :key="index" style="margin-bottom: 16px;">
+          <ESection v-for="(item, index) in shownItems" :key="index" style="margin-bottom: 16px;">
             <ERow>
               <EColumn style="width: 70%;">
                 <EText style="font-size: 16px; margin: 0; color: #525f7f; font-weight: 500;">
@@ -116,6 +124,15 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
                 </EText>
               </EColumn>
             </ERow>
+          </ESection>
+
+          <ESection v-if="hiddenItemCount > 0" style="margin-bottom: 16px;">
+            <EText style="font-size: 16px; margin: 0; color: #525f7f; font-weight: 500;">
+              ...
+            </EText>
+            <EText style="font-size: 14px; margin: 4px 0 0; color: #8898aa;">
+              + {{ hiddenItemCount }} {{ hiddenItemCount === 1 ? 'produs' : 'produse' }}. Lista completă este în factura proformă atașată.
+            </EText>
           </ESection>
 
           <EHr style="border-color: #e6ebf1; margin: 20px 0;" />

@@ -75,7 +75,8 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
     billingAddress: data.billingAddress,
     orderDate: data.orderDate,
     paymentMethod: data.paymentMethod,
-    shippingMethod: data.shippingMethod
+    shippingMethod: data.shippingMethod,
+    hasProforma: Boolean(data.attachment)
   })
 
   const htmlContent = typeof template === 'string' ? template : template.html
