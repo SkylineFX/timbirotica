@@ -1,5 +1,9 @@
 import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
 
+// The guest-cart merge currently running in this browser, shared by every
+// useCart() caller. Two merges at once would add the guest quantities twice.
+let guestCartMerge: Promise<void> | null = null
+
 export const useCart = () => {
   const { loggedIn } = useUserSession()
   const cartItems = useState<any[]>('cart-items', () => [])
@@ -169,9 +173,18 @@ export const useCart = () => {
     clearCart()
   }
 
-  const syncCart = async () => {
-    if (!loggedIn.value) return
+  /**
+   * Merge the browser's guest cart into the signed-in user's cart, then load
+   * the cart from the server. Safe to call from several places at once
+   * (sign-in watcher, login page, checkout): callers share one merge.
+   */
+  const syncCart = (): Promise<void> => {
+    if (!import.meta.client || !loggedIn.value) return Promise.resolve()
+    guestCartMerge ??= mergeGuestCart().finally(() => { guestCartMerge = null })
+    return guestCartMerge
+  }
 
+  const mergeGuestCart = async () => {
     let itemsToSync = []
     if (import.meta.client) {
       const saved = localStorage.getItem('guest-cart')
