@@ -55,6 +55,9 @@ public/temporary
 .windsurf/
 skills/
 project_analysis.md
+prompts/
+# Local review report. It describes open security issues and this repo is public.
+CODEBASE_REVIEW.md
 
 # OS & Editor metadata
 .DS_Store
