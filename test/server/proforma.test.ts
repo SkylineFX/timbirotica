@@ -1,0 +1,90 @@
+import { describe, it, expect } from 'vitest'
+import { PDFDocument, StandardFonts } from 'pdf-lib'
+import { generateProformaPdf, paginateRows, type PaginationSpace, type ProformaInput } from '~~/server/utils/proforma'
+
+describe('paginateRows', () => {
+  const space: PaginationSpace = { firstPage: 100, otherPages: 200, totals: 30 }
+
+  it('keeps everything on one page when it fits', () => {
+    expect(paginateRows([20, 20, 20], space)).toEqual([[0, 1, 2]])
+  })
+
+  it('moves the rows that do not fit to the next page', () => {
+    // page 1 holds 40 + 40; the third row would need 120 of its 100
+    expect(paginateRows([40, 40, 40, 40], space)).toEqual([[0, 1], [2, 3]])
+  })
+
+  it('uses the larger space of the pages after the first', () => {
+    // page 1: 2 rows of 40 (80 of 100); page 2: 5 rows of 40 (200 of 200);
+    // the last page holds the rest plus the totals (3 x 40 + 30 = 150 of 200)
+    expect(paginateRows(Array(10).fill(40), space)).toEqual([[0, 1], [2, 3, 4, 5, 6], [7, 8, 9]])
+  })
+
+  it('moves the last row to a new page when the totals do not fit under it', () => {
+    // 40 + 40 fit on page 1 (80 of 100), but the totals would need 30 more
+    expect(paginateRows([40, 40], space)).toEqual([[0], [1]])
+  })
+
+  it('gives the totals their own page only when one row fills the page', () => {
+    expect(paginateRows([90], space)).toEqual([[0], []])
+  })
+
+  it('puts a row taller than a page on a page of its own', () => {
+    expect(paginateRows([20, 150, 20], { firstPage: 100, otherPages: 120, totals: 10 })).toEqual([[0], [1], [2]])
+  })
+
+  it('places every row exactly once, in order, within the space of its page', () => {
+    // Deterministic pseudo-random heights between 28 and 64 (1 to 4 name lines)
+    const heights = Array.from({ length: 500 }, (_, i) => 28 + ((i * 37) % 4) * 12)
+    const pages = paginateRows(heights, { firstPage: 430, otherPages: 650, totals: 54 })
+
+    expect(pages.flat()).toEqual(heights.map((_, i) => i))
+    pages.forEach((rows, pageIndex) => {
+      const capacity = pageIndex === 0 ? 430 : 650
+      const used = rows.reduce((sum, i) => sum + heights[i]!, 0)
+      const totals = pageIndex === pages.length - 1 ? 54 : 0
+      expect(used + totals).toBeLessThanOrEqual(capacity)
+    })
+  })
+})
+
+describe('generateProformaPdf', () => {
+  // pdf-lib's built-in fonts, so the test needs no font download.
+  const builtInFonts = async () => ({ regular: StandardFonts.Helvetica, bold: StandardFonts.HelveticaBold })
+
+  const proforma = (itemCount: number, name = (i: number) => `PRODUS DE TEST NUMARUL ${i + 1} HARTIE COPIATOR A4 80G 500 COLI`): ProformaInput => ({
+    orderNumber: 'TEST0001',
+    orderDate: new Date('2026-11-17T10:00:00Z'),
+    paymentMethod: 'transfer',
+    shippingMethod: 'courier',
+    shippingCost: 30,
+    total: itemCount * 2 * 19.99 + 30,
+    items: Array.from({ length: itemCount }, (_, i) => ({ name: name(i), quantity: 2, priceAtBuy: 19.99 })),
+    customer: {
+      type: 'company', name: 'Client Test SRL', cui: 'RO123456', onrc: 'J40/1234/2024',
+      address: 'Strada Exemplu 1', city: 'Bucuresti', county: 'Bucuresti',
+    },
+  })
+
+  const pageCount = async (input: ProformaInput) =>
+    (await PDFDocument.load(await generateProformaPdf(input, builtInFonts))).getPageCount()
+
+  it('fits a short order on one page', async () => {
+    expect(await pageCount(proforma(5))).toBe(1)
+  })
+
+  it('spreads a long order over several pages', async () => {
+    expect(await pageCount(proforma(40))).toBeGreaterThan(1)
+  })
+
+  it('adds pages as the order grows', async () => {
+    const counts = [await pageCount(proforma(40)), await pageCount(proforma(120)), await pageCount(proforma(300))]
+    expect(counts[1]).toBeGreaterThan(counts[0]!)
+    expect(counts[2]).toBeGreaterThan(counts[1]!)
+  })
+
+  it('handles a product name with a word longer than the name column', async () => {
+    const longWord = 'X'.repeat(80)
+    expect(await pageCount(proforma(3, () => `PRODUS ${longWord} TEST`))).toBe(1)
+  })
+})
