@@ -47,6 +47,14 @@ export interface OrderEmailData {
   attachment?: EmailAttachment
 }
 
+/**
+ * Email subject with the configured prefix. Previews set it to "[TEST] " so a
+ * test email (with a real-looking proforma) can't be mistaken for a real order.
+ */
+function emailSubject(text: string): string {
+  return `${useRuntimeConfig().emailSubjectPrefix || ''}${text}`
+}
+
 export async function sendOrderConfirmation(data: OrderEmailData): Promise<void> {
   const config = useRuntimeConfig()
 
@@ -75,7 +83,7 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
   const { error } = await resend.emails.send({
     from: 'Timbirotica <comenzi@timbirotica.ro>',
     to: data.customerEmail,
-    subject: `Confirmare înregistrare comandă #${data.orderNumber}`,
+    subject: emailSubject(`Confirmare înregistrare comandă #${data.orderNumber}`),
     html: htmlContent,
     attachments: data.attachment ? [{
       filename: data.attachment.filename,
@@ -111,7 +119,7 @@ export async function sendEmailVerification(data: { email: string; firstName: st
   const { error } = await resend.emails.send({
     from: 'Timbirotica <noreply@timbirotica.ro>',
     to: data.email,
-    subject: 'Confirmare adresă email - Timbirotica',
+    subject: emailSubject('Confirmare adresă email - Timbirotica'),
     html: htmlContent
   })
 
@@ -153,7 +161,7 @@ export async function sendNewOrderAdminNotification(data: OrderEmailData): Promi
     from: 'Timbirotica <comenzi@timbirotica.ro>',
     to: config.adminEmail,
     replyTo: data.customerEmail, // Admin can reply straight to the customer
-    subject: `Comanda noua #${data.orderNumber}`,
+    subject: emailSubject(`Comanda noua #${data.orderNumber}`),
     html: htmlContent,
     attachments: data.attachment ? [{
       filename: data.attachment.filename,
@@ -220,7 +228,7 @@ export async function sendContactMessage(data: ContactMessageData): Promise<void
     from: 'Timbirotica <noreply@timbirotica.ro>',
     to: config.adminEmail,
     replyTo: data.email, // Replies go straight to the person who wrote in
-    subject: `[Contact] ${data.subject}`,
+    subject: emailSubject(`[Contact] ${data.subject}`),
     html: htmlContent
   })
 
@@ -252,7 +260,7 @@ export async function sendPasswordReset(data: { email: string; firstName: string
   const { error } = await resend.emails.send({
     from: 'Timbirotica <noreply@timbirotica.ro>',
     to: data.email,
-    subject: 'Resetare parolă - Timbirotica',
+    subject: emailSubject('Resetare parolă - Timbirotica'),
     html: htmlContent
   })
 
