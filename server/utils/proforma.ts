@@ -369,7 +369,6 @@ function drawContinuationHeader(page: PDFPage, { font, fontBold }: Fonts, input:
 
   const title = `PROFORMA Nr. ${input.orderNumber}`
   page.drawText(title, { x: MARGIN, y: top - 12, size: 12, font: fontBold, color: BLACK })
-  page.drawText('(continuare)', { x: MARGIN + fontBold.widthOfTextAtSize(title, 12) + 6, y: top - 12, size: 10, font, color: GREY })
   const dateText = `Data: ${formatShopDate(input.orderDate)}`
   page.drawText(dateText, { x: width - MARGIN - font.widthOfTextAtSize(dateText, 10), y: top - 12, size: 10, font, color: GREY })
 
