@@ -204,48 +204,52 @@ async function submitOrder() {
     return
   }
 
-  // Make sure any guest products are merged before ordering, so the cart shown
-  // here is the cart the server will order.
-  await syncCart()
-
-  if (cartItems.value.length === 0) {
-    toast.add({ title: 'Cos gol', description: 'Cosul trebuie sa contina produse.', color: 'error' })
-    return
-  }
-
-  // Personal address is required for courier delivery, or as the individual invoice (persoana fizica)
-  if ((deliveryMethod.value === 'courier' || billingSameAsShipping.value) && !selectedAddress.value) {
-    toast.add({ title: 'Adresa lipsa', description: 'Te rugam sa selectezi o adresa.', color: 'error' })
-    return
-  }
-
-  if (!billingSameAsShipping.value && !selectedBilling.value) {
-     toast.add({ title: 'Facturare lipsa', description: 'Te rugam sa selectezi datele de facturare.', color: 'error' })
-     return
-  }
-
-  if (billingSameAsShipping.value && deliveryMethod.value === 'courier' && !selectedBillingAddress.value) {
-     toast.add({ title: 'Adresa de facturare lipsa', description: 'Te rugam sa selectezi adresa de facturare.', color: 'error' })
-     return
-  }
-
+  // Block a second submit from here on, including while the cart refreshes below.
   isSubmitting.value = true
-
-  const payload = {
-    shippingMethod: deliveryMethod.value,
-    paymentMethod: paymentMethod.value,
-    shippingAddressId: (deliveryMethod.value === 'courier' || billingSameAsShipping.value) ? selectedAddressId.value : null,
-    billingSameAsShipping: billingSameAsShipping.value,
-    billingAddressId: billingSameAsShipping.value ? null : selectedBillingId.value,
-    billingPersonalAddressId: (billingSameAsShipping.value && deliveryMethod.value === 'courier') ? selectedBillingAddressId.value : null,
-    termsAccepted: true as const,
-    priceSnapshots: cartItems.value.map(item => ({
+  try {
+    // The prices the customer is looking at, taken before the cart refresh below,
+    // so the server still refuses the order (409) if a price changed meanwhile.
+    const priceSnapshots = cartItems.value.map(item => ({
       productId: item.productId,
       price: item.product?.price ?? 0
     }))
-  }
 
-  try {
+    // Merge any guest products first, so the cart the server orders is the cart
+    // shown here.
+    await syncCart()
+
+    if (cartItems.value.length === 0) {
+      toast.add({ title: 'Cos gol', description: 'Cosul trebuie sa contina produse.', color: 'error' })
+      return
+    }
+
+    // Personal address is required for courier delivery, or as the individual invoice (persoana fizica)
+    if ((deliveryMethod.value === 'courier' || billingSameAsShipping.value) && !selectedAddress.value) {
+      toast.add({ title: 'Adresa lipsa', description: 'Te rugam sa selectezi o adresa.', color: 'error' })
+      return
+    }
+
+    if (!billingSameAsShipping.value && !selectedBilling.value) {
+      toast.add({ title: 'Facturare lipsa', description: 'Te rugam sa selectezi datele de facturare.', color: 'error' })
+      return
+    }
+
+    if (billingSameAsShipping.value && deliveryMethod.value === 'courier' && !selectedBillingAddress.value) {
+      toast.add({ title: 'Adresa de facturare lipsa', description: 'Te rugam sa selectezi adresa de facturare.', color: 'error' })
+      return
+    }
+
+    const payload = {
+      shippingMethod: deliveryMethod.value,
+      paymentMethod: paymentMethod.value,
+      shippingAddressId: (deliveryMethod.value === 'courier' || billingSameAsShipping.value) ? selectedAddressId.value : null,
+      billingSameAsShipping: billingSameAsShipping.value,
+      billingAddressId: billingSameAsShipping.value ? null : selectedBillingId.value,
+      billingPersonalAddressId: (billingSameAsShipping.value && deliveryMethod.value === 'courier') ? selectedBillingAddressId.value : null,
+      termsAccepted: true as const,
+      priceSnapshots
+    }
+
     const res = await $fetch('/api/orders', {
       method: 'POST',
       body: payload
