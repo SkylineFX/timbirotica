@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
+
 const route = useRoute()
 const slug = route.params.slug as string
 
@@ -155,7 +157,8 @@ const accordionItems = [
                         <p>Cantitate:</p>
                         <UInputNumber
                             v-model="quantity" 
-                            :min="1" 
+                            :min="1"
+                            :max="CART_MAX_QUANTITY"
                             class="w-24"
                             size="xs"
                         />

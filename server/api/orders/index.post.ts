@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/nuxt'
 import { dispatchOrderEmails } from '../../utils/email'
 import { generateProformaPdf, resolveProformaCustomer } from '../../utils/proforma'
 import { orderPayloadSchema, computeOrderTotals } from '~~/shared/constants/order'
+import { cartQuantitySchema } from '~~/shared/schemas/cart'
 
 // CSRF posture: state-changing endpoints rely on nuxt-auth-utils' session cookie
 // with SameSite=Lax (h3 default; nuxt.config only overrides `secure` for dev LAN).
@@ -61,11 +62,31 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Cosul de cumparaturi este gol.' })
   }
 
+  // Backstop: the cart endpoints validate quantities, but re-check here so a bad
+  // row (e.g. saved before that validation existed) can't produce a wrong total.
+  const invalidQuantity = cart.items.filter(i => !cartQuantitySchema.safeParse(i.quantity).success)
+  if (invalidQuantity.length) {
+    throw createError({
+      statusCode: 400,
+      message: `Cantitate invalida pentru: ${invalidQuantity.map(i => i.product.name).join(', ')}. Actualizeaza cosul si reincearca.`
+    })
+  }
+
   const unavailable = cart.items.filter(i => (i.product?.stock ?? 0) <= 0)
   if (unavailable.length) {
     throw createError({
       statusCode: 409,
       message: `Urmatoarele produse nu mai sunt disponibile: ${unavailable.map(i => i.product.name).join(', ')}.`
+    })
+  }
+
+  // Never sell a product without a valid price. A price of 0 or less can only
+  // come from bad catalog data (e.g. an empty price in a scraper file).
+  const unpriced = cart.items.filter(i => !(i.product.price > 0))
+  if (unpriced.length) {
+    throw createError({
+      statusCode: 409,
+      message: `Pretul nu este disponibil pentru: ${unpriced.map(i => i.product.name).join(', ')}. Te rugam sa ne contactezi.`
     })
   }
 

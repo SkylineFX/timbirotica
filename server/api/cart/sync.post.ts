@@ -1,12 +1,5 @@
-import { z } from 'zod'
 import { mergeCartItems } from '~~/shared/utils/cart'
-
-const syncCartSchema = z.object({
-  items: z.array(z.object({
-    productId: z.number(),
-    quantity: z.number()
-  }))
-})
+import { parseCartLines, CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -14,29 +7,29 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 401, message: 'Unauthorized' })
   }
 
-  const { items } = await readValidatedBody(event, syncCartSchema.parse)
-  if (items.length === 0) return { success: true }
+  // The guest cart comes from localStorage, so treat every line as untrusted:
+  // drop lines with an invalid productId/quantity rather than failing the sync.
+  const body = await readBody(event)
+  const validLines = parseCartLines(body?.items)
+  if (validLines.length === 0) return { success: true }
 
   const userId = session.user.id
   const db = useDrizzle()
 
-  // 1. Get or Create Cart
-  let cart = await db.query.carts.findFirst({
-    where: eq(tables.carts.userId, userId)
-  })
+  // Drop products that no longer exist (deleted from the catalog since the guest
+  // added them). Inserting them would fail the cart_items foreign key on D1.
+  // parseCartLines keeps at most CART_SYNC_MAX_PRODUCTS ids, which keeps this
+  // IN list within D1's limit of 100 bound parameters per query.
+  const productIds = [...new Set(validLines.map(l => l.productId))]
+  const existingProducts = await db.select({ id: tables.products.id })
+    .from(tables.products)
+    .where(inArray(tables.products.id, productIds))
+  const knownIds = new Set(existingProducts.map(p => p.id))
+  const items = validLines.filter(l => knownIds.has(l.productId))
+  if (items.length === 0) return { success: true }
 
-  if (!cart) {
-    const [newCart] = await db.insert(tables.carts).values({
-      userId,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }).returning()
-    cart = newCart
-  }
-  if (!cart) {
-    throw createError({ status: 500, message: 'Nu am putut crea cosul.' })
-  }
-  const cartId = cart.id
+  // 1. Get or Create Cart
+  const { id: cartId } = await getOrCreateCart(userId)
 
   // 2. Merge the guest cart into the user's cart: quantities for products already
   // present are summed, new products are inserted. The consolidation is a pure
@@ -52,16 +45,18 @@ export default defineEventHandler(async (event) => {
   )
 
   for (const line of merged) {
+    // Summing guest + existing quantities can exceed the per-line maximum.
+    const quantity = Math.min(line.quantity, CART_MAX_QUANTITY)
     const existingItem = existingByProduct.get(line.productId)
     if (existingItem) {
       await db.update(tables.cartItems)
-        .set({ quantity: line.quantity })
+        .set({ quantity })
         .where(eq(tables.cartItems.id, existingItem.id))
     } else {
       await db.insert(tables.cartItems).values({
         cartId,
         productId: line.productId,
-        quantity: line.quantity
+        quantity
       })
     }
   }
