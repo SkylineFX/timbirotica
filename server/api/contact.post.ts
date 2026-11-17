@@ -1,13 +1,20 @@
 import { z } from 'zod'
 import { sendContactMessage } from '../utils/email'
 
+// Messages match the contact form's own validation (app/pages/contact.vue).
 const contactSchema = z.object({
-  name: z.string().min(2).max(100),
-  email: z.email(),
-  subject: z.string().min(5).max(200),
-  message: z.string().min(10).max(5000),
-  turnstileToken: z.string().min(1, 'Verificare lipsa. Reincarca pagina si incearca din nou.'),
-})
+  name: z.string('Numele este obligatoriu')
+    .min(2, 'Numele trebuie sa aiba cel putin 2 caractere')
+    .max(100, 'Numele poate avea cel mult 100 de caractere'),
+  email: z.email('Adresa de email invalida'),
+  subject: z.string('Subiectul este obligatoriu')
+    .min(5, 'Subiectul trebuie sa aiba cel putin 5 caractere')
+    .max(200, 'Subiectul poate avea cel mult 200 de caractere'),
+  message: z.string('Mesajul este obligatoriu')
+    .min(10, 'Mesajul trebuie sa aiba cel putin 10 caractere')
+    .max(5000, 'Mesajul poate avea cel mult 5000 de caractere'),
+  turnstileToken: z.string('Verificare lipsa. Reincarca pagina si incearca din nou.').min(1, 'Verificare lipsa. Reincarca pagina si incearca din nou.'),
+}, { error: 'Datele formularului sunt invalide.' })
 
 export default defineEventHandler(async (event) => {
   const result = contactSchema.safeParse(await readBody(event))

@@ -2,17 +2,18 @@ import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { issueVerificationToken } from '../utils/emailVerification'
 
+// Messages match the registration form's own validation (app/pages/user/register.vue).
 const registerSchema = z.object({
-  email: z.email(),
-  password: z.string()
+  email: z.email('Adresa de email nu este valida'),
+  password: z.string('Parola este obligatorie')
     .min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
     .regex(/[A-Z]/, 'Parola trebuie sa contina cel putin o litera mare')
     .regex(/[0-9]/, 'Parola trebuie sa contina cel putin o cifra'),
-  firstName: z.string().min(2),
-  lastName: z.string().min(2),
-  phone: z.string().regex(/^0\d{9}$/),
-  turnstileToken: z.string().min(1, 'Verificare lipsa. Reincarca pagina si incearca din nou.'),
-})
+  firstName: z.string('Prenumele este obligatoriu').min(2, 'Prenumele prea scurt'),
+  lastName: z.string('Numele este obligatoriu').min(2, 'Numele prea scurt'),
+  phone: z.string('Numarul de telefon este obligatoriu').regex(/^0\d{9}$/, 'Numar de telefon invalid'),
+  turnstileToken: z.string('Verificare lipsa. Reincarca pagina si incearca din nou.').min(1, 'Verificare lipsa. Reincarca pagina si incearca din nou.'),
+}, { error: 'Date invalide.' })
 
 export default defineEventHandler(async (event) => {
   const result = registerSchema.safeParse(await readBody(event))

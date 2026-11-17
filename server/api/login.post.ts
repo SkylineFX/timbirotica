@@ -1,12 +1,13 @@
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 
+// Messages match the login form's own validation (app/pages/user/login.vue).
 const bodySchema = z.object({
-  email: z.email(),
-  password: z.string().min(1),
+  email: z.email('Adresa de email nu este valida'),
+  password: z.string('Parola este obligatorie').min(1, 'Parola este obligatorie'),
   remember: z.boolean().optional(),
-  turnstileToken: z.string().min(1, 'Verificare lipsa. Reincarca pagina si incearca din nou.'),
-})
+  turnstileToken: z.string('Verificare lipsa. Reincarca pagina si incearca din nou.').min(1, 'Verificare lipsa. Reincarca pagina si incearca din nou.'),
+}, { error: 'Date invalide.' })
 
 // Pre-computed bcrypt hash used to equalize response time when the email
 // isn't found, preventing user enumeration via timing of login attempts.
