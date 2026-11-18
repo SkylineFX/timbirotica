@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
+import * as Sentry from '@sentry/nuxt'
 import { issueVerificationToken } from '../utils/emailVerification'
 
 // Messages match the registration form's own validation (app/pages/user/register.vue).
@@ -86,7 +87,10 @@ export default defineEventHandler(async (event) => {
   try {
     await issueVerificationToken(event, { id: newUser.id, email: newUser.email, firstName: newUser.firstName })
   } catch (e) {
+    // The account is created either way; the user can ask for a new email.
+    // Report it to Sentry so a failing email service doesn't go unnoticed.
     console.error('Failed to send verification email at registration', e)
+    Sentry.captureException(e, { tags: { area: 'registration-verification-email', userId: newUser.id } })
   }
 
   return {}

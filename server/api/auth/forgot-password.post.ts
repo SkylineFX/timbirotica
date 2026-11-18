@@ -1,4 +1,5 @@
 import { randomBytes, createHash } from 'node:crypto'
+import * as Sentry from '@sentry/nuxt'
 
 export default defineEventHandler(async (event) => {
   const { email, turnstileToken } = await readBody(event)
@@ -44,7 +45,11 @@ export default defineEventHandler(async (event) => {
   try {
     await sendPasswordReset({ email: user.email, firstName: user.firstName, resetLink })
   } catch (e) {
+    // The visitor still gets the generic answer (it can't reveal whether the
+    // account exists), so they'd wait for an email that never comes. Report it
+    // to Sentry so someone is alerted.
     console.error('Failed to send password reset email', e)
+    Sentry.captureException(e, { tags: { area: 'password-reset-email', userId: user.id } })
   }
 
   return genericResponse
