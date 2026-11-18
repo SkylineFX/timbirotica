@@ -105,7 +105,9 @@ export default defineNuxtConfig({
             NUXT_EMAIL_SUBJECT_PREFIX: '[TEST] ',
             // Cloudflare's public Turnstile test keys: the check always passes on preview hostnames.
             NUXT_PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
-            NUXT_TURNSTILE_SECRET_KEY: '1x0000000000000000000000000000000AA'
+            NUXT_TURNSTILE_SECRET_KEY: '1x0000000000000000000000000000000AA',
+            // Labels server errors from previews in Sentry (read in server/plugins/sentry.ts).
+            SENTRY_ENVIRONMENT: 'preview'
           }
         }
       }
