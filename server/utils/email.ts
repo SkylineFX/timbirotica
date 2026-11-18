@@ -97,7 +97,8 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
     throw new Error(error.message)
   }
 
-  console.log(`Order confirmation email sent to ${data.customerEmail} for order ${data.orderNumber}`)
+  // No customer email address in the logs: the order number is enough to find it.
+  console.log(`Order confirmation email sent for order ${data.orderNumber}`)
 }
 
 export async function sendEmailVerification(data: { email: string; firstName: string; verifyLink: string }): Promise<void> {
@@ -238,7 +239,8 @@ export async function sendContactMessage(data: ContactMessageData): Promise<void
     throw new Error(error.message)
   }
 
-  console.log(`Contact message from ${data.email} sent to ${config.adminEmail}`)
+  // No visitor email address in the logs; the message itself has it.
+  console.log(`Contact message sent to ${config.adminEmail}`)
 }
 
 export async function sendPasswordReset(data: { email: string; firstName: string; resetLink: string }): Promise<void> {
