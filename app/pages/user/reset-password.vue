@@ -93,7 +93,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
           title="Parola noua"
           icon="i-lucide-lock-keyhole"
           :fields="fields"
-          submit-label="Seteaza parola noua"
+          :submit="{ label: 'Seteaza parola noua' }"
           @submit="onSubmit"
         >
           <template #description>
