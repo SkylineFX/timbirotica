@@ -2,10 +2,7 @@
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 
-definePageMeta({
-  middleware: 'guest'
-})
-
+// Open to signed-in users too: someone signed in may still need a reset link.
 const toast = useToast()
 const submitted = ref(false)
 const turnstileToken = ref('')

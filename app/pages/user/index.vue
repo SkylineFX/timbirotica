@@ -70,6 +70,23 @@ async function saveProfile() {
   }
 }
 
+// === Set a password (accounts that sign in only with Google) ===
+// They have no current password, so the change form below can't work for
+// them. The server emails a link instead.
+const isSendingPasswordEmail = ref(false)
+
+async function sendPasswordEmail() {
+  isSendingPasswordEmail.value = true
+  try {
+    await $fetch('/api/user/password-email', { method: 'POST' })
+    toast.add({ title: 'Email trimis', description: 'Linkul este valabil o ora.', color: 'success' })
+  } catch (err: any) {
+    toast.add({ title: 'Emailul nu a fost trimis', description: err?.data?.message || 'Te rugam sa incerci din nou.', color: 'error' })
+  } finally {
+    isSendingPasswordEmail.value = false
+  }
+}
+
 // === Password change ===
 const passwordForm = ref({
   currentPassword: '',
@@ -170,7 +187,26 @@ async function savePassword() {
       </form>
     </UCard>
 
-    <UCard class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
+    <UCard v-if="userProfile && !userProfile.hasPassword" class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
+      <div class="mb-6">
+        <h3 class="text-lg font-bold text-gray-900">Seteaza o parola</h3>
+        <p class="text-sm text-gray-500 mt-1">Acum te autentifici doar cu Google.</p>
+      </div>
+      <div class="flex justify-end">
+        <UButton
+          color="primary"
+          size="lg"
+          class="rounded-md font-semibold"
+          :loading="isSendingPasswordEmail"
+          :disabled="isSendingPasswordEmail"
+          @click="sendPasswordEmail"
+        >
+          Trimite link pe email
+        </UButton>
+      </div>
+    </UCard>
+
+    <UCard v-else class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
       <div class="mb-6">
         <h3 class="text-lg font-bold text-gray-900">Schimba parola</h3>
         <p class="text-sm text-gray-500 mt-1">Introdu parola curenta, apoi alege una noua cu cel putin 8 caractere, o litera mare si o cifra.</p>

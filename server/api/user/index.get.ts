@@ -12,7 +12,8 @@ export default eventHandler(async (event) => {
       lastName: true,
       phone: true,
       email: true,
-      createdAt: true
+      createdAt: true,
+      password: true
     }
   })
 
@@ -23,5 +24,8 @@ export default eventHandler(async (event) => {
     })
   }
 
-  return user
+  // The hash never leaves the server. The account page only needs to know
+  // whether there is one, to offer "Seteaza o parola" to Google-only accounts.
+  const { password, ...profile } = user
+  return { ...profile, hasPassword: hasOwnPassword(password) }
 })
