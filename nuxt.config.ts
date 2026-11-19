@@ -48,7 +48,9 @@ export default defineNuxtConfig({
     // Prepended to every email subject. Set to "[TEST] " on previews (see nitro.cloudflare.wrangler.previews).
     emailSubjectPrefix: '',
     session: {
-      password: process.env.NUXT_SESSION_PASSWORD || '',
+      // Read from NUXT_SESSION_PASSWORD at run time. Don't read process.env
+      // here: that runs at build time and writes the secret into the bundle.
+      password: '',
       cookie: {
         secure: process.env.NODE_ENV === 'production', // Allow cookies over HTTP in dev (for LAN testing)
       }
