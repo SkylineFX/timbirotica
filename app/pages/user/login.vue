@@ -20,7 +20,7 @@ const turnstile = useTemplateRef('turnstile')
 // always confirmed; it happens with a Google account made for another address.
 const GOOGLE_ERRORS: Record<string, string> = {
   oauth_failed: 'Autentificarea cu Google nu a reusit. Incearca din nou.',
-  oauth_unverified: 'Google nu a confirmat adresa de email a contului tau Google, asa ca nu te putem autentifica prin Google. Intra cu email si parola sau creeaza un cont.',
+  oauth_unverified: 'Google nu a confirmat adresa de email a contului tau. Intra cu email si parola sau creeaza un cont.',
 }
 
 onMounted(() => {
