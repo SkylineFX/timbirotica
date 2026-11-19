@@ -14,10 +14,13 @@ const turnstileToken = ref('')
 const turnstile = useTemplateRef('turnstile')
 
 // A failed Google sign-in redirects here with ?error=oauth_failed, or with
-// ?error=oauth_unverified when Google hasn't confirmed the account's email.
+// ?error=oauth_unverified when Google itself reports that it hasn't confirmed
+// the address of the Google account (email_verified: false). That is Google's
+// own check, not the confirmation link this shop emails. Gmail addresses are
+// always confirmed; it happens with a Google account made for another address.
 const GOOGLE_ERRORS: Record<string, string> = {
   oauth_failed: 'Autentificarea cu Google nu a reusit. Incearca din nou.',
-  oauth_unverified: 'Adresa de email a contului Google nu este confirmata. Confirm-o in contul Google sau intra cu email si parola.',
+  oauth_unverified: 'Google nu a confirmat adresa de email a contului tau Google, asa ca nu te putem autentifica prin Google. Intra cu email si parola sau creeaza un cont.',
 }
 
 onMounted(() => {
@@ -26,7 +29,10 @@ onMounted(() => {
   toast.add({
     title: 'Autentificare esuata',
     description,
-    color: 'error'
+    color: 'error',
+    // The default 2.5 s is too short to read this, and it can't be shown again:
+    // it comes from a redirect.
+    duration: 8000
   })
   const { error: _, ...query } = route.query
   router.replace({ query })
