@@ -4,6 +4,14 @@ import { signInWithGoogle, type GoogleProfile } from '../../utils/googleSignIn'
 // redirect to Google and rejects a callback whose `state` doesn't match, so a
 // callback link made by someone else can't sign a visitor in to their account.
 export default defineOAuthGoogleEventHandler({
+  config: {
+    // Always show Google's account list. Without it, a browser signed in to
+    // one Google account that approved the shop before is signed in silently.
+    // Customers often have a personal and a work account, and an order placed
+    // on the wrong one is hard to undo. The consent screen still appears only
+    // the first time.
+    authorizationParams: { prompt: 'select_account' },
+  },
   async onSuccess(event, { user: profile }: { user: GoogleProfile }) {
     const result = await signInWithGoogle(useDrizzle(), profile)
 
