@@ -81,7 +81,8 @@ export default defineEventHandler(async (event) => {
       firstName: newUser.firstName,
       lastName: newUser.lastName,
       role: 'user',
-    }
+    },
+    secure: newSessionGuard(hashedPassword, SESSION_MAX_AGE),
   })
 
   try {

@@ -19,10 +19,14 @@ export default defineOAuthGoogleEventHandler({
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role as 'user' | 'admin',
-      }
+      },
+      // If this sign-in just replaced the password of an unverified account,
+      // the stamp differs from the one in sessions opened with that password,
+      // so those sessions end.
+      secure: newSessionGuard(user.password, REMEMBERED_SESSION_MAX_AGE),
     }, {
       // Keep Google-authenticated sessions alive for 30 days automatically
-      maxAge: 60 * 60 * 24 * 30
+      maxAge: REMEMBERED_SESSION_MAX_AGE
     })
 
     // The query parameter lets app.vue confirm the sign-in with a toast, like

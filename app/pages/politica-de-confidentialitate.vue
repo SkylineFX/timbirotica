@@ -33,7 +33,7 @@ useSeoMeta({
           <h2 class="text-2xl font-semibold mb-4 font-serif">II. Politica de Cookies</h2>
           <p>Un modul cookie este un fisier text de mici dimensiuni salvat pe computerul dumneavoastra. Platforma noastra utilizeaza exclusiv cookie-uri <strong>strict necesare</strong> pentru functionarea site-ului, fara a crea profile personalizate sau a colecta date pentru publicitate.</p>
           <ul class="list-disc pl-5 mt-2 space-y-2">
-            <li><strong>Cookie de sesiune (autentificare):</strong> un cookie HTTP-only criptat, setat dupa autentificarea in cont. Permite mentinerea conectarii intre pagini. Expira la inchiderea browserului sau, daca bifati &quot;Tine-ma minte&quot;, dupa 30 de zile.</li>
+            <li><strong>Cookie de sesiune (autentificare):</strong> un cookie HTTP-only criptat, setat dupa autentificarea in cont. Permite mentinerea conectarii intre pagini. Expira la inchiderea browserului, dar cel tarziu dupa 7 zile, sau dupa 30 de zile daca bifati &quot;Tine-ma minte&quot; ori va autentificati cu Google. Schimbarea sau resetarea parolei inchide sesiunile deschise pe alte dispozitive.</li>
             <li><strong>Cookie de confirmare (&bdquo;cookie-consent&quot;):</strong> retine faptul ca ati luat la cunostinta utilizarea cookie-urilor, pentru a nu va mai afisa banner-ul informativ. Valabilitate 1 an.</li>
           </ul>
           <p class="mt-4 text-sm">Nu folosim cookie-uri de analiza, urmarire publicitara sau retele sociale. Puteti gestiona acceptul cookie-urilor din setarile oricarui browser standard, insa respingerea cookie-ului de sesiune va bloca autentificarea in cont si plasarea comenzilor.</p>
@@ -72,7 +72,7 @@ useSeoMeta({
             <li><strong>Date privind comenzile si documentele fiscale:</strong> 10 ani, conform obligatiilor de arhivare din legislatia fiscala romana.</li>
             <li><strong>Cos de cumparaturi:</strong> continutul cosului este sters automat la finalizarea comenzii. Cosurile abandonate sunt sterse dupa 90 de zile de inactivitate.</li>
             <li><strong>Token-uri de resetare a parolei:</strong> maxim 1 ora; sterse imediat dupa utilizare.</li>
-            <li><strong>Cookie de sesiune:</strong> 30 de zile (cu &quot;Tine-ma minte&quot;) sau pana la inchiderea browser-ului.</li>
+            <li><strong>Cookie de sesiune:</strong> pana la inchiderea browser-ului, cel mult 7 zile, sau 30 de zile (cu &quot;Tine-ma minte&quot; sau autentificare Google).</li>
             <li><strong>Cookie &bdquo;cookie-consent&quot;:</strong> 1 an de la confirmare.</li>
           </ul>
         </section>

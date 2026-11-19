@@ -51,6 +51,10 @@ export default defineNuxtConfig({
       // Read from NUXT_SESSION_PASSWORD at run time. Don't read process.env
       // here: that runs at build time and writes the secret into the bundle.
       password: '',
+      // h3 also accepts a sealed session from an x-nuxt-session-session
+      // header. The app doesn't use it, and server/middleware/session.ts only
+      // checks sessions that come in a cookie.
+      sessionHeader: false,
       cookie: {
         secure: process.env.NODE_ENV === 'production', // Allow cookies over HTTP in dev (for LAN testing)
       }
