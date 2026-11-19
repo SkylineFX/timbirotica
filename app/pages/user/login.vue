@@ -13,12 +13,19 @@ const router = useRouter()
 const turnstileToken = ref('')
 const turnstile = useTemplateRef('turnstile')
 
-// A failed Google sign-in redirects here with ?error=oauth_failed.
+// A failed Google sign-in redirects here with ?error=oauth_failed, or with
+// ?error=oauth_unverified when Google hasn't confirmed the account's email.
+const GOOGLE_ERRORS: Record<string, string> = {
+  oauth_failed: 'Autentificarea cu Google nu a reusit. Incearca din nou.',
+  oauth_unverified: 'Adresa de email a contului Google nu este confirmata. Confirm-o in contul Google sau intra cu email si parola.',
+}
+
 onMounted(() => {
-  if (route.query.error !== 'oauth_failed') return
+  const description = GOOGLE_ERRORS[String(route.query.error)]
+  if (!description) return
   toast.add({
     title: 'Autentificare esuata',
-    description: 'Autentificarea cu Google nu a reusit. Incearca din nou.',
+    description,
     color: 'error'
   })
   const { error: _, ...query } = route.query
