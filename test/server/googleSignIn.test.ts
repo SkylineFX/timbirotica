@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { count, eq } from 'drizzle-orm'
 import * as schema from '~~/server/db/schema'
-import { signInWithGoogle, GOOGLE_ONLY_PASSWORD, type GoogleProfile } from '~~/server/utils/googleSignIn'
+import { signInWithGoogle, hasOwnPassword, GOOGLE_ONLY_PASSWORD, type GoogleProfile } from '~~/server/utils/googleSignIn'
 import { createTestDb, type TestDb } from './testDb'
 
 // Runs the real Google sign-in reads and writes against an in-memory SQLite
@@ -126,5 +126,12 @@ describe('signInWithGoogle', () => {
 
     expect(result).toEqual({ status: 'signed-in', user: existing, isNewUser: false })
     expect(await userCount()).toBe(1)
+  })
+})
+
+describe('hasOwnPassword', () => {
+  it('is false only for the placeholder of a Google-only account', () => {
+    expect(hasOwnPassword(GOOGLE_ONLY_PASSWORD)).toBe(false)
+    expect(hasOwnPassword(SOMEONE_ELSES_HASH)).toBe(true)
   })
 })

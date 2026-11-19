@@ -47,6 +47,12 @@ export default defineNuxtConfig({
     adminEmail: process.env.NUXT_ADMIN_EMAIL || 'eurotimalex@yahoo.com',
     // Prepended to every email subject. Set to "[TEST] " on previews (see nitro.cloudflare.wrangler.previews).
     emailSubjectPrefix: '',
+    public: {
+      // Base of the links in password-reset and email-confirmation emails
+      // (server/utils/siteOrigin.ts). Not secret, so it can be read at build
+      // time; previews set NUXT_PUBLIC_SITE_URL at run time.
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://timbirotica.ro',
+    },
     session: {
       // Read from NUXT_SESSION_PASSWORD at run time. Don't read process.env
       // here: that runs at build time and writes the secret into the bundle.
@@ -113,7 +119,10 @@ export default defineNuxtConfig({
             NUXT_PUBLIC_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
             NUXT_TURNSTILE_SECRET_KEY: '1x0000000000000000000000000000000AA',
             // Labels server errors from previews in Sentry (read in server/plugins/sentry.ts).
-            SENTRY_ENVIRONMENT: 'preview'
+            SENTRY_ENVIRONMENT: 'preview',
+            // Links in emails sent from a preview open the preview, not the live site.
+            // Every preview so far is built from the `staging` branch.
+            NUXT_PUBLIC_SITE_URL: 'https://staging-timbirotica.rrstudor.workers.dev'
           }
         }
       }

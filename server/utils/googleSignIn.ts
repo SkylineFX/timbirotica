@@ -5,6 +5,11 @@ import * as schema from '../db/schema'
 /** Stored instead of a bcrypt hash for accounts that sign in only with Google. */
 export const GOOGLE_ONLY_PASSWORD = 'OAUTH_USER'
 
+/** Whether the account has a password of its own, so it isn't Google-only. */
+export function hasOwnPassword(storedPassword: string): boolean {
+  return storedPassword !== GOOGLE_ONLY_PASSWORD
+}
+
 /** The fields of Google's userinfo response that sign-in uses. */
 export interface GoogleProfile {
   email?: unknown

@@ -17,8 +17,7 @@ export async function issueVerificationToken(event: H3Event, user: { id: number;
     createdAt: now,
   })
 
-  const origin = getRequestURL(event).origin
-  const verifyLink = `${origin}/user/verify-email?token=${rawToken}`
+  const verifyLink = `${siteOrigin(event)}/user/verify-email?token=${rawToken}`
 
   await sendEmailVerification({ email: user.email, firstName: user.firstName, verifyLink })
 }

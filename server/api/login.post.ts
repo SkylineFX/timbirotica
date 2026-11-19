@@ -52,7 +52,12 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password)
+  // A Google-only account has no hash, and comparing against its placeholder
+  // returns at once. Compare against the dummy hash instead, so the answer
+  // takes as long as any wrong password and doesn't reveal how the account
+  // signs in.
+  const canUsePassword = hasOwnPassword(user.password)
+  const isPasswordValid = await bcrypt.compare(password, canUsePassword ? user.password : DUMMY_HASH) && canUsePassword
 
   if (!isPasswordValid) {
     throw createError({

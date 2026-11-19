@@ -1,4 +1,3 @@
-import { randomBytes, createHash } from 'node:crypto'
 import * as Sentry from '@sentry/nuxt'
 
 export default defineEventHandler(async (event) => {
@@ -25,32 +24,15 @@ export default defineEventHandler(async (event) => {
 
   if (!user) return genericResponse
 
-  // Delete any existing reset token for this user (one active token at a time)
-  await db.delete(tables.passwordResetTokens).where(eq(tables.passwordResetTokens.userId, user.id))
-
-  const rawToken = randomBytes(32).toString('hex')
-  const tokenHash = createHash('sha256').update(rawToken).digest('hex')
-  const now = Math.floor(Date.now() / 1000)
-
-  await db.insert(tables.passwordResetTokens).values({
-    userId: user.id,
-    tokenHash,
-    expiresAt: now + 3600,
-    createdAt: now,
-  })
-
-  const origin = getRequestURL(event).origin
-  const resetLink = `${origin}/user/reset-password?token=${rawToken}`
-
-  try {
-    await sendPasswordReset({ email: user.email, firstName: user.firstName, resetLink })
-  } catch (e) {
-    // The visitor still gets the generic answer (it can't reveal whether the
-    // account exists), so they'd wait for an email that never comes. Report it
-    // to Sentry so someone is alerted.
+  // Answer at once and do the rest in the background. Waiting for the token
+  // writes and the email would make a known address answer noticeably later
+  // than an unknown one, which reveals that the account exists.
+  event.waitUntil(issuePasswordReset(event, user).catch((e) => {
+    // The visitor already got the generic answer, so they'd wait for an email
+    // that never comes. Report it to Sentry so someone is alerted.
     console.error('Failed to send password reset email', e)
     Sentry.captureException(e, { tags: { area: 'password-reset-email', userId: user.id } })
-  }
+  }))
 
   return genericResponse
 })
