@@ -33,5 +33,21 @@ export default defineEventHandler(async (event) => {
   await db.update(tables.users).set({ password: hashedPassword }).where(eq(tables.users.id, resetToken.userId))
   await db.delete(tables.passwordResetTokens).where(eq(tables.passwordResetTokens.id, resetToken.id))
 
+  // The new password changes the stamp, which signs out every session of this
+  // account. When the person is signed in to the same account on this device,
+  // as a Google-only account setting a password is, give that session the new
+  // stamp so it stays signed in, with its expiry unchanged.
+  if (hasSessionCookie(event)) {
+    const session = await getUserSession(event)
+    if (session.user?.id === resetToken.userId) {
+      await setUserSession(event, {
+        secure: {
+          passwordStamp: passwordStamp(hashedPassword),
+          expiresAt: session.secure?.expiresAt ?? Date.now() + SESSION_MAX_AGE * 1000,
+        },
+      })
+    }
+  }
+
   return { message: 'Parola a fost resetata cu succes.' }
 })

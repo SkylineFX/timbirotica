@@ -23,6 +23,13 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Utilizatorul nu a fost gasit.' })
   }
 
+  // The account page shows "Seteaza o parola" instead of this form to
+  // Google-only accounts. Without this check they would get "Parola curenta
+  // este incorecta." for a password they never had.
+  if (!hasOwnPassword(user.password)) {
+    throw createError({ statusCode: 400, message: 'Contul tau nu are inca o parola. Cere pe email un link ca sa setezi una.' })
+  }
+
   const isCurrentValid = await bcrypt.compare(currentPassword, user.password)
   if (!isCurrentValid) {
     throw createError({ statusCode: 401, message: 'Parola curenta este incorecta.' })

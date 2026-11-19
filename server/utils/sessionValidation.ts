@@ -2,6 +2,17 @@ import type { H3Event } from 'h3'
 import { isSessionCurrent } from './sessionCheck'
 
 /**
+ * Whether the request carries a session cookie. Check this before calling
+ * getUserSession on a request that may have none: getUserSession creates a new
+ * session cookie when there isn't one. Sessions can't arrive in a header,
+ * because nuxt.config.ts sets sessionHeader to false.
+ */
+export function hasSessionCookie(event: H3Event): boolean {
+  const cookieName = useRuntimeConfig(event).session?.name || 'nuxt-session'
+  return Boolean(getCookie(event, cookieName))
+}
+
+/**
  * Sign out a session that is no longer valid (see isSessionCurrent). This
  * reads the account's password hash and role by primary key. It runs once per
  * request, from server/middleware/session.ts and from requireAdminSession, so
@@ -11,11 +22,7 @@ export async function validateUserSession(event: H3Event): Promise<void> {
   if (event.context.userSessionValidated) return
   event.context.userSessionValidated = true
 
-  // getUserSession creates a new session cookie when the request has none, so
-  // only look at requests that already carry one. Sessions can't arrive in a
-  // header: nuxt.config.ts sets sessionHeader to false.
-  const cookieName = useRuntimeConfig(event).session?.name || 'nuxt-session'
-  if (!getCookie(event, cookieName)) return
+  if (!hasSessionCookie(event)) return
 
   const session = await getUserSession(event)
   if (!session.user) return

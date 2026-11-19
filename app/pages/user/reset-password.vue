@@ -2,12 +2,11 @@
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 
-definePageMeta({
-  middleware: 'guest'
-})
-
+// Open to signed-in users too. The link can be opened by someone who is
+// signed in, such as a Google-only account that asked for a password from /user.
 const route = useRoute()
 const toast = useToast()
+const { loggedIn, fetch: refreshSession } = useUserSession()
 
 const token = computed(() => {
   const q = route.query.token
@@ -51,8 +50,17 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       method: 'POST',
       body: { token: token.value, password: payload.data.password }
     })
-    toast.add({ title: 'Parola resetata', description: 'Te poti autentifica cu noua parola.', color: 'success' })
-    await navigateTo('/user/login')
+    // The new password signs out the account's other sessions. A session for
+    // this same account on this device stays signed in, so check the session
+    // again to know where to go.
+    await refreshSession()
+    if (loggedIn.value) {
+      toast.add({ title: 'Parola a fost salvata', color: 'success' })
+      await navigateTo('/user')
+    } else {
+      toast.add({ title: 'Parola resetata', description: 'Te poti autentifica cu noua parola.', color: 'success' })
+      await navigateTo('/user/login')
+    }
   } catch (err: any) {
     if (err.statusCode === 400) {
       tokenInvalid.value = true
