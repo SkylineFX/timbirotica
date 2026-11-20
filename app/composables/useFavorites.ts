@@ -62,8 +62,16 @@ export const useFavorites = () => {
       })
       if (res.success) {
         toast.add({ title: 'Produs adaugat la favorite', color: 'success' })
-        // Refresh to get real ID
-        await fetchFavorites()
+        // Swap the temporary id for the saved row's id, so removing it later
+        // deletes the right row. (Refetching didn't do this: fetchFavorites
+        // skips the request when the list isn't empty.)
+        const item = favorites.value.find(f => f.id === tempId)
+        if (item) {
+          item.id = res.id
+        } else {
+          // Removed again while it was being saved: delete the saved row too.
+          await $fetch(`/api/favorites/${res.id}`, { method: 'DELETE' }).catch(() => {})
+        }
       } else {
         throw new Error((res as any).message)
       }
