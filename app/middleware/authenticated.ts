@@ -1,4 +1,4 @@
-export default defineNuxtRouteMiddleware(async () => {
+export default defineNuxtRouteMiddleware(async (to) => {
   const { loggedIn, fetch: refreshSession } = useUserSession()
 
   // Cached `loggedIn` can be stale (cookie expired, server restarted, session
@@ -9,6 +9,7 @@ export default defineNuxtRouteMiddleware(async () => {
   }
 
   if (!loggedIn.value) {
-    return navigateTo('/user/login')
+    // Come back here after signing in, e.g. to the checkout with a full cart.
+    return navigateTo({ path: '/user/login', query: { redirect: to.fullPath } })
   }
 })

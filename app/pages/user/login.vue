@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
+import { safeRedirectPath } from '~~/shared/utils/redirect'
 
 definePageMeta({
   middleware: 'guest'
@@ -12,6 +13,11 @@ const route = useRoute()
 const router = useRouter()
 const turnstileToken = ref('')
 const turnstile = useTemplateRef('turnstile')
+
+// The page that sent the visitor here (?redirect=, set by the route
+// middleware), e.g. /checkout. Every way of signing in returns to it.
+const redirectTo = safeRedirectPath(route.query.redirect)
+const redirectQuery = redirectTo ? { redirect: redirectTo } : {}
 
 // A failed Google sign-in redirects here with ?error=oauth_failed, or with
 // ?error=oauth_unverified when Google itself reports that it hasn't confirmed
@@ -59,7 +65,7 @@ const fields: AuthFormField[] = [{
 const providers = [{
   label: 'Google',
   icon: 'i-simple-icons-google',
-  to: '/auth/google',
+  to: redirectTo ? `/auth/google?redirect=${encodeURIComponent(redirectTo)}` : '/auth/google',
   exact: true,
   external: true
 }]
@@ -81,7 +87,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     await fetch()
     await useCart().syncCart()
     toast.add({ title: 'Autentificare reusita', color: 'success' })
-    await navigateTo('/')
+    await navigateTo(redirectTo ?? '/')
   } catch (err: any) {
     turnstileToken.value = ''
     turnstile.value?.reset()
@@ -109,7 +115,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         @submit="onSubmit"
       >
         <template #description>
-          Nu ai cont? <ULink to="/user/register" class="text-primary font-medium">Inregistrare</ULink>.
+          Nu ai cont? <ULink :to="{ path: '/user/register', query: redirectQuery }" class="text-primary font-medium">Inregistrare</ULink>.
         </template>
         <template #password-hint>
           <ULink to="/user/forgot-password" class="text-primary font-medium" tabindex="-1">Am uitat parola</ULink>
