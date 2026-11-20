@@ -23,15 +23,17 @@ export default defineEventHandler(async (event) => {
     )
   })
 
+  // Both answers include the row's id: the client shows the favorite at once
+  // under a temporary id and needs the real one to remove it later.
   if (existing) {
-    return { success: true, message: 'Already in favorites' }
+    return { success: true, id: existing.id, message: 'Already in favorites' }
   }
 
-  await db.insert(tables.favorites).values({
+  const created = await db.insert(tables.favorites).values({
     userId,
     productId,
     createdAt: new Date()
-  })
+  }).returning({ id: tables.favorites.id }).get()
 
-  return { success: true }
+  return { success: true, id: created.id }
 })
