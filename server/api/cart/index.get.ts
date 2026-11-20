@@ -19,7 +19,12 @@ export default defineEventHandler(async (event) => {
     with: {
       items: {
         with: {
-          product: true
+          product: {
+            // The long description isn't shown in the cart.
+            columns: { description: false },
+            // The cart links each line to /c/<category slug>/<product slug>.
+            with: { category: { columns: { slug: true } } },
+          }
         }
       }
     }
