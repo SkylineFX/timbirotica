@@ -1,14 +1,22 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
+import { safeRedirectPath } from '~~/shared/utils/redirect'
 
 definePageMeta({
   middleware: 'guest'
 })
 
 const toast = useToast()
+const route = useRoute()
 const turnstileToken = ref('')
 const turnstile = useTemplateRef('turnstile')
+
+// The page that sent the visitor to sign in (?redirect=), e.g. /checkout.
+// After registering they go back there. The checkout asks them to confirm
+// their email before the order can be placed.
+const redirectTo = safeRedirectPath(route.query.redirect)
+const redirectQuery = redirectTo ? { redirect: redirectTo } : {}
 
 const fields: AuthFormField[] = [{
   name: 'firstName',
@@ -49,7 +57,7 @@ const fields: AuthFormField[] = [{
 const providers = [{
   label: 'Google',
   icon: 'i-simple-icons-google',
-  to: '/auth/google',
+  to: redirectTo ? `/auth/google?redirect=${encodeURIComponent(redirectTo)}` : '/auth/google',
   exact: true,
   external: true
 }]
@@ -90,7 +98,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     })
     const { fetch } = useUserSession()
     await fetch()
-    await navigateTo('/')
+    await navigateTo(redirectTo ?? '/')
   } catch (err: any) {
     turnstileToken.value = ''
     turnstile.value?.reset()
@@ -120,7 +128,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         @submit="onSubmit"
       >
         <template #description>
-          Ai deja un cont? <ULink to="/user/login" class="text-primary font-medium">Autentificare</ULink>.
+          Ai deja un cont? <ULink :to="{ path: '/user/login', query: redirectQuery }" class="text-primary font-medium">Autentificare</ULink>.
         </template>
 
         <template #password-field="{ state }">

@@ -1,6 +1,7 @@
 
 export const useFavorites = () => {
   const { loggedIn, user } = useUserSession()
+  const route = useRoute()
   const favorites = useState<any[]>('favorites', () => [])
   const isFavoritesOpen = useState<boolean>('favorites-open', () => false)
   const isLoading = useState<boolean>('favorites-loading', () => false)
@@ -33,7 +34,8 @@ export const useFavorites = () => {
   const addToFavorites = async (product: any) => {
     if (!loggedIn.value) {
       toast.add({ title: 'Trebuie sa fii autentificat', color: 'warning' })
-      return navigateTo('/user/login')
+      // Return to this page after signing in.
+      return navigateTo({ path: '/user/login', query: { redirect: route.fullPath } })
     }
 
     // Optimistic update
