@@ -98,9 +98,13 @@ export default defineNuxtConfig({
         // Previews (staging): Workers Builds builds every branch other than master
         // with `wrangler preview`. Previews don't inherit production settings, so
         // they get their own database and test settings here and never touch
-        // production data. Their secrets, NUXT_SESSION_PASSWORD (must differ from
-        // production) and NUXT_RESEND_API_KEY, are set with
-        // `npx wrangler preview base-config secret put <NAME>`.
+        // production data. Their secrets are NUXT_SESSION_PASSWORD (must differ
+        // from production), NUXT_RESEND_API_KEY and NUXT_OAUTH_GOOGLE_CLIENT_ID /
+        // _SECRET. A new preview copies them from the base config, set with
+        // `npx wrangler preview base-config secret put <NAME>`. Changing the base
+        // config doesn't reach a preview that already exists, even after a
+        // rebuild. Set it on that preview too:
+        // `npx wrangler preview secret put <NAME> --name <branch> --worker-name timbirotica`.
         // @ts-expect-error `previews` is newer than the Wrangler types bundled with Nitro; Nitro copies it into the generated wrangler.json unchanged.
         previews: {
           d1_databases: [
