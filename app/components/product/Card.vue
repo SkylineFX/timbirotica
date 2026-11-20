@@ -4,7 +4,19 @@ const props = defineProps<{
   to: string
 }>()
 
-const { addToCart, isLoading } = useCart()
+const { addToCart } = useCart()
+
+// This card's own loading state. useCart's isLoading is shared by the whole
+// page, so one "Adauga in cos" click spun the button on every card.
+const adding = ref(false)
+const add = async () => {
+  adding.value = true
+  try {
+    await addToCart(props.product)
+  } finally {
+    adding.value = false
+  }
+}
 const { favorites, addToFavorites, removeFromFavorites } = useFavorites()
 
 const isFavorite = computed(() => favorites.value.some((f: any) => f.productId === props.product.id))
@@ -68,8 +80,8 @@ const toggleFavorite = async () => {
                 color="primary"
                 variant="solid"
                 class="rounded-sm flex-1 justify-center text-center text-xs lg:text-sm"
-                @click.prevent="addToCart(product)"
-                :loading="isLoading"
+                @click.prevent="add"
+                :loading="adding"
                 :disabled="product.stock === 0"
               >
                 Adauga in cos
