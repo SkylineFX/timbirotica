@@ -17,6 +17,12 @@ let quantityUpdates: LatestWinsSender<number> | null = null
 // Shopify's themes wait 300 ms; Baymard suggests 200-300 ms for a stepper.
 const QUANTITY_SEND_DELAY_MS = 300
 
+// Numbers each quantity change of a signed-in cart, so a cart read can tell
+// which lines changed after it started (see fetchCart).
+let quantityChangeCount = 0
+const lastQuantityChange = new Map<number, number>()
+const changedSince = (itemId: number, mark: number) => (lastQuantityChange.get(itemId) ?? 0) > mark
+
 /**
  * Sends cart quantity changes still waiting, and resolves when the server has
  * answered. Call it before ending the session: a change sent after logout is
@@ -57,13 +63,19 @@ export const useCart = () => {
         // back (on the checkout page, before an order, after "Adauga in cos")
         // has them.
         await quantityUpdates?.flush()
+        // A line changed after this read starts keeps its on-screen quantity:
+        // the read can answer with the older value, before or after the change
+        // reaches the server, and the change is sent anyway.
+        const readStartedAt = quantityChangeCount
         // Use $fetch, not useFetch, to avoid stale cache in actions
         const data = await $fetch('/api/cart') as any
         if (data && data.items) {
           cartItems.value = data.items.map((item: any) => ({
             id: item.id,
             productId: item.productId,
-            quantity: item.quantity,
+            quantity: changedSince(item.id, readStartedAt)
+              ? (cartItems.value.find(i => i.id === item.id)?.quantity ?? item.quantity)
+              : item.quantity,
             product: item.product
           }))
         } else {
@@ -192,7 +204,10 @@ export const useCart = () => {
     // Shown at once. A signed-in cart sends it to the server 300 ms after the
     // last change, one request per line at a time. A failure puts back the
     // quantity the server holds.
-    if (loggedIn.value) quantitySender().set(itemId, quantity, previousQuantity)
+    if (loggedIn.value) {
+      lastQuantityChange.set(itemId, ++quantityChangeCount)
+      quantitySender().set(itemId, quantity, previousQuantity)
+    }
   }
 
   const clearCart = () => {
