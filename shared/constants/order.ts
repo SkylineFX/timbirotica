@@ -72,6 +72,11 @@ export const computeOrderTotals = (
   return { subtotal, shippingCost, total: roundToBani(subtotal + shippingCost) }
 }
 
+// Orders one account can place in an hour. Each order sends two emails with a
+// PDF, so a script with one verified account could otherwise use up the email
+// quota that password resets and order confirmations also need.
+export const MAX_ORDERS_PER_HOUR = 5
+
 // Payload accepted by POST /api/orders. Addresses are passed as IDs only and
 // re-resolved server-side; the courier-needs-an-address rule is enforced in the
 // handler (it requires a DB lookup anyway).
