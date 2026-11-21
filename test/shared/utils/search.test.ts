@@ -1,7 +1,17 @@
 import { describe, it, expect } from 'vitest'
 import {
-  parseSearchTerms, buildSearchMatch, SEARCH_MAX_TERMS, SEARCH_MAX_TERM_LENGTH,
+  parseSearchTerms, buildSearchMatch, isSearchLongEnough, SEARCH_MAX_TERMS, SEARCH_MAX_TERM_LENGTH,
 } from '~~/shared/utils/search'
+
+describe('isSearchLongEnough', () => {
+  it('runs a search of 2 characters or more, whatever they are', () => {
+    for (const q of ['ab', 'a4', '80', 'g.', '..', 'ș ș', 'pix']) expect(isSearchLongEnough(q), q).toBe(true)
+  })
+
+  it('does not run a shorter search, not counting spaces around it', () => {
+    for (const q of ['', ' ', 'c', ' c ', '2', '😀']) expect(isSearchLongEnough(q), q).toBe(false)
+  })
+})
 
 describe('parseSearchTerms', () => {
   it('splits on whitespace and strips diacritics', () => {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
+import { isSearchLongEnough } from '~~/shared/utils/search'
 
 
 const { loggedIn, clear, user } = useUserSession()
@@ -28,7 +29,8 @@ onMounted(() => {
 const route = useRoute()
 
 const performSearch = async () => {
-    if (!searchQuery.value.trim()) return
+    // Searches shorter than 2 characters are not run (shared/utils/search.ts).
+    if (!isSearchLongEnough(searchQuery.value)) return
     closeAll() // close mobile menu if opened
     await navigateTo({
         path: '/cautare',

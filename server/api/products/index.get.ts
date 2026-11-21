@@ -1,5 +1,5 @@
 import { inArray, and, eq, gte, lte, gt, sql } from "drizzle-orm"
-import { parseSearchTerms, buildSearchMatch } from '~~/shared/utils/search'
+import { parseSearchTerms, buildSearchMatch, isSearchLongEnough } from '~~/shared/utils/search'
 
 export default eventHandler(async (event) => {
   const query = getQuery(event)
@@ -62,6 +62,8 @@ export default eventHandler(async (event) => {
   if (scopeBrand) scopeConditions.push(eq(tables.products.brandId, scopeBrand.id))
   let searchOrder: ReturnType<typeof productSearchOrder> | null = null
   if (searchQ) {
+    // A search shorter than 2 characters is not run.
+    if (!isSearchLongEnough(String(searchQ))) return emptyResponse
     const searchTerms = parseSearchTerms(String(searchQ))
     if (searchTerms.length > 0) {
       const searchMatch = buildSearchMatch(searchTerms)
