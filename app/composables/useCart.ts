@@ -17,6 +17,13 @@ let quantityUpdates: LatestWinsSender<number> | null = null
 // Shopify's themes wait 300 ms; Baymard suggests 200-300 ms for a stepper.
 const QUANTITY_SEND_DELAY_MS = 300
 
+/**
+ * Sends cart quantity changes still waiting, and resolves when the server has
+ * answered. Call it before ending the session: a change sent after logout is
+ * refused and lost.
+ */
+export const flushCartQuantityUpdates = (): Promise<void> => quantityUpdates?.flush() ?? Promise.resolve()
+
 export const useCart = () => {
   const { loggedIn } = useUserSession()
   const cartItems = useState<any[]>('cart-items', () => [])

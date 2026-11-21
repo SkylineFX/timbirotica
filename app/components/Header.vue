@@ -48,6 +48,8 @@ watch(() => route.path, (newPath) => {
 })
 
 async function logout () {
+  // Save cart quantity changes still waiting while the session is valid.
+  await flushCartQuantityUpdates()
   await clear()
   await navigateTo('/user/login')
 }
