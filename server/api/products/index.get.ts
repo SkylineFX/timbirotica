@@ -1,4 +1,5 @@
 import { inArray, like, and, or, eq, gte, lte, gt, sql } from "drizzle-orm"
+import { parseSearchTerms } from '~~/shared/utils/search'
 
 export default eventHandler(async (event) => {
   const query = getQuery(event)
@@ -60,8 +61,7 @@ export default eventHandler(async (event) => {
   if (scopeCategoryIds.length) scopeConditions.push(inArray(tables.products.categoryId, scopeCategoryIds))
   if (scopeBrand) scopeConditions.push(eq(tables.products.brandId, scopeBrand.id))
   if (searchQ) {
-    const stripDiacritics = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '')
-    const searchTerms = stripDiacritics(searchQ).trim().split(/\s+/).filter(Boolean)
+    const searchTerms = parseSearchTerms(String(searchQ))
     if (searchTerms.length > 0) {
       const termConditions = searchTerms.map(term => or(
         like(tables.products.name, `%${term}%`),
