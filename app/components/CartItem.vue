@@ -24,7 +24,9 @@ const { removeFromCart, updateQuantity } = useCart()
       <div class="flex justify-between items-end mt-2">
              <div class="flex items-center gap-1">
                  <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" @click="removeFromCart(item.id)" class="p-1.5" />
-                 <UInputNumber size="xs" class="w-24" :model-value="item.quantity" :min="0" :max="CART_MAX_QUANTITY" :step="1" @update:model-value="(val) => updateQuantity(item.id, Number(val))" />
+                 <!-- Stops at 1: holding the minus button, an arrow key or the wheel
+                      shouldn't delete a line. Removal is the trash button only. -->
+                 <UInputNumber size="xs" class="w-24" :model-value="item.quantity" :min="1" :max="CART_MAX_QUANTITY" :step="1" disable-wheel-change @update:model-value="(val) => updateQuantity(item.id, Number(val))" />
              </div>
              <div class="flex flex-col items-end">
                  <span class="font-medium text-sm">{{ ((item.product?.price || 0) * item.quantity).toFixed(2) }} RON</span>
