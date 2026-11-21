@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises'
 import { createClient } from '@libsql/client'
 import { drizzle, type LibSQLDatabase } from 'drizzle-orm/libsql'
 import { sql } from 'drizzle-orm'
@@ -32,6 +33,14 @@ export async function createTestDb(): Promise<TestDb> {
     await db.run(sql.raw(statement))
   }
   return db
+}
+
+/**
+ * Runs scripts/search-fts.sql, the file applied to local, staging and
+ * production: the products_fts search index and the triggers that maintain it.
+ */
+export async function addSearchIndex(db: TestDb): Promise<void> {
+  await db.$client.executeMultiple(await readFile('scripts/search-fts.sql', 'utf8'))
 }
 
 export const TEST_USER_ID = 1
