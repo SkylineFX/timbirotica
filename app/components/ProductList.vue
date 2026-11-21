@@ -32,16 +32,21 @@ const page = computed({
   }
 })
 
-const sortOptions = [
+// Search results start sorted by relevance (the API's default when there is a
+// search); other listings start with the newest products.
+const isSearch = computed(() => !!props.apiQuery.q)
+
+const sortOptions = computed(() => [
+  ...(isSearch.value ? [{ label: 'Relevanta', value: 'relevance' }] : []),
   { label: 'Cele mai noi', value: 'default' },
   { label: 'Pret crescator', value: 'price-asc' },
   { label: 'Pret descrescator', value: 'price-desc' },
   { label: 'Nume: A-Z', value: 'name-asc' },
   { label: 'Nume: Z-A', value: 'name-desc' }
-]
+])
 
 const sort = computed({
-  get: () => route.query.sort as string || 'default',
+  get: () => route.query.sort as string || (isSearch.value ? 'relevance' : 'default'),
   set: async (val) => {
     if (val === sort.value) return
     await navigateTo({ query: { ...route.query, sort: val, page: 1 } })

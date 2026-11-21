@@ -1,5 +1,5 @@
-import { inArray, like, and, or, eq, gte, lte, gt, sql } from "drizzle-orm"
-import { parseSearchTerms } from '~~/shared/utils/search'
+import { inArray, and, eq, gte, lte, gt, sql } from "drizzle-orm"
+import { parseSearchTerms, buildSearchMatch } from '~~/shared/utils/search'
 
 export default eventHandler(async (event) => {
   const query = getQuery(event)
@@ -60,14 +60,16 @@ export default eventHandler(async (event) => {
   if (query.recommended === 'true') scopeConditions.push(eq(tables.products.isRecommended, true))
   if (scopeCategoryIds.length) scopeConditions.push(inArray(tables.products.categoryId, scopeCategoryIds))
   if (scopeBrand) scopeConditions.push(eq(tables.products.brandId, scopeBrand.id))
+  let searchOrder: ReturnType<typeof productSearchOrder> | null = null
   if (searchQ) {
     const searchTerms = parseSearchTerms(String(searchQ))
     if (searchTerms.length > 0) {
-      const termConditions = searchTerms.map(term => or(
-        like(tables.products.name, `%${term}%`),
-        like(tables.products.sku, `%${term}%`)
-      ))
-      scopeConditions.push(and(...termConditions))
+      const searchMatch = buildSearchMatch(searchTerms)
+      const wholeWordsMatch = buildSearchMatch(searchTerms, { wholeWords: true })
+      // Only punctuation was typed, and the index holds words only.
+      if (!searchMatch || !wholeWordsMatch) return emptyResponse
+      scopeConditions.push(productSearchFilter(searchMatch))
+      searchOrder = productSearchOrder(searchMatch, wholeWordsMatch)
     }
   }
   const [selectedSubs, selectedBrands] = await Promise.all([
@@ -109,7 +111,8 @@ export default eventHandler(async (event) => {
   const brandFacetWhere = buildWhere({ excludeBrand: true })
   const subFacetWhere = buildWhere({ excludeSub: true })
 
-  const sortParam = query.sort as string || 'default'
+  // A search is sorted by relevance unless the customer picks another order.
+  const sortParam = query.sort as string || (searchOrder ? 'relevance' : 'default')
 
   const findProducts = () => db.query.products.findMany({
     columns: { description: false },
@@ -123,14 +126,17 @@ export default eventHandler(async (event) => {
         case 'price-desc': return [desc(products.price)]
         case 'name-asc': return [asc(products.name)]
         case 'name-desc': return [desc(products.name)]
+        case 'relevance':
+          // Equal scores fall back to newest first; the id keeps pages stable.
+          if (searchOrder) return [...searchOrder, desc(products.createdAt), desc(products.id)]
+          return [desc(products.createdAt)]
         default: return [desc(products.createdAt)]
       }
     }
   })
 
   // The search preview and the home page carousels show only the products.
-  // facets=0 skips the total and the facet queries, 6 of the 7 queries, each of
-  // which reads the whole products table when the request is a text search.
+  // facets=0 skips the total and the facet queries, 6 of the 7 queries.
   if (query.facets === '0') {
     return { products: await findProducts(), total: null, page, limit, facets: emptyResponse.facets }
   }
