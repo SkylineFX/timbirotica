@@ -1,9 +1,15 @@
 import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
 import { roundToBani } from '~~/shared/constants/order'
+import { createLatestWinsSender, type LatestWinsSender } from '~~/shared/utils/latestWins'
 
 // The guest-cart merge currently running in this browser, shared by every
 // useCart() caller. Two merges at once would add the guest quantities twice.
 let guestCartMerge: Promise<void> | null = null
+
+// Quantity changes of a signed-in cart, sent one request at a time per line so
+// the server always ends on the last value (shared/utils/latestWins.ts). Shared
+// by every useCart() caller in this browser; created on first use, client only.
+let quantityUpdates: LatestWinsSender<number> | null = null
 
 export const useCart = () => {
   const { loggedIn } = useUserSession()
@@ -12,11 +18,29 @@ export const useCart = () => {
   const isCartOpen = useState<boolean>('cart-open', () => false)
   const toast = useToast()
 
+  const quantitySender = () => {
+    quantityUpdates ??= createLatestWinsSender<number>(
+      (id, value) => $fetch(`/api/cart/${id}`, { method: 'PATCH', body: { quantity: value } }),
+      (id, confirmed, e) => {
+        console.error('Failed to update quantity', e)
+        // Show the quantity the server still holds.
+        const line = cartItems.value.find(i => i.id === id)
+        if (line) line.quantity = confirmed
+        toast.add({ title: 'Nu s-a putut actualiza cantitatea', description: (e as any)?.data?.message, color: 'error' })
+      }
+    )
+    return quantityUpdates
+  }
+
   // Explicitly fetch cart using $fetch (no caching issues)
   const fetchCart = async () => {
     isLoading.value = true
     try {
       if (loggedIn.value) {
+        // Finish quantity changes still on their way first, so the cart read
+        // back (on the checkout page, before an order, after "Adauga in cos")
+        // has them.
+        await quantityUpdates?.flush()
         // Use $fetch, not useFetch, to avoid stale cache in actions
         const data = await $fetch('/api/cart') as any
         if (data && data.items) {
@@ -120,6 +144,8 @@ export const useCart = () => {
 
     if (loggedIn.value) {
       try {
+        // A quantity change still on its way would reach a deleted line.
+        await quantityUpdates?.cancel(itemId)
         await $fetch(`/api/cart/${itemId}`, { method: 'DELETE' })
         // DELETE confirmed — server state matches the optimistic update, no re-fetch needed.
       } catch (e) {
@@ -145,19 +171,10 @@ export const useCart = () => {
     const previousQuantity = item.quantity
     item.quantity = quantity
 
-    if (loggedIn.value) {
-      try {
-        await $fetch(`/api/cart/${itemId}`, {
-          method: 'PATCH',
-          body: { quantity }
-        })
-        // PATCH confirmed — server state matches the optimistic update, no re-fetch needed.
-      } catch (e) {
-        console.error('Failed to update quantity', e)
-        item.quantity = previousQuantity
-        toast.add({ title: 'Nu s-a putut actualiza cantitatea', description: (e as any)?.data?.message, color: 'error' })
-      }
-    }
+    // Shown at once. A signed-in cart sends it to the server: at most one
+    // request per line at a time, then only the latest quantity. A failure
+    // puts back the quantity the server holds.
+    if (loggedIn.value) quantitySender().set(itemId, quantity, previousQuantity)
   }
 
   const clearCart = () => {
