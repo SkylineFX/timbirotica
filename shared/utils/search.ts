@@ -3,6 +3,10 @@
 // paragraph still runs as a small query and finds what its first words find.
 export const SEARCH_MAX_TERMS = 10
 export const SEARCH_MAX_TERM_LENGTH = 48
+export const SEARCH_MIN_LENGTH = 2
+
+/** Whether a typed search is long enough to run: at least 2 characters, not counting spaces around it. */
+export const isSearchLongEnough = (q: string): boolean => Array.from(q.trim()).length >= SEARCH_MIN_LENGTH
 
 /**
  * The words of a search query, without diacritics. Control characters count as
