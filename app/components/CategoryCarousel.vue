@@ -14,7 +14,7 @@ interface Product {
 
 interface ApiResponse {
   products: Product[]
-  total: number
+  total: number | null
   page: number
   limit: number
 }
@@ -36,14 +36,14 @@ if (props.categoryId) {
       displayTitle.value = category.value.name
     }
     displayLink.value = `/c/${category.value.slug}`
-    fetchUrl.value = `/api/products?category=${category.value.slug}&limit=10`
+    fetchUrl.value = `/api/products?category=${category.value.slug}&limit=10&facets=0`
   }
 } else if (props.recommended) {
   if (!displayTitle.value) {
     displayTitle.value = 'Produse Recomandate'
   }
   displayLink.value = '/produse-recomandate'
-  fetchUrl.value = `/api/products?recommended=true&limit=10`
+  fetchUrl.value = `/api/products?recommended=true&limit=10&facets=0`
 }
 
 const { data: response } = await useFetch<ApiResponse>(() => fetchUrl.value || '')

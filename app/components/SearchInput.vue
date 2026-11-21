@@ -42,7 +42,7 @@ const fetchPreview = async (query: string) => {
 
   try {
     const res = await $fetch('/api/products', {
-      query: { q: query, limit: 5 },
+      query: { q: query, limit: 5, facets: 0 },
       signal: abortController.signal
     }) as any
     
