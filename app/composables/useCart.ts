@@ -6,10 +6,15 @@ import { createLatestWinsSender, type LatestWinsSender } from '~~/shared/utils/l
 // useCart() caller. Two merges at once would add the guest quantities twice.
 let guestCartMerge: Promise<void> | null = null
 
-// Quantity changes of a signed-in cart, sent one request at a time per line so
-// the server always ends on the last value (shared/utils/latestWins.ts). Shared
-// by every useCart() caller in this browser; created on first use, client only.
+// Quantity changes of a signed-in cart (shared/utils/latestWins.ts). Each line's
+// change is sent once no change came for QUANTITY_SEND_DELAY_MS, so a burst of
+// clicks or a held +/- button is one request, and one request at a time per
+// line, so the server always ends on the last value. Shared by every useCart()
+// caller in this browser; created on first use, client only.
 let quantityUpdates: LatestWinsSender<number> | null = null
+
+// Shopify's themes wait 300 ms; Baymard suggests 200-300 ms for a stepper.
+const QUANTITY_SEND_DELAY_MS = 300
 
 export const useCart = () => {
   const { loggedIn } = useUserSession()
@@ -23,11 +28,14 @@ export const useCart = () => {
       (id, value) => $fetch(`/api/cart/${id}`, { method: 'PATCH', body: { quantity: value } }),
       (id, confirmed, e) => {
         console.error('Failed to update quantity', e)
-        // Show the quantity the server still holds.
+        // A line removed meanwhile needs no correction or message.
         const line = cartItems.value.find(i => i.id === id)
-        if (line) line.quantity = confirmed
+        if (!line) return
+        // Show the quantity the server still holds.
+        line.quantity = confirmed
         toast.add({ title: 'Nu s-a putut actualiza cantitatea', description: (e as any)?.data?.message, color: 'error' })
-      }
+      },
+      { delayMs: QUANTITY_SEND_DELAY_MS }
     )
     return quantityUpdates
   }
@@ -171,9 +179,9 @@ export const useCart = () => {
     const previousQuantity = item.quantity
     item.quantity = quantity
 
-    // Shown at once. A signed-in cart sends it to the server: at most one
-    // request per line at a time, then only the latest quantity. A failure
-    // puts back the quantity the server holds.
+    // Shown at once. A signed-in cart sends it to the server 300 ms after the
+    // last change, one request per line at a time. A failure puts back the
+    // quantity the server holds.
     if (loggedIn.value) quantitySender().set(itemId, quantity, previousQuantity)
   }
 
