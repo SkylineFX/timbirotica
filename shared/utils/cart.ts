@@ -1,3 +1,5 @@
+import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
+
 // Pure cart-merge logic, extracted from the cart-sync endpoint so it can be unit
 // tested without a database. The endpoint (server/api/cart/sync.post.ts) feeds it
 // the user's existing cart rows and the guest cart, then persists the result.
@@ -44,4 +46,17 @@ export function mergeCartItems(existing: CartLine[], incoming: CartLine[]): Merg
   }
 
   return result
+}
+
+/**
+ * The quantity to apply when a cart line's quantity field reports `value`, or
+ * null to do nothing. Nothing happens for an emptied field (Number(undefined)
+ * is NaN) or for the quantity the line already has: the field reports its value
+ * again on every blur. 0 or less means remove the line; anything else is a
+ * whole number capped at the cart maximum.
+ */
+export function nextCartQuantity(value: number, current: number): number | null {
+  if (!Number.isFinite(value)) return null
+  const quantity = value <= 0 ? 0 : Math.min(Math.floor(value), CART_MAX_QUANTITY)
+  return quantity === current ? null : quantity
 }
