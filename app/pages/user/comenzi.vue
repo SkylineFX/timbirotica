@@ -8,7 +8,7 @@ definePageMeta({
 })
 
 const { data: userOrders, refresh: refreshOrders } = await useFetch('/api/user/orders')
-const { fetchCart, cartItems, clearServerCart } = useCart()
+const { fetchCart, cartItems } = useCart()
 const toast = useToast()
 
 const statusLabel = ORDER_STATUS_LABEL
@@ -68,30 +68,16 @@ async function performReorder({ replace }: { replace: boolean }) {
   if (!selectedOrder.value?.items?.length) return
   isReorderLoading.value = true
   try {
-    if (replace) {
-      try {
-        await clearServerCart()
-      } catch {
-        toast.add({ title: 'Nu am putut goli cosul', color: 'error' })
-        return
-      }
-    }
-
-    const items = selectedOrder.value.items
-    const results = await Promise.allSettled(
-      items.map((item: any) =>
-        $fetch('/api/cart', { method: 'POST', body: { productId: item.productId, quantity: item.quantity } })
-      )
-    )
+    // One request for the whole order (server/api/user/orders/[id]/reorder.post.ts).
+    // The server reads the order's lines, skips unavailable products and changes
+    // the cart in one transaction, so a large order never half-fills the cart.
+    const { added, skipped } = await $fetch(`/api/user/orders/${selectedOrder.value.id}/reorder`, {
+      method: 'POST',
+      body: { replace }
+    })
     await fetchCart()
 
-    const skipped = results
-      .map((r, i) => ({ r, name: items[i].product?.name }))
-      .filter(({ r }) => r.status === 'rejected')
-      .map(({ name }) => name)
-      .filter(Boolean)
-
-    if (skipped.length === items.length) {
+    if (added === 0) {
       toast.add({ title: 'Produsele nu sunt disponibile', description: skipped.join(', '), color: 'error' })
     } else if (skipped.length) {
       toast.add({ title: 'Unele produse nu sunt disponibile', description: `Sarite: ${skipped.join(', ')}`, color: 'warning' })
