@@ -4,9 +4,10 @@ export default defineConfig({
   dialect: 'sqlite',
   schema: './server/db/schema.ts',
   out: './server/db/migrations',
-  // _hub_migrations is NuxtHub's internal table (not in schema.ts); without this
-  // filter `drizzle-kit push` tries to DROP it.
-  tablesFilter: ['!_hub_migrations'],
+  // Tables that are not in schema.ts, which `drizzle-kit push` would otherwise
+  // DROP: NuxtHub's _hub_migrations, and the product search index from
+  // scripts/search-fts.sql (products_fts and its products_fts_* tables).
+  tablesFilter: ['!_hub_migrations', '!products_fts*'],
   dbCredentials: {
     url: 'file:.data/db/sqlite.db'
   }

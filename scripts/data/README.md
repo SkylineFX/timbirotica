@@ -45,3 +45,6 @@ npx tsx scripts/import-new-products.ts
 * **Auto-detects** the newest `details_*.json` file.
 * **Auto-moves** any staged images from `public/uploads/products_*` into `public/uploads/products/` (preserving higher-resolution existing files) and cleans up the empty staging folder.
 * Inserts new products (or backfills `images` onto existing products with `images = null`) into `.data/db/sqlite.db` using local `/uploads/products/...` paths.
+
+### Search index
+Product search uses `products_fts`, an FTS5 index over product names and SKUs. Triggers on `products` keep it up to date, so the steps above and `sync.sql` need nothing extra. Run `npm run db:fts` once on a new checkout, and again after `npm run db:push` changes the `products` table (rebuilding a table drops its triggers). Staging and production get the same `scripts/search-fts.sql` through `wrangler d1 execute`; see the header of that file.
