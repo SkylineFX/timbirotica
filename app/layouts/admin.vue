@@ -11,6 +11,8 @@ const navItems = computed(() => [
 onMounted(() => { refreshPendingCount() })
 
 async function logout() {
+  // Save cart quantity changes still waiting while the session is valid.
+  await flushCartQuantityUpdates()
   await clear()
   await router.push('/')
 }
