@@ -111,6 +111,30 @@ export default eventHandler(async (event) => {
 
   const sortParam = query.sort as string || 'default'
 
+  const findProducts = () => db.query.products.findMany({
+    columns: { description: false },
+    where: fullWhere,
+    limit,
+    offset,
+    with: { brand: true, category: true },
+    orderBy: (products, { asc, desc }) => {
+      switch (sortParam) {
+        case 'price-asc': return [asc(products.price)]
+        case 'price-desc': return [desc(products.price)]
+        case 'name-asc': return [asc(products.name)]
+        case 'name-desc': return [desc(products.name)]
+        default: return [desc(products.createdAt)]
+      }
+    }
+  })
+
+  // The search preview and the home page carousels show only the products.
+  // facets=0 skips the total and the facet queries, 6 of the 7 queries, each of
+  // which reads the whole products table when the request is a text search.
+  if (query.facets === '0') {
+    return { products: await findProducts(), total: null, page, limit, facets: emptyResponse.facets }
+  }
+
   const scopeOnlyWhere = scopeConditions.length ? and(...scopeConditions) : undefined
 
   const subcategoryFacetWhere = scopeCategory
@@ -137,22 +161,7 @@ export default eventHandler(async (event) => {
     brandScopeRows,
     subcategoryScopeRows
   ] = await Promise.all([
-    db.query.products.findMany({
-      columns: { description: false },
-      where: fullWhere,
-      limit,
-      offset,
-      with: { brand: true, category: true },
-      orderBy: (products, { asc, desc }) => {
-        switch (sortParam) {
-          case 'price-asc': return [asc(products.price)]
-          case 'price-desc': return [desc(products.price)]
-          case 'name-asc': return [asc(products.name)]
-          case 'name-desc': return [desc(products.name)]
-          default: return [desc(products.createdAt)]
-        }
-      }
-    }),
+    findProducts(),
     db.select({ count: sql<number>`count(*)` })
       .from(tables.products)
       .where(fullWhere ?? sql`1=1`),
