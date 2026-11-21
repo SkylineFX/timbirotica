@@ -239,3 +239,22 @@ describe('createLatestWinsSender with a wait', () => {
     vi.useRealTimers()
   })
 })
+
+describe('flush with keepalive', () => {
+  it('marks the waiting values it sends, and only those', async () => {
+    vi.useFakeTimers()
+    const sent: Array<{ key: number; value: number; keepalive: boolean }> = []
+    const sender = createLatestWinsSender(
+      async (key: number, value: number, { keepalive }: { keepalive: boolean }) => { sent.push({ key, value, keepalive }) },
+      vi.fn(),
+      { delayMs: 300 }
+    )
+    sender.set(1, 2, 1)
+    await sender.flush({ keepalive: true }) // e.g. the page is being closed
+    sender.set(1, 3, 2)
+    await vi.advanceTimersByTimeAsync(300)
+    await sender.flush()
+    expect(sent).toEqual([{ key: 1, value: 2, keepalive: true }, { key: 1, value: 3, keepalive: false }])
+    vi.useRealTimers()
+  })
+})

@@ -16,14 +16,18 @@
 export interface LatestWinsSender<V> {
   /** Queues `value` for `key`. `current` is what the server holds now (reported if the first send fails). */
   set(key: number, value: V, current: V): void
-  /** Sends waiting values now, skipping the wait, and resolves when every key is done. */
-  flush(): Promise<void>
+  /**
+   * Sends waiting values now, skipping the wait, and resolves when every key
+   * is done. With `keepalive`, those requests are made so they finish even if
+   * the page closes (fetch's keepalive option).
+   */
+  flush(options?: { keepalive?: boolean }): Promise<void>
   /** Drops the value waiting for `key` and resolves when its request in flight is done. */
   cancel(key: number): Promise<void>
 }
 
 export function createLatestWinsSender<V>(
-  send: (key: number, value: V) => Promise<unknown>,
+  send: (key: number, value: V, options: { keepalive: boolean }) => Promise<unknown>,
   onError: (key: number, confirmed: V, error: unknown) => void,
   { delayMs = 0 }: { delayMs?: number } = {}
 ): LatestWinsSender<V> {
@@ -32,6 +36,7 @@ export function createLatestWinsSender<V>(
     waiting: { value: V } | null
     inFlight: Promise<void> | null
     timer: ReturnType<typeof setTimeout> | null
+    keepalive: boolean
     idle: Promise<void>
     resolveIdle: () => void
   }
@@ -53,9 +58,11 @@ export function createLatestWinsSender<V>(
     }
     const { value } = entry.waiting
     entry.waiting = null
+    const keepalive = entry.keepalive
+    entry.keepalive = false
     entry.inFlight = (async () => {
       try {
-        await send(key, value)
+        await send(key, value, { keepalive })
         entry.confirmed = value
       } catch (error) {
         entry.waiting = null
@@ -73,7 +80,7 @@ export function createLatestWinsSender<V>(
       if (!entry) {
         let resolveIdle!: () => void
         const idle = new Promise<void>(resolve => { resolveIdle = resolve })
-        entry = { confirmed: current, waiting: null, inFlight: null, timer: null, idle, resolveIdle }
+        entry = { confirmed: current, waiting: null, inFlight: null, timer: null, keepalive: false, idle, resolveIdle }
         entries.set(key, entry)
       }
       entry.waiting = { value }
@@ -88,10 +95,11 @@ export function createLatestWinsSender<V>(
         pump(key, entry)
       }
     },
-    async flush() {
+    async flush({ keepalive = false } = {}) {
       const pending = [...entries]
       for (const [key, entry] of pending) {
         stopTimer(entry)
+        if (keepalive && entry.waiting) entry.keepalive = true
         pump(key, entry)
       }
       await Promise.all(pending.map(([, entry]) => entry.idle))
