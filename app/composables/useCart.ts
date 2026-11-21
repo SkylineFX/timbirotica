@@ -1,6 +1,7 @@
 import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
 import { roundToBani } from '~~/shared/constants/order'
 import { createLatestWinsSender, type LatestWinsSender } from '~~/shared/utils/latestWins'
+import { nextCartQuantity } from '~~/shared/utils/cart'
 
 // The guest-cart merge currently running in this browser, shared by every
 // useCart() caller. Two merges at once would add the guest quantities twice.
@@ -164,18 +165,20 @@ export const useCart = () => {
     }
   }
 
-  const updateQuantity = async (itemId: number, quantity: number) => {
+  const updateQuantity = async (itemId: number, value: number) => {
     if (!itemId) return
-
-    if (quantity <= 0) {
-      await removeFromCart(itemId)
-      return
-    }
 
     const item = cartItems.value.find(i => i.id === itemId)
     if (!item) return
 
-    quantity = Math.min(quantity, CART_MAX_QUANTITY)
+    // Nothing for an emptied field or an unchanged quantity (shared/utils/cart.ts).
+    const quantity = nextCartQuantity(value, item.quantity)
+    if (quantity === null) return
+    if (quantity === 0) {
+      await removeFromCart(itemId)
+      return
+    }
+
     const previousQuantity = item.quantity
     item.quantity = quantity
 
