@@ -38,8 +38,9 @@ export const useCart = () => {
   const toast = useToast()
 
   const quantitySender = () => {
-    quantityUpdates ??= createLatestWinsSender<number>(
-      (id, value) => $fetch(`/api/cart/${id}`, { method: 'PATCH', body: { quantity: value } }),
+    if (quantityUpdates) return quantityUpdates
+    quantityUpdates = createLatestWinsSender<number>(
+      (id, value, { keepalive }) => $fetch(`/api/cart/${id}`, { method: 'PATCH', body: { quantity: value }, keepalive }),
       (id, confirmed, e) => {
         console.error('Failed to update quantity', e)
         // A line removed meanwhile needs no correction or message.
@@ -51,6 +52,16 @@ export const useCart = () => {
       },
       { delayMs: QUANTITY_SEND_DELAY_MS }
     )
+    // Leaving the page within the wait would lose the last change. When the
+    // page is hidden (tab switched, app backgrounded) or closed, send waiting
+    // changes at once, as keepalive requests that finish after the page is
+    // gone. A change still queued behind a request in flight can be lost if
+    // the page closes before that request answers (one round trip).
+    const sendBeforeLeaving = () => { void quantityUpdates?.flush({ keepalive: true }) }
+    window.addEventListener('pagehide', sendBeforeLeaving)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') sendBeforeLeaving()
+    })
     return quantityUpdates
   }
 
