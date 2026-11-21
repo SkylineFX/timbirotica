@@ -119,3 +119,123 @@ describe('createLatestWinsSender', () => {
     await sender.flush()
   })
 })
+
+describe('createLatestWinsSender with a wait', () => {
+  const DELAY = 300
+
+  // Fake timers for the wait; the fake server still resolves on demand.
+  const setup = () => {
+    vi.useFakeTimers()
+    const server = fakeServer()
+    const onError = vi.fn()
+    const sender = createLatestWinsSender(server.send, onError, { delayMs: DELAY })
+    return { ...server, onError, sender }
+  }
+  const settle = () => vi.advanceTimersByTimeAsync(0)
+
+  it('sends one request, with the last value, after the clicks stop', async () => {
+    const { requests, sender } = setup()
+    for (let value = 2; value <= 6; value++) {
+      sender.set(1, value, 1)
+      await vi.advanceTimersByTimeAsync(60) // a held button repeats every 60 ms
+    }
+    expect(requests).toHaveLength(0)
+    await vi.advanceTimersByTimeAsync(DELAY)
+    expect(requests.map(r => r.value)).toEqual([6])
+    requests[0]!.resolve()
+    await sender.flush()
+    vi.useRealTimers()
+  })
+
+  it('restarts the wait on every change', async () => {
+    const { requests, sender } = setup()
+    sender.set(1, 2, 1)
+    await vi.advanceTimersByTimeAsync(DELAY - 1)
+    sender.set(1, 3, 1)
+    await vi.advanceTimersByTimeAsync(DELAY - 1)
+    expect(requests).toHaveLength(0)
+    await vi.advanceTimersByTimeAsync(1)
+    expect(requests.map(r => r.value)).toEqual([3])
+    requests[0]!.resolve()
+    await sender.flush()
+    vi.useRealTimers()
+  })
+
+  it('flush sends at once, skipping the wait, and resolves after the answer', async () => {
+    const { requests, sender } = setup()
+    sender.set(1, 4, 1)
+    let flushed = false
+    const flushing = sender.flush().then(() => { flushed = true })
+    await settle()
+    expect(requests.map(r => r.value)).toEqual([4])
+    expect(flushed).toBe(false)
+    requests[0]!.resolve()
+    await flushing
+    expect(flushed).toBe(true)
+    vi.useRealTimers()
+  })
+
+  it('cancel stops a send that was still waiting', async () => {
+    const { requests, sender } = setup()
+    sender.set(1, 4, 1)
+    await sender.cancel(1)
+    await vi.advanceTimersByTimeAsync(DELAY * 2)
+    expect(requests).toHaveLength(0)
+    await sender.flush()
+    vi.useRealTimers()
+  })
+
+  it('a change made during a request is sent after it, once its own wait is over', async () => {
+    const { requests, sender } = setup()
+    sender.set(1, 2, 1)
+    await vi.advanceTimersByTimeAsync(DELAY)
+    sender.set(1, 5, 1) // while "2" is in flight
+    requests[0]!.resolve()
+    await settle()
+    expect(requests.map(r => r.value)).toEqual([2]) // "5" still waits for its timer
+    await vi.advanceTimersByTimeAsync(DELAY)
+    expect(requests.map(r => r.value)).toEqual([2, 5])
+    requests[1]!.resolve()
+    await sender.flush()
+    vi.useRealTimers()
+  })
+
+  it('a change whose wait ended during a request is sent as soon as it answers', async () => {
+    const { requests, sender } = setup()
+    sender.set(1, 2, 1)
+    await vi.advanceTimersByTimeAsync(DELAY)
+    sender.set(1, 7, 1)
+    await vi.advanceTimersByTimeAsync(DELAY) // the wait is over, "2" still in flight
+    expect(requests.map(r => r.value)).toEqual([2])
+    requests[0]!.resolve()
+    await settle()
+    expect(requests.map(r => r.value)).toEqual([2, 7])
+    requests[1]!.resolve()
+    await sender.flush()
+    vi.useRealTimers()
+  })
+
+  it('sends changes to two lines made within one wait', async () => {
+    const { requests, sender } = setup()
+    sender.set(1, 3, 1)
+    sender.set(2, 9, 1)
+    await vi.advanceTimersByTimeAsync(DELAY)
+    expect(requests.map(r => [r.key, r.value])).toEqual([[1, 3], [2, 9]])
+    requests.forEach(r => r.resolve())
+    await sender.flush()
+    vi.useRealTimers()
+  })
+
+  it('a failure reports the confirmed value and drops a change still waiting', async () => {
+    const { requests, onError, sender } = setup()
+    sender.set(1, 2, 1)
+    await vi.advanceTimersByTimeAsync(DELAY)
+    sender.set(1, 3, 1)
+    requests[0]!.reject(new Error('429'))
+    await vi.advanceTimersByTimeAsync(DELAY * 2)
+    expect(onError).toHaveBeenCalledWith(1, 1, expect.any(Error))
+    expect(requests.map(r => r.value)).toEqual([2])
+    await sender.flush()
+    vi.useRealTimers()
+  })
+})
