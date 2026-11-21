@@ -15,6 +15,7 @@
  *   npx tsx scripts/export-seed-sql.ts
  *   npx wrangler d1 import <DB_NAME> --remote --file=seed.sql   # recommended for large files
  *   # (or: npx wrangler d1 execute <DB_NAME> --remote --file=seed.sql)
+ *   npx wrangler d1 execute <DB_NAME> --remote --file=scripts/search-fts.sql   # product search index
  */
 import { createClient } from '@libsql/client'
 import { writeFile } from 'node:fs/promises'
