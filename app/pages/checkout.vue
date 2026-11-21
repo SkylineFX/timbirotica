@@ -250,6 +250,11 @@ async function submitOrder() {
       priceSnapshots
     }
 
+    // The server orders the cart it holds, so send any quantity change still
+    // waiting. syncCart() above can reuse a cart read that started before the
+    // change, and the cart lines are locked from here on (isSubmitting).
+    await flushCartQuantityUpdates()
+
     const res = await $fetch('/api/orders', {
       method: 'POST',
       body: payload
@@ -544,7 +549,7 @@ async function submitOrder() {
                Cosul tau este gol.
             </div>
 
-            <CartItem v-for="item in cartItems" :key="item.id" :item="item" variant="checkout" />
+            <CartItem v-for="item in cartItems" :key="item.id" :item="item" variant="checkout" :disabled="isSubmitting" />
          </div>
 
          <!-- Totals -->
