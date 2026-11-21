@@ -1,10 +1,10 @@
-import { eq, and } from 'drizzle-orm'
+import { eq, and, gt } from 'drizzle-orm'
 import { randomBytes } from 'crypto'
 import * as Sentry from '@sentry/nuxt'
 import { dispatchOrderEmails } from '../../utils/email'
 import { generateProformaPdf, resolveProformaCustomer } from '../../utils/proforma'
 import { buildOrderWrites } from '../../utils/orderWrites'
-import { orderPayloadSchema, computeOrderTotals } from '~~/shared/constants/order'
+import { orderPayloadSchema, computeOrderTotals, MAX_ORDERS_PER_HOUR } from '~~/shared/constants/order'
 import { cartQuantitySchema } from '~~/shared/schemas/cart'
 
 // CSRF posture: state-changing endpoints rely on nuxt-auth-utils' session cookie
@@ -45,6 +45,21 @@ export default eventHandler(async (event) => {
 
   if (!userRecord.emailVerifiedAt) {
     throw createError({ statusCode: 403, message: 'Trebuie sa confirmi adresa de email inainte de a plasa o comanda.' })
+  }
+
+  // Rate limit per account (see MAX_ORDERS_PER_HOUR). orders_user_id_idx keeps
+  // this to the account's own order rows.
+  const [recent] = await db.select({ count: sql<number>`count(*)` })
+    .from(tables.orders)
+    .where(and(
+      eq(tables.orders.userId, session.user.id),
+      gt(tables.orders.createdAt, new Date(Date.now() - 60 * 60 * 1000))
+    ))
+  if ((recent?.count ?? 0) >= MAX_ORDERS_PER_HOUR) {
+    throw createError({
+      statusCode: 429,
+      message: `Ai plasat ${MAX_ORDERS_PER_HOUR} comenzi in ultima ora. Te rugam sa incerci din nou mai tarziu sau sa ne contactezi.`
+    })
   }
 
   // 1. Fetch the user's cart holding the products. Only the product columns the
