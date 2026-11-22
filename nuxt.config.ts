@@ -182,7 +182,15 @@ export default defineNuxtConfig({
 
   sentry: {
     org: 'timbirotica',
-    project: 'javascript-nuxt'
+    project: 'javascript-nuxt',
+    // The client maps are built for Sentry (sourcemap.client below), not for
+    // visitors: delete them from the public folder once the build has
+    // uploaded them, so /_nuxt/*.js.map returns 404. Sentry deletes them on
+    // its own only when it chose the sourcemap setting itself. The deletion
+    // also runs when there is no SENTRY_AUTH_TOKEN and nothing was uploaded.
+    sourcemaps: {
+      filesToDeleteAfterUpload: ['.output/public/**/*.map']
+    }
   },
 
   sourcemap: {
