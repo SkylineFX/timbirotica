@@ -18,7 +18,8 @@ describe('createCspNonce', () => {
 describe('contentSecurityPolicy', () => {
   it('allows scripts from this site, Turnstile, the nonce and the image handler only', () => {
     const policy = contentSecurityPolicy('abc')
-    expect(policy).toContain(`script-src 'self' 'nonce-abc' 'unsafe-hashes' '${NUXT_IMG_ONERROR_HASH}' https://challenges.cloudflare.com;`)
+    expect(policy).toContain(`script-src 'self' 'nonce-abc' 'unsafe-hashes' '${NUXT_IMG_ONERROR_HASH}' https://challenges.cloudflare.com https://static.cloudflareinsights.com;`)
+    expect(policy).toMatch(/connect-src [^;]*https:\/\/cloudflareinsights\.com/)
     expect(policy).not.toMatch(/script-src[^;]*'unsafe-(inline|eval)'/)
     expect(policy).toContain("frame-ancestors 'self'")
     expect(policy).toContain("object-src 'none'")

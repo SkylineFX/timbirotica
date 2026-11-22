@@ -7,17 +7,24 @@
 // - scripts: the app bundle from this site; inline scripts from Nuxt (the
 //   runtime config) and from Cloudflare's bot detection, which takes the
 //   nonce from this header; Turnstile from challenges.cloudflare.com; the
-//   image error handler below. No eval. Zod tries new Function once per page
+//   Cloudflare Web Analytics beacon, which Cloudflare adds to pages on
+//   timbirotica.ro for visitors outside the EU; the image error handler
+//   below. No eval. Zod tries new Function once per page
 //   load to see whether it may compile its parsers, so every page shows one
 //   expected eval violation from zod. When eval is blocked, Zod catches the
 //   error and uses its plain parser, the same one it uses in the Worker.
 // - frames: Turnstile, and the Google Maps embed on /despre-noi.
 // - images: this site, the product CDN, the placehold.co fallback in the cart,
 //   and data: URLs for the icons.
-// - requests: this site (including Cloudflare's /cdn-cgi/ paths) and Sentry.
+// - requests: this site (including Cloudflare's /cdn-cgi/ paths), Sentry and
+//   the Web Analytics beacon's reports.
 // Styles stay 'unsafe-inline': Nuxt UI and the components set inline styles.
 
 const SENTRY_INGEST = 'https://o4511418226114560.ingest.de.sentry.io'
+// The hosts Cloudflare documents for Web Analytics: the beacon script and
+// where it sends its reports.
+const WEB_ANALYTICS_SCRIPT = 'https://static.cloudflareinsights.com'
+const WEB_ANALYTICS_REPORTS = 'https://cloudflareinsights.com'
 
 /**
  * NuxtImg puts onerror="this.setAttribute('data-error', 1)" on every image
@@ -37,10 +44,10 @@ export function createCspNonce(): string {
 export function contentSecurityPolicy(nonce: string): string {
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'unsafe-hashes' '${NUXT_IMG_ONERROR_HASH}' https://challenges.cloudflare.com`,
+    `script-src 'self' 'nonce-${nonce}' 'unsafe-hashes' '${NUXT_IMG_ONERROR_HASH}' https://challenges.cloudflare.com ${WEB_ANALYTICS_SCRIPT}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https://cdn.timbirotica.ro https://placehold.co",
-    `connect-src 'self' ${SENTRY_INGEST}`,
+    `connect-src 'self' ${SENTRY_INGEST} ${WEB_ANALYTICS_REPORTS}`,
     "frame-src 'self' https://challenges.cloudflare.com https://www.google.com",
     "object-src 'none'",
     "base-uri 'self'",
