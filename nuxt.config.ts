@@ -157,6 +157,20 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // Security headers on every response from the Worker. Only this site may
+    // show its pages in a frame (clickjacking), which also lets the Nuxt
+    // devtools panel open in dev. The full Content-Security-Policy for pages
+    // is in server/plugins/securityHeaders.ts. Strict-Transport-Security is
+    // set in Cloudflare (SSL/TLS > Edge Certificates); previews on workers.dev
+    // get it from the .dev domain.
+    '/**': {
+      headers: {
+        'Content-Security-Policy': "frame-ancestors 'self'; base-uri 'self'; object-src 'none'",
+        'X-Frame-Options': 'SAMEORIGIN',
+        'X-Content-Type-Options': 'nosniff',
+        'Referrer-Policy': 'strict-origin-when-cross-origin'
+      }
+    },
     '/comenzi': { redirect: { to: '/user/comenzi', statusCode: 301 } }
   },
 
