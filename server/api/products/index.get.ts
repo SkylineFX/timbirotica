@@ -16,12 +16,8 @@ export default eventHandler(async (event) => {
   const minPrice = query.minPrice ? Number(query.minPrice) : undefined
   const maxPrice = query.maxPrice ? Number(query.maxPrice) : undefined
   const onlyAvailable = query.available === '1'
-  const subSlugs = query.sub
-    ? String(query.sub).split(',').map(s => s.trim()).filter(Boolean)
-    : []
-  const brandFilterSlugs = query.b
-    ? String(query.b).split(',').map(s => s.trim()).filter(Boolean)
-    : []
+  const subSlugs = parseFilterList(query.sub)
+  const brandFilterSlugs = parseFilterList(query.b)
 
   const db = useDrizzle()
 
