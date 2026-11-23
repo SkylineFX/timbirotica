@@ -129,14 +129,22 @@ export const useCart = () => {
     }
   }, { deep: true })
 
-  // Initialize: If client-side and empty, fetch
+  // Initialize: If client-side and empty, load the guest cart. On a page load,
+  // wait until hydration has finished: the server can't see localStorage and
+  // renders an empty cart, so filling it during hydration made the header badge
+  // differ from the server HTML ("Hydration completed but contains mismatches").
   if (import.meta.client) {
-    const saved = localStorage.getItem('guest-cart')
-    if (saved && !loggedIn.value && cartItems.value.length === 0) {
-      try {
-        cartItems.value = JSON.parse(saved)
-      } catch { /* ignore */ }
+    const loadGuestCart = () => {
+      const saved = localStorage.getItem('guest-cart')
+      if (saved && !loggedIn.value && cartItems.value.length === 0) {
+        try {
+          cartItems.value = JSON.parse(saved)
+        } catch { /* ignore */ }
+      }
     }
+    const nuxtApp = useNuxtApp()
+    if (nuxtApp.isHydrating) nuxtApp.hooks.hookOnce('app:suspense:resolve', loadGuestCart)
+    else loadGuestCart()
   }
 
   const addToCart = async (product: any, quantity = 1) => {
