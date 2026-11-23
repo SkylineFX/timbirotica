@@ -52,6 +52,10 @@ export default defineNuxtConfig({
       // (server/utils/siteOrigin.ts). Not secret, so it can be read at build
       // time; previews set NUXT_PUBLIC_SITE_URL at run time.
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://timbirotica.ro',
+      // The Sentry environment for browser errors and traces
+      // (sentry.client.config.ts). Previews set NUXT_PUBLIC_SENTRY_ENVIRONMENT
+      // to "preview" at run time, as the Worker gets SENTRY_ENVIRONMENT.
+      sentryEnvironment: 'production',
     },
     session: {
       // Read from NUXT_SESSION_PASSWORD at run time. Don't read process.env
@@ -124,6 +128,8 @@ export default defineNuxtConfig({
             NUXT_TURNSTILE_SECRET_KEY: '1x0000000000000000000000000000000AA',
             // Labels server errors from previews in Sentry (read in server/plugins/sentry.ts).
             SENTRY_ENVIRONMENT: 'preview',
+            // The same for browser errors and traces (runtimeConfig.public.sentryEnvironment).
+            NUXT_PUBLIC_SENTRY_ENVIRONMENT: 'preview',
             // Links in emails sent from a preview open the preview, not the live site.
             // Every preview so far is built from the `staging` branch.
             NUXT_PUBLIC_SITE_URL: 'https://staging-timbirotica.rrstudor.workers.dev'

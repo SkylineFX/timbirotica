@@ -1,8 +1,13 @@
 import * as Sentry from "@sentry/nuxt";
+import { useRuntimeConfig } from "#imports";
 
 Sentry.init({
   // Only send events from production builds — keeps localhost/dev noise out of the dashboard.
   enabled: import.meta.env.PROD,
+
+  // "preview" on Worker Previews (NUXT_PUBLIC_SENTRY_ENVIRONMENT in nuxt.config.ts),
+  // so errors from staging don't show up as production.
+  environment: useRuntimeConfig().public.sentryEnvironment,
 
   // If set up, you can use your runtime config here
   // dsn: useRuntimeConfig().public.sentry.dsn,
