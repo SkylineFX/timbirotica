@@ -134,8 +134,11 @@ const performSearch = () => {
   </ClientOnly>
 
   <div ref="containerRef" class="relative w-full z-[60]">
+    <!-- Typing opens the preview too, not just focusing the box: after Escape
+         or a search the box keeps its focus, so no new focus event comes. -->
     <UInput
       v-model="localQuery"
+      @update:model-value="isOpen = true"
       @keyup.enter="performSearch"
       @focus="isOpen = true"
       size="md"
