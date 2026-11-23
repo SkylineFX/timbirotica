@@ -10,6 +10,19 @@ if (!product.value) {
   throw createError({ statusCode: 404, message: 'Product not found' })
 }
 
+// A product has one address, /c/<its category>/<slug>, the one the links and
+// the sitemap use. Any other category in the path moves there for good (301).
+const productCategory = product.value.category?.slug ?? 'toate'
+const isWrongCategory = route.params.category !== productCategory
+if (isWrongCategory) {
+  const productPage = { path: `/c/${productCategory}/${product.value.slug}`, query: route.query, hash: route.hash }
+  // The server answers with the redirect. In the browser it isn't awaited: the
+  // rest of this setup reads the product, which is gone once the navigation
+  // has replaced this page.
+  if (import.meta.server) await navigateTo(productPage, { redirectCode: 301 })
+  else navigateTo(productPage, { replace: true })
+}
+
 const site = useSiteConfig()
 const truncate = (s: string | undefined | null, n = 155) =>
   s ? (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s) : undefined
@@ -220,7 +233,9 @@ const accordionItems = [
         </div>
     </div>
 
-    <div class="mt-12" v-if="product?.categoryId">
+    <!-- Not while redirecting: the server renders the page before it sends the
+         301, and the carousel would query the database for nothing. -->
+    <div class="mt-12" v-if="product?.categoryId && !isWrongCategory">
         <CategoryCarousel 
             title="Produse similare" 
             :categoryId="product?.categoryId"
