@@ -24,8 +24,8 @@ const { addToCart } = useCart()
                 </div>
                 <div class="flex justify-between items-end mt-2">
                        <div class="flex items-center gap-2">
-                           <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" @click="removeFromFavorites(item.id)" class="p-1.5" />
-                           <UButton size="xs" color="primary" variant="soft" icon="i-lucide-shopping-cart" @click="addToCart(item.product)" tooltip="Adauga in cos" class="p-1.5" />
+                           <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" aria-label="Sterge de la favorite" @click="removeFromFavorites(item.id)" class="p-1.5" />
+                           <UButton size="xs" color="primary" variant="soft" icon="i-lucide-shopping-cart" aria-label="Adauga in cos" @click="addToCart(item.product)" class="p-1.5" />
                        </div>
                        <span class="font-bold text-sm">{{ (item.product?.price ?? 0).toFixed(2) }} RON</span>
                 </div>

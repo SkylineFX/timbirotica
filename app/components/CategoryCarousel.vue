@@ -55,7 +55,7 @@ const items = computed(() => response.value?.products?.slice(0, 10) || [])
   <div class="flex flex-col gap-4">
     <div v-if="displayTitle" class="flex justify-between sm:justify-start items-baseline border-b border-gray-200 pb-1">
       <h3 class="text-xl lg:text-2xl font-bold">{{ displayTitle }}</h3>
-      <UButton v-if="displayLink" class="text-xs py-0 self-center" :to="displayLink" color="primary" variant="link">
+      <UButton v-if="displayLink" class="text-xs py-0 self-center" :to="displayLink" :aria-label="`Vezi tot: ${displayTitle}`" color="primary" variant="link">
         <span class="block sm:hidden">Vezi tot</span>
         <template #trailing>
           <UIcon name="i-lucide-arrow-right" class="w-4 sm:w-5 h-4 sm:h-5" />

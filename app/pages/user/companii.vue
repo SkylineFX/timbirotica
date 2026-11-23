@@ -73,8 +73,8 @@ async function handleBillingSaved() {
               <UBadge v-if="addr.isDefaultBilling" color="neutral" variant="subtle" size="sm">Adresa implicita</UBadge>
             </div>
             <div class="flex gap-1">
-              <UButton color="neutral" variant="ghost" size="sm" icon="i-lucide-pencil" class="font-medium" @click="openEditBilling(addr)" />
-              <UButton color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" class="font-medium" @click="removeBilling(addr.id)" />
+              <UButton color="neutral" variant="ghost" size="sm" icon="i-lucide-pencil" aria-label="Editeaza compania" class="font-medium" @click="openEditBilling(addr)" />
+              <UButton color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" aria-label="Sterge compania" class="font-medium" @click="removeBilling(addr.id)" />
             </div>
           </div>
         </div>

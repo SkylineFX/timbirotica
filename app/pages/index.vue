@@ -127,6 +127,7 @@ const featuredCategories = [
         <UButton
           class="text-xs py-0 self-center"
           to="/producatori"
+          aria-label="Vezi tot: Marci populare"
           color="primary"
           variant="link"
         >

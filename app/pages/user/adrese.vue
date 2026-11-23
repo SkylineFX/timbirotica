@@ -84,8 +84,8 @@ async function handleAddressSaved() {
               <UBadge v-if="addr.isDefaultShipping" color="neutral" variant="subtle" size="sm">Adresa implicita</UBadge>
             </div>
             <div class="flex gap-1">
-              <UButton color="neutral" variant="ghost" size="sm" icon="i-lucide-pencil" class="font-medium" @click="openEditAddress(addr)" />
-              <UButton color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" class="font-medium" @click="removeAddress(addr.id)" />
+              <UButton color="neutral" variant="ghost" size="sm" icon="i-lucide-pencil" aria-label="Editeaza adresa" class="font-medium" @click="openEditAddress(addr)" />
+              <UButton color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" aria-label="Sterge adresa" class="font-medium" @click="removeAddress(addr.id)" />
             </div>
           </div>
         </div>

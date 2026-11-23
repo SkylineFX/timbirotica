@@ -383,7 +383,7 @@ async function submitOrder() {
         <div v-show="deliveryMethod === 'courier'" class="flex flex-col gap-3">
           <div class="flex justify-between items-center text-sm font-medium text-gray-700">
             <span>Adresa de livrare</span>
-            <button @click="isAddressModalOpen = true" class="text-blue-600 hover:text-blue-700 transition">
+            <button aria-label="Schimba adresa de livrare" @click="isAddressModalOpen = true" class="text-blue-600 hover:text-blue-700 transition">
                <UIcon name="i-lucide-chevron-down" class="w-4 h-4 ml-1 inline align-middle"/>
             </button>
           </div>
@@ -561,7 +561,7 @@ async function submitOrder() {
             <div class="flex justify-between items-center text-base text-gray-600">
               <span class="flex items-center gap-1">
                 Livrare 
-                <NuxtLink to="/termeni-si-conditii#livrare" class="cursor-pointer flex items-center">
+                <NuxtLink to="/termeni-si-conditii#livrare" aria-label="Detalii despre livrare" class="cursor-pointer flex items-center">
                   <UIcon name="i-lucide-help-circle" class="w-3.5 h-3.5 text-gray-400 hover:text-primary transition-colors"/>
                 </NuxtLink>
               </span>
