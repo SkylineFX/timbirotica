@@ -115,7 +115,7 @@ const performSearch = () => {
 
 <template>
   <ClientOnly>
-    <Teleport to="#__nuxt">
+    <Teleport to="#search-backdrop">
       <Transition
         enter-active-class="transition-opacity duration-150 ease-out"
         enter-from-class="opacity-0"
