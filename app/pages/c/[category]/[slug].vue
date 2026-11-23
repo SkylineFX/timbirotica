@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
+import { absoluteUrl, canonicalUrl, jsonLd, productStructuredData } from '~~/shared/utils/seo'
 
 const route = useRoute()
 const slug = route.params.slug as string
@@ -23,7 +24,7 @@ if (isWrongCategory) {
   else navigateTo(productPage, { replace: true })
 }
 
-const site = useSiteConfig()
+const config = useRuntimeConfig()
 const truncate = (s: string | undefined | null, n = 155) =>
   s ? (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s) : undefined
 
@@ -32,9 +33,7 @@ const pageTitle = product.value.category?.name
   : product.value.name
 const pageDescription = truncate(product.value.description)
 const productImage = product.value.images?.[0]
-const absoluteImage = productImage
-  ? (productImage.startsWith('http') ? productImage : `${site.url}${productImage}`)
-  : undefined
+const absoluteImage = productImage ? absoluteUrl(config.public.siteUrl, productImage) : undefined
 
 useSeoMeta({
   title: pageTitle,
@@ -47,6 +46,17 @@ useSeoMeta({
   twitterTitle: pageTitle,
   twitterDescription: pageDescription,
   twitterImage: absoluteImage
+})
+
+// Product data for search results: name, photos, brand, price and stock.
+useHead({
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: jsonLd(productStructuredData(product.value, {
+      url: canonicalUrl(config.public.siteUrl, `/c/${productCategory}/${product.value.slug}`),
+      siteUrl: config.public.siteUrl
+    }))
+  }]
 })
 
 const breadcrumbs = computed(() => {
