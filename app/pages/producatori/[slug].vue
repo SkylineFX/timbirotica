@@ -1,7 +1,19 @@
 <script setup lang="ts">
 const route = useRoute()
 const brandSlug = computed(() => route.params.slug as string)
-const title = computed(() => brandSlug.value.replace(/-/g, ' ').charAt(0).toUpperCase() + brandSlug.value.replace(/-/g, ' ').slice(1))
+
+// The stored name comes from the brand list, which the header menu loads too
+// (same request, useCatalogMenus.ts). An unknown brand is a 404, not an empty
+// listing.
+const { data: brands, error } = await useBrandList()
+const brand = computed(() => brands.value?.find(b => b.to === `/producatori/${brandSlug.value}`))
+if (!brand.value) {
+  throw createError(error.value
+    ? { statusCode: error.value.statusCode ?? 500, fatal: true }
+    : { statusCode: 404, message: 'Producatorul nu a fost gasit.', fatal: true })
+}
+
+const title = computed(() => brand.value?.label ?? '')
 const apiQuery = computed(() => ({ brand: brandSlug.value }))
 const breadcrumbs = computed(() => [
   { label: 'Acasa', to: '/' },
