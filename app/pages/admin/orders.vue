@@ -294,7 +294,7 @@ function fmtDate(d: string | Date) {
             <h5 class="font-semibold text-gray-900">Produse</h5>
             <div v-for="item in selectedOrder.items" :key="item.id" class="flex gap-4 py-3 border-b border-gray-100 last:border-0">
               <div class="w-14 h-14 bg-white rounded-md border border-gray-200 overflow-hidden flex-shrink-0">
-                <img v-if="item.product?.images?.[0]" :src="item.product.images[0]" :alt="item.product.name" class="w-full h-full object-contain p-1" />
+                <img v-if="item.product?.images?.[0]" :src="item.product.images[0]" :alt="item.product.name" loading="lazy" class="w-full h-full object-contain p-1" />
                 <div v-else class="w-full h-full flex items-center justify-center bg-gray-100/50">
                   <UIcon name="i-lucide-image" class="w-5 h-5 text-gray-300" />
                 </div>
