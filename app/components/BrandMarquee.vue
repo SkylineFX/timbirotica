@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data: brands } = useFetch('/api/brands')
+const { data: brands } = useBrandList()
 </script>
 
 <template>
