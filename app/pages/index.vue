@@ -4,8 +4,7 @@ useSeoMeta({
   ogTitle: "Timbirotica · Articole de birotica si papetarie",
 });
 
-const { data: categoryTree } = useFetch("/api/categories/tree");
-const { data: brands } = useFetch("/api/brands");
+const { data: categoryTree } = useCategoryTree();
 
 const navigation = computed(() => [
   [

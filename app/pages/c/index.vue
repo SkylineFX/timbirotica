@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data: categories } = await useFetch("/api/categories/tree");
+const { data: categories } = await useCategoryTree();
 </script>
 
 <template>

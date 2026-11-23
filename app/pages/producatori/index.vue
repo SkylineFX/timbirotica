@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-const { data: brands } = await useFetch('/api/brands')
+const { data: brands } = await useBrandList()
 </script>
 
 <template>
