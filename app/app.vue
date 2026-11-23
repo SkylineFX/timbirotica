@@ -14,10 +14,11 @@ useSeoMeta({
   ogSiteName: 'Timbirotica',
   ogType: 'website',
   ogLocale: 'ro_RO',
-  ogImage: 'https://timbirotica.ro/og-image.jpg',
-  ogImageWidth: 1200,
-  ogImageHeight: 630,
-  twitterCard: 'summary_large_image',
+  // The logo, until there is a proper 1200x630 share image. Product pages
+  // replace it with the product's photo. No size here: those pages would
+  // otherwise inherit it for a photo of another size.
+  ogImage: 'https://timbirotica.ro/logo.png',
+  twitterCard: 'summary',
 })
 
 const { loggedIn } = useUserSession()
