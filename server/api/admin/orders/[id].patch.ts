@@ -31,10 +31,11 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 400, message: `Statusul nu poate fi schimbat din ${from} in ${ORDER_STATUS_LABEL[status]}.` })
   }
 
-  const [updated] = await db.update(tables.orders)
-    .set({ status })
-    .where(eq(tables.orders.id, id))
-    .returning()
+  const updated = await changeOrderStatus(db, id, order.status, status)
+
+  if (!updated) {
+    throw createError({ statusCode: 409, message: 'Statusul comenzii s-a schimbat intre timp. Reincarca pagina.' })
+  }
 
   return updated
 })

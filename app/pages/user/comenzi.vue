@@ -50,6 +50,10 @@ async function cancelOrder() {
     toast.add({ title: 'Comanda a fost anulata', color: 'success' })
   } catch (err: any) {
     toast.add({ title: 'Eroare la anularea comenzii', description: err.data?.message, color: 'error' })
+    // The order may have been confirmed in the meantime: show its current status.
+    await refreshOrders()
+    const current = userOrders.value?.find(o => o.id === selectedOrder.value?.id)
+    if (current) selectedOrder.value = { ...selectedOrder.value, status: current.status }
   } finally {
     isCancelLoading.value = false
   }
