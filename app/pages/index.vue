@@ -36,6 +36,9 @@ const featuredCategories = [
 
 <template>
   <div>
+    <!-- The page's main title for screen readers and search engines, hidden
+         so the design stays as it is. -->
+    <h1 class="sr-only">Timbirotica · Articole de birotica si papetarie</h1>
     <UContainer
       class="my-6 grid grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)] gap-4 items-stretch"
     >
