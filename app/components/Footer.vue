@@ -81,8 +81,8 @@ const columns: FooterColumn[] = [
               </a> -->
               <a href="https://reclamatiisal.anpc.ro/" target="_blank">
                 <div class="flex gap-2">
-                    <img src="https://cdn.timbirotica.ro/uploads/footer/sal.webp" alt="SAL" class="h-8" />
-                    <img src="https://cdn.timbirotica.ro/uploads/footer/sol.webp" alt="SOL" class="h-8" />
+                    <img src="https://cdn.timbirotica.ro/uploads/footer/sal.webp" alt="SAL" loading="lazy" class="h-8" />
+                    <img src="https://cdn.timbirotica.ro/uploads/footer/sol.webp" alt="SOL" loading="lazy" class="h-8" />
                 </div>
               </a>
             </div>
