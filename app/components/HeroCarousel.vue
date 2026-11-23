@@ -9,7 +9,7 @@ const items = [
 
 <template>
   <UCarousel
-    v-slot="{ item }"
+    v-slot="{ item, index }"
     :autoplay="{delay: 10000}"
     loop
     dots
@@ -19,7 +19,9 @@ const items = [
     class="w-full flex-1 bg-white rounded-md"
   >
     <NuxtLink :to="item.link" class="w-full h-full block">
-      <NuxtImg :src="item.image" :alt="item.alt" class="rounded-sm w-full h-full object-cover aspect-[50/33]" />
+      <!-- Only the first banner is on screen when the page opens. The others
+           wait until the carousel brings them near the view. -->
+      <NuxtImg :src="item.image" :alt="item.alt" :loading="index === 0 ? 'eager' : 'lazy'" class="rounded-sm w-full h-full object-cover aspect-[50/33]" />
     </NuxtLink>
   </UCarousel>
 </template>
