@@ -100,8 +100,8 @@ const loggedInItems = computed(() => [
 
 const dropdownItems = computed<any[][]>(() => loggedIn.value ? loggedInItems.value : loggedOutItems)
 
-const { data: categoryTree } = useFetch('/api/categories/tree')
-const { data: brands } = useFetch('/api/brands')
+const { data: categoryTree } = useCategoryTree()
+const { data: brands } = useBrandList()
 
 // Top-level menu entries shown above the inlined category list in the slideover.
 const navigation = computed(() => [
