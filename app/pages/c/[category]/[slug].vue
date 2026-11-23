@@ -5,11 +5,15 @@ import { absoluteUrl, canonicalUrl, jsonLd, productStructuredData } from '~~/sha
 const route = useRoute()
 const slug = route.params.slug as string
 
-const { data: product } = await useFetch(`/api/products/${slug}`)
+const { data: product, error } = await useFetch(`/api/products/${slug}`)
 
 if (!product.value) {
-  // Fatal, so in-app navigation shows the 404 page too, not an empty page.
-  throw createError({ statusCode: 404, message: 'Product not found', fatal: true })
+  // Fatal, so in-app navigation shows the error page too, not an empty page.
+  // Only a missing product is a 404. A failed request (the database down)
+  // keeps its status, so search engines retry the page instead of dropping it.
+  throw createError(error.value && error.value.statusCode !== 404
+    ? { statusCode: error.value.statusCode ?? 500, fatal: true }
+    : { statusCode: 404, message: 'Product not found', fatal: true })
 }
 
 // A product has one address, /c/<its category>/<slug>, the one the links and
