@@ -185,7 +185,7 @@ const performSearch = () => {
             class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800 last:border-0 transition-colors"
           >
             <div class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-sm overflow-hidden flex items-center justify-center">
-              <NuxtImg v-if="product.images && product.images.length > 0" :src="product.images[0]" alt="" class="w-full h-full object-cover" />
+              <NuxtImg v-if="product.images && product.images.length > 0" :src="product.images[0]" alt="" loading="lazy" class="w-full h-full object-cover" />
               <UIcon v-else name="i-lucide-image" class="text-gray-400 w-6 h-6" />
             </div>
             

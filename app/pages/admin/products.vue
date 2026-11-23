@@ -118,7 +118,7 @@ const columns: TableColumn<any>[] = [
       >
         <template #image-cell="{ row }">
           <NuxtLink :to="`/c/${row.original.category?.slug ?? 'toate'}/${row.original.slug}`" target="_blank" class="block w-12 h-12 bg-stone-50 rounded-md border border-gray-100 overflow-hidden flex items-center justify-center hover:border-primary transition-colors">
-            <img v-if="row.original.images?.[0]" :src="row.original.images[0]" :alt="row.original.name" class="w-full h-full object-contain p-1" />
+            <img v-if="row.original.images?.[0]" :src="row.original.images[0]" :alt="row.original.name" loading="lazy" class="w-full h-full object-contain p-1" />
             <UIcon v-else name="i-lucide-image" class="w-5 h-5 text-gray-300" />
           </NuxtLink>
         </template>
