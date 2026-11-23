@@ -29,6 +29,15 @@ export default defineEventHandler(async (event) => {
     return { success: true, id: existing.id, message: 'Already in favorites' }
   }
 
+  // Without this, an unknown product id fails the foreign key with a 500.
+  const product = await db.query.products.findFirst({
+    where: eq(tables.products.id, productId),
+    columns: { id: true }
+  })
+  if (!product) {
+    throw createError({ statusCode: 404, message: 'Produsul nu a fost gasit.' })
+  }
+
   const created = await db.insert(tables.favorites).values({
     userId,
     productId,
