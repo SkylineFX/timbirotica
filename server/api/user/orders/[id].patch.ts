@@ -22,10 +22,11 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Doar comenzile in procesare pot fi anulate.' })
   }
 
-  const [updated] = await db.update(tables.orders)
-    .set({ status: 'cancelled' })
-    .where(eq(tables.orders.id, id))
-    .returning()
+  const updated = await changeOrderStatus(db, id, 'processing', 'cancelled')
+
+  if (!updated) {
+    throw createError({ statusCode: 409, message: 'Comanda nu mai poate fi anulata. Statusul ei s-a schimbat intre timp.' })
+  }
 
   return updated
 })
