@@ -1,4 +1,6 @@
 <script setup>
+import { canonicalUrl } from '~~/shared/utils/seo'
+
 useHead({
   titleTemplate: (title) =>
     title ? `${title} · Timbirotica` : 'Timbirotica · Articole de birotica si papetarie',
@@ -23,6 +25,13 @@ const { syncCart, clearCart } = useCart()
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
+
+// Every page names its canonical address, without filter, sort or page size
+// parameters, and gives the same address as og:url.
+const config = useRuntimeConfig()
+const canonical = computed(() => canonicalUrl(config.public.siteUrl, route.path, route.query))
+useHead({ link: [{ rel: 'canonical', href: canonical }] })
+useSeoMeta({ ogUrl: canonical })
 
 // Google sign-in ends with a server redirect to /?login=google (or
 // google-new for a new account), so no form handler is there to confirm it.
