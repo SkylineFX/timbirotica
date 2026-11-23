@@ -141,7 +141,7 @@ const resetFilters = () => {
   <UContainer class="py-6">
     <UBreadcrumb v-if="breadcrumbs?.length" :items="breadcrumbs" :ui="{ separatorIcon: 'w-4 h-4' }" class="mb-6 [&_ol]:flex-nowrap [&_ol]:overflow-hidden [&_li]:shrink-0 [&_li:last-child]:shrink-1 [&_li:last-child]:min-w-0" />
     <div class="flex flex-col mb-8 gap-4 rounded-md p-4 bg-white">
-      <h1 class="text-xl font-bold flex flex-wrap items-baseline gap-2 xl:text-2xl">
+      <h1 class="text-xl font-bold flex flex-wrap items-baseline gap-2 xl:text-2xl wrap-anywhere">
         {{ title }} <span v-if="subtitle" class="font-normal italic">"{{ subtitle }}"</span>
         <span v-if="total !== undefined" class="text-sm font-medium text-gray-500 normal-case">
           ({{ total }} produse)
@@ -231,7 +231,7 @@ const resetFilters = () => {
             />
         </div>
     </div>
-    <div v-else class="text-center py-12 text-gray-500">
+    <div v-else class="text-center py-12 text-gray-500 wrap-anywhere">
         {{ emptyMessage }}
     </div>
   </UContainer>
