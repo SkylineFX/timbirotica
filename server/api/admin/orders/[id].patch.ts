@@ -28,13 +28,15 @@ export default eventHandler(async (event) => {
 
   if (!canChangeOrderStatus(order.status, status)) {
     const from = ORDER_STATUS_LABEL[order.status] ?? order.status
-    throw createError({ statusCode: 400, message: `Statusul nu poate fi schimbat din ${from} in ${ORDER_STATUS_LABEL[status]}.` })
+    // The current status goes back too, for an admin page showing an older one.
+    throw createError({ statusCode: 400, message: `Statusul nu poate fi schimbat din ${from} in ${ORDER_STATUS_LABEL[status]}.`, data: { status: order.status } })
   }
 
   const updated = await changeOrderStatus(db, id, order.status, status)
 
   if (!updated) {
-    throw createError({ statusCode: 409, message: 'Statusul comenzii s-a schimbat intre timp. Reincarca pagina.' })
+    const current = await db.query.orders.findFirst({ where: eq(tables.orders.id, id), columns: { status: true } })
+    throw createError({ statusCode: 409, message: 'Statusul comenzii s-a schimbat intre timp.', data: { status: current?.status } })
   }
 
   return updated
