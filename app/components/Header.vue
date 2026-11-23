@@ -132,7 +132,7 @@ const navigation = computed(() => [
             aria-label="Meniu"
           />
           <NuxtLink to="/" class="flex-shrink-0">
-            <NuxtImg src="/logo.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
+            <NuxtImg src="/logo.svg" alt="Timbirotica" class="h-6 lg:h-8 w-auto" />
           </NuxtLink>
         </div>
 
