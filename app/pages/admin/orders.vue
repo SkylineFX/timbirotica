@@ -122,6 +122,17 @@ async function saveStatus() {
     toast.add({ title: 'Status actualizat', description: ORDER_STATUS_LABEL[updated.status as keyof typeof ORDER_STATUS_LABEL], color: 'success' })
   } catch (e: any) {
     toast.add({ title: 'Eroare', description: e?.data?.message ?? 'Nu am putut actualiza statusul.', color: 'error' })
+    // The order may have changed meanwhile (a customer cancelled it): reload
+    // the list and show the order's current status and choices in the modal.
+    // A status filter can drop the order from the list, so the status the
+    // endpoint sends back with the error is the fallback.
+    await Promise.all([refresh(), refreshPendingCount()])
+    const current = orders.value.find((o: any) => o.id === selectedOrder.value?.id)
+    const status = current?.status ?? e?.data?.data?.status
+    if (status && selectedOrder.value) {
+      selectedOrder.value.status = status
+      newStatus.value = status
+    }
   } finally {
     isSavingStatus.value = false
   }
