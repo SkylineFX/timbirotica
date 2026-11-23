@@ -19,6 +19,7 @@ const { data: brands } = await useBrandList()
             <NuxtImg 
               :src="brand.image || ''" 
               :alt="brand.label"
+              loading="lazy"
               class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-200" 
             />
           </div>

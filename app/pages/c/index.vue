@@ -28,6 +28,7 @@ const { data: categories } = await useCategoryTree();
                 v-if="category.image"
                 :src="category.image"
                 :alt="category.label"
+                loading="lazy"
                 class="w-full h-full object-contain p-4"
               />
               <UIcon
