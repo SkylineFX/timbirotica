@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
-import { shippingMethodLabel, paymentMethodLabel } from '~~/shared/constants/order'
+import { shippingMethodLabel, paymentMethodLabel, ORDER_STATUS_TRANSITIONS } from '~~/shared/constants/order'
 
 definePageMeta({
   layout: 'admin',
@@ -93,6 +93,13 @@ const parsedShipping = ref<any>({})
 const parsedBilling = ref<any>({})
 const newStatus = ref<OrderStatus | undefined>(undefined)
 const isSavingStatus = ref(false)
+
+// The order's status and the ones it can move to from there.
+const statusChoices = computed(() => {
+  const current = selectedOrder.value?.status as OrderStatus | undefined
+  if (!current) return []
+  return [current, ...(ORDER_STATUS_TRANSITIONS[current] ?? [])].map(s => ({ label: ORDER_STATUS_LABEL[s] ?? s, value: s }))
+})
 
 function openOrder(order: any) {
   selectedOrder.value = order
@@ -307,12 +314,12 @@ function fmtDate(d: string | Date) {
           </div>
 
           <!-- Status updater -->
-          <div class="bg-stone-50 p-4 rounded-sm border border-gray-100">
+          <div v-if="statusChoices.length > 1" class="bg-stone-50 p-4 rounded-sm border border-gray-100">
             <h5 class="text-sm font-bold text-gray-900 mb-3">Schimba statusul</h5>
             <div class="flex gap-3">
               <USelect
                 v-model="newStatus"
-                :items="ORDER_STATUS_VALUES.map(s => ({ label: ORDER_STATUS_LABEL[s], value: s }))"
+                :items="statusChoices"
                 class="flex-1"
               />
               <UButton

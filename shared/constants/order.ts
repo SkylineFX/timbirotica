@@ -25,6 +25,33 @@ export const shippingMethodLabel = (m: string): string =>
 export const paymentMethodLabel = (m: string): string =>
   PAYMENT_METHOD_LABELS[m as PaymentMethod] ?? m
 
+// Order statuses. A new order starts as 'processing'.
+export const ORDER_STATUS_VALUES = ['processing', 'confirmed', 'shipped', 'completed', 'cancelled'] as const
+
+export type OrderStatus = typeof ORDER_STATUS_VALUES[number]
+
+export const ORDER_STATUS_LABEL: Record<string, string> = {
+  processing: 'In procesare',
+  confirmed: 'Confirmata',
+  shipped: 'Expediata',
+  completed: 'Finalizata',
+  cancelled: 'Anulata',
+}
+
+// The statuses an admin can move an order to from each status. Completed and
+// cancelled orders are final. A customer can only cancel an order in processing.
+export const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {
+  processing: ['confirmed', 'cancelled'],
+  confirmed: ['shipped', 'cancelled', 'processing'],
+  shipped: ['completed'],
+  completed: [],
+  cancelled: [],
+}
+
+/** Whether an admin can move an order from one status to another. */
+export const canChangeOrderStatus = (from: string, to: string): boolean =>
+  ORDER_STATUS_TRANSITIONS[from as OrderStatus]?.includes(to as OrderStatus) ?? false
+
 // Shipping cost rules
 export const FREE_SHIPPING_THRESHOLD = 200
 export const COURIER_SHIPPING_COST = 30

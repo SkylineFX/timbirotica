@@ -9,6 +9,9 @@ import {
   orderPayloadSchema,
   FREE_SHIPPING_THRESHOLD,
   COURIER_SHIPPING_COST,
+  ORDER_STATUS_VALUES,
+  ORDER_STATUS_TRANSITIONS,
+  canChangeOrderStatus,
 } from '~~/shared/constants/order'
 
 describe('getCourierShippingCost', () => {
@@ -123,5 +126,43 @@ describe('orderPayloadSchema', () => {
   it('rejects unknown shipping/payment methods', () => {
     expect(orderPayloadSchema.safeParse({ ...valid, shippingMethod: 'drone' }).success).toBe(false)
     expect(orderPayloadSchema.safeParse({ ...valid, paymentMethod: 'crypto' }).success).toBe(false)
+  })
+})
+
+describe('canChangeOrderStatus', () => {
+  it('allows the listed status changes', () => {
+    expect(canChangeOrderStatus('processing', 'confirmed')).toBe(true)
+    expect(canChangeOrderStatus('processing', 'cancelled')).toBe(true)
+    expect(canChangeOrderStatus('confirmed', 'shipped')).toBe(true)
+    expect(canChangeOrderStatus('confirmed', 'cancelled')).toBe(true)
+    expect(canChangeOrderStatus('confirmed', 'processing')).toBe(true)
+    expect(canChangeOrderStatus('shipped', 'completed')).toBe(true)
+  })
+
+  it('refuses skipped steps, going back from shipped, and keeping the same status', () => {
+    expect(canChangeOrderStatus('processing', 'shipped')).toBe(false)
+    expect(canChangeOrderStatus('processing', 'completed')).toBe(false)
+    expect(canChangeOrderStatus('shipped', 'confirmed')).toBe(false)
+    expect(canChangeOrderStatus('shipped', 'cancelled')).toBe(false)
+    expect(canChangeOrderStatus('processing', 'processing')).toBe(false)
+  })
+
+  it('treats completed and cancelled orders as final', () => {
+    for (const to of ORDER_STATUS_VALUES) {
+      expect(canChangeOrderStatus('completed', to)).toBe(false)
+      expect(canChangeOrderStatus('cancelled', to)).toBe(false)
+    }
+  })
+
+  it('refuses unknown statuses', () => {
+    expect(canChangeOrderStatus('archived', 'processing')).toBe(false)
+    expect(canChangeOrderStatus('processing', 'archived')).toBe(false)
+  })
+
+  it('has an entry for every status, pointing only at known statuses', () => {
+    expect(Object.keys(ORDER_STATUS_TRANSITIONS).sort()).toEqual([...ORDER_STATUS_VALUES].sort())
+    for (const targets of Object.values(ORDER_STATUS_TRANSITIONS)) {
+      for (const to of targets) expect(ORDER_STATUS_VALUES).toContain(to)
+    }
   })
 })
