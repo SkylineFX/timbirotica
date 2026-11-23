@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useMediaQuery } from '@vueuse/core'
-
 const route = useRoute()
 
 const tabs = [
@@ -17,22 +15,31 @@ const activeTab = computed<string>({
   },
   set: (val) => { navigateTo(val) }
 })
-
-const isDesktop = useMediaQuery('(min-width: 768px)')
-const orientation = computed<'horizontal' | 'vertical'>(() => isDesktop.value ? 'horizontal' : 'vertical')
 </script>
 
 <template>
   <NuxtLayout name="default">
     <UContainer class="py-8 lg:py-12 max-w-5xl flex-1 flex flex-col w-full">
       <h1 class="text-2xl lg:text-3xl font-bold mb-6">Contul meu</h1>
+      <!-- Vertical on phones, horizontal from md up. UTabs takes one fixed
+           orientation, and the server can't know the screen width: choosing
+           it in JavaScript rendered the phone tabs on the server, and desktop
+           page loads kept them. Two tab bars let CSS choose instead. -->
       <UTabs
         v-model="activeTab"
         :items="tabs"
         variant="link"
         value-key="to"
-        :orientation="orientation"
-        class="mb-6"
+        orientation="vertical"
+        class="mb-6 md:hidden"
+      />
+      <UTabs
+        v-model="activeTab"
+        :items="tabs"
+        variant="link"
+        value-key="to"
+        orientation="horizontal"
+        class="mb-6 hidden md:flex"
       />
       <slot />
     </UContainer>
