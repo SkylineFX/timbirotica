@@ -8,7 +8,8 @@ const slug = route.params.slug as string
 const { data: product } = await useFetch(`/api/products/${slug}`)
 
 if (!product.value) {
-  throw createError({ statusCode: 404, message: 'Product not found' })
+  // Fatal, so in-app navigation shows the 404 page too, not an empty page.
+  throw createError({ statusCode: 404, message: 'Product not found', fatal: true })
 }
 
 // A product has one address, /c/<its category>/<slug>, the one the links and
