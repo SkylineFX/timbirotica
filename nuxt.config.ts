@@ -77,6 +77,14 @@ export default defineNuxtConfig({
 
   css: ['~/assets/main.css'],
 
+  // Every page, the error page included, is in Romanian. Screen readers pick
+  // their voice from this, and search engines read it too.
+  app: {
+    head: {
+      htmlAttrs: { lang: 'ro' }
+    }
+  },
+
   hub: {
     // driver omitted on purpose: @nuxthub/core auto-resolves to 'd1' in the
     // Cloudflare production build and to local libsql (.data/db/sqlite.db) in dev.
