@@ -15,7 +15,7 @@ const { removeFromCart, updateQuantity } = useCart()
 <template>
   <div class="flex gap-4 w-full" :class="variant === 'slideover' ? 'border-b border-gray-200 dark:border-gray-800 py-8' : 'py-3'">
     <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`" class="flex-shrink-0 cursor-pointer border border-gray-200 rounded-sm p-1 flex items-center justify-center">
-      <NuxtImg :src="item.product?.images?.[0] || 'https://placehold.co/100'" class="w-16 h-16 object-contain bg-white rounded-sm shrink-0" :class="variant === 'checkout' ? 'p-1' : ''" />
+      <NuxtImg :src="item.product?.images?.[0] || 'https://placehold.co/100'" :alt="item.product?.name" class="w-16 h-16 object-contain bg-white rounded-sm shrink-0" :class="variant === 'checkout' ? 'p-1' : ''" />
     </NuxtLink>
     <div class="flex-1 flex flex-col justify-between min-w-0">
         <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`">

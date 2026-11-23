@@ -14,7 +14,7 @@ const { addToCart } = useCart()
           <ul v-else class="flex flex-col">
             <li v-for="item in favorites" :key="item.id" class="flex gap-4 py-8 border-b border-gray-200 dark:border-gray-800">
                <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`" class="flex-shrink-0 cursor-pointer border border-gray-200 rounded-sm flex items-center justify-center p-1">
-                  <NuxtImg :src="item.product?.images?.[0] || ''" class="w-16 h-16 object-contain bg-white rounded-sm" />
+                  <NuxtImg :src="item.product?.images?.[0] || ''" :alt="item.product?.name" class="w-16 h-16 object-contain bg-white rounded-sm" />
                </NuxtLink>
               <div class="flex-1 flex flex-col justify-between">
                 <div>
