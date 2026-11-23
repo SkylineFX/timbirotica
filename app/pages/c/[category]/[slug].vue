@@ -110,54 +110,41 @@ const accordionItems = [
 <template>
   <UContainer class="py-6">
     <UBreadcrumb :items="breadcrumbs" :ui="{ separatorIcon: 'w-4 h-4' }" class="mb-6 [&_ol]:flex-nowrap [&_ol]:overflow-hidden [&_li]:shrink-0 [&_li:last-child]:shrink-1 [&_li:last-child]:min-w-0" />
-    <div v-if="product" class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
-        <div class="w-full md:col-span-7">
-            <!-- Mobile Header (hidden on desktop) -->
-            <div class="block md:hidden mb-6">
-                <!-- Brand container -->
-                <div v-if="product.brand" class="mb-2 dark:bg-gray-900 p-1 rounded-md border border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                    <NuxtLink :to="`/producatori/${product.brand.slug}`" class="text-xs text-gray-500 underline hover:text-primary transition-colors">
-                        <NuxtImg v-if="product.brand.image" :src="product.brand.image" :alt="product.brand.name" class="h-4 object-contain" />
-                        <span v-else class="font-bold text-gray-900 border-gray-100 dark:text-white">{{ product.brand.name }}</span>
-                    </NuxtLink>
-                </div>
-
-                <!-- Title -->
-                <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 dark:text-white mb-2 leading-tight"> <!-- lowercase first-letter:uppercase-->
-                    {{ product.name }}
-                </h1>
-                
-                <!-- SKU / Code -->
-                <p class="text-sm text-gray-500 mb-0 font-mono">
-                    Cod produs: {{ product.sku}}
-                </p>
+    <!-- One header for every screen size, so the page has a single h1: above
+         the photos on phones, beside them from md up (grid placement). -->
+    <div v-if="product" class="grid grid-cols-1 md:grid-cols-12 md:grid-rows-[auto_1fr] md:gap-x-12">
+        <div class="mb-6 md:mb-0 md:col-start-8 md:col-span-5 md:row-start-1">
+            <!-- Brand container, phones -->
+            <div v-if="product.brand" class="md:hidden mb-2 dark:bg-gray-900 p-1 rounded-md border border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                <NuxtLink :to="`/producatori/${product.brand.slug}`" class="text-xs text-gray-500 underline hover:text-primary transition-colors">
+                    <NuxtImg v-if="product.brand.image" :src="product.brand.image" :alt="product.brand.name" class="h-4 object-contain" />
+                    <span v-else class="font-bold text-gray-900 border-gray-100 dark:text-white">{{ product.brand.name }}</span>
+                </NuxtLink>
             </div>
-            
+            <!-- Brand container, wider screens -->
+            <div v-if="product.brand" class="hidden mb-6 bg-white dark:bg-gray-900 p-3 rounded-md border border-gray-100 dark:border-gray-800 md:flex items-center justify-between">
+                <NuxtImg v-if="product.brand.image" :src="product.brand.image" :alt="product.brand.name" class="h-6 object-contain" />
+                <span v-else class="font-bold text-gray-900 border-gray-100 dark:text-white">{{ product.brand.name }}</span>
+                <NuxtLink :to="`/producatori/${product.brand.slug}`" class="text-xs text-gray-500 underline hover:text-primary transition-colors">Vezi toate produsele</NuxtLink>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 dark:text-white mb-2 leading-tight"> <!-- lowercase first-letter:uppercase-->
+                {{ product.name }}
+            </h1>
+
+            <!-- SKU / Code -->
+            <p class="text-sm text-gray-500 mb-0 md:mb-6 font-mono">
+                Cod produs: {{ product.sku}}
+            </p>
+        </div>
+
+        <div class="w-full mb-8 md:mb-0 md:col-start-1 md:col-span-7 md:row-start-1 md:row-span-2">
             <ProductCarousel :productImages="product.images || []"/>
         </div>
 
-        <div class="w-full md:col-span-5">
+        <div class="w-full md:col-start-8 md:col-span-5 md:row-start-2">
             <div class="flex flex-col h-full md:pb-[0px]">
-                <!-- Desktop Header (hidden on mobile) -->
-                <div class="hidden md:block">
-                    <!-- Brand container -->
-                    <div v-if="product.brand" class="mb-6 bg-white dark:bg-gray-900 p-3 rounded-md border border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                        <NuxtImg v-if="product.brand.image" :src="product.brand.image" :alt="product.brand.name" class="h-6 object-contain" />
-                        <span v-else class="font-bold text-gray-900 border-gray-100 dark:text-white">{{ product.brand.name }}</span>
-                        <NuxtLink :to="`/producatori/${product.brand.slug}`" class="text-xs text-gray-500 underline hover:text-primary transition-colors">Vezi toate produsele</NuxtLink>
-                    </div>
-
-                    <!-- Title -->
-                    <h1 class="text-xl lg:text-3xl font-semibold text-gray-900 dark:text-white mb-2 leading-tight"> <!-- lowercase first-letter:uppercase-->
-                        {{ product.name }}
-                    </h1>
-                    
-                    <!-- SKU / Code -->
-                    <p class="text-sm text-gray-500 mb-6 font-mono">
-                        Cod produs: {{ product.sku}}
-                    </p>
-                </div>
-
                 <!-- Stock Status -->
                 <div class="flex items-center gap-2 mb-2 font-medium" :class="stockColor">
                     <UBadge v-if="product.stock > 0" color="success" variant="soft" class="rounded-sm" leading-icon="i-lucide-check">Disponibil</UBadge>
