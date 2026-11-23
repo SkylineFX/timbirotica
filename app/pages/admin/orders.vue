@@ -213,7 +213,7 @@ function fmtDate(d: string | Date) {
           <span class="text-sm text-gray-600">{{ fmtDate(row.original.createdAt) }}</span>
         </template>
         <template #actions-cell="{ row }">
-          <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-chevron-right" @click.stop="openOrder(row.original)" />
+          <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-chevron-right" aria-label="Detalii comanda" @click.stop="openOrder(row.original)" />
         </template>
       </UTable>
 

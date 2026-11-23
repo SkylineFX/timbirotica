@@ -181,6 +181,7 @@ const accordionItems = [
                             :variant="isFavorite ? 'solid' : 'subtle'" 
                             class="rounded-sm"
                             icon="i-lucide-heart"
+                            :aria-label="isFavorite ? 'Sterge de la favorite' : 'Adauga la favorite'"
                             @click.prevent="toggleFavorite"
                         />
                     </div>

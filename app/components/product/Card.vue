@@ -54,6 +54,7 @@ const toggleFavorite = async () => {
             :color="isFavorite ? 'primary' : 'neutral'" 
             :variant="isFavorite ? 'solid' : 'subtle'" 
             icon="i-lucide-heart"
+            :aria-label="isFavorite ? 'Sterge de la favorite' : 'Adauga la favorite'"
             class="rounded-sm"
             @click.prevent="toggleFavorite"
           />

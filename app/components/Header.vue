@@ -129,7 +129,7 @@ const navigation = computed(() => [
             color="neutral" 
             variant="ghost" 
             @click="isNavOpen = true"
-            aria-label="Menu"
+            aria-label="Meniu"
           />
           <NuxtLink to="/" class="flex-shrink-0">
             <NuxtImg src="/logo.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
@@ -325,7 +325,7 @@ const navigation = computed(() => [
             icon="i-lucide-x"
             color="neutral"
             variant="ghost"
-            aria-label="Close"
+            aria-label="Inchide"
             @click="closeAll"
           />
         </div>
