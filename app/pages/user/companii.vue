@@ -6,6 +6,7 @@ definePageMeta({
   middleware: ['authenticated']
 })
 
+const toast = useToast()
 const { data: userBillingAddresses, refresh: refreshBillingAddresses } = await useFetch('/api/user/billing-addresses')
 
 const isBillingModalOpen = ref(false)
@@ -30,9 +31,13 @@ const currentBilling = computed(() => {
 
 async function removeBilling(id: number) {
   if (!confirm('Sigur doresti sa stergi aceasta companie?')) return
-  await $fetch(`/api/user/billing-addresses/${id}`, { method: 'DELETE' })
+  try {
+    await $fetch(`/api/user/billing-addresses/${id}`, { method: 'DELETE' })
+    toast.add({ title: 'Companie stearsa', color: 'success' })
+  } catch {
+    toast.add({ title: 'Eroare la stergerea companiei', description: 'Te rugam sa incerci din nou.', color: 'error' })
+  }
   await refreshBillingAddresses()
-  useToast().add({ title: 'Companie stearsa', color: 'success' })
 }
 
 async function handleBillingSaved() {

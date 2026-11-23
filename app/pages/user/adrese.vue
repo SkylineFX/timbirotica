@@ -18,6 +18,7 @@ type Address = {
   isDefaultShipping: boolean | null
 }
 
+const toast = useToast()
 const { data: userAddresses, refresh: refreshAddresses } = await useFetch('/api/user/addresses')
 
 const isAddressModalOpen = ref(false)
@@ -42,9 +43,13 @@ const currentAddress = computed(() => {
 
 async function removeAddress(id: number) {
   if (!confirm('Sigur doresti sa stergi aceasta adresa?')) return
-  await $fetch(`/api/user/addresses/${id}`, { method: 'DELETE' })
+  try {
+    await $fetch(`/api/user/addresses/${id}`, { method: 'DELETE' })
+    toast.add({ title: 'Adresa stearsa', color: 'success' })
+  } catch {
+    toast.add({ title: 'Eroare la stergerea adresei', description: 'Te rugam sa incerci din nou.', color: 'error' })
+  }
   await refreshAddresses()
-  useToast().add({ title: 'Adresa stearsa', color: 'success' })
 }
 
 async function handleAddressSaved() {
