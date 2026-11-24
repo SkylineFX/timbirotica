@@ -75,6 +75,9 @@ async function performReorder({ replace }: { replace: boolean }) {
     // One request for the whole order (server/api/user/orders/[id]/reorder.post.ts).
     // The server reads the order's lines, skips unavailable products and changes
     // the cart in one transaction, so a large order never half-fills the cart.
+    // It adds to or replaces the cart it holds, so send quantity changes still
+    // waiting first: sent after, they would overwrite the sums or hit deleted lines.
+    await flushCartQuantityUpdates()
     const { added, skipped } = await $fetch(`/api/user/orders/${selectedOrder.value.id}/reorder`, {
       method: 'POST',
       body: { replace }

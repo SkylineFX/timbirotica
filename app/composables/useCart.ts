@@ -152,8 +152,9 @@ export const useCart = () => {
     isLoading.value = true
     try {
       if (loggedIn.value) {
-        // Optimistic Update (Optional): We could push to cartItems here immediately
-        // But for reliability, let's wait for server.
+        // The server adds to the quantity it holds, so send a change still
+        // waiting first: sent after, it would overwrite the sum.
+        await flushCartQuantityUpdates()
         await $fetch('/api/cart', {
           method: 'POST',
           body: { productId: product.id, quantity }
