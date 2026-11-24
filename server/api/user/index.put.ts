@@ -9,11 +9,7 @@ const bodySchema = z.object({
 
 export default eventHandler(async (event) => {
   const session = await requireUserSession(event)
-  const result = bodySchema.safeParse(await readBody(event))
-  if (!result.success) {
-    throw createError({ statusCode: 400, message: result.error.issues[0]?.message || 'Date invalide.' })
-  }
-  const body = result.data
+  const body = await readBodyWithSchema(event, bodySchema)
   const db = useDrizzle()
 
   const [updatedUser] = await db.update(tables.users)

@@ -17,13 +17,7 @@ const registerSchema = z.object({
 }, { error: 'Date invalide.' })
 
 export default defineEventHandler(async (event) => {
-  const result = registerSchema.safeParse(await readBody(event))
-  if (!result.success) {
-    // First validation issue becomes the user-facing message — avoids leaking
-    // the raw ZodError JSON to the client (which h3's readValidatedBody does).
-    throw createError({ statusCode: 400, message: result.error.issues[0]?.message || 'Date invalide.' })
-  }
-  const { email, password, firstName, lastName, phone, turnstileToken } = result.data
+  const { email, password, firstName, lastName, phone, turnstileToken } = await readBodyWithSchema(event, registerSchema)
 
   // Cloudflare Turnstile verification — rejects bots/abuse before any DB work.
   const turnstile = await verifyTurnstileToken(turnstileToken, event)
