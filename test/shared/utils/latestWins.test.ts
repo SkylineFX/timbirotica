@@ -60,6 +60,22 @@ describe('createLatestWinsSender', () => {
     expect(flushed).toBe(true)
   })
 
+  it('flush resolves false when a request failed, true when every value was saved', async () => {
+    const { requests, send } = fakeServer()
+    const sender = createLatestWinsSender(send, vi.fn())
+    sender.set(1, 2, 1)
+    sender.set(2, 5, 4)
+    const flushing = sender.flush()
+    requests[0]!.resolve()
+    requests[1]!.reject(new Error('429'))
+    expect(await flushing).toBe(false)
+
+    sender.set(1, 3, 2)
+    const next = sender.flush()
+    requests[2]!.resolve()
+    expect(await next).toBe(true)
+  })
+
   it('on failure drops the waiting value and reports the last confirmed one', async () => {
     const { requests, send } = fakeServer()
     const onError = vi.fn()

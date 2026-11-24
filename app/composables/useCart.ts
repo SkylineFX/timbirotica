@@ -25,10 +25,11 @@ const changedSince = (itemId: number, mark: number) => (lastQuantityChange.get(i
 
 /**
  * Sends cart quantity changes still waiting, and resolves when the server has
- * answered. Call it before ending the session: a change sent after logout is
- * refused and lost.
+ * answered: false if a change failed (the line is back at the quantity the
+ * server holds, and a toast says so). Call it before ending the session: a
+ * change sent after logout is refused and lost.
  */
-export const flushCartQuantityUpdates = (): Promise<void> => quantityUpdates?.flush() ?? Promise.resolve()
+export const flushCartQuantityUpdates = (): Promise<boolean> => quantityUpdates?.flush() ?? Promise.resolve(true)
 
 export const useCart = () => {
   const { loggedIn } = useUserSession()
