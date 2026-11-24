@@ -207,6 +207,13 @@ async function submitOrder() {
   // Block a second submit from here on, including while the cart refreshes below.
   isSubmitting.value = true
   try {
+    // The server orders the cart it holds, so first send any quantity change
+    // still waiting; the cart lines are locked from here on. This must come
+    // before syncCart(), which sends them too but ignores a failure. If one
+    // failed, the line is back at the server's quantity, with a toast: stop,
+    // so the customer sees what would be ordered.
+    if (!await flushCartQuantityUpdates()) return
+
     // The prices the customer is looking at, taken before the cart refresh below,
     // so the server still refuses the order (409) if a price changed meanwhile.
     const priceSnapshots = cartItems.value.map(item => ({
@@ -249,13 +256,6 @@ async function submitOrder() {
       termsAccepted: true as const,
       priceSnapshots
     }
-
-    // The server orders the cart it holds, so send any quantity change still
-    // waiting. syncCart() above can reuse a cart read that started before the
-    // change, and the cart lines are locked from here on (isSubmitting). If a
-    // change failed, the server holds a quantity the customer didn't choose:
-    // stop, so they see the corrected line before ordering.
-    if (!await flushCartQuantityUpdates()) return
 
     const res = await $fetch('/api/orders', {
       method: 'POST',
