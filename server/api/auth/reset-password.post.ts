@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
   if (hasSessionCookie(event)) {
     const session = await getUserSession(event)
     if (session.user?.id === resetToken.userId) {
-      await setUserSession(event, {
+      await saveUserSession(event, {
         secure: {
           passwordStamp: passwordStamp(hashedPassword),
           expiresAt: session.secure?.expiresAt ?? Date.now() + SESSION_MAX_AGE * 1000,

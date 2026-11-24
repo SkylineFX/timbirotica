@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  isSessionCurrent, newSessionGuard, passwordStamp,
-  SESSION_MAX_AGE, REMEMBERED_SESSION_MAX_AGE,
+  isSessionCurrent, newSessionGuard, passwordStamp, sessionCookieExpires,
 } from '~~/server/utils/sessionCheck'
 import { GOOGLE_ONLY_PASSWORD } from '~~/server/utils/googleSignIn'
 
@@ -13,8 +12,8 @@ const NEW_HASH = '$2a$10$0ZYXWVUTSRQPONMLKJIHGFEDCBAzyxwvutsrqpomlkjihgfedcbaZ'
 const account = (overrides: Partial<{ password: string, role: string }> = {}) =>
   ({ password: HASH, role: 'user', ...overrides })
 
-const sessionFor = (passwordHash = HASH, role = 'user', maxAge = SESSION_MAX_AGE) =>
-  ({ user: { role }, secure: newSessionGuard(passwordHash, maxAge, NOW) })
+const sessionFor = (passwordHash = HASH, role = 'user', remember = false) =>
+  ({ user: { role }, secure: newSessionGuard(passwordHash, remember, NOW) })
 
 describe('passwordStamp', () => {
   it('is the same for the same hash and differs when the password changes', () => {
@@ -29,8 +28,21 @@ describe('passwordStamp', () => {
 
 describe('newSessionGuard', () => {
   it('expires after 7 days, or 30 when remembered', () => {
-    expect(newSessionGuard(HASH, SESSION_MAX_AGE, NOW).expiresAt).toBe(NOW + 7 * DAY)
-    expect(newSessionGuard(HASH, REMEMBERED_SESSION_MAX_AGE, NOW).expiresAt).toBe(NOW + 30 * DAY)
+    expect(newSessionGuard(HASH, false, NOW).expiresAt).toBe(NOW + 7 * DAY)
+    expect(newSessionGuard(HASH, true, NOW).expiresAt).toBe(NOW + 30 * DAY)
+  })
+})
+
+describe('sessionCookieExpires', () => {
+  it('ends a remembered session\'s cookie with the session', () => {
+    expect(sessionCookieExpires(newSessionGuard(HASH, true, NOW))).toEqual(new Date(NOW + 30 * DAY))
+  })
+
+  it('ends any other cookie when the browser closes', () => {
+    expect(sessionCookieExpires(newSessionGuard(HASH, false, NOW))).toBeUndefined()
+    // Sessions opened before the flag existed, and guests.
+    expect(sessionCookieExpires({ passwordStamp: 'x', expiresAt: NOW + DAY })).toBeUndefined()
+    expect(sessionCookieExpires(undefined)).toBeUndefined()
   })
 })
 
@@ -42,7 +54,7 @@ describe('isSessionCurrent', () => {
 
   it('refuses a session once it has expired', () => {
     expect(isSessionCurrent(sessionFor(), account(), NOW + 7 * DAY)).toBe(false)
-    const remembered = sessionFor(HASH, 'user', REMEMBERED_SESSION_MAX_AGE)
+    const remembered = sessionFor(HASH, 'user', true)
     expect(isSessionCurrent(remembered, account(), NOW + 29 * DAY)).toBe(true)
     expect(isSessionCurrent(remembered, account(), NOW + 30 * DAY)).toBe(false)
   })

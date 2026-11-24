@@ -19,6 +19,8 @@ export interface SessionGuard {
   passwordStamp: string
   /** Unix time in milliseconds after which the session is refused. */
   expiresAt: number
+  /** Whether the cookie outlives the browser ("Tine-ma minte" or Google sign-in). */
+  persistent: boolean
 }
 
 /**
@@ -31,8 +33,18 @@ export function passwordStamp(passwordHash: string): string {
   return createHash('sha256').update(`session:${passwordHash}`).digest('base64url')
 }
 
-export function newSessionGuard(passwordHash: string, maxAgeSeconds: number, now = Date.now()): SessionGuard {
-  return { passwordStamp: passwordStamp(passwordHash), expiresAt: now + maxAgeSeconds * 1000 }
+/** The guard for a new session: 7 days, or 30 when remembered. */
+export function newSessionGuard(passwordHash: string, remember: boolean, now = Date.now()): SessionGuard {
+  const maxAge = remember ? REMEMBERED_SESSION_MAX_AGE : SESSION_MAX_AGE
+  return { passwordStamp: passwordStamp(passwordHash), expiresAt: now + maxAge * 1000, persistent: remember }
+}
+
+/**
+ * When the session's cookie should end: with the session itself when it is
+ * remembered, otherwise (undefined) when the browser closes.
+ */
+export function sessionCookieExpires(guard: Partial<SessionGuard> | undefined): Date | undefined {
+  return guard?.persistent && typeof guard.expiresAt === 'number' ? new Date(guard.expiresAt) : undefined
 }
 
 /**

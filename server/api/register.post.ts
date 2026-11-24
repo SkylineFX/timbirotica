@@ -75,14 +75,14 @@ export default defineEventHandler(async (event) => {
   }
 
   // Log them in immediately
-  await setUserSession(event, {
+  await saveUserSession(event, {
     user: {
       id: newUser.id,
       firstName: newUser.firstName,
       lastName: newUser.lastName,
       role: 'user',
     },
-    secure: newSessionGuard(hashedPassword, SESSION_MAX_AGE),
+    secure: newSessionGuard(hashedPassword, false),
   })
 
   try {

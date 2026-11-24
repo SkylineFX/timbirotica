@@ -35,7 +35,7 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'User not found' })
   }
 
-  await setUserSession(event, {
+  await saveUserSession(event, {
     user: {
       id: updatedUser.id,
       firstName: updatedUser.firstName,

@@ -17,6 +17,8 @@ declare module '#auth-utils' {
     passwordStamp: string
     /** Unix time in milliseconds after which the session is refused. */
     expiresAt: number
+    /** Whether the cookie outlives the browser ("Tine-ma minte" or Google sign-in). */
+    persistent?: boolean
   }
 }
 

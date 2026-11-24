@@ -45,7 +45,7 @@ export default eventHandler(async (event) => {
   // The new password changes the stamp, which signs out every other device.
   // Give this session the new stamp so it stays signed in, with its expiry
   // unchanged.
-  await setUserSession(event, {
+  await saveUserSession(event, {
     secure: {
       passwordStamp: passwordStamp(hashed),
       expiresAt: session.secure?.expiresAt ?? Date.now() + SESSION_MAX_AGE * 1000,
