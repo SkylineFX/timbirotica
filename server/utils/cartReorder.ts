@@ -37,7 +37,7 @@ export function planReorder(
     if (product && product.stock > 0) availableLines.push(line)
     else skipped.add(product?.name ?? `Produsul #${line.productId}`)
   }
-  const available = mergeCartItems([], availableLines).map(({ productId, quantity }) => ({ productId, quantity }))
+  const available = mergeCartItems([], availableLines)
   return { available, skipped: [...skipped] }
 }
 

@@ -238,13 +238,6 @@ export const useCart = () => {
     }
   }
 
-  const clearServerCart = async () => {
-    if (loggedIn.value) {
-      await $fetch('/api/cart', { method: 'DELETE' })
-    }
-    clearCart()
-  }
-
   /**
    * Merge the browser's guest cart into the signed-in user's cart, then load
    * the cart from the server. Safe to call from several places at once
@@ -307,7 +300,6 @@ export const useCart = () => {
     removeFromCart,
     updateQuantity,
     clearCart,
-    clearServerCart,
     syncCart,
     total
   }

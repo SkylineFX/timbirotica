@@ -5,24 +5,24 @@ import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
 describe('mergeCartItems', () => {
   it('adds incoming quantities to a product already in the cart', () => {
     expect(mergeCartItems([{ productId: 1, quantity: 2 }], [{ productId: 1, quantity: 3 }]))
-      .toEqual([{ productId: 1, quantity: 5, isNew: false }])
+      .toEqual([{ productId: 1, quantity: 5 }])
   })
 
   it('flags products not already in the cart as new', () => {
     expect(mergeCartItems([], [{ productId: 2, quantity: 1 }]))
-      .toEqual([{ productId: 2, quantity: 1, isNew: true }])
+      .toEqual([{ productId: 2, quantity: 1 }])
   })
 
   it('consolidates duplicate incoming lines for the same product', () => {
     expect(mergeCartItems([], [{ productId: 1, quantity: 1 }, { productId: 1, quantity: 2 }]))
-      .toEqual([{ productId: 1, quantity: 3, isNew: true }])
+      .toEqual([{ productId: 1, quantity: 3 }])
   })
 
   it('sums duplicate incoming lines on top of the existing quantity', () => {
     expect(mergeCartItems(
       [{ productId: 1, quantity: 5 }],
       [{ productId: 1, quantity: 1 }, { productId: 1, quantity: 2 }],
-    )).toEqual([{ productId: 1, quantity: 8, isNew: false }])
+    )).toEqual([{ productId: 1, quantity: 8 }])
   })
 
   it('returns nothing when there is nothing to merge', () => {
@@ -34,8 +34,8 @@ describe('mergeCartItems', () => {
       [{ productId: 1, quantity: 2 }],
       [{ productId: 1, quantity: 1 }, { productId: 3, quantity: 4 }],
     )).toEqual([
-      { productId: 1, quantity: 3, isNew: false },
-      { productId: 3, quantity: 4, isNew: true },
+      { productId: 1, quantity: 3 },
+      { productId: 3, quantity: 4 },
     ])
   })
 
@@ -43,7 +43,7 @@ describe('mergeCartItems', () => {
     expect(mergeCartItems(
       [{ productId: 1, quantity: 2 }, { productId: 9, quantity: 7 }],
       [{ productId: 1, quantity: 1 }],
-    )).toEqual([{ productId: 1, quantity: 3, isNew: false }])
+    )).toEqual([{ productId: 1, quantity: 3 }])
   })
 })
 

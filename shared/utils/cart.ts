@@ -9,11 +9,6 @@ export interface CartLine {
   quantity: number
 }
 
-export interface MergedCartLine extends CartLine {
-  /** True when the product is not in the existing cart (caller inserts vs updates). */
-  isNew: boolean
-}
-
 /**
  * Merge guest (incoming) cart lines into the user's existing cart lines.
  *
@@ -22,13 +17,13 @@ export interface MergedCartLine extends CartLine {
  * products present in `incoming` are returned — existing-only products are left
  * untouched, matching the endpoint's original behaviour.
  */
-export function mergeCartItems(existing: CartLine[], incoming: CartLine[]): MergedCartLine[] {
+export function mergeCartItems(existing: CartLine[], incoming: CartLine[]): CartLine[] {
   const existingQty = new Map<number, number>()
   for (const line of existing) {
     existingQty.set(line.productId, (existingQty.get(line.productId) ?? 0) + line.quantity)
   }
 
-  const result: MergedCartLine[] = []
+  const result: CartLine[] = []
   const indexByProduct = new Map<number, number>()
 
   for (const line of incoming) {
@@ -41,7 +36,6 @@ export function mergeCartItems(existing: CartLine[], incoming: CartLine[]): Merg
     result.push({
       productId: line.productId,
       quantity: (existingQty.get(line.productId) ?? 0) + line.quantity,
-      isNew: !existingQty.has(line.productId),
     })
   }
 
