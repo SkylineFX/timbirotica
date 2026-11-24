@@ -14,13 +14,7 @@ const bodySchema = z.object({
 const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', 10)
 
 export default defineEventHandler(async (event) => {
-  const result = bodySchema.safeParse(await readBody(event))
-  if (!result.success) {
-    // First validation issue becomes the user-facing message — avoids leaking
-    // the raw ZodError JSON to the client (which h3's readValidatedBody does).
-    throw createError({ statusCode: 400, message: result.error.issues[0]?.message || 'Date invalide.' })
-  }
-  const { email, password, remember, turnstileToken } = result.data
+  const { email, password, remember, turnstileToken } = await readBodyWithSchema(event, bodySchema)
 
   // Cloudflare Turnstile verification — rejects bots/credential-stuffing before DB or bcrypt work.
   const turnstile = await verifyTurnstileToken(turnstileToken, event)

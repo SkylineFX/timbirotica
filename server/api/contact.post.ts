@@ -17,21 +17,13 @@ const contactSchema = z.object({
 }, { error: 'Datele formularului sunt invalide.' })
 
 export default defineEventHandler(async (event) => {
-  const result = contactSchema.safeParse(await readBody(event))
-
-  if (!result.success) {
-    // First validation issue becomes the user-facing message — keeps the
-    // raw ZodError JSON out of the client toast.
-    throw createError({ statusCode: 400, message: result.error.issues[0]?.message || 'Datele formularului sunt invalide.' })
-  }
+  const { turnstileToken, ...payload } = await readBodyWithSchema(event, contactSchema)
 
   // Cloudflare Turnstile verification — rejects bots before sending an email.
-  const turnstile = await verifyTurnstileToken(result.data.turnstileToken, event)
+  const turnstile = await verifyTurnstileToken(turnstileToken, event)
   if (!turnstile.success) {
     throw createError({ statusCode: 400, message: 'Verificare esuata. Reincarca pagina si incearca din nou.' })
   }
-
-  const { turnstileToken: _turnstileToken, ...payload } = result.data
 
   try {
     await sendContactMessage(payload)
