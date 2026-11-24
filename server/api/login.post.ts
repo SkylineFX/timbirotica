@@ -68,16 +68,14 @@ export default defineEventHandler(async (event) => {
 
   // set the user session in the cookie. Without "Tine-ma minte" the cookie
   // ends when the browser closes, and the server refuses it after 7 days.
-  await setUserSession(event, {
+  await saveUserSession(event, {
     user: {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role as 'user' | 'admin',
     },
-    secure: newSessionGuard(user.password, remember ? REMEMBERED_SESSION_MAX_AGE : SESSION_MAX_AGE),
-  }, {
-    maxAge: remember ? REMEMBERED_SESSION_MAX_AGE : undefined
+    secure: newSessionGuard(user.password, Boolean(remember)),
   })
 
   return {}

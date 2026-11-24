@@ -43,20 +43,17 @@ const googleSignIn = defineOAuthGoogleEventHandler({
     }
 
     const { user, isNewUser } = result
-    await setUserSession(event, {
+    await saveUserSession(event, {
       user: {
         id: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role as 'user' | 'admin',
       },
-      // If this sign-in just replaced the password of an unverified account,
-      // the stamp differs from the one in sessions opened with that password,
-      // so those sessions end.
-      secure: newSessionGuard(user.password, REMEMBERED_SESSION_MAX_AGE),
-    }, {
-      // Keep Google-authenticated sessions alive for 30 days automatically
-      maxAge: REMEMBERED_SESSION_MAX_AGE
+      // Google sessions are always remembered (30 days). If this sign-in just
+      // replaced the password of an unverified account, the stamp differs from
+      // the one in sessions opened with that password, so those sessions end.
+      secure: newSessionGuard(user.password, true),
     })
 
     // The query parameter lets app.vue confirm the sign-in with a toast, like
