@@ -18,10 +18,11 @@ export interface LatestWinsSender<V> {
   set(key: number, value: V, current: V): void
   /**
    * Sends waiting values now, skipping the wait, and resolves when every key
-   * is done. With `keepalive`, those requests are made so they finish even if
-   * the page closes (fetch's keepalive option).
+   * is done: true if the server took every value, false if a request failed
+   * (`onError` has been called for it). With `keepalive`, those requests are
+   * made so they finish even if the page closes (fetch's keepalive option).
    */
-  flush(options?: { keepalive?: boolean }): Promise<void>
+  flush(options?: { keepalive?: boolean }): Promise<boolean>
   /** Drops the value waiting for `key` and resolves when its request in flight is done. */
   cancel(key: number): Promise<void>
 }
@@ -37,6 +38,7 @@ export function createLatestWinsSender<V>(
     inFlight: Promise<void> | null
     timer: ReturnType<typeof setTimeout> | null
     keepalive: boolean
+    failed: boolean
     idle: Promise<void>
     resolveIdle: () => void
   }
@@ -65,6 +67,7 @@ export function createLatestWinsSender<V>(
         await send(key, value, { keepalive })
         entry.confirmed = value
       } catch (error) {
+        entry.failed = true
         entry.waiting = null
         stopTimer(entry)
         onError(key, entry.confirmed, error)
@@ -80,7 +83,7 @@ export function createLatestWinsSender<V>(
       if (!entry) {
         let resolveIdle!: () => void
         const idle = new Promise<void>(resolve => { resolveIdle = resolve })
-        entry = { confirmed: current, waiting: null, inFlight: null, timer: null, keepalive: false, idle, resolveIdle }
+        entry = { confirmed: current, waiting: null, inFlight: null, timer: null, keepalive: false, failed: false, idle, resolveIdle }
         entries.set(key, entry)
       }
       entry.waiting = { value }
@@ -103,6 +106,7 @@ export function createLatestWinsSender<V>(
         pump(key, entry)
       }
       await Promise.all(pending.map(([, entry]) => entry.idle))
+      return pending.every(([, entry]) => !entry.failed)
     },
     async cancel(key) {
       const entry = entries.get(key)

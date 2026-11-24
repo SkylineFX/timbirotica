@@ -252,8 +252,10 @@ async function submitOrder() {
 
     // The server orders the cart it holds, so send any quantity change still
     // waiting. syncCart() above can reuse a cart read that started before the
-    // change, and the cart lines are locked from here on (isSubmitting).
-    await flushCartQuantityUpdates()
+    // change, and the cart lines are locked from here on (isSubmitting). If a
+    // change failed, the server holds a quantity the customer didn't choose:
+    // stop, so they see the corrected line before ordering.
+    if (!await flushCartQuantityUpdates()) return
 
     const res = await $fetch('/api/orders', {
       method: 'POST',
