@@ -1,4 +1,4 @@
-import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
+import { CART_MAX_QUANTITY, cartQuantitySchema } from '~~/shared/schemas/cart'
 
 // Pure cart-merge logic, extracted from the cart-sync endpoint so it can be unit
 // tested without a database. The endpoint (server/api/cart/sync.post.ts) feeds it
@@ -53,4 +53,22 @@ export function nextCartQuantity(value: number, current: number): number | null 
   if (!Number.isFinite(value)) return null
   const quantity = value <= 0 ? 0 : Math.min(Math.floor(value), CART_MAX_QUANTITY)
   return quantity === current ? null : quantity
+}
+
+/**
+ * The products whose cart quantity can't be ordered: a line outside the
+ * allowed range, or several lines of one product (two quick adds, until
+ * rank 22 adds a unique index) that together pass CART_MAX_QUANTITY.
+ */
+export function productsWithInvalidQuantity(lines: readonly CartLine[]): Set<number> {
+  const total = new Map<number, number>()
+  const invalid = new Set<number>()
+  for (const line of lines) {
+    if (!cartQuantitySchema.safeParse(line.quantity).success) invalid.add(line.productId)
+    total.set(line.productId, (total.get(line.productId) ?? 0) + line.quantity)
+  }
+  for (const [productId, quantity] of total) {
+    if (quantity > CART_MAX_QUANTITY) invalid.add(productId)
+  }
+  return invalid
 }

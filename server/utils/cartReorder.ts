@@ -74,7 +74,7 @@ export async function reorderIntoCart(
   writes.push(...buildCartMergeWrites(db, {
     cartId,
     merged: mergeCartItems(existingItems.map(i => ({ productId: i.productId, quantity: i.quantity })), available),
-    existingItemIdByProduct: new Map(existingItems.map(i => [i.productId, i.id])),
+    existingItems,
   }))
   const [firstWrite, ...moreWrites] = writes
   await db.batch([firstWrite!, ...moreWrites])

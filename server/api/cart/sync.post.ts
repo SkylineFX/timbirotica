@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
   const [firstWrite, ...moreWrites] = buildCartMergeWrites(db, {
     cartId,
     merged,
-    existingItemIdByProduct: new Map(existingItems.map(i => [i.productId, i.id])),
+    existingItems,
   })
   if (firstWrite) await db.batch([firstWrite, ...moreWrites])
 

@@ -84,6 +84,19 @@ const stockColor = computed(() => {
 
 const { addToCart } = useCart()
 
+// The button's own loading state, as on the product cards: a second click
+// while the first add is still running would add the product twice.
+const adding = ref(false)
+const add = async () => {
+  if (adding.value || !product.value) return
+  adding.value = true
+  try {
+    await addToCart(product.value, quantity.value)
+  } finally {
+    adding.value = false
+  }
+}
+
 const { favorites, addToFavorites, removeFromFavorites } = useFavorites()
 const isFavorite = computed(() => favorites.value.some((f: any) => f.productId === product.value?.id))
 
@@ -186,7 +199,8 @@ const accordionItems = [
                             variant="subtle"
                             icon="i-lucide-shopping-cart"
                             :disabled="product.stock === 0"
-                            @click="addToCart(product, quantity)"
+                            :loading="adding"
+                            @click="add"
                         >
                             Adauga in cos
                         </UButton>

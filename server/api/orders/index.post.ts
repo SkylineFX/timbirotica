@@ -5,7 +5,7 @@ import { dispatchOrderEmails } from '../../utils/email'
 import { generateProformaPdf, resolveProformaCustomer } from '../../utils/proforma'
 import { buildOrderWrites } from '../../utils/orderWrites'
 import { orderPayloadSchema, computeOrderTotals, MAX_ORDERS_PER_HOUR } from '~~/shared/constants/order'
-import { cartQuantitySchema } from '~~/shared/schemas/cart'
+import { productsWithInvalidQuantity } from '~~/shared/utils/cart'
 
 // CSRF posture: state-changing endpoints rely on nuxt-auth-utils' session cookie
 // with SameSite=Lax (h3 default; nuxt.config only overrides `secure` for dev LAN).
@@ -81,11 +81,13 @@ export default eventHandler(async (event) => {
 
   // Backstop: the cart endpoints validate quantities, but re-check here so a bad
   // row (e.g. saved before that validation existed) can't produce a wrong total.
-  const invalidQuantity = cart.items.filter(i => !cartQuantitySchema.safeParse(i.quantity).success)
-  if (invalidQuantity.length) {
+  // Two rows of one product are checked together, so they can't pass the maximum.
+  const invalidProducts = productsWithInvalidQuantity(cart.items)
+  if (invalidProducts.size) {
+    const names = new Set(cart.items.filter(i => invalidProducts.has(i.productId)).map(i => i.product.name))
     throw createError({
       statusCode: 400,
-      message: `Cantitate invalida pentru: ${invalidQuantity.map(i => i.product.name).join(', ')}. Actualizeaza cosul si reincearca.`
+      message: `Cantitate invalida pentru: ${[...names].join(', ')}. Actualizeaza cosul si reincearca.`
     })
   }
 
