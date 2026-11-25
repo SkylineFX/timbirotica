@@ -2,6 +2,7 @@
 import { ref, computed, watch, watchEffect, onMounted, onUnmounted } from 'vue'
 import { useCart } from '~/composables/useCart'
 import { getCourierShippingCost } from '~~/shared/constants/order'
+import { sameCartQuantities } from '~~/shared/utils/cart'
 import { fromBani, toBani, vatBreakdown } from '~~/shared/utils/money'
 
 definePageMeta({
@@ -224,6 +225,8 @@ async function submitOrder() {
       productId: item.productId,
       price: item.product?.price ?? 0
     }))
+    // The products and quantities on screen: the order must be this cart.
+    const shownCart = cartItems.value.map(item => ({ productId: item.productId, quantity: item.quantity }))
 
     // The server orders the cart it holds, so send any quantity change still
     // waiting, before syncCart(): it sends them too but ignores a failure. The
@@ -235,6 +238,15 @@ async function submitOrder() {
     // Merge any guest products first, so the cart the server orders is the cart
     // shown here.
     await syncCart()
+
+    // The cart read back from the server can differ from the one on screen:
+    // a quantity change that failed on screen but was saved, or a change from
+    // another tab. The page now shows the server's cart; stop so the customer
+    // checks it, and the next click orders what is shown.
+    if (!sameCartQuantities(shownCart, cartItems.value)) {
+      toast.add({ title: 'Cosul s-a actualizat', description: 'Verifica produsele si cantitatile, apoi plaseaza comanda din nou.', color: 'warning' })
+      return
+    }
 
     if (cartItems.value.length === 0) {
       toast.add({ title: 'Cos gol', description: 'Cosul trebuie sa contina produse.', color: 'error' })

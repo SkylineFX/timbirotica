@@ -72,3 +72,17 @@ export function productsWithInvalidQuantity(lines: readonly CartLine[]): Set<num
   }
   return invalid
 }
+
+/**
+ * Whether two carts hold the same products in the same quantities, rows of one
+ * product added up. The checkout compares the cart on screen with the cart
+ * read back from the server just before ordering.
+ */
+export function sameCartQuantities(a: readonly CartLine[], b: readonly CartLine[]): boolean {
+  const totals = (lines: readonly CartLine[]) =>
+    lines.reduce((sum, line) => sum.set(line.productId, (sum.get(line.productId) ?? 0) + line.quantity), new Map<number, number>())
+  const x = totals(a)
+  const y = totals(b)
+  return x.size === y.size && [...x].every(([productId, quantity]) => y.get(productId) === quantity)
+}
+

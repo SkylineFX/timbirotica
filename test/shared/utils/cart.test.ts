@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mergeCartItems, nextCartQuantity, productsWithInvalidQuantity } from '~~/shared/utils/cart'
+import { mergeCartItems, nextCartQuantity, productsWithInvalidQuantity, sameCartQuantities } from '~~/shared/utils/cart'
 import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
 
 describe('mergeCartItems', () => {
@@ -87,5 +87,24 @@ describe('productsWithInvalidQuantity', () => {
   it('adds up two lines of one product', () => {
     expect(productsWithInvalidQuantity([{ productId: 8, quantity: 200 }, { productId: 8, quantity: 50 }])).toEqual(new Set())
     expect(productsWithInvalidQuantity([{ productId: 8, quantity: 200 }, { productId: 8, quantity: 51 }])).toEqual(new Set([8]))
+  })
+})
+
+describe('sameCartQuantities', () => {
+  const cart = [{ productId: 1, quantity: 2 }, { productId: 2, quantity: 1 }]
+
+  it('matches the same products and quantities, in any order', () => {
+    expect(sameCartQuantities(cart, [...cart].reverse())).toBe(true)
+    expect(sameCartQuantities([], [])).toBe(true)
+  })
+
+  it('adds up two rows of one product', () => {
+    expect(sameCartQuantities([{ productId: 1, quantity: 5 }], [{ productId: 1, quantity: 2 }, { productId: 1, quantity: 3 }])).toBe(true)
+  })
+
+  it('tells a changed quantity, an extra product and a missing one apart', () => {
+    expect(sameCartQuantities(cart, [{ productId: 1, quantity: 5 }, { productId: 2, quantity: 1 }])).toBe(false)
+    expect(sameCartQuantities(cart, [...cart, { productId: 3, quantity: 1 }])).toBe(false)
+    expect(sameCartQuantities(cart, [cart[0]!])).toBe(false)
   })
 })
