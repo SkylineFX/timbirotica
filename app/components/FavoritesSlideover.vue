@@ -3,7 +3,8 @@ const { favorites, isFavoritesOpen, removeFromFavorites, isLoading } = useFavori
 const { addToCart, cartLocked } = useCart()
 
 // The product being added: its button shows a spinner and a second click is
-// ignored, so a double click doesn't add it twice.
+// ignored, so a double click adds once. Adds from different buttons are sent
+// one at a time by useCart.
 const addingProductId = ref<number | null>(null)
 const add = async (product: any) => {
   if (addingProductId.value !== null || !product) return

@@ -6,8 +6,10 @@ const props = defineProps<{
 
 const { addToCart } = useCart()
 
-// This card's own loading state. useCart's isLoading is shared by the whole
-// page, so one "Adauga in cos" click spun the button on every card.
+// This card's own loading state: a click while its add is still saving is
+// ignored, so a double click adds once. useCart's isLoading is shared by the
+// whole page, so it would spin every card. Adds from different cards are sent
+// one at a time by useCart.
 const adding = ref(false)
 const add = async () => {
   adding.value = true

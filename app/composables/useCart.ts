@@ -17,6 +17,18 @@ let quantityUpdates: LatestWinsSender<number> | null = null
 // Shopify's themes wait 300 ms; Baymard suggests 200-300 ms for a stepper.
 const QUANTITY_SEND_DELAY_MS = 300
 
+// Adds to the cart, run one at a time. The server reads the cart line and then
+// writes it, so two adds at once could insert the product twice or lose one of
+// them. Each button also ignores clicks while its own add is saving (a double
+// click adds once); the queue covers adds from different buttons, such as two
+// product cards. Shared by every useCart() caller in this browser.
+let addQueue: Promise<void> = Promise.resolve()
+
+// How long an add waits for the server. Without a limit a request that never
+// answers (a dropped connection, a stuck Worker) would hold up every add after
+// it in the queue.
+const ADD_TIMEOUT_MS = 15_000
+
 // Numbers each quantity change of a signed-in cart, so a cart read can tell
 // which lines changed after it started (see fetchCart).
 let quantityChangeCount = 0
@@ -151,7 +163,13 @@ export const useCart = () => {
     else loadGuestCart()
   }
 
-  const addToCart = async (product: any, quantity = 1) => {
+  const addToCart = (product: any, quantity = 1): Promise<void> => {
+    const add = addQueue.then(() => addOne(product, quantity))
+    addQueue = add.catch(() => {}) // a failed add must not stop the ones after it
+    return add
+  }
+
+  const addOne = async (product: any, quantity: number) => {
     if (cartLocked.value) return
     isLoading.value = true
     try {
@@ -161,7 +179,8 @@ export const useCart = () => {
         await flushCartQuantityUpdates()
         await $fetch('/api/cart', {
           method: 'POST',
-          body: { productId: product.id, quantity }
+          body: { productId: product.id, quantity },
+          timeout: ADD_TIMEOUT_MS,
         })
         await fetchCart()
       } else {
@@ -182,7 +201,15 @@ export const useCart = () => {
       toast.add({ title: 'Produs adaugat in cos', color: 'success' })
     } catch (e: any) {
       console.error('Failed to add to cart', e)
-      toast.add({ title: 'Eroare la adaugarea in cos', description: e?.data?.message, color: 'error' })
+      // No answer at all (the timeout, a dropped connection): the add may still
+      // have been saved, so the cart is read again and the message says so.
+      const noAnswer = loggedIn.value && !e?.response
+      if (noAnswer) void fetchCart()
+      toast.add({
+        title: 'Eroare la adaugarea in cos',
+        description: noAnswer ? 'Serverul nu a raspuns. Verifica cosul inainte sa adaugi din nou.' : e?.data?.message,
+        color: 'error',
+      })
     } finally {
       isLoading.value = false
     }
