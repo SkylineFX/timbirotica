@@ -60,8 +60,9 @@ GEMINI.md
 skills/
 project_analysis.md
 prompts/
-# Local review report. It describes open security issues and this repo is public.
+# Local review files: open work and its archive. They describe security issues and this repo is public.
 CODEBASE_REVIEW.md
+CODEBASE_REVIEW_DONE.md
 
 # OS & Editor metadata
 .DS_Store
