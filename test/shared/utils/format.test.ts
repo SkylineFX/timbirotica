@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatAmount, formatRon, formatShopDate, formatShopDateTime } from '~~/shared/utils/format'
+import { formatAmount, formatRon, formatShopDate, formatShopDateTime, formatShopLongDate } from '~~/shared/utils/format'
 
 // 00:30 on 17 November in Romania (UTC+2) is still 16 November in UTC.
 const JUST_AFTER_MIDNIGHT_WINTER = new Date('2026-11-16T22:30:00Z')
@@ -20,6 +20,13 @@ describe('formatShopDate', () => {
 
   it('accepts an ISO string', () => {
     expect(formatShopDate('2026-11-16T22:30:00.000Z')).toBe('17.11.2026')
+  })
+})
+
+describe('formatShopLongDate', () => {
+  it('uses the Romanian date, with the month named', () => {
+    expect(formatShopLongDate(JUST_AFTER_MIDNIGHT_WINTER)).toBe('17 noiembrie 2026')
+    expect(formatShopLongDate(JUST_AFTER_MIDNIGHT_SUMMER)).toBe('16 iulie 2026')
   })
 })
 
