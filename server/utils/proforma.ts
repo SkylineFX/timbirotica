@@ -532,6 +532,13 @@ export interface InfoLineLayout {
 const INFO_FONT_SIZE = 10
 
 /**
+ * The most lines one value may take. Real names, addresses and bank names
+ * fit in 2 or 3; the stored fields have no length limit, and an endless one
+ * would push the item table off the first page, so it is cut with "…".
+ */
+export const INFO_MAX_LINES_PER_VALUE = 4
+
+/**
  * Wraps each value to the space after its label, measured in bold, so no line
  * runs past the column (a long bank name used to run off the page). Lines
  * after the first are drawn under the value, not under the label.
@@ -540,7 +547,15 @@ export function layoutInfoLines(lines: InfoLine[], { font, fontBold }: Fonts, ma
   return lines.map(({ label, value }) => {
     const labelText = label ? `${label}: ` : ''
     const labelWidth = labelText ? font.widthOfTextAtSize(labelText, INFO_FONT_SIZE) : 0
-    return { label: labelText, labelWidth, valueLines: wrapText(value, fontBold, INFO_FONT_SIZE, maxWidth - labelWidth) }
+    const width = maxWidth - labelWidth
+    const wrapped = wrapText(value, fontBold, INFO_FONT_SIZE, width)
+    if (wrapped.length <= INFO_MAX_LINES_PER_VALUE) return { label: labelText, labelWidth, valueLines: wrapped }
+    // Cut: the last kept line ends with "…", shortened until it fits.
+    const kept = wrapped.slice(0, INFO_MAX_LINES_PER_VALUE)
+    let last = kept[kept.length - 1]!
+    while (last && fontBold.widthOfTextAtSize(`${last}…`, INFO_FONT_SIZE) > width) last = last.slice(0, -1).trimEnd()
+    kept[kept.length - 1] = `${last}…`
+    return { label: labelText, labelWidth, valueLines: kept }
   })
 }
 
