@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
+import { productPriceSchema } from '~~/shared/schemas/product'
 
 definePageMeta({
   layout: 'admin',
@@ -60,8 +61,10 @@ async function savePrice(p: any) {
   const draft = priceDrafts.value[p.id]
   if (draft === undefined) return
   const parsed = parseFloat(draft)
-  if (isNaN(parsed) || parsed <= 0) {
-    toast.add({ title: 'Pret invalid', description: 'Pretul trebuie sa fie mai mare decat 0.', color: 'error' })
+  // The same rule the server applies: above 0, at most two decimals.
+  const check = productPriceSchema.safeParse(parsed)
+  if (!check.success) {
+    toast.add({ title: 'Pret invalid', description: check.error.issues[0]?.message, color: 'error' })
     delete priceDrafts.value[p.id]
     return
   }

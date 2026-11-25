@@ -2,7 +2,7 @@
 import { ref, computed, watch, watchEffect, onMounted, onUnmounted } from 'vue'
 import { useCart } from '~/composables/useCart'
 import { getCourierShippingCost } from '~~/shared/constants/order'
-import { vatPortionOfGross } from '~~/shared/constants/company'
+import { fromBani, toBani, vatBreakdown } from '~~/shared/utils/money'
 
 definePageMeta({
   middleware: ['authenticated'],
@@ -187,8 +187,15 @@ const orderSummaryShippingCost = computed(() => {
 })
 
 const finalTotal = computed(() => {
-  return total.value + orderSummaryShippingCost.value
+  return fromBani(toBani(total.value) + toBani(orderSummaryShippingCost.value))
 })
+
+// The VAT included in the total, worked out per line like the proforma, so the
+// two show the same amount.
+const finalVat = computed(() => fromBani(vatBreakdown(
+  cartItems.value.map(item => ({ price: item.product?.price || 0, quantity: item.quantity })),
+  orderSummaryShippingCost.value,
+).vat))
 const isSubmitting = ref(false)
 const termsAccepted = ref(false)
 const toast = useToast()
@@ -580,7 +587,7 @@ async function submitOrder() {
          <div class="pt-6 flex justify-between items-end mt-4 border-t border-gray-300 border-dashed">
             <div class="flex flex-col">
                <span class="text-xl font-extrabold text-gray-900">Total</span>
-               <span class="text-xs text-gray-500 mt-0.5" v-if="finalTotal > 0">Include TVA de {{ vatPortionOfGross(finalTotal).toFixed(2) }} RON</span>
+               <span class="text-xs text-gray-500 mt-0.5" v-if="finalTotal > 0">Include TVA de {{ finalVat.toFixed(2) }} RON</span>
             </div>
             <div class="flex items-end gap-2 mb-0.5">
                <span class="text-2xl sm:text-3xl leading-none tracking-tight font-extrabold text-gray-900">{{ finalTotal.toFixed(2) }} RON</span>

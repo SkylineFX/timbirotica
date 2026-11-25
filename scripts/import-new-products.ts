@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/libsql'
 import { createClient } from '@libsql/client'
 import * as schema from '../server/db/schema'
+import { fromBani, toBani } from '../shared/utils/money'
 import { eq } from 'drizzle-orm'
 import { readFile } from 'fs/promises'
 import { existsSync, mkdirSync, readdirSync, renameSync, rmdirSync, statSync, unlinkSync } from 'fs'
@@ -410,7 +411,8 @@ async function main() {
     }
 
     // Resolve Price
-    const price = Number(entry.price) || 0
+    // Rounded to whole bani (at most two decimals), like every stored price.
+    const price = fromBani(toBani(Number(entry.price) || 0))
 
     // Generate unique slug
     let baseSlug = slugify(name)

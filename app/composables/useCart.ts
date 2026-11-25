@@ -1,5 +1,5 @@
 import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
-import { roundToBani } from '~~/shared/constants/order'
+import { fromBani, sumLines } from '~~/shared/utils/money'
 import { createLatestWinsSender, type LatestWinsSender } from '~~/shared/utils/latestWins'
 import { nextCartQuantity } from '~~/shared/utils/cart'
 
@@ -289,11 +289,12 @@ export const useCart = () => {
     }
   }
 
-  // Rounded to bani like the order's subtotal on the server, so checkout shows
-  // the same free-shipping decision the order is charged with.
-  const total = computed(() => roundToBani(cartItems.value.reduce((acc, item) => {
-    return acc + (item.product?.price || 0) * item.quantity
-  }, 0)))
+  // Added up in whole bani like the order's subtotal on the server, so checkout
+  // shows the same free-shipping decision the order is charged with.
+  const total = computed(() => fromBani(sumLines(cartItems.value.map(item => ({
+    price: item.product?.price || 0,
+    quantity: item.quantity,
+  })))))
 
   return {
     cartItems,
