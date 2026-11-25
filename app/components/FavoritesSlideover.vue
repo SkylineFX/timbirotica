@@ -2,6 +2,19 @@
 const { favorites, isFavoritesOpen, removeFromFavorites, isLoading } = useFavorites()
 const { addToCart, cartLocked } = useCart()
 
+// The product being added: its button shows a spinner and a second click is
+// ignored, so a double click doesn't add it twice.
+const addingProductId = ref<number | null>(null)
+const add = async (product: any) => {
+  if (addingProductId.value !== null || !product) return
+  addingProductId.value = product.id
+  try {
+    await addToCart(product)
+  } finally {
+    addingProductId.value = null
+  }
+}
+
 // Computed total price of favorites? (Not requested, but easy to add if needed. User asked for "with a delete button... and price, without quantity")
 </script>
 
@@ -25,7 +38,7 @@ const { addToCart, cartLocked } = useCart()
                 <div class="flex justify-between items-end mt-2">
                        <div class="flex items-center gap-2">
                            <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" aria-label="Sterge de la favorite" @click="removeFromFavorites(item.id)" class="p-1.5" />
-                           <UButton size="xs" color="primary" variant="soft" icon="i-lucide-shopping-cart" aria-label="Adauga in cos" :disabled="cartLocked" @click="addToCart(item.product)" class="p-1.5" />
+                           <UButton size="xs" color="primary" variant="soft" icon="i-lucide-shopping-cart" aria-label="Adauga in cos" :disabled="cartLocked" :loading="addingProductId === item.product?.id" @click="add(item.product)" class="p-1.5" />
                        </div>
                        <span class="font-bold text-sm">{{ (item.product?.price ?? 0).toFixed(2) }} RON</span>
                 </div>

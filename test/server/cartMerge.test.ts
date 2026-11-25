@@ -31,7 +31,7 @@ async function mergeIntoCart(incoming: CartLine[]) {
   const writes = buildCartMergeWrites(db, {
     cartId: TEST_CART_ID,
     merged,
-    existingItemIdByProduct: new Map(existing.map(i => [i.productId, i.id])),
+    existingItems: existing,
   })
   const [first, ...rest] = writes
   if (first) await db.batch([first, ...rest])
@@ -106,5 +106,30 @@ describe('buildCartMergeWrites', () => {
 
   it('builds no writes when there is nothing to merge', async () => {
     expect(await mergeIntoCart([])).toEqual([])
+  })
+
+  it('folds two rows of one product into one, with their quantities added', async () => {
+    // Two quick adds can leave two rows for a product (no unique index yet).
+    await db.insert(schema.cartItems).values([
+      { cartId: TEST_CART_ID, productId: 7, quantity: 2 },
+      { cartId: TEST_CART_ID, productId: 7, quantity: 2 },
+    ])
+
+    await mergeIntoCart([{ productId: 7, quantity: 3 }])
+
+    const rows = await db.select().from(schema.cartItems).where(eq(schema.cartItems.productId, 7))
+    expect(rows.map(r => r.quantity)).toEqual([7])
+  })
+
+  it('keeps a product with two rows within the maximum', async () => {
+    await db.insert(schema.cartItems).values([
+      { cartId: TEST_CART_ID, productId: 8, quantity: 200 },
+      { cartId: TEST_CART_ID, productId: 8, quantity: 2 },
+    ])
+
+    await mergeIntoCart([{ productId: 8, quantity: 50 }])
+
+    const rows = await db.select().from(schema.cartItems).where(eq(schema.cartItems.productId, 8))
+    expect(rows.map(r => r.quantity)).toEqual([CART_MAX_QUANTITY])
   })
 })

@@ -35,19 +35,35 @@ export function buildProductLookups(db: Db, productIds: readonly number[]) {
  * for new products, split to fit D1's parameter limit. A batch is one
  * transaction, so the cart is never left half-merged.
  *
- * `merged` comes from mergeCartItems. Quantities are capped at the maximum,
- * because adding guest and existing quantities can go over it.
+ * `merged` comes from mergeCartItems, which adds up every existing row of a
+ * product. Quantities are capped at the maximum, because adding guest and
+ * existing quantities can go over it.
+ *
+ * `existingItems` are the cart's rows. A product can have two rows (two quick
+ * adds, until rank 22 adds a unique index): the first row takes the merged
+ * quantity and the others are deleted, so the extra row can't push the
+ * product past the maximum.
  */
 export function buildCartMergeWrites(
   db: Db,
-  { cartId, merged, existingItemIdByProduct }: {
+  { cartId, merged, existingItems }: {
     cartId: number
     merged: readonly CartLine[]
-    existingItemIdByProduct: ReadonlyMap<number, number>
+    existingItems: readonly { id: number, productId: number }[]
   }
 ): BatchItem<'sqlite'>[] {
   const writes: BatchItem<'sqlite'>[] = []
   const newLines: (typeof schema.cartItems.$inferInsert)[] = []
+
+  const existingItemIdByProduct = new Map<number, number>()
+  const duplicateItemIds: number[] = []
+  for (const item of existingItems) {
+    if (existingItemIdByProduct.has(item.productId)) duplicateItemIds.push(item.id)
+    else existingItemIdByProduct.set(item.productId, item.id)
+  }
+  for (const ids of splitIntoChunks(duplicateItemIds, PRODUCT_IDS_PER_LOOKUP)) {
+    writes.push(db.delete(schema.cartItems).where(inArray(schema.cartItems.id, ids)))
+  }
 
   for (const line of merged) {
     const quantity = Math.min(line.quantity, CART_MAX_QUANTITY)
