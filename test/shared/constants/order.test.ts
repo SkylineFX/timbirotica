@@ -97,6 +97,15 @@ describe('computeOrderTotals', () => {
     const cart = [{ quantity: 1, price: 0.01 }, { quantity: 1, price: 129.14 }, { quantity: 1, price: 70.85 }]
     expect(computeOrderTotals(cart, 'courier')).toEqual({ subtotal: 200, shippingCost: 0, total: 200 })
   })
+
+  it('charges shipping one ban below the threshold, and adds quantities exactly', () => {
+    expect(computeOrderTotals([{ quantity: 1, price: 199.99 }], 'courier')).toEqual({ subtotal: 199.99, shippingCost: 30, total: 229.99 })
+    expect(computeOrderTotals([{ quantity: 3, price: 19.99 }], 'pickup').subtotal).toBe(59.97)
+    expect(computeOrderTotals([{ quantity: 3, price: 0.1 }], 'pickup').subtotal).toBe(0.3)
+    // 170.07 + 2.23 + 22.11 + 5.59 is 199.99999999999997 in floating point
+    const cart = [170.07, 2.23, 22.11, 5.59].map(price => ({ quantity: 1, price }))
+    expect(computeOrderTotals(cart, 'courier').shippingCost).toBe(0)
+  })
 })
 
 describe('roundToBani', () => {

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { fromBani, sumLines, toBani } from '~~/shared/utils/money'
 
 // Single source of truth for order method values, labels, and shipping cost.
 // Shared by the checkout UI, the order endpoint (validation + cost), the order
@@ -80,7 +81,7 @@ export interface OrderTotals {
  * tails such as 9244.300000000003; prices have at most two decimals, so the exact
  * sum is always a whole number of bani and rounding restores it.
  */
-export const roundToBani = (amount: number): number => Math.round(amount * 100) / 100
+export const roundToBani = (amount: number): number => fromBani(toBani(amount))
 
 /**
  * Order totals from line items + shipping method. Single source of truth shared by
@@ -90,13 +91,12 @@ export const computeOrderTotals = (
   items: OrderLineItem[],
   shippingMethod: ShippingMethod,
 ): OrderTotals => {
-  let sum = 0
-  for (const item of items) {
-    sum += item.price * item.quantity
-  }
-  const subtotal = roundToBani(sum)
+  // Added up in whole bani (shared/utils/money.ts), so the free-shipping test
+  // and the stored total see the exact amount.
+  const subtotalBani = sumLines(items)
+  const subtotal = fromBani(subtotalBani)
   const shippingCost = getShippingCost(shippingMethod, subtotal)
-  return { subtotal, shippingCost, total: roundToBani(subtotal + shippingCost) }
+  return { subtotal, shippingCost, total: fromBani(subtotalBani + toBani(shippingCost)) }
 }
 
 // Orders one account can place in an hour. Each order sends two emails with a

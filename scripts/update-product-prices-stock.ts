@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/libsql'
 import { createClient } from '@libsql/client'
 import * as schema from '../server/db/schema'
+import { fromBani, toBani } from '../shared/utils/money'
 import { eq } from 'drizzle-orm'
 import { readFile, writeFile } from 'fs/promises'
 import { existsSync, readdirSync, statSync } from 'fs'
@@ -194,10 +195,12 @@ async function main() {
 
       // Price
       if (entry.price != null) {
-        const newPrice = Number(entry.price)
+        // Rounded to whole bani, and compared in bani, so a price with a
+        // floating-point tail is neither stored nor counted as a change.
+        const newPrice = fromBani(toBani(Number(entry.price)))
         if (!Number.isFinite(newPrice) || newPrice < 0) {
           invalidPrice++
-        } else if (newPrice !== existing.price) {
+        } else if (toBani(newPrice) !== toBani(existing.price)) {
           updates.price = newPrice
           priceChanged++
         }

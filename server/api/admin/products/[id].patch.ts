@@ -1,12 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { z } from 'zod'
-
-const bodySchema = z.object({
-  price: z.number().positive().optional(),
-  stock: z.union([z.literal(0), z.literal(1)]).optional(),
-}).refine(b => b.price !== undefined || b.stock !== undefined, {
-  message: 'Trebuie sa trimiti cel putin un camp.'
-})
+import { adminProductUpdateSchema } from '~~/shared/schemas/product'
 
 export default eventHandler(async (event) => {
   await requireAdminSession(event)
@@ -16,7 +9,7 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'ID produs invalid.' })
   }
 
-  const body = await readValidatedBody(event, bodySchema.parse)
+  const body = await readBodyWithSchema(event, adminProductUpdateSchema)
 
   const db = useDrizzle()
   const [updated] = await db.update(tables.products)
