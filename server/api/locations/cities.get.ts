@@ -2,7 +2,7 @@ import { eq, asc } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
-  const countyName = query.countyName as string
+  const countyName = queryString(query.countyName)
 
   if (!countyName) {
     return []
