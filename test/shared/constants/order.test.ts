@@ -124,6 +124,16 @@ describe('orderPayloadSchema', () => {
     termsAccepted: true,
   }
 
+  it('accepts cart snapshots with the quantity shown, and without it (pages loaded before it was sent)', () => {
+    expect(orderPayloadSchema.safeParse({ ...valid, priceSnapshots: [{ productId: 1, price: 9.99, quantity: 2 }] }).success).toBe(true)
+    expect(orderPayloadSchema.safeParse({ ...valid, priceSnapshots: [{ productId: 1, price: 9.99 }] }).success).toBe(true)
+  })
+
+  it('refuses a snapshot quantity that is not a positive whole number', () => {
+    expect(orderPayloadSchema.safeParse({ ...valid, priceSnapshots: [{ productId: 1, price: 9.99, quantity: 0 }] }).success).toBe(false)
+    expect(orderPayloadSchema.safeParse({ ...valid, priceSnapshots: [{ productId: 1, price: 9.99, quantity: 1.5 }] }).success).toBe(false)
+  })
+
   it('accepts a minimal valid payload', () => {
     expect(orderPayloadSchema.safeParse(valid).success).toBe(true)
   })
