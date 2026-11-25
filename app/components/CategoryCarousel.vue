@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { findCategory } from '~~/shared/utils/categoryTree'
+
 interface Product {
   id: number
   name: string
@@ -30,13 +32,17 @@ const displayLink = ref<string | undefined>(undefined)
 const fetchUrl = ref<string | undefined>(undefined)
 
 if (props.categoryId) {
-  const { data: category } = await useFetch<any>(`/api/categories/${props.categoryId}`)
-  if (category.value) {
+  // The category's name and link come from the tree the header menu loads
+  // (same request, useCatalogMenus.ts), not from a request of their own.
+  const { data: categoryTree } = await useCategoryTree()
+  const category = findCategory(categoryTree.value ?? [], node => node.id === props.categoryId)
+  if (category) {
     if (!displayTitle.value) {
-      displayTitle.value = category.value.name
+      displayTitle.value = category.label
     }
-    displayLink.value = `/c/${category.value.slug}`
-    fetchUrl.value = `/api/products?category=${category.value.slug}&limit=10&facets=0`
+    displayLink.value = category.to
+    // The product list filters by slug, the end of the category's /c/<slug> link.
+    fetchUrl.value = `/api/products?category=${category.to.slice('/c/'.length)}&limit=10&facets=0`
   }
 } else if (props.recommended) {
   if (!displayTitle.value) {
