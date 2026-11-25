@@ -15,9 +15,10 @@ export default defineEventHandler(async (event) => {
     where: eq(tables.favorites.userId, userId),
     with: {
       product: {
-        with: {
-          category: true
-        }
+        // The long description isn't shown with favorites.
+        columns: { description: false },
+        // Each favorite links to /c/<category slug>/<product slug>.
+        with: { category: { columns: { slug: true } } }
       }
     },
     orderBy: (favorites, { desc }) => [desc(favorites.createdAt)]
