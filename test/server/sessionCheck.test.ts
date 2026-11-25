@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  isSessionCurrent, newSessionGuard, passwordStamp, sessionCookieExpires,
+  isSessionCurrent, newSessionGuard, passwordStamp, sessionCookieExpires, skipsSessionCheck,
 } from '~~/server/utils/sessionCheck'
 import { GOOGLE_ONLY_PASSWORD } from '~~/server/utils/googleSignIn'
 
@@ -81,5 +81,23 @@ describe('isSessionCurrent', () => {
     expect(isSessionCurrent({ user: { role: 'user' } }, account(), NOW)).toBe(false)
     expect(isSessionCurrent({ user: { role: 'user' }, secure: { passwordStamp: passwordStamp(HASH) } }, account(), NOW)).toBe(false)
     expect(isSessionCurrent({ user: { role: 'user' }, secure: { expiresAt: NOW + DAY } }, account(), NOW)).toBe(false)
+  })
+})
+
+describe('skipsSessionCheck', () => {
+  it('skips the public catalog endpoints', () => {
+    for (const path of [
+      '/api/products', '/api/products?q=pix&limit=10', '/api/products/pix-albastru',
+      '/api/categories/tree', '/api/brands', '/api/locations/cities?countyName=Alba',
+      '/api/__sitemap__/urls', '//api//products',
+    ]) expect(skipsSessionCheck(path), path).toBe(true)
+  })
+
+  it('checks pages and every other endpoint', () => {
+    for (const path of [
+      '/', '/c/radiere', '/user/comenzi', '/api/_auth/session', '/api/cart', '/api/favorites',
+      '/api/orders', '/api/user/orders', '/api/admin/products', '/auth/google',
+      '/api/productsx', '/api/brands-admin', '/api', '/api/cart?x=/api/products',
+    ]) expect(skipsSessionCheck(path), path).toBe(false)
   })
 })

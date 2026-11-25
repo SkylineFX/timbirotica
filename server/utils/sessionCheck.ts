@@ -48,6 +48,25 @@ export function sessionCookieExpires(guard: Partial<SessionGuard> | undefined): 
 }
 
 /**
+ * Public catalog endpoints, which never read the session. The session
+ * middleware skips them, so browsing signed in doesn't unseal the cookie and
+ * read the account for every list, menu and filter. Every other path is
+ * checked, so a new endpoint is covered unless it is added here.
+ * test/server/session-free.test.ts fails if a handler under these paths reads
+ * the session.
+ */
+export const SESSION_FREE_PATHS = ['/api/products', '/api/categories', '/api/brands', '/api/locations', '/api/__sitemap__']
+
+/**
+ * Whether the session middleware may skip a request. Pass event.path, the
+ * decoded path that the router also uses (see server/middleware/admin.ts).
+ */
+export function skipsSessionCheck(path: string): boolean {
+  const route = (path.split('?')[0] ?? '').replace(/\/{2,}/g, '/')
+  return SESSION_FREE_PATHS.some(prefix => route === prefix || route.startsWith(`${prefix}/`))
+}
+
+/**
  * Whether a signed-in session is still valid for the account it names. It
  * isn't when the account no longer exists, the session has expired or comes
  * from before this check existed, the password changed since sign-in, or the
