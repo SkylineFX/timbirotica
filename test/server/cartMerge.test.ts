@@ -121,6 +121,19 @@ describe('buildCartMergeWrites', () => {
     expect(rows.map(r => r.quantity)).toEqual([7])
   })
 
+  it('leaves the rows of a product that is not being merged alone', async () => {
+    // Product 9 has two rows; the guest cart only brings product 10.
+    await db.insert(schema.cartItems).values([
+      { cartId: TEST_CART_ID, productId: 9, quantity: 2 },
+      { cartId: TEST_CART_ID, productId: 9, quantity: 3 },
+    ])
+
+    await mergeIntoCart([{ productId: 10, quantity: 1 }])
+
+    const rows = await db.select().from(schema.cartItems).where(eq(schema.cartItems.productId, 9))
+    expect(rows.reduce((sum, r) => sum + r.quantity, 0)).toBe(5)
+  })
+
   it('keeps a product with two rows within the maximum', async () => {
     await db.insert(schema.cartItems).values([
       { cartId: TEST_CART_ID, productId: 8, quantity: 200 },

@@ -24,10 +24,11 @@ const QUANTITY_SEND_DELAY_MS = 300
 // product cards. Shared by every useCart() caller in this browser.
 let addQueue: Promise<void> = Promise.resolve()
 
-// How long an add waits for the server. Without a limit a request that never
-// answers (a dropped connection, a stuck Worker) would hold up every add after
-// it in the queue.
-const ADD_TIMEOUT_MS = 15_000
+// How long a cart request (an add, a quantity change, a cart read) waits for
+// the server. Without a limit a request that never answers (a dropped
+// connection, a stuck Worker) would hold up every add after it in the queue,
+// since an add also waits for quantity changes and reads the cart back.
+const CART_REQUEST_TIMEOUT_MS = 15_000
 
 // Numbers each quantity change of a signed-in cart, so a cart read can tell
 // which lines changed after it started (see fetchCart).
@@ -56,7 +57,7 @@ export const useCart = () => {
   const quantitySender = () => {
     if (quantityUpdates) return quantityUpdates
     quantityUpdates = createLatestWinsSender<number>(
-      (id, value, { keepalive }) => $fetch(`/api/cart/${id}`, { method: 'PATCH', body: { quantity: value }, keepalive }),
+      (id, value, { keepalive }) => $fetch(`/api/cart/${id}`, { method: 'PATCH', body: { quantity: value }, keepalive, timeout: CART_REQUEST_TIMEOUT_MS }),
       (id, confirmed, e) => {
         console.error('Failed to update quantity', e)
         // A line removed meanwhile needs no correction or message.
@@ -95,7 +96,7 @@ export const useCart = () => {
         // reaches the server, and the change is sent anyway.
         const readStartedAt = quantityChangeCount
         // Use $fetch, not useFetch, to avoid stale cache in actions
-        const data = await $fetch('/api/cart') as any
+        const data = await $fetch('/api/cart', { timeout: CART_REQUEST_TIMEOUT_MS }) as any
         if (data && data.items) {
           cartItems.value = data.items.map((item: any) => ({
             id: item.id,
@@ -180,7 +181,7 @@ export const useCart = () => {
         await $fetch('/api/cart', {
           method: 'POST',
           body: { productId: product.id, quantity },
-          timeout: ADD_TIMEOUT_MS,
+          timeout: CART_REQUEST_TIMEOUT_MS,
         })
         await fetchCart()
       } else {
@@ -202,14 +203,15 @@ export const useCart = () => {
     } catch (e: any) {
       console.error('Failed to add to cart', e)
       // No answer at all (the timeout, a dropped connection): the add may still
-      // have been saved, so the cart is read again and the message says so.
+      // have been saved, so the message says so and the cart is read again,
+      // within the queue, so the read can't land after a later add's.
       const noAnswer = loggedIn.value && !e?.response
-      if (noAnswer) void fetchCart()
       toast.add({
         title: 'Eroare la adaugarea in cos',
         description: noAnswer ? 'Serverul nu a raspuns. Verifica cosul inainte sa adaugi din nou.' : e?.data?.message,
         color: 'error',
       })
+      if (noAnswer) await fetchCart()
     } finally {
       isLoading.value = false
     }
