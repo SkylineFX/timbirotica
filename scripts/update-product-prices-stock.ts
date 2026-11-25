@@ -195,10 +195,12 @@ async function main() {
 
       // Price
       if (entry.price != null) {
-        // Rounded to whole bani, and compared in bani, so a price with a
-        // floating-point tail is neither stored nor counted as a change.
-        const newPrice = fromBani(toBani(Number(entry.price)))
-        if (!Number.isFinite(newPrice) || newPrice < 0) {
+        // Checked as read, then rounded to whole bani and compared in bani, so
+        // a price with a floating-point tail is neither stored nor counted as a
+        // change. Checking first keeps -0.001 out (rounded, it would be -0).
+        const rawPrice = Number(entry.price)
+        const newPrice = fromBani(toBani(rawPrice))
+        if (!Number.isFinite(rawPrice) || rawPrice < 0) {
           invalidPrice++
         } else if (toBani(newPrice) !== toBani(existing.price)) {
           updates.price = newPrice

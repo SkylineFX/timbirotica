@@ -8,8 +8,13 @@ import { VAT_RATE } from '../constants/company'
 // only to store or show an amount: a whole number of bani divided by 100 is
 // stored and read back unchanged.
 
-/** Lei to whole bani. Also cleans a stored amount with a tail (58.76000000000001 -> 5876). */
-export const toBani = (lei: number): number => Math.round(lei * 100)
+/**
+ * Lei to whole bani. Also cleans a stored amount with a tail (58.76000000000001
+ * -> 5876). lei * 100 can land a hair below a half ban (1.005 * 100 is
+ * 100.49999999999999), so it is snapped to 6 decimals before rounding, and a
+ * half ban rounds up (1.005 -> 101).
+ */
+export const toBani = (lei: number): number => Math.round(Number((lei * 100).toFixed(6)))
 
 /** Whole bani back to lei, for storing and showing. */
 export const fromBani = (bani: number): number => bani / 100
