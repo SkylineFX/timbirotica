@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
 import { productPriceSchema } from '~~/shared/schemas/product'
+import { isSearchLongEnough } from '~~/shared/utils/search'
 
 definePageMeta({
   layout: 'admin',
@@ -30,7 +31,7 @@ const query = computed(() => ({
   ...(debouncedQuery.value ? { q: debouncedQuery.value } : {}),
 }))
 
-const { data, pending, refresh } = await useFetch('/api/admin/products', { query })
+const { data, pending, error, refresh } = await useFetch('/api/admin/products', { query })
 const products = computed(() => data.value?.products ?? [])
 const total = computed(() => data.value?.total ?? 0)
 
@@ -99,7 +100,7 @@ const columns: TableColumn<any>[] = [
   <div class="max-w-7xl mx-auto w-full h-full flex flex-col min-h-0">
     <div class="mb-6 flex items-center justify-between flex-shrink-0">
       <h1 class="text-2xl font-semibold font-serif">Produse</h1>
-      <p class="text-sm text-gray-500">{{ total }} {{ total === 1 ? 'produs' : 'produse' }}</p>
+      <p v-if="!error" class="text-sm text-gray-500">{{ total }} {{ total === 1 ? 'produs' : 'produse' }}</p>
     </div>
 
     <div class="bg-white border border-gray-200 rounded-md p-4 mb-4 flex flex-wrap items-center gap-3 flex-shrink-0">
@@ -120,6 +121,14 @@ const columns: TableColumn<any>[] = [
         :ui="{ root: 'flex-1 min-h-0' }"
       >
         <!-- Hidden title: an empty one ('') breaks hydration in UTable and leaves the column unnamed for screen readers. -->
+        <!-- What the table shows instead of rows: a load error, the search minimum, or no match. -->
+        <template #empty>
+          <div v-if="error" class="space-y-3">
+            <p>Nu am putut incarca produsele.</p>
+            <UButton color="neutral" variant="outline" icon="i-lucide-rotate-ccw" @click="refresh()">Reincearca</UButton>
+          </div>
+          <span v-else-if="!pending">{{ debouncedQuery && !isSearchLongEnough(debouncedQuery) ? 'Scrie cel putin 2 caractere.' : 'Niciun produs gasit.' }}</span>
+        </template>
         <template #image-header>
           <span class="sr-only">Imagine</span>
         </template>
@@ -166,9 +175,6 @@ const columns: TableColumn<any>[] = [
         </template>
       </UTable>
 
-      <div v-if="!pending && products.length === 0" class="py-12 text-center text-sm text-gray-500 flex-shrink-0">
-        Niciun produs gasit.
-      </div>
     </div>
 
     <div v-if="total > limit" class="mt-4 flex justify-center flex-shrink-0">

@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, like, lte, or, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, gte, lte, sql } from 'drizzle-orm'
 
 const SORTABLE_COLUMNS = {
   createdAt: tables.orders.createdAt,
@@ -11,11 +11,11 @@ export default eventHandler(async (event) => {
   await requireAdminSession(event)
 
   const query = getQuery(event)
-  const page = Math.max(1, parseInt(String(query.page ?? '1')))
-  const limit = Math.min(100, Math.max(1, parseInt(String(query.limit ?? '25'))))
+  const page = queryInteger(query.page, { fallback: 1, min: 1, max: 10_000 })
+  const limit = queryInteger(query.limit, { fallback: 25, min: 1, max: 100 })
   const offset = (page - 1) * limit
-  const status = query.status ? String(query.status) : undefined
-  const q = query.q ? String(query.q).trim() : ''
+  const status = queryString(query.status) || undefined
+  const q = queryString(query.q)?.trim() ?? ''
 
   const sortByRaw = query.sortBy ? String(query.sortBy) : 'createdAt'
   const sortBy: SortKey = (sortByRaw in SORTABLE_COLUMNS ? sortByRaw : 'createdAt') as SortKey
@@ -30,11 +30,8 @@ export default eventHandler(async (event) => {
 
   const filters = [
     status ? eq(tables.orders.status, status) : undefined,
-    q ? or(
-      like(tables.orders.orderNumber, `%${q}%`),
-      like(tables.orders.shippingAddressSnapshot, `%${q}%`),
-      like(tables.orders.billingAddressSnapshot, `%${q}%`),
-    ) : undefined,
+    // Every word in the order number, an address or the customer's name or email.
+    orderSearchFilter(q),
     from ? gte(tables.orders.createdAt, from) : undefined,
     to ? lte(tables.orders.createdAt, to) : undefined,
   ].filter(Boolean) as ReturnType<typeof eq>[]

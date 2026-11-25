@@ -8,10 +8,8 @@ export default eventHandler(async (event) => {
   const searchQ = queryString(query.q)
 
   // The page is capped so the offset stays a valid integer for D1.
-  const rawPage = queryNumber(query.page) ?? 1
-  const page = rawPage >= 1 ? Math.min(Math.floor(rawPage), 10_000) : 1
-  const rawLimit = queryNumber(query.limit) ?? 12
-  const limit = rawLimit >= 1 ? Math.min(Math.floor(rawLimit), 96) : 12
+  const page = queryInteger(query.page, { fallback: 1, min: 1, max: 10_000 })
+  const limit = queryInteger(query.limit, { fallback: 12, min: 1, max: 96 })
   const offset = (page - 1) * limit
 
   const minPrice = queryNumber(query.minPrice)
