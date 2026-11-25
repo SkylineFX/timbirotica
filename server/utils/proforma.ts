@@ -1,7 +1,8 @@
 import { PDFDocument, rgb, type PDFFont, type PDFPage, type StandardFonts } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
-import { COMPANY, VAT_RATE } from './company'
+import { COMPANY } from './company'
 import { formatAmount, formatRon, formatShopDate } from '~~/shared/utils/format'
+import { fromBani, splitGross, toBani, vatBreakdown } from '~~/shared/utils/money'
 
 export interface ProformaInput {
   orderNumber: string
@@ -194,7 +195,7 @@ interface TableRow {
   lineVat: number
 }
 
-interface Fonts {
+export interface Fonts {
   font: PDFFont
   fontBold: PDFFont
 }
@@ -265,9 +266,7 @@ export async function generateProformaPdf(
     fontBold: await pdfDoc.embedFont(fontData.bold, { subset: true }),
   }
 
-  const rows = buildRows(input, fonts.font)
-  const subtotalNet = rows.reduce((sum, row) => sum + row.lineNet, 0)
-  const subtotalVat = rows.reduce((sum, row) => sum + row.lineVat, 0)
+  const { rows, net: subtotalNet, vat: subtotalVat } = buildRows(input, fonts.font)
 
   const firstPage = pdfDoc.addPage(PAGE_SIZE)
   const firstRowsTop = drawTableHeader(firstPage, fonts, drawFirstPageHeader(firstPage, fonts, input))
@@ -302,36 +301,40 @@ export async function generateProformaPdf(
   return await pdfDoc.save()
 }
 
-function buildRows(input: ProformaInput, font: PDFFont): TableRow[] {
-  const vatMul = 1 + VAT_RATE / 100
+/**
+ * The table rows and the totals of the Net and VAT columns, in lei. The
+ * amounts come from vatBreakdown: each line is split in whole bani and the
+ * totals add up the printed lines, so the columns add up to the Total row and
+ * net plus VAT is the order total.
+ */
+function buildRows(input: ProformaInput, font: PDFFont): { rows: TableRow[], net: number, vat: number } {
   const nameWidth = COLUMNS.name.width - 4
+  const breakdown = vatBreakdown(
+    input.items.map(item => ({ price: item.priceAtBuy, quantity: item.quantity })),
+    input.shippingCost,
+  )
 
-  const rows: TableRow[] = input.items.map((item, index) => {
-    const lineGross = item.priceAtBuy * item.quantity
-    const lineNet = lineGross / vatMul
-    return {
-      idx: String(index + 1),
-      nameLines: wrapText(item.name, font, NAME_FONT_SIZE, nameWidth),
-      qty: String(item.quantity),
-      unitNet: item.priceAtBuy / vatMul,
-      lineNet,
-      lineVat: lineGross - lineNet,
-    }
-  })
+  const rows: TableRow[] = input.items.map((item, index) => ({
+    idx: String(index + 1),
+    nameLines: wrapText(item.name, font, NAME_FONT_SIZE, nameWidth),
+    qty: String(item.quantity),
+    unitNet: fromBani(splitGross(toBani(item.priceAtBuy)).net),
+    lineNet: fromBani(breakdown.rows[index]!.net),
+    lineVat: fromBani(breakdown.rows[index]!.vat),
+  }))
 
-  if (input.shippingCost > 0) {
-    const shippingNet = input.shippingCost / vatMul
+  if (breakdown.shipping) {
     rows.push({
       idx: '',
       nameLines: ['Transport'],
       qty: '1',
-      unitNet: shippingNet,
-      lineNet: shippingNet,
-      lineVat: input.shippingCost - shippingNet,
+      unitNet: fromBani(breakdown.shipping.net),
+      lineNet: fromBani(breakdown.shipping.net),
+      lineVat: fromBani(breakdown.shipping.vat),
     })
   }
 
-  return rows
+  return { rows, net: fromBani(breakdown.net), vat: fromBani(breakdown.vat) }
 }
 
 /** Title, reference, supplier and customer. Returns the y where the item table starts. */
@@ -357,19 +360,19 @@ function drawFirstPageHeader(page: PDFPage, { font, fontBold }: Fonts, input: Pr
   page.drawText('FURNIZOR', { x: supplierX, y, size: 10, font: fontBold, color: GREY })
   page.drawText('CLIENT', { x: customerX, y, size: 10, font: fontBold, color: GREY })
 
-  const supplierLines = [
-    COMPANY.name,
-    `CIF: ${COMPANY.cui}`,
-    `Reg. Com.: ${COMPANY.onrc}`,
-    ...wrapText(`Adresa: ${COMPANY.address}`, font, 10, colWidth),
-    `IBAN: ${COMPANY.iban}`,
-    `Banca: ${COMPANY.bankName}`
+  const supplierLines: InfoLine[] = [
+    { value: COMPANY.name },
+    { label: 'CIF', value: COMPANY.cui },
+    { label: 'Reg. Com.', value: COMPANY.onrc },
+    { label: 'Adresa', value: COMPANY.address },
+    { label: 'IBAN', value: COMPANY.iban },
+    { label: 'Banca', value: COMPANY.bankName },
   ]
 
-  const customerLines = wrapText(input.customer.name, fontBold, 10, colWidth)
+  const customerLines: InfoLine[] = [{ value: input.customer.name }]
   if (input.customer.type === 'company') {
-    if (input.customer.cui) customerLines.push(`CIF: ${input.customer.cui}`)
-    if (input.customer.onrc) customerLines.push(`Reg. Com.: ${input.customer.onrc}`)
+    if (input.customer.cui) customerLines.push({ label: 'CIF', value: input.customer.cui })
+    if (input.customer.onrc) customerLines.push({ label: 'Reg. Com.', value: input.customer.onrc })
   }
   // Address + locality as one wrapped block, mirroring the FURNIZOR column layout
   const locality = [input.customer.city, input.customer.county].filter(v => v && v !== '—').join(', ')
@@ -377,16 +380,14 @@ function drawFirstPageHeader(page: PDFPage, { font, fontBold }: Fonts, input: Pr
     input.customer.address && input.customer.address !== '—' ? input.customer.address : null,
     locality || null,
   ].filter(Boolean).join(', ')
-  if (addressBlock) {
-    customerLines.push(...wrapText(addressBlock, font, 10, colWidth))
-  }
+  if (addressBlock) customerLines.push({ value: addressBlock })
   if (input.customer.type === 'company') {
-    if (input.customer.iban) customerLines.push(`IBAN: ${input.customer.iban}`)
-    if (input.customer.bankName) customerLines.push(`Banca: ${input.customer.bankName}`)
+    if (input.customer.iban) customerLines.push({ label: 'IBAN', value: input.customer.iban })
+    if (input.customer.bankName) customerLines.push({ label: 'Banca', value: input.customer.bankName })
   }
 
-  const supplierEnd = drawLabeledLines(page, { font, fontBold }, supplierLines, supplierX, y - 14)
-  const customerEnd = drawLabeledLines(page, { font, fontBold }, customerLines, customerX, y - 14)
+  const supplierEnd = drawInfoLines(page, { font, fontBold }, layoutInfoLines(supplierLines, { font, fontBold }, colWidth), supplierX, y - 14)
+  const customerEnd = drawInfoLines(page, { font, fontBold }, layoutInfoLines(customerLines, { font, fontBold }, colWidth), customerX, y - 14)
   y = Math.min(supplierEnd, customerEnd) - 10
 
   drawDivider(page, y)
@@ -514,20 +515,44 @@ function drawDivider(page: PDFPage, y: number) {
  * Draw lines 12pt apart. A line with "Label: value" has a regular label and a
  * bold value; any other line is bold. Returns the y under the last line.
  */
-function drawLabeledLines(page: PDFPage, { font, fontBold }: Fonts, lines: string[], x: number, yStart: number): number {
+/** One line of the supplier or customer block: an optional label in regular type, the value in bold. */
+export interface InfoLine {
+  label?: string
+  value: string
+}
+
+export interface InfoLineLayout {
+  /** "CIF: ", or '' for a line without a label. */
+  label: string
+  labelWidth: number
+  /** The value wrapped to the column, measured in the bold font it is drawn in. */
+  valueLines: string[]
+}
+
+const INFO_FONT_SIZE = 10
+
+/**
+ * Wraps each value to the space after its label, measured in bold, so no line
+ * runs past the column (a long bank name used to run off the page). Lines
+ * after the first are drawn under the value, not under the label.
+ */
+export function layoutInfoLines(lines: InfoLine[], { font, fontBold }: Fonts, maxWidth: number): InfoLineLayout[] {
+  return lines.map(({ label, value }) => {
+    const labelText = label ? `${label}: ` : ''
+    const labelWidth = labelText ? font.widthOfTextAtSize(labelText, INFO_FONT_SIZE) : 0
+    return { label: labelText, labelWidth, valueLines: wrapText(value, fontBold, INFO_FONT_SIZE, maxWidth - labelWidth) }
+  })
+}
+
+function drawInfoLines(page: PDFPage, { font, fontBold }: Fonts, lines: InfoLineLayout[], x: number, yStart: number): number {
   const lineHeight = 12
-  const size = 10
   let y = yStart
-  for (const line of lines) {
-    const sepIdx = line.indexOf(': ')
-    if (sepIdx === -1) {
-      page.drawText(line, { x, y, size, font: fontBold, color: BLACK })
-    } else {
-      const label = line.slice(0, sepIdx + 2)
-      page.drawText(label, { x, y, size, font, color: BLACK })
-      page.drawText(line.slice(sepIdx + 2), { x: x + font.widthOfTextAtSize(label, size), y, size, font: fontBold, color: BLACK })
+  for (const { label, labelWidth, valueLines } of lines) {
+    if (label) page.drawText(label, { x, y, size: INFO_FONT_SIZE, font, color: BLACK })
+    for (const text of valueLines) {
+      page.drawText(text, { x: x + labelWidth, y, size: INFO_FONT_SIZE, font: fontBold, color: BLACK })
+      y -= lineHeight
     }
-    y -= lineHeight
   }
   return y
 }
