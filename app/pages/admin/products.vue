@@ -116,6 +116,10 @@ const columns: TableColumn<any>[] = [
         sticky
         :ui="{ root: 'flex-1 min-h-0' }"
       >
+        <!-- Hidden title: an empty one ('') breaks hydration in UTable and leaves the column unnamed for screen readers. -->
+        <template #image-header>
+          <span class="sr-only">Imagine</span>
+        </template>
         <template #image-cell="{ row }">
           <NuxtLink :to="`/c/${row.original.category?.slug ?? 'toate'}/${row.original.slug}`" target="_blank" class="block w-12 h-12 bg-stone-50 rounded-md border border-gray-100 overflow-hidden flex items-center justify-center hover:border-primary transition-colors">
             <img v-if="row.original.images?.[0]" :src="row.original.images[0]" :alt="row.original.name" loading="lazy" class="w-full h-full object-contain p-1" />
