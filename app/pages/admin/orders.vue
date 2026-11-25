@@ -220,6 +220,10 @@ const columns: TableColumn<any>[] = [
         <template #createdAt-cell="{ row }">
           <span class="text-sm text-gray-600">{{ formatShopDateTime(row.original.createdAt) }}</span>
         </template>
+        <!-- Hidden title: an empty one ('') breaks hydration in UTable and leaves the column unnamed for screen readers. -->
+        <template #actions-header>
+          <span class="sr-only">Actiuni</span>
+        </template>
         <template #actions-cell="{ row }">
           <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-chevron-right" aria-label="Detalii comanda" @click.stop="openOrder(row.original)" />
         </template>
