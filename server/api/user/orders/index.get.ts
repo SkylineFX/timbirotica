@@ -15,6 +15,8 @@ export default eventHandler(async (event) => {
       items: {
         with: {
           product: {
+            // The long description isn't shown in the order list.
+            columns: { description: false },
             with: {
               category: { columns: { slug: true } }
             }

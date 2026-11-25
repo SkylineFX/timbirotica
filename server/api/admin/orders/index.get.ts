@@ -51,7 +51,8 @@ export default eventHandler(async (event) => {
       limit,
       offset,
       with: {
-        items: { with: { product: true } },
+        // The long product description isn't shown in the order list.
+        items: { with: { product: { columns: { description: false } } } },
         user: {
           columns: { id: true, firstName: true, lastName: true, email: true, phone: true }
         }
