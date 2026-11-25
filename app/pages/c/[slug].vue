@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { findCategory } from '~~/shared/utils/categoryTree'
+
 const route = useRoute()
 const categorySlug = computed(() => route.params.slug as string)
 
@@ -6,15 +8,7 @@ const categorySlug = computed(() => route.params.slug as string)
 // too (same request, useCatalogMenus.ts). An unknown category is a 404, not an
 // empty listing.
 const { data: categoryTree, error } = await useCategoryTree()
-type CategoryNode = { label: string, to: string, children?: CategoryNode[] }
-const findByLink = (nodes: CategoryNode[], to: string): CategoryNode | undefined => {
-  for (const node of nodes) {
-    if (node.to === to) return node
-    const found = findByLink(node.children ?? [], to)
-    if (found) return found
-  }
-}
-const category = computed(() => findByLink(categoryTree.value ?? [], `/c/${categorySlug.value}`))
+const category = computed(() => findCategory(categoryTree.value ?? [], node => node.to === `/c/${categorySlug.value}`))
 if (!category.value) {
   throw createError(error.value
     ? { statusCode: error.value.statusCode ?? 500, fatal: true }
