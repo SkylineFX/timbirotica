@@ -311,7 +311,7 @@ function buildRows(input: ProformaInput, font: PDFFont): { rows: TableRow[], net
   const nameWidth = COLUMNS.name.width - 4
   const breakdown = vatBreakdown(
     input.items.map(item => ({ price: item.priceAtBuy, quantity: item.quantity })),
-    input.shippingCost,
+    input.shippingCost
   )
 
   const rows: TableRow[] = input.items.map((item, index) => ({
@@ -320,7 +320,7 @@ function buildRows(input: ProformaInput, font: PDFFont): { rows: TableRow[], net
     qty: String(item.quantity),
     unitNet: fromBani(splitGross(toBani(item.priceAtBuy)).net),
     lineNet: fromBani(breakdown.rows[index]!.net),
-    lineVat: fromBani(breakdown.rows[index]!.vat),
+    lineVat: fromBani(breakdown.rows[index]!.vat)
   }))
 
   if (breakdown.shipping) {
@@ -330,7 +330,7 @@ function buildRows(input: ProformaInput, font: PDFFont): { rows: TableRow[], net
       qty: '1',
       unitNet: fromBani(breakdown.shipping.net),
       lineNet: fromBani(breakdown.shipping.net),
-      lineVat: fromBani(breakdown.shipping.vat),
+      lineVat: fromBani(breakdown.shipping.vat)
     })
   }
 
@@ -366,7 +366,7 @@ function drawFirstPageHeader(page: PDFPage, { font, fontBold }: Fonts, input: Pr
     { label: 'Reg. Com.', value: COMPANY.onrc },
     { label: 'Adresa', value: COMPANY.address },
     { label: 'IBAN', value: COMPANY.iban },
-    { label: 'Banca', value: COMPANY.bankName },
+    { label: 'Banca', value: COMPANY.bankName }
   ]
 
   const customerLines: InfoLine[] = [{ value: input.customer.name }]
@@ -511,10 +511,6 @@ function drawDivider(page: PDFPage, y: number) {
   page.drawLine({ start: { x: MARGIN, y }, end: { x: width - MARGIN, y }, thickness: 0.8, color: LIGHT_GREY })
 }
 
-/**
- * Draw lines 12pt apart. A line with "Label: value" has a regular label and a
- * bold value; any other line is bold. Returns the y under the last line.
- */
 /** One line of the supplier or customer block: an optional label in regular type, the value in bold. */
 export interface InfoLine {
   label?: string
@@ -559,6 +555,10 @@ export function layoutInfoLines(lines: InfoLine[], { font, fontBold }: Fonts, ma
   })
 }
 
+/**
+ * Draws laid-out lines 12pt apart: each label in regular type, its value lines
+ * in bold under one another. Returns the y under the last line.
+ */
 function drawInfoLines(page: PDFPage, { font, fontBold }: Fonts, lines: InfoLineLayout[], x: number, yStart: number): number {
   const lineHeight = 12
   let y = yStart

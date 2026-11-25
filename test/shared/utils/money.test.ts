@@ -88,7 +88,7 @@ describe('vatBreakdown', () => {
     for (let order = 0; order < 2000; order++) {
       const lines = Array.from({ length: 1 + Math.floor(random() * 40) }, () => ({
         price: fromBani(1 + Math.floor(random() * 50_000)),
-        quantity: 1 + Math.floor(random() * 20),
+        quantity: 1 + Math.floor(random() * 20)
       }))
       const shipping = random() < 0.5 ? 30 : 0
       const breakdown = vatBreakdown(lines, shipping)

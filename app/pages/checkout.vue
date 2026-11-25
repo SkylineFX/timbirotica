@@ -195,7 +195,7 @@ const finalTotal = computed(() => {
 // two show the same amount.
 const finalVat = computed(() => fromBani(vatBreakdown(
   cartItems.value.map(item => ({ price: item.product?.price || 0, quantity: item.quantity })),
-  orderSummaryShippingCost.value,
+  orderSummaryShippingCost.value
 ).vat))
 const isSubmitting = ref(false)
 const termsAccepted = ref(false)

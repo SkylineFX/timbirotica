@@ -61,6 +61,6 @@ export function vatBreakdown(lines: readonly GrossLine[], shippingCost = 0) {
     rows,
     shipping,
     net: all.reduce((sum, row) => sum + row.net, 0),
-    vat: all.reduce((sum, row) => sum + row.vat, 0),
+    vat: all.reduce((sum, row) => sum + row.vat, 0)
   }
 }

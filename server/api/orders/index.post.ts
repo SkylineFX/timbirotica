@@ -109,10 +109,6 @@ export default eventHandler(async (event) => {
     })
   }
 
-  // Price-change guard: if any product's live price differs from what the
-  // customer saw at submit time, abort with 409 so the client can refresh the
-  // cart and have the user re-confirm. Snapshots are optional so older clients
-  // still work (they'd just lose the guard).
   // The cart ordered must be the cart the customer saw: the browser compares it
   // too, but a quantity change it gave up on can still be saved after its last
   // read, and another tab can change the cart. Older pages send no quantities.
@@ -128,6 +124,10 @@ export default eventHandler(async (event) => {
     }
   }
 
+  // Price-change guard: if any product's live price differs from what the
+  // customer saw at submit time, abort with 409 so the client can refresh the
+  // cart and have the user re-confirm. Snapshots are optional so older clients
+  // still work (they'd just lose the guard).
   if (body.priceSnapshots && body.priceSnapshots.length > 0) {
     const snapByProduct = new Map(body.priceSnapshots.map(s => [s.productId, s.price]))
     const changed = cart.items.some(item => {
