@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { queryNumber, queryString } from '~~/server/utils/query'
+import { queryInteger, queryNumber, queryString } from '~~/server/utils/query'
 
 describe('queryString', () => {
   it('passes a single value through', () => {
@@ -31,5 +31,24 @@ describe('queryNumber', () => {
     expect(queryNumber('abc')).toBeUndefined()
     expect(queryNumber('Infinity')).toBeUndefined()
     expect(queryNumber('-Infinity')).toBeUndefined()
+  })
+})
+
+describe('queryInteger', () => {
+  const page = (value: unknown) => queryInteger(value, { fallback: 1, min: 1, max: 10_000 })
+
+  it('keeps whole numbers within the bounds', () => {
+    expect(page('3')).toBe(3)
+    expect(page('2.7')).toBe(2)
+    expect(page('0')).toBe(1)
+    expect(page('-5')).toBe(1)
+    expect(page('1e20')).toBe(10_000)
+  })
+
+  it('uses the fallback for missing and non-numeric values, never NaN', () => {
+    expect(page(undefined)).toBe(1)
+    expect(page('')).toBe(1)
+    expect(page('abc')).toBe(1)
+    expect(page('Infinity')).toBe(1)
   })
 })

@@ -69,7 +69,7 @@ const query = computed(() => ({
   ...(rangeFrom(dateRange.value) ? { from: rangeFrom(dateRange.value) } : {}),
 }))
 
-const { data, pending, refresh } = await useFetch('/api/admin/orders', { query })
+const { data, pending, error, refresh } = await useFetch('/api/admin/orders', { query })
 const { refresh: refreshPendingCount } = usePendingOrders()
 
 const orders = computed(() => data.value?.orders ?? [])
@@ -153,7 +153,7 @@ const columns: TableColumn<any>[] = [
   <div class="max-w-7xl mx-auto w-full h-full flex flex-col min-h-0">
     <div class="mb-6 flex items-center justify-between flex-shrink-0">
       <h1 class="text-2xl font-semibold font-serif">Comenzi</h1>
-      <p class="text-sm text-gray-500">{{ total }} {{ total === 1 ? 'comanda' : 'comenzi' }}</p>
+      <p v-if="!error" class="text-sm text-gray-500">{{ total }} {{ total === 1 ? 'comanda' : 'comenzi' }}</p>
     </div>
 
     <div class="bg-white border border-gray-200 rounded-md p-4 mb-4 flex flex-wrap items-center gap-3 flex-shrink-0">
@@ -194,6 +194,14 @@ const columns: TableColumn<any>[] = [
             <UIcon :name="sortBy === 'total' ? (sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down') : 'i-lucide-arrow-up-down'" class="size-3.5" :class="sortBy === 'total' ? 'text-primary' : 'text-gray-400'" />
           </button>
         </template>
+        <!-- What the table shows instead of rows: a load error or no match. -->
+        <template #empty>
+          <div v-if="error" class="space-y-3">
+            <p>Nu am putut incarca comenzile.</p>
+            <UButton color="neutral" variant="outline" icon="i-lucide-rotate-ccw" @click="refresh()">Reincearca</UButton>
+          </div>
+          <span v-else-if="!pending">Nicio comanda gasita.</span>
+        </template>
         <template #createdAt-header>
           <button class="inline-flex items-center gap-1 hover:text-primary transition-colors" @click="toggleSort('createdAt')">
             Data
@@ -229,9 +237,6 @@ const columns: TableColumn<any>[] = [
         </template>
       </UTable>
 
-      <div v-if="!pending && orders.length === 0" class="py-12 text-center text-sm text-gray-500 flex-shrink-0">
-        Nicio comanda gasita.
-      </div>
     </div>
 
     <div v-if="total > limit" class="mt-4 flex justify-center flex-shrink-0">
