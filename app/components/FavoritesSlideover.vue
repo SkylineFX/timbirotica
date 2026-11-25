@@ -2,17 +2,17 @@
 const { favorites, isFavoritesOpen, removeFromFavorites, isLoading } = useFavorites()
 const { addToCart, cartLocked } = useCart()
 
-// The product being added: its button shows a spinner and a second click is
-// ignored, so a double click adds once. Adds from different buttons are sent
-// one at a time by useCart.
-const addingProductId = ref<number | null>(null)
+// The products being added: each one's button shows a spinner and ignores a
+// second click, so a double click adds once. A different product's button
+// still works; useCart sends the adds one at a time.
+const addingProductIds = ref(new Set<number>())
 const add = async (product: any) => {
-  if (addingProductId.value !== null || !product) return
-  addingProductId.value = product.id
+  if (!product || addingProductIds.value.has(product.id)) return
+  addingProductIds.value.add(product.id)
   try {
     await addToCart(product)
   } finally {
-    addingProductId.value = null
+    addingProductIds.value.delete(product.id)
   }
 }
 
@@ -39,7 +39,7 @@ const add = async (product: any) => {
                 <div class="flex justify-between items-end mt-2">
                        <div class="flex items-center gap-2">
                            <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" aria-label="Sterge de la favorite" @click="removeFromFavorites(item.id)" class="p-1.5" />
-                           <UButton size="xs" color="primary" variant="soft" icon="i-lucide-shopping-cart" aria-label="Adauga in cos" :disabled="cartLocked" :loading="addingProductId === item.product?.id" @click="add(item.product)" class="p-1.5" />
+                           <UButton size="xs" color="primary" variant="soft" icon="i-lucide-shopping-cart" aria-label="Adauga in cos" :disabled="cartLocked" :loading="addingProductIds.has(item.product?.id)" @click="add(item.product)" class="p-1.5" />
                        </div>
                        <span class="font-bold text-sm">{{ (item.product?.price ?? 0).toFixed(2) }} RON</span>
                 </div>

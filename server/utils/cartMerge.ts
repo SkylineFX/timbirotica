@@ -40,9 +40,10 @@ export function buildProductLookups(db: Db, productIds: readonly number[]) {
  * existing quantities can go over it.
  *
  * `existingItems` are the cart's rows. A product can have two rows (two quick
- * adds, until rank 22 adds a unique index): the first row takes the merged
- * quantity and the others are deleted, so the extra row can't push the
- * product past the maximum.
+ * adds, until rank 22 adds a unique index). For a product being merged, the
+ * first row takes the merged quantity, which counts every row, and the others
+ * are deleted, so the extra row can't push the product past the maximum. A
+ * product not being merged keeps its rows: nothing writes its total back.
  */
 export function buildCartMergeWrites(
   db: Db,
@@ -55,11 +56,12 @@ export function buildCartMergeWrites(
   const writes: BatchItem<'sqlite'>[] = []
   const newLines: (typeof schema.cartItems.$inferInsert)[] = []
 
+  const mergedProductIds = new Set(merged.map(line => line.productId))
   const existingItemIdByProduct = new Map<number, number>()
   const duplicateItemIds: number[] = []
   for (const item of existingItems) {
-    if (existingItemIdByProduct.has(item.productId)) duplicateItemIds.push(item.id)
-    else existingItemIdByProduct.set(item.productId, item.id)
+    if (!existingItemIdByProduct.has(item.productId)) existingItemIdByProduct.set(item.productId, item.id)
+    else if (mergedProductIds.has(item.productId)) duplicateItemIds.push(item.id)
   }
   for (const ids of splitIntoChunks(duplicateItemIds, PRODUCT_IDS_PER_LOOKUP)) {
     writes.push(db.delete(schema.cartItems).where(inArray(schema.cartItems.id, ids)))
