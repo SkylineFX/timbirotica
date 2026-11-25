@@ -9,6 +9,13 @@ describe('toBani and fromBani', () => {
     }
   })
 
+  it('rounds half a ban up, although lei * 100 lands just below it', () => {
+    expect(toBani(1.005)).toBe(101) // 1.005 * 100 is 100.49999999999999
+    expect(toBani(1.015)).toBe(102)
+    expect(toBani(0.285)).toBe(29)
+    expect(toBani(2.675)).toBe(268)
+  })
+
   it('cleans floating-point tails', () => {
     expect(toBani(0.1 + 0.2)).toBe(30)
     expect(toBani(58.76000000000001)).toBe(5876)
