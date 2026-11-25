@@ -10,7 +10,7 @@ export const productPriceSchema = z
 /** An admin edit of one product: a new price, its availability, or both. */
 export const adminProductUpdateSchema = z.object({
   price: productPriceSchema.optional(),
-  stock: z.union([z.literal(0), z.literal(1)]).optional(),
+  stock: z.union([z.literal(0), z.literal(1)]).optional()
 }).refine(body => body.price !== undefined || body.stock !== undefined, {
-  message: 'Trebuie sa trimiti cel putin un camp.',
+  message: 'Trebuie sa trimiti cel putin un camp.'
 })

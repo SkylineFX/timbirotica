@@ -43,14 +43,14 @@ describe('orderSearchFilter', () => {
     const now = new Date()
     await db.insert(schema.users).values([
       { id: 1, firstName: 'Ion', lastName: 'Popescu', email: 'ion.popescu@example.com', password: 'x', createdAt: now },
-      { id: 2, firstName: 'Ana', lastName: 'Ionescu', email: 'ana@firma.ro', password: 'x', createdAt: now },
+      { id: 2, firstName: 'Ana', lastName: 'Ionescu', email: 'ana@firma.ro', password: 'x', createdAt: now }
     ])
     await db.insert(schema.orders).values([
       // Snapshots store the names apart, as the order endpoint does.
       { userId: 1, orderNumber: 'A1B2C3D4', total: 10, shippingAddressSnapshot: JSON.stringify({ firstName: 'Ion', lastName: 'Popescu', street: 'Bl: A1, Sc: 2' }), createdAt: now },
       // A pickup order for a company: no delivery address at all.
       { userId: 1, orderNumber: 'E5F6A7B8', total: 20, shippingAddressSnapshot: '{}', billingAddressSnapshot: JSON.stringify({ companyName: 'Firma SRL' }), createdAt: now },
-      { userId: 2, orderNumber: 'C9D0E1F2', total: 30, shippingAddressSnapshot: JSON.stringify({ firstName: 'Ana', lastName: 'Ionescu', street: 'Strada 50%' }), createdAt: now },
+      { userId: 2, orderNumber: 'C9D0E1F2', total: 30, shippingAddressSnapshot: JSON.stringify({ firstName: 'Ana', lastName: 'Ionescu', street: 'Strada 50%' }), createdAt: now }
     ])
   })
 

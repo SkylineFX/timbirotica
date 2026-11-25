@@ -112,7 +112,7 @@ describe('buildCartMergeWrites', () => {
     // Two quick adds can leave two rows for a product (no unique index yet).
     await db.insert(schema.cartItems).values([
       { cartId: TEST_CART_ID, productId: 7, quantity: 2 },
-      { cartId: TEST_CART_ID, productId: 7, quantity: 2 },
+      { cartId: TEST_CART_ID, productId: 7, quantity: 2 }
     ])
 
     await mergeIntoCart([{ productId: 7, quantity: 3 }])
@@ -125,7 +125,7 @@ describe('buildCartMergeWrites', () => {
     // Product 9 has two rows; the guest cart only brings product 10.
     await db.insert(schema.cartItems).values([
       { cartId: TEST_CART_ID, productId: 9, quantity: 2 },
-      { cartId: TEST_CART_ID, productId: 9, quantity: 3 },
+      { cartId: TEST_CART_ID, productId: 9, quantity: 3 }
     ])
 
     await mergeIntoCart([{ productId: 10, quantity: 1 }])
@@ -137,7 +137,7 @@ describe('buildCartMergeWrites', () => {
   it('keeps a product with two rows within the maximum', async () => {
     await db.insert(schema.cartItems).values([
       { cartId: TEST_CART_ID, productId: 8, quantity: 200 },
-      { cartId: TEST_CART_ID, productId: 8, quantity: 2 },
+      { cartId: TEST_CART_ID, productId: 8, quantity: 2 }
     ])
 
     await mergeIntoCart([{ productId: 8, quantity: 50 }])

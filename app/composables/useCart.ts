@@ -181,7 +181,7 @@ export const useCart = () => {
         await $fetch('/api/cart', {
           method: 'POST',
           body: { productId: product.id, quantity },
-          timeout: CART_REQUEST_TIMEOUT_MS,
+          timeout: CART_REQUEST_TIMEOUT_MS
         })
         await fetchCart()
       } else {
@@ -209,7 +209,7 @@ export const useCart = () => {
       toast.add({
         title: 'Eroare la adaugarea in cos',
         description: noAnswer ? 'Serverul nu a raspuns. Verifica cosul inainte sa adaugi din nou.' : e?.data?.message,
-        color: 'error',
+        color: 'error'
       })
       if (noAnswer) await fetchCart()
     } finally {
@@ -322,7 +322,7 @@ export const useCart = () => {
   // shows the same free-shipping decision the order is charged with.
   const total = computed(() => fromBani(sumLines(cartItems.value.map(item => ({
     price: item.product?.price || 0,
-    quantity: item.quantity,
+    quantity: item.quantity
   })))))
 
   return {

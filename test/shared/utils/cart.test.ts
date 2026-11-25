@@ -80,7 +80,7 @@ describe('productsWithInvalidQuantity', () => {
       { productId: 1, quantity: 0 },
       { productId: 2, quantity: 1.5 },
       { productId: 3, quantity: CART_MAX_QUANTITY + 1 },
-      { productId: 4, quantity: 2 },
+      { productId: 4, quantity: 2 }
     ])).toEqual(new Set([1, 2, 3]))
   })
 

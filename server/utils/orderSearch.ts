@@ -52,7 +52,7 @@ export function orderSearchFilter(q: string): SQL | undefined {
     sql`${orders.userId} in (select ${usersColumn(users.id)} from ${sql.identifier(getTableName(users))} where ${or(
       likeEscaped(usersColumn(users.firstName), pattern),
       likeEscaped(usersColumn(users.lastName), pattern),
-      likeEscaped(usersColumn(users.email), pattern),
-    )})`,
+      likeEscaped(usersColumn(users.email), pattern)
+    )})`
   )))
 }

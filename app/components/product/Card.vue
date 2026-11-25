@@ -12,6 +12,7 @@ const { addToCart } = useCart()
 // one at a time by useCart.
 const adding = ref(false)
 const add = async () => {
+  if (adding.value) return
   adding.value = true
   try {
     await addToCart(props.product)
