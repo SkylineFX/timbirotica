@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
 import { shippingMethodLabel, paymentMethodLabel, ORDER_STATUS_TRANSITIONS } from '~~/shared/constants/order'
+import { formatShopDateTime } from '~~/shared/utils/format'
 
 definePageMeta({
   layout: 'admin',
@@ -146,10 +147,6 @@ const columns: TableColumn<any>[] = [
   { accessorKey: 'createdAt', header: 'Data' },
   { accessorKey: 'actions', header: '' },
 ]
-
-function fmtDate(d: string | Date) {
-  return new Date(d).toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' })
-}
 </script>
 
 <template>
@@ -221,7 +218,7 @@ function fmtDate(d: string | Date) {
           </UBadge>
         </template>
         <template #createdAt-cell="{ row }">
-          <span class="text-sm text-gray-600">{{ fmtDate(row.original.createdAt) }}</span>
+          <span class="text-sm text-gray-600">{{ formatShopDateTime(row.original.createdAt) }}</span>
         </template>
         <template #actions-cell="{ row }">
           <UButton size="xs" variant="ghost" color="neutral" icon="i-lucide-chevron-right" aria-label="Detalii comanda" @click.stop="openOrder(row.original)" />
@@ -244,7 +241,7 @@ function fmtDate(d: string | Date) {
           <div class="flex justify-between items-start border-b border-gray-100 pb-4">
             <div>
               <h4 class="font-bold text-gray-900 text-xl tracking-tight">#{{ selectedOrder.orderNumber }}</h4>
-              <p class="text-sm text-gray-500 mt-0.5">Plasata pe {{ fmtDate(selectedOrder.createdAt) }}</p>
+              <p class="text-sm text-gray-500 mt-0.5">Plasata pe {{ formatShopDateTime(selectedOrder.createdAt) }}</p>
               <p class="text-sm text-gray-700 mt-1">{{ selectedOrder.user?.firstName }} {{ selectedOrder.user?.lastName }} · {{ selectedOrder.user?.email }}</p>
             </div>
             <UBadge :color="ORDER_STATUS_COLOR[selectedOrder.status as keyof typeof ORDER_STATUS_COLOR] ?? 'neutral'" variant="subtle" size="sm">

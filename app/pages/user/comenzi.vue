@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { shippingMethodLabel, paymentMethodLabel } from '~~/shared/constants/order'
+import { formatShopDateTime, formatShopLongDate } from '~~/shared/utils/format'
 
 definePageMeta({
   layout: 'account',
@@ -118,7 +119,7 @@ async function performReorder({ replace }: { replace: boolean }) {
                       <span class="font-bold text-md text-gray-900">#{{ order.orderNumber }}</span>
                     </p>
                     <div class="flex items-center gap-2">
-                      <span class="text-sm text-gray-500">{{ new Date(order.createdAt).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' }) }}</span>
+                      <span class="text-sm text-gray-500">{{ formatShopLongDate(order.createdAt) }}</span>
                       <span class="text-sm text-gray-500">·</span>
                       <span class="text-sm text-gray-500">Total: {{ order.total.toFixed(2) }} RON</span>
                     </div>
@@ -173,7 +174,7 @@ async function performReorder({ replace }: { replace: boolean }) {
             <div class="flex justify-between items-center border-b border-gray-100 pb-4">
                <div>
                   <h4 class="font-bold text-gray-900 text-xl tracking-tight">#{{ selectedOrder.orderNumber }}</h4>
-                  <p class="text-sm text-gray-500 mt-0.5">Plasata pe {{ new Date(selectedOrder.createdAt).toLocaleString('ro-RO', { dateStyle: 'medium', timeStyle: 'short' }) }}</p>
+                  <p class="text-sm text-gray-500 mt-0.5">Plasata pe {{ formatShopDateTime(selectedOrder.createdAt) }}</p>
                </div>
                <div class="text-right">
                   <UBadge :color="statusColor[selectedOrder.status] ?? 'neutral'" variant="subtle" size="sm">{{ statusLabel[selectedOrder.status] ?? selectedOrder.status }}</UBadge>
