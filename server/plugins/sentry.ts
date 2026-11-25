@@ -1,4 +1,5 @@
 import { sentryCloudflareNitroPlugin } from '@sentry/nuxt/module/plugins'
+import { SENTRY_DATA_COLLECTION } from '~~/shared/constants/sentry'
 
 // Server-side Sentry for the Cloudflare Worker. sentry.server.config.ts only
 // runs on Node (it must be preloaded at start-up), so the Worker never started
@@ -20,6 +21,6 @@ export default defineNitroPlugin(sentryCloudflareNitroPlugin(() => ({
   // Errors only. Tracing would add CPU time to every request and send spans for
   // bots and the uptime check; turn it on with tracesSampleRate if needed.
 
-  // Disabled to honor the privacy policy.
-  sendDefaultPii: false
+  // Only what the privacy policy describes.
+  dataCollection: SENTRY_DATA_COLLECTION,
 })))

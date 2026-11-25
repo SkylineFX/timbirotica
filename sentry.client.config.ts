@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/nuxt";
 import { useRuntimeConfig } from "#imports";
+import { SENTRY_DATA_COLLECTION } from "./shared/constants/sentry";
 
 Sentry.init({
   // Only send events from production builds — keeps localhost/dev noise out of the dashboard.
@@ -17,9 +18,8 @@ Sentry.init({
   // for finer control
   tracesSampleRate: 0.2,
 
-  // Disabled to honor privacy policy.
-  // https://docs.sentry.io/platforms/javascript/guides/nuxt/configuration/options/#sendDefaultPii
-  sendDefaultPii: false,
+  // Only what the privacy policy describes (shared/constants/sentry.ts).
+  dataCollection: SENTRY_DATA_COLLECTION,
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
