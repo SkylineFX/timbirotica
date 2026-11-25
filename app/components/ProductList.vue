@@ -67,10 +67,17 @@ const fetchQuery = computed(() => {
   }
 })
 
-const { data, status } = await useFetch('/api/products', {
+const { data, status, error, refresh } = await useFetch('/api/products', {
     query: fetchQuery,
     watch: [fetchQuery]
 })
+
+// A failed load is an error, not an empty list. During server rendering the
+// page gets the real status code, so search engines don't index "0 produse";
+// in the browser (a filter or page change) the list offers a retry.
+if (import.meta.server && error.value) {
+  throw createError({ statusCode: error.value.statusCode ?? 500, fatal: true })
+}
 
 const products = computed(() => data.value?.products || [])
 const total = computed(() => data.value?.total || 0)
@@ -143,7 +150,7 @@ const resetFilters = () => {
     <div class="flex flex-col mb-8 gap-4 rounded-md p-4 bg-white">
       <h1 class="text-xl font-bold flex flex-wrap items-baseline gap-2 xl:text-2xl wrap-anywhere">
         {{ title }} <span v-if="subtitle" class="font-normal italic">"{{ subtitle }}"</span>
-        <span v-if="total !== undefined" class="text-sm font-medium text-gray-500 normal-case">
+        <span v-if="total !== undefined && !error" class="text-sm font-medium text-gray-500 normal-case">
           ({{ total }} produse)
         </span>
       </h1>
@@ -212,6 +219,10 @@ const resetFilters = () => {
 
     <div v-if="status === 'pending'" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 lg:gap-4">
         <ProductCardSkeleton v-for="i in limit" :key="i" />
+    </div>
+    <div v-else-if="error" class="text-center py-12 text-gray-500 space-y-4">
+        <p>Nu am putut incarca produsele.</p>
+        <UButton color="neutral" variant="outline" icon="i-lucide-rotate-ccw" @click="refresh()">Reincearca</UButton>
     </div>
     <div v-else-if="products?.length" class="space-y-8">
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 lg:gap-4">

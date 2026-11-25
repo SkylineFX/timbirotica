@@ -3,18 +3,19 @@ import { parseSearchTerms, buildSearchMatch, isSearchLongEnough } from '~~/share
 
 export default eventHandler(async (event) => {
   const query = getQuery(event)
-  const categorySlug = query.category as string | undefined
-  const brandSlug = query.brand as string | undefined
-  const searchQ = query.q as string | undefined
+  const categorySlug = queryString(query.category)
+  const brandSlug = queryString(query.brand)
+  const searchQ = queryString(query.q)
 
-  const rawPage = Number(query.page)
-  const page = Number.isFinite(rawPage) && rawPage >= 1 ? Math.floor(rawPage) : 1
-  const rawLimit = Number(query.limit)
-  const limit = Number.isFinite(rawLimit) && rawLimit >= 1 ? Math.min(Math.floor(rawLimit), 96) : 12
+  // The page is capped so the offset stays a valid integer for D1.
+  const rawPage = queryNumber(query.page) ?? 1
+  const page = rawPage >= 1 ? Math.min(Math.floor(rawPage), 10_000) : 1
+  const rawLimit = queryNumber(query.limit) ?? 12
+  const limit = rawLimit >= 1 ? Math.min(Math.floor(rawLimit), 96) : 12
   const offset = (page - 1) * limit
 
-  const minPrice = query.minPrice ? Number(query.minPrice) : undefined
-  const maxPrice = query.maxPrice ? Number(query.maxPrice) : undefined
+  const minPrice = queryNumber(query.minPrice)
+  const maxPrice = queryNumber(query.maxPrice)
   const onlyAvailable = query.available === '1'
   const subSlugs = parseFilterList(query.sub)
   const brandFilterSlugs = parseFilterList(query.b)
@@ -59,16 +60,15 @@ export default eventHandler(async (event) => {
   let searchOrder: ReturnType<typeof productSearchOrder> | null = null
   if (searchQ) {
     // A search shorter than 2 characters is not run.
-    if (!isSearchLongEnough(String(searchQ))) return emptyResponse
-    const searchTerms = parseSearchTerms(String(searchQ))
-    if (searchTerms.length > 0) {
-      const searchMatch = buildSearchMatch(searchTerms)
-      const wholeWordsMatch = buildSearchMatch(searchTerms, { wholeWords: true })
-      // Only punctuation was typed, and the index holds words only.
-      if (!searchMatch || !wholeWordsMatch) return emptyResponse
-      scopeConditions.push(productSearchFilter(searchMatch))
-      searchOrder = productSearchOrder(searchMatch, wholeWordsMatch)
-    }
+    if (!isSearchLongEnough(searchQ)) return emptyResponse
+    const searchTerms = parseSearchTerms(searchQ)
+    const searchMatch = buildSearchMatch(searchTerms)
+    const wholeWordsMatch = buildSearchMatch(searchTerms, { wholeWords: true })
+    // Nothing searchable was typed (punctuation, control characters), and the
+    // index holds words only: no products, never the whole catalog.
+    if (!searchMatch || !wholeWordsMatch) return emptyResponse
+    scopeConditions.push(productSearchFilter(searchMatch))
+    searchOrder = productSearchOrder(searchMatch, wholeWordsMatch)
   }
   const [selectedSubs, selectedBrands] = await Promise.all([
     subSlugs.length
@@ -89,11 +89,18 @@ export default eventHandler(async (event) => {
   ])
 
   const priceConds: any[] = []
-  if (minPrice !== undefined && !isNaN(minPrice)) priceConds.push(gte(tables.products.price, minPrice))
-  if (maxPrice !== undefined && !isNaN(maxPrice)) priceConds.push(lte(tables.products.price, maxPrice))
+  if (minPrice !== undefined) priceConds.push(gte(tables.products.price, minPrice))
+  if (maxPrice !== undefined) priceConds.push(lte(tables.products.price, maxPrice))
   const availabilityCond = onlyAvailable ? gt(tables.products.stock, 0) : undefined
-  const subCond = selectedSubs.length ? inArray(tables.products.categoryId, selectedSubs.map(s => s.id)) : undefined
-  const brandCond = selectedBrands.length ? inArray(tables.products.brandId, selectedBrands.map(b => b.id)) : undefined
+  // A filter whose values match nothing (an old link, a subcategory of another
+  // category) gives no products, not the whole listing.
+  const matchesNothing = sql`0 = 1`
+  const subCond = selectedSubs.length
+    ? inArray(tables.products.categoryId, selectedSubs.map(s => s.id))
+    : subSlugs.length ? matchesNothing : undefined
+  const brandCond = selectedBrands.length
+    ? inArray(tables.products.brandId, selectedBrands.map(b => b.id))
+    : brandFilterSlugs.length && !scopeBrand ? matchesNothing : undefined
 
   const buildWhere = (opts: { excludePrice?: boolean; excludeAvailability?: boolean; excludeSub?: boolean; excludeBrand?: boolean } = {}) => {
     const conds = [...scopeConditions]
@@ -110,7 +117,7 @@ export default eventHandler(async (event) => {
   const subFacetWhere = buildWhere({ excludeSub: true })
 
   // A search is sorted by relevance unless the customer picks another order.
-  const sortParam = query.sort as string || (searchOrder ? 'relevance' : 'default')
+  const sortParam = queryString(query.sort) || (searchOrder ? 'relevance' : 'default')
 
   const findProducts = () => db.query.products.findMany({
     columns: { description: false },
