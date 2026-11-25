@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
-import { generateProformaPdf, layoutInfoLines, paginateRows, proformaCustomerFromSnapshots, type PaginationSpace, type ProformaInput } from '~~/server/utils/proforma'
+import { generateProformaPdf, INFO_MAX_LINES_PER_VALUE, layoutInfoLines, paginateRows, proformaCustomerFromSnapshots, type PaginationSpace, type ProformaInput } from '~~/server/utils/proforma'
 
 describe('paginateRows', () => {
   const space: PaginationSpace = { firstPage: 100, otherPages: 200, totals: 30 }
@@ -103,6 +103,16 @@ describe('layoutInfoLines', () => {
     const [bank] = layoutInfoLines([{ label: 'Banca', value: 'BANCA COMERCIALA ROMANA S.A. - SUCURSALA SECTOR 6 BUCURESTI' }], f, COLUMN)
     expect(bank!.label).toBe('Banca: ')
     expect(bank!.valueLines.length).toBeGreaterThan(1)
+    for (const line of bank!.valueLines) {
+      expect(bank!.labelWidth + f.fontBold.widthOfTextAtSize(line, 10)).toBeLessThanOrEqual(COLUMN)
+    }
+  })
+
+  it('cuts an endless value at a few lines, so the item table keeps its place on the first page', async () => {
+    const f = await fonts()
+    const [bank] = layoutInfoLines([{ label: 'Banca', value: 'BANCA FOARTE LUNGA '.repeat(200) }], f, COLUMN)
+    expect(bank!.valueLines).toHaveLength(INFO_MAX_LINES_PER_VALUE)
+    expect(bank!.valueLines.at(-1)!.endsWith('…')).toBe(true)
     for (const line of bank!.valueLines) {
       expect(bank!.labelWidth + f.fontBold.widthOfTextAtSize(line, 10)).toBeLessThanOrEqual(COLUMN)
     }
