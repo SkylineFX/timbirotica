@@ -9,7 +9,7 @@ definePageMeta({
 })
 
 // Cart integration
-const { cartItems, total, fetchCart, syncCart } = useCart()
+const { cartItems, total, fetchCart, syncCart, cartLocked } = useCart()
 
 // Always show the server's cart, because the order is built from it. Merge any
 // guest products first: a tab that showed the guest view can hold products the
@@ -204,8 +204,11 @@ async function submitOrder() {
     return
   }
 
-  // Block a second submit from here on, including while the cart refreshes below.
+  // Block a second submit from here on, including while the cart refreshes
+  // below, and lock the cart everywhere on the page (these lines, the header's
+  // cart, favorites) until the order is placed.
   isSubmitting.value = true
+  cartLocked.value = true
   try {
     // The prices the customer is looking at, taken first: a cart read that
     // answers during the waits below can bring newer prices, and the server
@@ -216,9 +219,10 @@ async function submitOrder() {
     }))
 
     // The server orders the cart it holds, so send any quantity change still
-    // waiting, before syncCart(): it sends them too but ignores a failure. If
-    // one failed, the line is back at the server's quantity, with a toast:
-    // stop, so the customer sees what would be ordered.
+    // waiting, before syncCart(): it sends them too but ignores a failure. The
+    // cart is locked, so nothing changes after this. If a change failed, the
+    // line is back at the server's quantity, with a toast: stop, so the
+    // customer sees what would be ordered.
     if (!await flushCartQuantityUpdates()) return
 
     // Merge any guest products first, so the cart the server orders is the cart
@@ -257,10 +261,6 @@ async function submitOrder() {
       priceSnapshots
     }
 
-    // The header's cart stays editable meanwhile (only this page's lines are
-    // locked), so send any change made there too, on the same terms.
-    if (!await flushCartQuantityUpdates()) return
-
     const res = await $fetch('/api/orders', {
       method: 'POST',
       body: payload
@@ -290,6 +290,7 @@ async function submitOrder() {
     await fetchCart()
   } finally {
     isSubmitting.value = false
+    cartLocked.value = false
   }
 }
 </script>
@@ -555,7 +556,7 @@ async function submitOrder() {
                Cosul tau este gol.
             </div>
 
-            <CartItem v-for="item in cartItems" :key="item.id" :item="item" variant="checkout" :disabled="isSubmitting" />
+            <CartItem v-for="item in cartItems" :key="item.id" :item="item" variant="checkout" />
          </div>
 
          <!-- Totals -->

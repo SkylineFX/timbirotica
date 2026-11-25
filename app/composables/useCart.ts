@@ -36,6 +36,9 @@ export const useCart = () => {
   const cartItems = useState<any[]>('cart-items', () => [])
   const isLoading = useState<boolean>('cart-loading', () => false)
   const isCartOpen = useState<boolean>('cart-open', () => false)
+  // Set by the checkout while it places an order. The cart can't change then,
+  // from any control on the page, so the order is the cart the customer sent.
+  const cartLocked = useState<boolean>('cart-locked', () => false)
   const toast = useToast()
 
   const quantitySender = () => {
@@ -149,6 +152,7 @@ export const useCart = () => {
   }
 
   const addToCart = async (product: any, quantity = 1) => {
+    if (cartLocked.value) return
     isLoading.value = true
     try {
       if (loggedIn.value) {
@@ -185,7 +189,7 @@ export const useCart = () => {
   }
 
   const removeFromCart = async (itemId: number) => {
-    if (!itemId) return
+    if (!itemId || cartLocked.value) return
 
     // Optimistic Update
     const previousItems = [...cartItems.value]
@@ -206,7 +210,7 @@ export const useCart = () => {
   }
 
   const updateQuantity = async (itemId: number, value: number) => {
-    if (!itemId) return
+    if (!itemId || cartLocked.value) return
 
     const item = cartItems.value.find(i => i.id === itemId)
     if (!item) return
@@ -295,6 +299,7 @@ export const useCart = () => {
     cartItems,
     isLoading,
     isCartOpen,
+    cartLocked,
     fetchCart,
     addToCart,
     removeFromCart,
