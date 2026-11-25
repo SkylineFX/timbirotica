@@ -221,12 +221,13 @@ async function submitOrder() {
     // The prices the customer is looking at, taken first: a cart read that
     // answers during the waits below can bring newer prices, and the server
     // must still refuse the order (409) if a price changed meanwhile.
+    // With them, the products and quantities on screen: the order must be this
+    // cart, which the server checks too.
     const priceSnapshots = cartItems.value.map(item => ({
       productId: item.productId,
-      price: item.product?.price ?? 0
+      price: item.product?.price ?? 0,
+      quantity: item.quantity
     }))
-    // The products and quantities on screen: the order must be this cart.
-    const shownCart = cartItems.value.map(item => ({ productId: item.productId, quantity: item.quantity }))
 
     // The server orders the cart it holds, so send any quantity change still
     // waiting, before syncCart(): it sends them too but ignores a failure. The
@@ -243,7 +244,7 @@ async function submitOrder() {
     // a quantity change that failed on screen but was saved, or a change from
     // another tab. The page now shows the server's cart; stop so the customer
     // checks it, and the next click orders what is shown.
-    if (!sameCartQuantities(shownCart, cartItems.value)) {
+    if (!sameCartQuantities(priceSnapshots, cartItems.value)) {
       toast.add({ title: 'Cosul s-a actualizat', description: 'Verifica produsele si cantitatile, apoi plaseaza comanda din nou.', color: 'warning' })
       return
     }
@@ -301,6 +302,13 @@ async function submitOrder() {
     if (e?.statusCode === 409 && e?.data?.data?.priceChanged) {
       await fetchCart()
       toast.add({ title: 'Preturi actualizate', description: 'Verifica suma totala si reincearca.', color: 'warning' })
+      return
+    }
+    // The server's cart differs from the one shown (see the check before the
+    // order): show its cart, and the next click orders what is shown.
+    if (e?.statusCode === 409 && e?.data?.data?.cartChanged) {
+      await fetchCart()
+      toast.add({ title: 'Cosul s-a actualizat', description: 'Verifica produsele si cantitatile, apoi plaseaza comanda din nou.', color: 'warning' })
       return
     }
     toast.add({ title: 'Eroare la procesare', description: e?.data?.message || e.statusMessage || e.message || 'Te rugam sa incerci din nou.', color: 'error' })

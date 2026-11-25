@@ -117,12 +117,15 @@ export const orderPayloadSchema = z.object({
   billingPersonalAddressId: z.number().int().positive().nullable().optional(),
   // Customer must explicitly accept T&C; recorded server-side as proof of consent
   termsAccepted: z.literal(true),
-  // Snapshot of the prices the customer saw at submit time. The server compares
-  // each entry to the live DB price and rejects with 409 on any mismatch so the
-  // customer can re-confirm before being charged a different amount.
+  // Snapshot of the cart the customer saw at submit time, one entry per line.
+  // The server compares each price to the live DB price, and the products and
+  // quantities to the cart it orders, and rejects with 409 on any difference so
+  // the customer can re-confirm. Quantity is optional for pages loaded before it
+  // was sent; without it only the prices are checked.
   priceSnapshots: z.array(z.object({
     productId: z.number().int().positive(),
-    price: z.number().nonnegative()
+    price: z.number().nonnegative(),
+    quantity: z.number().int().positive().optional()
   })).optional()
 })
 
