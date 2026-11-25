@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
-import { generateProformaPdf, paginateRows, proformaCustomerFromSnapshots, type PaginationSpace, type ProformaInput } from '~~/server/utils/proforma'
+import { generateProformaPdf, layoutInfoLines, paginateRows, proformaCustomerFromSnapshots, type PaginationSpace, type ProformaInput } from '~~/server/utils/proforma'
 
 describe('paginateRows', () => {
   const space: PaginationSpace = { firstPage: 100, otherPages: 200, totals: 30 }
@@ -86,6 +86,39 @@ describe('generateProformaPdf', () => {
   it('handles a product name with a word longer than the name column', async () => {
     const longWord = 'X'.repeat(80)
     expect(await pageCount(proforma(3, () => `PRODUS ${longWord} TEST`))).toBe(1)
+  })
+})
+
+describe('layoutInfoLines', () => {
+  // The column width of the supplier and customer blocks on an A4 page.
+  const COLUMN = (595.28 - 40 * 2 - 20) / 2
+
+  const fonts = async () => {
+    const doc = await PDFDocument.create()
+    return { font: await doc.embedFont(StandardFonts.Helvetica), fontBold: await doc.embedFont(StandardFonts.HelveticaBold) }
+  }
+
+  it('wraps a long bank name instead of letting it run off the page (M11)', async () => {
+    const f = await fonts()
+    const [bank] = layoutInfoLines([{ label: 'Banca', value: 'BANCA COMERCIALA ROMANA S.A. - SUCURSALA SECTOR 6 BUCURESTI' }], f, COLUMN)
+    expect(bank!.label).toBe('Banca: ')
+    expect(bank!.valueLines.length).toBeGreaterThan(1)
+    for (const line of bank!.valueLines) {
+      expect(bank!.labelWidth + f.fontBold.widthOfTextAtSize(line, 10)).toBeLessThanOrEqual(COLUMN)
+    }
+  })
+
+  it('measures values in the bold font they are drawn in, and keeps ": " inside a value (M11)', async () => {
+    const f = await fonts()
+    const address = 'Strada Drumul Taberei Nr. 92, Bl: A1, Sc: 2, Ap: 14, Sector 6, Bucuresti, Romania'
+    const layout = layoutInfoLines([{ label: 'Adresa', value: address }, { value: address }], f, COLUMN)
+    for (const { labelWidth, valueLines } of layout) {
+      for (const line of valueLines) {
+        expect(labelWidth + f.fontBold.widthOfTextAtSize(line, 10)).toBeLessThanOrEqual(COLUMN)
+      }
+      expect(valueLines.join(' ')).toBe(address)
+    }
+    expect(layout[1]!.label).toBe('')
   })
 })
 
