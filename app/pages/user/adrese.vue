@@ -73,8 +73,8 @@ async function handleAddressSaved() {
       <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div v-for="addr in userAddresses" :key="addr.id" class="p-5 rounded-sm border border-gray-200 bg-white relative hover:border-gray-300 transition-all">
           <div class="mb-4">
-            <p class="font-bold text-gray-900 inline">{{ addr.firstName + ' ' + addr.lastName }}</p>
-            <p v-if="addr.phone" class="text-gray-500 text-sm inline ml-1">· {{ addr.phone }}</p>
+            <span class="font-bold text-gray-900 inline">{{ addr.firstName + ' ' + addr.lastName }}</span>
+            <span v-if="addr.phone" class="text-gray-500 text-sm inline ml-1">· {{ addr.phone }}</span>
             <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.street }}</p>
             <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.city }}, {{ addr.county }} <span v-if="addr.postalCode">({{ addr.postalCode }})</span></p>
           </div>

@@ -3,6 +3,13 @@ defineProps<{ productImages: string[] }>()
 
 const carousel = useTemplateRef('carousel')
 const activeIndex = ref(0)
+
+// A function, not an inline handler with two statements: without
+// semicolons (the repo's Prettier style) Vue can't parse those.
+const showImage = (index: number) => {
+  carousel.value?.emblaApi?.scrollTo(index)
+  activeIndex.value = index
+}
 </script>
 
 <template>
@@ -27,7 +34,7 @@ const activeIndex = ref(0)
         :key="index"
         class="w-16 h-16 shrink-0 rounded-md border-2 bg-white flex items-center justify-center p-0.5 cursor-pointer transition-all"
         :class="activeIndex === index ? 'border-primary' : 'border-gray-200 opacity-60 hover:opacity-100'"
-        @click="carousel?.emblaApi?.scrollTo(index); activeIndex = index"
+        @click="showImage(index)"
       >
         <NuxtImg :src="item" class="w-full h-full object-contain rounded-sm" alt="Imagine Produs"> </NuxtImg>
       </div>

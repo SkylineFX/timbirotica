@@ -61,8 +61,8 @@ async function handleBillingSaved() {
       <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div v-for="addr in userBillingAddresses" :key="addr.id" class="p-5 rounded-sm border border-gray-200 bg-white relative hover:border-gray-300 transition-all flex flex-col">
           <div class="mb-4">
-            <p class="font-bold text-gray-900 inline">{{ addr.companyName }}</p>
-            <p class="text-sm text-gray-600 inline ml-1">· {{ addr.hasRo ? 'RO' : '' }}{{ addr.cui }}</p>
+            <span class="font-bold text-gray-900 inline">{{ addr.companyName }}</span>
+            <span class="text-sm text-gray-600 inline ml-1">· {{ addr.hasRo ? 'RO' : '' }}{{ addr.cui }}</span>
             <p v-if="addr.onrc" class="text-sm text-gray-600 mt-1">Reg. Com.: {{ addr.onrc }}</p>
             <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.street }}</p>
             <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.city }}, {{ addr.county }}</p>
