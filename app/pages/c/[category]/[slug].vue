@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { COURIER_DELIVERY_DAYS, COURIER_SHIPPING_COST, FREE_SHIPPING_THRESHOLD, RETURN_WINDOW_DAYS } from '~~/shared/constants/order'
 import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
 import { absoluteUrl, canonicalUrl, jsonLd, productStructuredData } from '~~/shared/utils/seo'
 
@@ -115,13 +116,13 @@ const accordionItems = [
   {
     label: 'Livrare',
     icon: 'i-lucide-truck',
-    text: 'Livrarea se face in 2-3 zile lucratoare de la confirmarea comenzii. Costul transportului este de 30 RON pentru comenzile sub 200 RON. Afla mai multe detalii:',
+    text: `Livrarea se face in ${COURIER_DELIVERY_DAYS} zile lucratoare de la confirmarea comenzii. Costul transportului este de ${COURIER_SHIPPING_COST} RON pentru comenzile sub ${FREE_SHIPPING_THRESHOLD} RON. Afla mai multe detalii:`,
     link: { to: '/termeni-si-conditii#livrare', label: 'Livrare' },
   },
   {
     label: 'Retur',
     icon: 'i-lucide-rotate-ccw',
-    text: 'Ai la dispozitie 14 zile calendaristice pentru a returna produsul. Acesta trebuie sa fie in aceeasi stare in care a fost livrat, in ambalajul original. Afla mai multe detalii:',
+    text: `Ai la dispozitie ${RETURN_WINDOW_DAYS} zile calendaristice pentru a returna produsul. Acesta trebuie sa fie in aceeasi stare in care a fost livrat, in ambalajul original. Afla mai multe detalii:`,
     link: { to: '/termeni-si-conditii#retur', label: 'Retur' },
   }
 ]
