@@ -67,6 +67,9 @@ export const getCourierShippingCost = (subtotal: number): number =>
 // these: change them together.
 export const COURIER_HANDLING_DAYS = { min: 1, max: 2 }
 export const COURIER_TRANSIT_DAYS = { min: 1, max: 1 }
+/** The whole courier delivery time for the shop's texts: "2-3" (working days). */
+export const COURIER_DELIVERY_DAYS =
+  `${COURIER_HANDLING_DAYS.min + COURIER_TRANSIT_DAYS.min}-${COURIER_HANDLING_DAYS.max + COURIER_TRANSIT_DAYS.max}`
 
 // Return terms, as stated on the terms page (/termeni-si-conditii#retur), which
 // hardcodes them: change both together. The customer pays the return shipping.

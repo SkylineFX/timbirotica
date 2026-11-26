@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, watchEffect, onMounted, onUnmounted } from 'vue'
 import { useCart } from '~/composables/useCart'
-import { getCourierShippingCost } from '~~/shared/constants/order'
+import { COURIER_DELIVERY_DAYS, getCourierShippingCost } from '~~/shared/constants/order'
 import { sameCartQuantities } from '~~/shared/utils/cart'
 import { fromBani, toBani, vatBreakdown } from '~~/shared/utils/money'
 
@@ -378,7 +378,7 @@ async function submitOrder() {
                 </div>
               </div>
               <div class="text-sm font-semibold min-w-fit" :class="courierShippingCost === 0 ? 'text-green-600' : 'text-gray-900'">
-                {{ courierShippingCost === 0 ? 'Gratuit' : '30.00 RON' }}
+                {{ courierShippingCost === 0 ? 'Gratuit' : `${courierShippingCost.toFixed(2)} RON` }}
               </div>
               <input type="radio" value="courier" v-model="deliveryMethod" class="hidden">
             </label>
@@ -386,7 +386,7 @@ async function submitOrder() {
             <div v-show="deliveryMethod === 'courier'" class="p-5 bg-gray-50 border-b border-gray-200 space-y-4">
                <div class="text-sm text-gray-600 text-left flex flex-col items-center gap-2">
                 <!-- <UIcon name="i-lucide-info" class="w-6 h-6 text-gray-400" /> -->
-                <p class="text-sm text-gray-600"> Livrarea se face in 2-3 zile lucratoare de la primirea facturii proforme pe mail, dupa ce comanda a fost confirmata.</p>
+                <p class="text-sm text-gray-600"> Livrarea se face in {{ COURIER_DELIVERY_DAYS }} zile lucratoare de la primirea facturii proforme pe mail, dupa ce comanda a fost confirmata.</p>
                </div>
             </div>
 
