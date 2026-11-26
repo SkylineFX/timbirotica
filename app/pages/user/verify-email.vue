@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
+
 const route = useRoute()
 const toast = useToast()
 const { loggedIn } = useUserSession()
@@ -45,8 +47,8 @@ onMounted(async () => {
     })
     status.value = 'success'
     startRedirect()
-  } catch (err: any) {
-    if (err?.statusCode === 400) {
+  } catch (err) {
+    if (fetchFailure(err).status === 400) {
       try {
         const result = await $fetch<{ verified: boolean }>('/api/auth/verification-status')
         if (result.verified) {
@@ -86,17 +88,19 @@ async function resendVerification() {
     await $fetch('/api/auth/send-verification', { method: 'POST' })
     toast.add({ title: 'Email trimis', description: 'Verifica casuta de email pentru noul link de confirmare.', color: 'success' })
     startCooldown(60)
-  } catch (e: any) {
-    if (e?.statusCode === 401) {
+  } catch (e) {
+    const failure = fetchFailure(e)
+    if (failure.status === 401) {
       toast.add({ title: 'Autentificare necesara', description: 'Conecteaza-te in cont si reincearca.', color: 'error' })
       navigateTo('/user/login')
       return
     }
-    if (e?.statusCode === 429 && e?.data?.data?.retryAfter) {
-      startCooldown(e.data.data.retryAfter)
+    const retryAfter = failure.data.retryAfter
+    if (failure.status === 429 && typeof retryAfter === 'number' && retryAfter) {
+      startCooldown(retryAfter)
       return
     }
-    toast.add({ title: 'Eroare', description: e?.data?.message || 'Nu am putut trimite emailul. Incearca din nou.', color: 'error' })
+    toast.add({ title: 'Eroare', description: failure.message || 'Nu am putut trimite emailul. Incearca din nou.', color: 'error' })
   } finally {
     isResending.value = false
   }

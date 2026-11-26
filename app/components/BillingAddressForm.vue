@@ -3,9 +3,11 @@ import { ref, watch } from 'vue'
 import { vMaska } from 'maska/vue'
 import { billingAddressSchema, type BillingAddress } from '~~/shared/schemas/billingAddress'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import type { SavedBillingAddress } from '~~/shared/types/account'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
 
 const { address = null } = defineProps<{
-  address?: any | null
+  address?: SavedBillingAddress | null
 }>()
 
 const emit = defineEmits(['saved'])
@@ -60,7 +62,7 @@ watch(() => address, (newAddr) => {
 }, { immediate: true })
 
 const { data: countiesData } = await useFetch('/api/locations/counties')
-const countyNames = computed(() => (countiesData.value as any[])?.map(c => c.name) || [])
+const countyNames = computed(() => countiesData.value?.map(c => c.name) || [])
 const citiesData = ref<string[]>([])
 const isFetchingCities = ref(false)
 
@@ -71,8 +73,8 @@ const loadCities = async (countyName: string) => {
   }
   isFetchingCities.value = true
   try {
-    const res = await ($fetch as any)('/api/locations/cities', { params: { countyName } })
-    citiesData.value = res.map((c: any) => c.name)
+    const res = await $fetch('/api/locations/cities', { params: { countyName } })
+    citiesData.value = res.map(c => c.name)
   } catch (e) {
     console.error('Failed to load cities', e)
   } finally {
@@ -109,8 +111,8 @@ async function submit(event: FormSubmitEvent<BillingAddress>) {
       toast.add({ title: 'Companie adaugata cu succes', color: 'success' })
     }
     emit('saved')
-  } catch(err: any) {
-     toast.add({ title: 'Eroare la salvare', description: err?.data?.message ?? err.message, color: 'error' })
+  } catch(err) {
+     toast.add({ title: 'Eroare la salvare', description: fetchFailure(err).message ?? (err instanceof Error ? err.message : undefined), color: 'error' })
   } finally {
     isLoading.value = false
   }
@@ -127,7 +129,7 @@ async function submit(event: FormSubmitEvent<BillingAddress>) {
         </UFormField>
         <UFormField label="Cod unic de Inregistrare" name="cui" required>
            <div class="flex gap-2 w-full">
-             <USelect v-model="form.hasRo" :items="hasRoOptions as any[]" value-attribute="value" option-attribute="label" size="lg" class="w-24 shrink-0" />
+             <USelect v-model="form.hasRo" :items="hasRoOptions" value-attribute="value" option-attribute="label" size="lg" class="w-24 shrink-0" />
              <UInput v-model="form.cui" size="lg" class="w-full" />
            </div>
         </UFormField>

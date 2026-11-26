@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { TableColumn } from '@nuxt/ui'
+import type { TableColumn, TableRow } from '@nuxt/ui'
 import { shippingMethodLabel, paymentMethodLabel, ORDER_STATUS_TRANSITIONS } from '~~/shared/constants/order'
 import { formatShopDateTime } from '~~/shared/utils/format'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
+import type { BillingAddressSnapshot, ShippingAddressSnapshot } from '~~/shared/types/account'
 
 definePageMeta({
   layout: 'admin',
@@ -75,6 +77,9 @@ const { refresh: refreshPendingCount } = usePendingOrders()
 const orders = computed(() => data.value?.orders ?? [])
 const total = computed(() => data.value?.total ?? 0)
 
+// One order row of GET /api/admin/orders, with its lines and customer.
+type AdminOrder = typeof orders.value[number]
+
 const statusOptions = ORDER_STATUS_VALUES.map(s => ({ label: ORDER_STATUS_LABEL[s], value: s }))
 
 function resetFilters() {
@@ -89,9 +94,9 @@ function resetFilters() {
 
 // Modal
 const isModalOpen = ref(false)
-const selectedOrder = ref<any>(null)
-const parsedShipping = ref<any>({})
-const parsedBilling = ref<any>({})
+const selectedOrder = ref<AdminOrder | null>(null)
+const parsedShipping = ref<ShippingAddressSnapshot>({})
+const parsedBilling = ref<BillingAddressSnapshot>({})
 const newStatus = ref<OrderStatus | undefined>(undefined)
 const isSavingStatus = ref(false)
 
@@ -102,9 +107,11 @@ const statusChoices = computed(() => {
   return [current, ...(ORDER_STATUS_TRANSITIONS[current] ?? [])].map(s => ({ label: ORDER_STATUS_LABEL[s] ?? s, value: s }))
 })
 
-function openOrder(order: any) {
+function openOrder(order: AdminOrder) {
   selectedOrder.value = order
-  newStatus.value = order.status
+  // orders.status is a plain text column, so TypeScript can't know it only
+  // ever holds an OrderStatus (the server writes nothing else).
+  newStatus.value = order.status as OrderStatus
   try { parsedShipping.value = JSON.parse(order.shippingAddressSnapshot || '{}') } catch { parsedShipping.value = {} }
   try { parsedBilling.value = JSON.parse(order.billingAddressSnapshot || '{}') } catch { parsedBilling.value = {} }
   isModalOpen.value = true
@@ -121,25 +128,28 @@ async function saveStatus() {
     selectedOrder.value.status = updated.status
     await Promise.all([refresh(), refreshPendingCount()])
     toast.add({ title: 'Status actualizat', description: ORDER_STATUS_LABEL[updated.status as keyof typeof ORDER_STATUS_LABEL], color: 'success' })
-  } catch (e: any) {
-    toast.add({ title: 'Eroare', description: e?.data?.message ?? 'Nu am putut actualiza statusul.', color: 'error' })
+  } catch (e) {
+    const failure = fetchFailure(e)
+    toast.add({ title: 'Eroare', description: failure.message ?? 'Nu am putut actualiza statusul.', color: 'error' })
     // The order may have changed meanwhile (a customer cancelled it): reload
     // the list and show the order's current status and choices in the modal.
     // A status filter can drop the order from the list, so the status the
     // endpoint sends back with the error is the fallback.
     await Promise.all([refresh(), refreshPendingCount()])
-    const current = orders.value.find((o: any) => o.id === selectedOrder.value?.id)
-    const status = current?.status ?? e?.data?.data?.status
+    const current = orders.value.find(o => o.id === selectedOrder.value?.id)
+    const sentStatus = failure.data.status
+    const status = current?.status ?? (typeof sentStatus === 'string' ? sentStatus : undefined)
     if (status && selectedOrder.value) {
       selectedOrder.value.status = status
-      newStatus.value = status
+      // A plain text column too, see openOrder.
+      newStatus.value = status as OrderStatus
     }
   } finally {
     isSavingStatus.value = false
   }
 }
 
-const columns: TableColumn<any>[] = [
+const columns: TableColumn<AdminOrder>[] = [
   { accessorKey: 'orderNumber', header: '# Comanda' },
   { accessorKey: 'customer', header: 'Client' },
   { accessorKey: 'total', header: 'Total' },
@@ -186,7 +196,7 @@ const columns: TableColumn<any>[] = [
         :loading="pending"
         sticky
         :ui="{ root: 'flex-1 min-h-0', tr: 'cursor-pointer hover:bg-stone-50 transition-colors' }"
-        :on-select="(_e: Event, row: any) => openOrder(row.original)"
+        :on-select="(_e: Event, row: TableRow<AdminOrder>) => openOrder(row.original)"
       >
         <template #total-header>
           <button class="inline-flex items-center gap-1 hover:text-primary transition-colors" @click="toggleSort('total')">

@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
 import { productPriceSchema } from '~~/shared/schemas/product'
 import { isSearchLongEnough } from '~~/shared/utils/search'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
 
 definePageMeta({
   layout: 'admin',
@@ -35,15 +36,18 @@ const { data, pending, error, refresh } = await useFetch('/api/admin/products', 
 const products = computed(() => data.value?.products ?? [])
 const total = computed(() => data.value?.total ?? 0)
 
+// One product row of GET /api/admin/products.
+type AdminProduct = typeof products.value[number]
+
 // Per-row UI state for price editing — local edits, persist on blur
 const priceDrafts = ref<Record<number, string>>({})
 const savingId = ref<number | null>(null)
 
-function priceFor(p: any): string {
+function priceFor(p: AdminProduct): string {
   return priceDrafts.value[p.id] ?? p.price.toFixed(2)
 }
 
-async function saveStock(p: any, available: boolean) {
+async function saveStock(p: AdminProduct, available: boolean) {
   const newStock = available ? 1 : 0
   if (p.stock === newStock) return
   savingId.value = p.id
@@ -51,14 +55,14 @@ async function saveStock(p: any, available: boolean) {
     await $fetch(`/api/admin/products/${p.id}`, { method: 'PATCH', body: { stock: newStock } })
     await refresh()
     toast.add({ title: available ? 'Produs disponibil' : 'Produs indisponibil', color: 'success' })
-  } catch (e: any) {
-    toast.add({ title: 'Eroare', description: e?.data?.message ?? 'Nu am putut actualiza stocul.', color: 'error' })
+  } catch (e) {
+    toast.add({ title: 'Eroare', description: fetchFailure(e).message ?? 'Nu am putut actualiza stocul.', color: 'error' })
   } finally {
     savingId.value = null
   }
 }
 
-async function savePrice(p: any) {
+async function savePrice(p: AdminProduct) {
   const draft = priceDrafts.value[p.id]
   if (draft === undefined) return
   const parsed = parseFloat(draft)
@@ -79,14 +83,14 @@ async function savePrice(p: any) {
     delete priceDrafts.value[p.id]
     await refresh()
     toast.add({ title: 'Pret actualizat', description: `${parsed.toFixed(2)} RON`, color: 'success' })
-  } catch (e: any) {
-    toast.add({ title: 'Eroare', description: e?.data?.message ?? 'Nu am putut actualiza pretul.', color: 'error' })
+  } catch (e) {
+    toast.add({ title: 'Eroare', description: fetchFailure(e).message ?? 'Nu am putut actualiza pretul.', color: 'error' })
   } finally {
     savingId.value = null
   }
 }
 
-const columns: TableColumn<any>[] = [
+const columns: TableColumn<AdminProduct>[] = [
   { accessorKey: 'image', header: '' },
   { accessorKey: 'name', header: 'Nume' },
   { accessorKey: 'sku', header: 'SKU' },
@@ -161,7 +165,7 @@ const columns: TableColumn<any>[] = [
             size="sm"
             class="w-28"
             :loading="savingId === row.original.id"
-            @update:model-value="(v: any) => priceDrafts[row.original.id] = String(v)"
+            @update:model-value="(v: string | number) => priceDrafts[row.original.id] = String(v)"
             @blur="savePrice(row.original)"
             @keydown.enter="savePrice(row.original)"
           />

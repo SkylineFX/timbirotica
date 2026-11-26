@@ -2,6 +2,7 @@
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 import { safeRedirectPath } from '~~/shared/utils/redirect'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
 
 definePageMeta({
   middleware: 'guest'
@@ -99,12 +100,12 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     const { fetch } = useUserSession()
     await fetch()
     await navigateTo(redirectTo ?? '/')
-  } catch (err: any) {
+  } catch (err) {
     turnstileToken.value = ''
     turnstile.value?.reset()
     toast.add({
       title: 'Inregistrare esuata',
-      description: err.data?.message || 'Eroare la inregistrare.',
+      description: fetchFailure(err).message || 'Eroare la inregistrare.',
       color: 'error',
     })
   }

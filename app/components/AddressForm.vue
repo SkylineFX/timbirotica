@@ -3,9 +3,11 @@ import { ref, watch } from 'vue'
 import { vMaska } from 'maska/vue'
 import { addressFormSchema, type AddressForm } from '~~/shared/schemas/address'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import type { SavedAddress } from '~~/shared/types/account'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
 
 const { address = null } = defineProps<{
-  address?: any | null
+  address?: SavedAddress | null
 }>()
 
 const emit = defineEmits(['saved'])
@@ -47,7 +49,7 @@ watch(() => address, (newAddr) => {
 }, { immediate: true })
 
 const { data: countiesData } = await useFetch('/api/locations/counties')
-const countyNames = computed(() => (countiesData.value as any[])?.map(c => c.name) || [])
+const countyNames = computed(() => countiesData.value?.map(c => c.name) || [])
 const citiesData = ref<string[]>([])
 const isFetchingCities = ref(false)
 
@@ -58,8 +60,8 @@ const loadCities = async (countyName: string) => {
   }
   isFetchingCities.value = true
   try {
-    const res = await ($fetch as any)('/api/locations/cities', { params: { countyName } })
-    citiesData.value = res.map((c: any) => c.name)
+    const res = await $fetch('/api/locations/cities', { params: { countyName } })
+    citiesData.value = res.map(c => c.name)
   } catch (e) {
     console.error('Failed to load cities', e)
   } finally {
@@ -96,8 +98,8 @@ async function submit(event: FormSubmitEvent<AddressForm>) {
       toast.add({ title: 'Adresa adaugata cu succes', color: 'success' })
     }
     emit('saved')
-  } catch(err: any) {
-     toast.add({ title: 'Eroare la salvarea adresei', description: err?.data?.message ?? err.message, color: 'error' })
+  } catch(err) {
+     toast.add({ title: 'Eroare la salvarea adresei', description: fetchFailure(err).message ?? (err instanceof Error ? err.message : undefined), color: 'error' })
   } finally {
     isLoading.value = false
   }

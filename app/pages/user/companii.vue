@@ -19,14 +19,14 @@ function openAddBilling() {
   isBillingModalOpen.value = true
 }
 
-function openEditBilling(addr: any) {
+function openEditBilling(addr: { id: number }) {
   billingModalMode.value = 'edit'
   currentBillingId.value = addr.id
   isBillingModalOpen.value = true
 }
 
 const currentBilling = computed(() => {
-  return (userBillingAddresses.value as any[])?.find((a: any) => a.id === currentBillingId.value) || null
+  return userBillingAddresses.value?.find(a => a.id === currentBillingId.value) || null
 })
 
 async function removeBilling(id: number) {

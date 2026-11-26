@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
 
 // Open to signed-in users too: someone signed in may still need a reset link.
 const toast = useToast()
@@ -29,10 +30,10 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       body: { email: payload.data.email, turnstileToken: turnstileToken.value },
     })
     submitted.value = true
-  } catch (err: any) {
+  } catch (err) {
     turnstileToken.value = ''
     turnstile.value?.reset()
-    toast.add({ title: 'Eroare', description: err?.data?.message || 'A aparut o eroare. Te rugam sa incerci din nou.', color: 'error' })
+    toast.add({ title: 'Eroare', description: fetchFailure(err).message || 'A aparut o eroare. Te rugam sa incerci din nou.', color: 'error' })
   }
 }
 </script>

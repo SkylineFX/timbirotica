@@ -2,6 +2,8 @@
 import { ref } from 'vue'
 import { shippingMethodLabel, paymentMethodLabel } from '~~/shared/constants/order'
 import { formatShopDateTime, formatShopLongDate } from '~~/shared/utils/format'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
+import type { BillingAddressSnapshot, ShippingAddressSnapshot } from '~~/shared/types/account'
 
 definePageMeta({
   layout: 'account',
@@ -9,6 +11,8 @@ definePageMeta({
 })
 
 const { data: userOrders, refresh: refreshOrders } = await useFetch('/api/user/orders')
+// One order of GET /api/user/orders, with its lines.
+type UserOrder = NonNullable<typeof userOrders.value>[number]
 const { fetchCart, cartItems } = useCart()
 const toast = useToast()
 
@@ -16,14 +20,14 @@ const statusLabel = ORDER_STATUS_LABEL
 const statusColor = ORDER_STATUS_COLOR
 
 const isOrderModalOpen = ref(false)
-const selectedOrder = ref<any>(null)
-const parsedShippingAddress = ref<any>({})
-const parsedBillingAddress = ref<any>({})
+const selectedOrder = ref<UserOrder | null>(null)
+const parsedShippingAddress = ref<ShippingAddressSnapshot>({})
+const parsedBillingAddress = ref<BillingAddressSnapshot>({})
 const isCancelLoading = ref(false)
 const isReorderLoading = ref(false)
 const isReorderConfirmOpen = ref(false)
 
-function openOrderDetails(order: any) {
+function openOrderDetails(order: UserOrder) {
   selectedOrder.value = order
 
   try {
@@ -49,8 +53,8 @@ async function cancelOrder() {
     await refreshOrders()
     selectedOrder.value = { ...selectedOrder.value, status: 'cancelled' }
     toast.add({ title: 'Comanda a fost anulata', color: 'success' })
-  } catch (err: any) {
-    toast.add({ title: 'Eroare la anularea comenzii', description: err.data?.message, color: 'error' })
+  } catch (err) {
+    toast.add({ title: 'Eroare la anularea comenzii', description: fetchFailure(err).message, color: 'error' })
     // The order may have been confirmed in the meantime: show its current status.
     await refreshOrders()
     const current = userOrders.value?.find(o => o.id === selectedOrder.value?.id)

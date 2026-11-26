@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { vMaska } from 'maska/vue'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
 
 definePageMeta({
   layout: 'account',
@@ -63,8 +64,8 @@ async function saveProfile() {
     await refreshProfile()
     await refreshSession()
     toast.add({ title: 'Profil actualizat cu succes', color: 'success' })
-  } catch (err: any) {
-    toast.add({ title: 'Eroare la actualizarea profilului', description: err?.data?.message || 'Te rugam sa incerci din nou.', color: 'error' })
+  } catch (err) {
+    toast.add({ title: 'Eroare la actualizarea profilului', description: fetchFailure(err).message || 'Te rugam sa incerci din nou.', color: 'error' })
   } finally {
     isLoading.value = false
   }
@@ -80,8 +81,8 @@ async function sendPasswordEmail() {
   try {
     await $fetch('/api/user/password-email', { method: 'POST' })
     toast.add({ title: 'Email trimis', description: 'Linkul este valabil o ora.', color: 'success' })
-  } catch (err: any) {
-    toast.add({ title: 'Emailul nu a fost trimis', description: err?.data?.message || 'Te rugam sa incerci din nou.', color: 'error' })
+  } catch (err) {
+    toast.add({ title: 'Emailul nu a fost trimis', description: fetchFailure(err).message || 'Te rugam sa incerci din nou.', color: 'error' })
   } finally {
     isSendingPasswordEmail.value = false
   }
@@ -139,8 +140,8 @@ async function savePassword() {
     })
     passwordForm.value = { currentPassword: '', newPassword: '', confirmPassword: '' }
     toast.add({ title: 'Parola a fost actualizata', color: 'success' })
-  } catch (err: any) {
-    passwordError.value = err?.data?.message || 'Nu am putut actualiza parola.'
+  } catch (err) {
+    passwordError.value = fetchFailure(err).message || 'Nu am putut actualiza parola.'
   } finally {
     isPasswordSaving.value = false
   }

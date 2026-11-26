@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
 
 // Open to signed-in users too. The link can be opened by someone who is
 // signed in, such as a Google-only account that asked for a password from /user.
@@ -61,8 +62,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       toast.add({ title: 'Parola resetata', description: 'Te poti autentifica cu noua parola.', color: 'success' })
       await navigateTo('/user/login')
     }
-  } catch (err: any) {
-    if (err.statusCode === 400) {
+  } catch (err) {
+    if (fetchFailure(err).status === 400) {
       tokenInvalid.value = true
     } else {
       toast.add({ title: 'Eroare', description: 'A aparut o eroare. Te rugam sa incerci din nou.', color: 'error' })

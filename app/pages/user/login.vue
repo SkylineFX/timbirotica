@@ -2,6 +2,7 @@
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 import { safeRedirectPath } from '~~/shared/utils/redirect'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
 
 definePageMeta({
   middleware: 'guest'
@@ -88,12 +89,12 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     await useCart().syncCart()
     toast.add({ title: 'Autentificare reusita', color: 'success' })
     await navigateTo(redirectTo ?? '/')
-  } catch (err: any) {
+  } catch (err) {
     turnstileToken.value = ''
     turnstile.value?.reset()
     toast.add({
       title: 'Autentificare esuata',
-      description: err.data?.message || 'Datele introduse nu sunt valide',
+      description: fetchFailure(err).message || 'Datele introduse nu sunt valide',
       color: 'error'
     })
   }

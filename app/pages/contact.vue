@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
 
 useSeoMeta({
   title: 'Contact',
@@ -48,10 +49,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     state.email = ''
     state.subject = ''
     state.message = ''
-  } catch (err: any) {
+  } catch (err) {
     toast.add({
       title: 'A aparut o eroare',
-      description: err?.data?.message || 'Te rugam sa incerci din nou mai tarziu.',
+      description: fetchFailure(err).message || 'Te rugam sa incerci din nou mai tarziu.',
       icon: 'i-lucide-alert-circle',
       color: 'error'
     })
