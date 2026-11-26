@@ -6,10 +6,11 @@ const props = defineProps<{
 
 const { addToCart } = useCart()
 
-// This card's own loading state: a click while its add is still saving is
-// ignored, so a double click adds once. useCart's isLoading is shared by the
-// whole page, so it would spin every card. Adds from different cards are sent
-// one at a time by useCart.
+// This card's own loading state: a click before its add resolves is ignored,
+// and an add takes at least ADD_MIN_BUSY_MS (useCart), so a double click adds
+// once, signed in or not. useCart's isLoading is shared by the whole page, so
+// it would spin every card. Adds from different cards are sent one at a time
+// by useCart.
 const adding = ref(false)
 const add = async () => {
   if (adding.value) return

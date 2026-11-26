@@ -84,9 +84,10 @@ const stockColor = computed(() => {
 
 const { addToCart } = useCart()
 
-// The button's own loading state, as on the product cards: a click while this
-// button's add is still saving is ignored, so a double click adds once. Adds from
-// different buttons are sent one at a time by useCart.
+// The button's own loading state, as on the product cards: a click before this
+// button's add resolves is ignored, and an add takes at least ADD_MIN_BUSY_MS
+// (useCart), so a double click adds once. Adds from different buttons are sent
+// one at a time by useCart.
 const adding = ref(false)
 const add = async () => {
   if (adding.value || !product.value) return
