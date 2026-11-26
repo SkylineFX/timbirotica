@@ -4,6 +4,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   modules: [
+    // Generates the ESLint config that eslint.config.mjs extends (dev only).
+    '@nuxt/eslint',
     '@nuxt/ui',
     'nuxt-auth-utils',
     '@nuxthub/core',

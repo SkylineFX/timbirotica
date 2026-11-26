@@ -24,7 +24,7 @@ const { removeFromCart, updateQuantity, cartLocked } = useCart()
         </NuxtLink>
       <div class="flex justify-between items-end mt-2">
              <div class="flex items-center gap-1">
-                 <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" aria-label="Sterge din cos" :disabled="cartLocked" @click="removeFromCart(item.id)" class="p-1.5" />
+                 <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" aria-label="Sterge din cos" :disabled="cartLocked" class="p-1.5" @click="removeFromCart(item.id)" />
                  <!-- Stops at 1: holding the minus button, an arrow key or the wheel
                       shouldn't delete a line. Removal is the trash button only. -->
                  <UInputNumber size="xs" class="w-24" :model-value="item.quantity" :min="1" :max="CART_MAX_QUANTITY" :step="1" disable-wheel-change :disabled="cartLocked" @update:model-value="(val) => updateQuantity(item.id, Number(val))" />

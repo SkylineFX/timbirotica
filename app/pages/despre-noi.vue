@@ -43,7 +43,7 @@ useSeoMeta({
           </div>
         </div>
 
-        <div class="py-4 border-t border-gray-100 text-gray-700" id="locatie">
+        <div id="locatie" class="py-4 border-t border-gray-100 text-gray-700">
           <h3 class="font-bold text-gray-900 mb-3 text-lg">Locatie & Activitate</h3>
           <p>Comenzile pot fi ridicate de la sediul nostru:</p>
           <div class="mt-6 flex flex-col lg:flex-row gap-6 items-start">

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   termsAccepted: boolean
   isSubmitting: boolean
   isEmailVerified: boolean

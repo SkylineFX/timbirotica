@@ -43,14 +43,16 @@ watch(() => route.query.b, (v) => {
 
 const toggleSub = (slug: string) => {
   const set = new Set(selectedSubs.value)
-  set.has(slug) ? set.delete(slug) : set.add(slug)
+  if (set.has(slug)) set.delete(slug)
+  else set.add(slug)
   selectedSubs.value = Array.from(set)
   updateQuery({ sub: set.size ? selectedSubs.value.join(',') : undefined })
 }
 
 const toggleBrand = (slug: string) => {
   const set = new Set(selectedBrands.value)
-  set.has(slug) ? set.delete(slug) : set.add(slug)
+  if (set.has(slug)) set.delete(slug)
+  else set.add(slug)
   selectedBrands.value = Array.from(set)
   updateQuery({ b: set.size ? selectedBrands.value.join(',') : undefined })
 }

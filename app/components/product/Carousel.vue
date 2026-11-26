@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{ productImages: string[] }>()
+defineProps<{ productImages: string[] }>()
 
 const carousel = useTemplateRef('carousel')
 const activeIndex = ref(0)
@@ -13,9 +13,9 @@ const activeIndex = ref(0)
         v-slot="{ item }"
         :items="productImages"
         class="w-full"
-        @select="activeIndex = $event"
         arrows
         :ui="{arrows: 'hidden sm:block absolute top-1/2 -left-4 -right-4 sm:left-0 sm:right-0'}"
+        @select="activeIndex = $event"
       >
         <NuxtImg :src="item" class="w-full aspect-square object-contain select-none block mx-auto pointer-events-none rounded-sm" draggable="false" alt="Imagine Produs"> </NuxtImg>
       </UCarousel>

@@ -4,9 +4,8 @@ import { vMaska } from 'maska/vue'
 import { addressFormSchema, type AddressForm } from '~~/shared/schemas/address'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
-const { address = null, isFirstAddress = false } = defineProps<{
+const { address = null } = defineProps<{
   address?: any | null
-  isFirstAddress?: boolean
 }>()
 
 const emit = defineEmits(['saved'])

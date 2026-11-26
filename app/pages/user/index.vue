@@ -158,7 +158,7 @@ async function savePassword() {
         </div>
       </div>
 
-      <form @submit.prevent="saveProfile" class="space-y-6">
+      <form class="space-y-6" @submit.prevent="saveProfile">
         <UFormField label="Numar de telefon" name="phone">
           <UInput v-model="form.phone" v-maska="'#### ### ###'" type="tel" autocomplete="tel" size="lg" class="w-full" />
         </UFormField>
@@ -212,7 +212,7 @@ async function savePassword() {
         <p class="text-sm text-gray-500 mt-1">Introdu parola curenta, apoi alege una noua cu cel putin 8 caractere, o litera mare si o cifra.</p>
       </div>
 
-      <form @submit.prevent="savePassword" class="space-y-6">
+      <form class="space-y-6" @submit.prevent="savePassword">
         <UFormField label="Parola curenta" name="currentPassword">
           <UInput v-model="passwordForm.currentPassword" type="password" size="lg" class="w-full" autocomplete="current-password" required />
         </UFormField>

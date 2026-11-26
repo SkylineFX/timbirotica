@@ -128,8 +128,8 @@ const navigation = computed(() => [
             icon="i-lucide-menu" 
             color="neutral" 
             variant="ghost" 
-            @click="() => { isNavOpen = true }"
             aria-label="Meniu"
+            @click="() => { isNavOpen = true }"
           />
           <NuxtLink to="/" class="flex-shrink-0">
             <NuxtImg src="/logo.svg" alt="Timbirotica" class="h-6 lg:h-8 w-auto" />
@@ -162,8 +162,8 @@ const navigation = computed(() => [
               variant="ghost" 
               icon="i-lucide-heart" 
               aria-label="Favorite"
-              @click="() => { isFavoritesOpen = true }"
               class="relative"
+              @click="() => { isFavoritesOpen = true }"
             >
                 <UBadge 
                 v-if="favorites.length > 0" 
@@ -179,9 +179,9 @@ const navigation = computed(() => [
             variant="ghost" 
             icon="i-lucide-shopping-cart" 
             aria-label="Cosul meu"
-            @click="() => { isCartOpen = true }"
             class="relative"
             :loading="isLoading"
+            @click="() => { isCartOpen = true }"
           >
             <UBadge 
               v-if="cartItems.length > 0" 
@@ -282,8 +282,8 @@ const navigation = computed(() => [
             color="neutral"
             icon="i-lucide-mail"
             to="/contact"
-            @click="closeAll"
             class="justify-start w-full"
+            @click="closeAll"
           >
             Contact
           </UButton>
@@ -292,8 +292,8 @@ const navigation = computed(() => [
             color="neutral"
             icon="i-lucide-user"
             :to="user ? '/user' : '/user/login'"
-            @click="closeAll"
             class="justify-start w-full"
+            @click="closeAll"
           >
             Contul meu
           </UButton>
@@ -306,8 +306,8 @@ const navigation = computed(() => [
       v-for="(menu, index) in activeMenus" 
       :key="index"
       :open="true"
-      @update:open="(val) => { if(!val) closeAll() }"
       side="left"
+      @update:open="(val) => { if(!val) closeAll() }"
     >
       <template #header>
         <div class="flex items-center justify-between w-full">
@@ -356,7 +356,7 @@ const navigation = computed(() => [
           </template>
         </div>
       </template>
-      <template #footer v-if="menu.to">
+      <template v-if="menu.to" #footer>
         <div class="w-full flex flex-col gap-2">
           <UButton 
             :to="menu.to" 
@@ -397,11 +397,11 @@ const navigation = computed(() => [
             color="primary" 
             variant="subtle" 
             to="/checkout" 
-            @click="() => { isCartOpen = false }"
             trailing-icon="i-lucide-arrow-right"
             block
             class="rounded-sm p-3 justify-between"
             :disabled="cartItems.length === 0"
+            @click="() => { isCartOpen = false }"
           >
             Continua spre livrare
           </UButton>

@@ -138,15 +138,15 @@ const performSearch = () => {
          or a search the box keeps its focus, so no new focus event comes. -->
     <UInput
       v-model="localQuery"
-      @update:model-value="isOpen = true"
-      @keyup.enter="performSearch"
-      @focus="isOpen = true"
       size="md"
       variant="outline"
       placeholder="Cauta produse..."
       class="w-full"
       color="primary"
       :ui="{base: 'text-sm'}"
+      @update:model-value="isOpen = true"
+      @keyup.enter="performSearch"
+      @focus="isOpen = true"
     >
       <template #trailing>
         <UButton

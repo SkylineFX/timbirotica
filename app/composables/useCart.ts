@@ -302,7 +302,9 @@ export const useCart = () => {
       if (saved) {
         try {
           itemsToSync = JSON.parse(saved)
-        } catch { }
+        } catch {
+          // A damaged saved cart is left out of the sync.
+        }
       }
     }
 

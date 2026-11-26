@@ -51,7 +51,7 @@ async function handleBillingSaved() {
     <UCard class="flex-1 flex flex-col overflow-hidden" :ui="{ root: 'rounded-md flex-1 flex flex-col', body: 'p-6 sm:p-8 flex-1 flex flex-col' }">
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-lg sm:text-xl font-bold text-gray-900">Persoane Juridice</h3>
-        <UButton @click="openAddBilling" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-sm px-2">Adauga</UButton>
+        <UButton color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-sm px-2" @click="openAddBilling">Adauga</UButton>
       </div>
 
       <div v-if="userBillingAddresses?.length === 0" class="flex-1 flex flex-col items-center justify-center text-center py-12 text-gray-500 bg-gray-50 rounded-sm border border-dashed border-gray-200">
@@ -85,7 +85,6 @@ async function handleBillingSaved() {
       <template #body>
         <BillingAddressForm
           :key="billingModalMode === 'edit' ? `edit-${currentBillingId}` : 'add'"
-          :is-first-address="!userBillingAddresses || userBillingAddresses.length === 0"
           :address="billingModalMode === 'edit' ? currentBilling : null"
           @saved="handleBillingSaved"
         />

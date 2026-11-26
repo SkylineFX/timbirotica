@@ -63,7 +63,7 @@ async function handleAddressSaved() {
     <UCard class="flex-1 flex flex-col overflow-hidden" :ui="{ root: 'rounded-md flex-1 flex flex-col', body: 'p-6 sm:p-8 flex-1 flex flex-col' }">
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-lg sm:text-xl font-bold text-gray-900">Adresele mele</h3>
-        <UButton @click="openAddAddress" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-sm px-2">Adauga</UButton>
+        <UButton color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-sm px-2" @click="openAddAddress">Adauga</UButton>
       </div>
 
       <div v-if="userAddresses?.length === 0" class="flex-1 flex flex-col items-center justify-center text-center py-12 text-gray-500 bg-gray-50 rounded-sm border border-dashed border-gray-200">
@@ -74,7 +74,7 @@ async function handleAddressSaved() {
         <div v-for="addr in userAddresses" :key="addr.id" class="p-5 rounded-sm border border-gray-200 bg-white relative hover:border-gray-300 transition-all">
           <div class="mb-4">
             <p class="font-bold text-gray-900 inline">{{ addr.firstName + ' ' + addr.lastName }}</p>
-            <p class="text-gray-500 text-sm inline ml-1" v-if="addr.phone">· {{ addr.phone }}</p>
+            <p v-if="addr.phone" class="text-gray-500 text-sm inline ml-1">· {{ addr.phone }}</p>
             <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.street }}</p>
             <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.city }}, {{ addr.county }} <span v-if="addr.postalCode">({{ addr.postalCode }})</span></p>
           </div>
@@ -95,7 +95,6 @@ async function handleAddressSaved() {
     <UModal v-model:open="isAddressModalOpen" :title="modalMode === 'add' ? 'Adauga adresa noua' : 'Editeaza adresa'" :ui="{ content: 'sm:max-w-xl' }">
       <template #body>
         <AddressForm
-          :is-first-address="!userAddresses || userAddresses.length === 0"
           :address="modalMode === 'edit' ? currentAddress : null"
           @saved="handleAddressSaved"
         />

@@ -75,7 +75,7 @@ export const useFavorites = () => {
       } else {
         throw new Error((res as any).message)
       }
-    } catch (e) {
+    } catch {
       // Rollback
       favorites.value = favorites.value.filter(f => f.id !== tempId)
       toast.add({ title: 'Eroare la adaugare', color: 'error' })
@@ -92,7 +92,7 @@ export const useFavorites = () => {
         method: 'DELETE'
       })
       toast.add({ title: 'Sters de la favorite', color: 'success' })
-    } catch (e) {
+    } catch {
       favorites.value = prev
       toast.add({ title: 'Eroare la stergere', color: 'error' })
     }

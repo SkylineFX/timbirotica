@@ -28,13 +28,13 @@ function openOrderDetails(order: any) {
 
   try {
     parsedShippingAddress.value = JSON.parse(order.shippingAddressSnapshot || '{}')
-  } catch(e) {
+  } catch {
     parsedShippingAddress.value = {}
   }
 
   try {
     parsedBillingAddress.value = JSON.parse(order.billingAddressSnapshot || '{}')
-  } catch(e) {
+  } catch {
     parsedBillingAddress.value = {}
   }
 

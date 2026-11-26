@@ -84,7 +84,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             <p class="text-sm text-gray-500 mt-1">Timp estimat de raspuns: 24h.</p>
           </template>
 
-          <UForm :schema="schema" :state="state" @submit="onSubmit" class="space-y-6 flex-1 flex flex-col">
+          <UForm :schema="schema" :state="state" class="space-y-6 flex-1 flex flex-col" @submit="onSubmit">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <UFormField label="Nume complet" name="name" required>
                 <UInput v-model="state.name" placeholder="Popescu Ion" class="w-full" />

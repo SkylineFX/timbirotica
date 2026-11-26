@@ -20,8 +20,8 @@ useSeoMeta({
 <template>
   <ProductList
     :title="title"
-    :apiQuery="apiQuery"
+    :api-query="apiQuery"
     :breadcrumbs="breadcrumbs"
-    emptyMessage="Nu am gasit produse recomandate in acest moment."
+    empty-message="Nu am gasit produse recomandate in acest moment."
   />
 </template>

@@ -35,8 +35,8 @@ useSeoMeta({
 <template>
   <ProductList
     :title="title"
-    :apiQuery="apiQuery"
+    :api-query="apiQuery"
     :breadcrumbs="breadcrumbs"
-    emptyMessage="Nu au fost gasite produse pentru acest producator."
+    empty-message="Nu au fost gasite produse pentru acest producator."
   />
 </template>

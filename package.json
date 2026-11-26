@@ -14,7 +14,9 @@
     "db:push": "drizzle-kit push --config=drizzle.config.ts",
     "db:fts": "npx tsx scripts/apply-search-fts.ts",
     "db:studio": "drizzle-kit studio --config=drizzle.config.ts",
-    "typecheck": "nuxi typecheck && tsc -p tsconfig.tools.json"
+    "typecheck": "nuxi typecheck && tsc -p tsconfig.tools.json",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@libsql/client": "^0.17.0",
@@ -44,10 +46,13 @@
   },
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.98",
+    "@nuxt/eslint": "^1.17.0",
     "@nuxt/schema": "~4.4.6",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^25.0.9",
     "@vitest/coverage-v8": "^4.1.9",
+    "eslint": "^10.15.0",
+    "eslint-config-prettier": "^10.1.8",
     "typescript": "~5.9.3",
     "vitest": "^4.1.9",
     "vue-tsc": "^3.3.14"

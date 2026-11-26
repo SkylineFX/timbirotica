@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { favorites, isFavoritesOpen, removeFromFavorites, isLoading } = useFavorites()
+const { favorites, isFavoritesOpen, removeFromFavorites } = useFavorites()
 const { addToCart, cartLocked } = useCart()
 
 // The products being added: each one's button shows a spinner and ignores a
@@ -39,8 +39,8 @@ const add = async (product: any) => {
                 </div>
                 <div class="flex justify-between items-end mt-2">
                        <div class="flex items-center gap-2">
-                           <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" aria-label="Sterge de la favorite" @click="removeFromFavorites(item.id)" class="p-1.5" />
-                           <UButton size="xs" color="primary" variant="soft" icon="i-lucide-shopping-cart" aria-label="Adauga in cos" :disabled="cartLocked" :loading="addingProductIds.has(item.product?.id)" @click="add(item.product)" class="p-1.5" />
+                           <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" aria-label="Sterge de la favorite" class="p-1.5" @click="removeFromFavorites(item.id)" />
+                           <UButton size="xs" color="primary" variant="soft" icon="i-lucide-shopping-cart" aria-label="Adauga in cos" :disabled="cartLocked" :loading="addingProductIds.has(item.product?.id)" class="p-1.5" @click="add(item.product)" />
                        </div>
                        <span class="font-bold text-sm">{{ (item.product?.price ?? 0).toFixed(2) }} RON</span>
                 </div>
@@ -54,10 +54,10 @@ const add = async (product: any) => {
              <UButton 
             color="neutral" 
             variant="subtle" 
-            @click="() => { isFavoritesOpen = false }"
             icon="i-lucide-arrow-left"
             block
             class="rounded-sm p-3 justify-start"
+            @click="() => { isFavoritesOpen = false }"
           >
             Inchide
           </UButton>

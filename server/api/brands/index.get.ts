@@ -1,4 +1,4 @@
-export default eventHandler(async (event) => {
+export default eventHandler(async () => {
   const brands = await useDrizzle().select().from(tables.brands)
 
   return brands.map(brand => ({

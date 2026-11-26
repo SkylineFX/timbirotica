@@ -161,7 +161,7 @@ const accordionItems = [
         </div>
 
         <div class="w-full mb-8 md:mb-0 md:col-start-1 md:col-span-7 md:row-start-1 md:row-span-2">
-            <ProductCarousel :productImages="product.images || []"/>
+            <ProductCarousel :product-images="product.images || []"/>
         </div>
 
         <div class="w-full md:col-start-8 md:col-span-5 md:row-start-2">
@@ -254,10 +254,10 @@ const accordionItems = [
 
     <!-- Not while redirecting: the server renders the page before it sends the
          301, and the carousel would query the database for nothing. -->
-    <div class="mt-12" v-if="product?.categoryId && !isWrongCategory">
+    <div v-if="product?.categoryId && !isWrongCategory" class="mt-12">
         <CategoryCarousel 
             title="Produse similare" 
-            :categoryId="product?.categoryId"
+            :category-id="product?.categoryId"
         />
     </div>
   </UContainer>

@@ -37,8 +37,8 @@ useSeoMeta({
 <template>
   <ProductList
     :title="title"
-    :apiQuery="apiQuery"
+    :api-query="apiQuery"
     :breadcrumbs="breadcrumbs"
-    emptyMessage="Nu au fost gasite produse in aceasta categorie."
+    empty-message="Nu au fost gasite produse in aceasta categorie."
   />
 </template>

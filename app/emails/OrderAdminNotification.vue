@@ -41,7 +41,7 @@ interface Props {
   customerPhone?: string
   total: number
   shippingCost: number
-  items: OrderItem[]
+  items?: OrderItem[]
   shippingAddress?: Address
   billingAddress?: BillingAddress
   orderDate: string

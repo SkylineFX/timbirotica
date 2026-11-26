@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const db = useDrizzle()
 
   // Find or create cart
-  let cart = await db.query.carts.findFirst({
+  const cart = await db.query.carts.findFirst({
     where: eq(tables.carts.userId, userId),
     with: {
       items: {

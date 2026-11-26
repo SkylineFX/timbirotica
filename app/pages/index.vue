@@ -118,7 +118,7 @@ const featuredCategories = [
         v-for="(carousel, index) in featuredCategories"
         :key="index"
         :title="carousel.title"
-        :categoryId="carousel.categoryId"
+        :category-id="carousel.categoryId"
         :recommended="carousel.recommended"
       />
     </UContainer>

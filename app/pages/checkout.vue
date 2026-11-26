@@ -380,7 +380,7 @@ async function submitOrder() {
               <div class="text-sm font-semibold min-w-fit" :class="courierShippingCost === 0 ? 'text-green-600' : 'text-gray-900'">
                 {{ courierShippingCost === 0 ? 'Gratuit' : `${courierShippingCost.toFixed(2)} RON` }}
               </div>
-              <input type="radio" value="courier" v-model="deliveryMethod" class="hidden">
+              <input v-model="deliveryMethod" type="radio" value="courier" class="hidden">
             </label>
 
             <div v-show="deliveryMethod === 'courier'" class="p-5 bg-gray-50 border-b border-gray-200 space-y-4">
@@ -402,7 +402,7 @@ async function submitOrder() {
                 </div>
               </div>
               <div class="text-sm font-semibold text-gray-900 min-w-fit">Gratuit</div>
-              <input type="radio" value="pickup" v-model="deliveryMethod" class="hidden">
+              <input v-model="deliveryMethod" type="radio" value="pickup" class="hidden">
             </label>
 
 
@@ -417,7 +417,7 @@ async function submitOrder() {
         <div v-show="deliveryMethod === 'courier'" class="flex flex-col gap-3">
           <div class="flex justify-between items-center text-sm font-medium text-gray-700">
             <span>Adresa de livrare</span>
-            <button aria-label="Schimba adresa de livrare" @click="isAddressModalOpen = true" class="text-blue-600 hover:text-blue-700 transition">
+            <button aria-label="Schimba adresa de livrare" class="text-blue-600 hover:text-blue-700 transition" @click="isAddressModalOpen = true">
                <UIcon name="i-lucide-chevron-down" class="w-4 h-4 ml-1 inline align-middle"/>
             </button>
           </div>
@@ -447,7 +447,8 @@ async function submitOrder() {
           </div>
           <div class="border border-gray-200 rounded-md overflow-hidden mt-1">
             <!-- Bank Transfer -->
-            <label class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50 transition-colors border-b border-gray-200"
+            <label
+class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50 transition-colors border-b border-gray-200"
                    :class="{ 'bg-blue-50/10': paymentMethod === 'transfer' }">
               <div class="flex items-center gap-4">
                 <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="paymentMethod === 'transfer' ? 'border-primary' : 'border-gray-300'">
@@ -458,7 +459,7 @@ async function submitOrder() {
               <!-- <div class="flex items-center gap-2">
                  <UIcon name="i-lucide-building-2" class="w-6 h-6 text-gray-400" />
               </div> -->
-              <input type="radio" value="transfer" v-model="paymentMethod" class="hidden">
+              <input v-model="paymentMethod" type="radio" value="transfer" class="hidden">
             </label>
             
             <!-- Bank transfer info -->
@@ -471,7 +472,8 @@ async function submitOrder() {
 
             <!-- Cash on Delivery Option -->
             <template v-if="cashPaymentEnabled">
-              <label class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50 transition-colors"
+              <label
+class="px-5 py-4 flex items-center justify-between cursor-pointer bg-white hover:bg-gray-50 transition-colors"
                      :class="{ 'bg-blue-50/10': paymentMethod === 'cash' }">
                 <div class="flex items-center gap-4">
                   <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="paymentMethod === 'cash' ? 'border-primary' : 'border-gray-300'">
@@ -481,7 +483,7 @@ async function submitOrder() {
                 </div>
                 <!-- Money icon -->
                 <UIcon name="i-lucide-banknote" class="w-6 h-6 text-gray-400"></UIcon>
-                <input type="radio" value="cash" v-model="paymentMethod" class="hidden">
+                <input v-model="paymentMethod" type="radio" value="cash" class="hidden">
               </label>
 
               <div v-show="paymentMethod === 'cash'" class="p-5 bg-gray-50 border-t border-gray-200 text-left lg:text-left">
@@ -507,14 +509,14 @@ async function submitOrder() {
                 <div v-if="billingSameAsShipping" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
               </div>
               <span class="text-sm font-medium text-gray-900">Persoana fizica</span>
-              <input type="radio" :value="true" v-model="billingSameAsShipping" class="hidden">
+              <input v-model="billingSameAsShipping" type="radio" :value="true" class="hidden">
             </label>
             <label class="p-4 flex items-center gap-4 cursor-pointer bg-white hover:bg-gray-50" :class="{ 'bg-blue-50/10 hover:bg-blue-50/20': !billingSameAsShipping }">
               <div class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0" :class="!billingSameAsShipping ? 'border-primary' : 'border-gray-300'">
                 <div v-if="!billingSameAsShipping" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
               </div>
               <span class="text-sm font-medium text-gray-900">Persoana juridica</span>
-              <input type="radio" :value="false" v-model="billingSameAsShipping" class="hidden">
+              <input v-model="billingSameAsShipping" type="radio" :value="false" class="hidden">
             </label>
             <div v-if="!billingSameAsShipping" class="text-sm p-4 bg-gray-50 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors" @click="isBillingSelectorOpen = true">
                <div>
@@ -607,7 +609,7 @@ async function submitOrder() {
          <div class="pt-6 flex justify-between items-end mt-4 border-t border-gray-300 border-dashed">
             <div class="flex flex-col">
                <span class="text-xl font-extrabold text-gray-900">Total</span>
-               <span class="text-xs text-gray-500 mt-0.5" v-if="finalTotal > 0">Include TVA de {{ finalVat.toFixed(2) }} RON</span>
+               <span v-if="finalTotal > 0" class="text-xs text-gray-500 mt-0.5">Include TVA de {{ finalVat.toFixed(2) }} RON</span>
             </div>
             <div class="flex items-end gap-2 mb-0.5">
                <span class="text-2xl sm:text-3xl leading-none tracking-tight font-extrabold text-gray-900">{{ finalTotal.toFixed(2) }} RON</span>
@@ -625,82 +627,80 @@ async function submitOrder() {
       </div>
 
     </div>
+
+    <!-- Modals remain the same functionally, only minor classes to match the new border-radius theme -->
+    <!-- Address Selection Modal -->
+    <AddressSelectorModal 
+      v-model:open="isAddressModalOpen" 
+      v-model:selected-id="selectedAddressId" 
+      title="Adresa de livrare" 
+      :items="userAddresses" 
+      empty-message="Nu ai nicio adresa salvata in cont."
+      @add-new="openNewAddress"
+    >
+      <template #item="{ item }">
+        <div class="flex justify-between items-start">
+           <p class="font-bold mb-1 text-gray-900 text-base transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone }}</p>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
+        <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
+      </template>
+    </AddressSelectorModal>
+
+    <!-- Billing Selection Modal -->
+    <AddressSelectorModal 
+      v-model:open="isBillingSelectorOpen" 
+      v-model:selected-id="selectedBillingId" 
+      title="Adresa de facturare (Companie)" 
+      :items="userBillingAddresses" 
+      empty-message="Nu ai nicio companie salvata in cont."
+      @add-new="openNewBilling"
+    >
+      <template #item="{ item }">
+        <div class="flex justify-starty items-center gap-2">
+          <p class="font-bold mb-1 text-gray-900 text-base transition-colors">{{ item.companyName }}</p>
+          <p class="text-gray-600 text-sm leading-relaxed">· {{ item.hasRo ? 'RO' : '' }}{{ item.cui }}</p>
+        </div>
+        <p v-if="item.onrc" class="text-gray-600 text-sm leading-relaxed">Reg. Com.: {{ item.onrc }}</p>
+        <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
+        <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
+      </template>
+    </AddressSelectorModal>
+
+    <!-- Individual billing address selector (Persoana fizica, alta adresa) -->
+    <AddressSelectorModal
+      v-model:open="isBillingAddressSelectorOpen"
+      v-model:selected-id="selectedBillingAddressId"
+      title="Adresa de facturare"
+      :items="userAddresses"
+      empty-message="Nu ai nicio adresa salvata in cont."
+      @add-new="openNewBillingAddress"
+    >
+      <template #item="{ item }">
+        <div class="flex justify-between items-start">
+           <p class="font-bold mb-1 text-gray-900 text-base transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone }}</p>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
+        <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
+      </template>
+    </AddressSelectorModal>
+
+    <!-- New Address Form Modal -->
+    <UModal v-model:open="isNewAddressModalOpen" title="Adauga adresa noua" :ui="{ content: 'sm:max-w-xl' }" class="rounded-md">
+      <template #body>
+        <AddressForm 
+          @saved="handleAddressSaved" 
+        />
+      </template>
+    </UModal>
+
+    <!-- New Billing Form Modal -->
+    <UModal v-model:open="isNewBillingModalOpen" title="Adauga persoana juridica" :ui="{ content: 'sm:max-w-xl' }" class="rounded-md">
+      <template #body>
+        <BillingAddressForm 
+          @saved="handleBillingSaved" 
+        />
+      </template>
+    </UModal>
   </div>
-
-  <!-- Modals remain the same functionally, only minor classes to match the new border-radius theme -->
-  <!-- Address Selection Modal -->
-  <AddressSelectorModal 
-    v-model:open="isAddressModalOpen" 
-    v-model:selectedId="selectedAddressId" 
-    title="Adresa de livrare" 
-    :items="userAddresses" 
-    empty-message="Nu ai nicio adresa salvata in cont."
-    @add-new="openNewAddress"
-  >
-    <template #item="{ item }">
-      <div class="flex justify-between items-start">
-         <p class="font-bold mb-1 text-gray-900 text-base transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone }}</p>
-      </div>
-      <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
-      <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
-    </template>
-  </AddressSelectorModal>
-
-  <!-- Billing Selection Modal -->
-  <AddressSelectorModal 
-    v-model:open="isBillingSelectorOpen" 
-    v-model:selectedId="selectedBillingId" 
-    title="Adresa de facturare (Companie)" 
-    :items="userBillingAddresses" 
-    empty-message="Nu ai nicio companie salvata in cont."
-    @add-new="openNewBilling"
-  >
-    <template #item="{ item }">
-      <div class="flex justify-starty items-center gap-2">
-        <p class="font-bold mb-1 text-gray-900 text-base transition-colors">{{ item.companyName }}</p>
-        <p class="text-gray-600 text-sm leading-relaxed">· {{ item.hasRo ? 'RO' : '' }}{{ item.cui }}</p>
-      </div>
-      <p v-if="item.onrc" class="text-gray-600 text-sm leading-relaxed">Reg. Com.: {{ item.onrc }}</p>
-      <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
-      <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
-    </template>
-  </AddressSelectorModal>
-
-  <!-- Individual billing address selector (Persoana fizica, alta adresa) -->
-  <AddressSelectorModal
-    v-model:open="isBillingAddressSelectorOpen"
-    v-model:selectedId="selectedBillingAddressId"
-    title="Adresa de facturare"
-    :items="userAddresses"
-    empty-message="Nu ai nicio adresa salvata in cont."
-    @add-new="openNewBillingAddress"
-  >
-    <template #item="{ item }">
-      <div class="flex justify-between items-start">
-         <p class="font-bold mb-1 text-gray-900 text-base transition-colors">{{ item.firstName }} {{ item.lastName }} <span class="text-gray-400 font-normal mx-1">·</span> {{ item.phone }}</p>
-      </div>
-      <p class="text-gray-600 text-sm leading-relaxed">{{ item.street }}</p>
-      <p class="text-gray-600 text-sm leading-relaxed">{{ item.city }}, {{ item.county }}</p>
-    </template>
-  </AddressSelectorModal>
-
-  <!-- New Address Form Modal -->
-  <UModal v-model:open="isNewAddressModalOpen" title="Adauga adresa noua" :ui="{ content: 'sm:max-w-xl' }" class="rounded-md">
-    <template #body>
-      <AddressForm 
-        :is-first-address="!userAddresses || userAddresses.length === 0" 
-        @saved="handleAddressSaved" 
-      />
-    </template>
-  </UModal>
-
-  <!-- New Billing Form Modal -->
-  <UModal v-model:open="isNewBillingModalOpen" title="Adauga persoana juridica" :ui="{ content: 'sm:max-w-xl' }" class="rounded-md">
-    <template #body>
-      <BillingAddressForm 
-        :is-first-address="!userBillingAddresses || userBillingAddresses.length === 0" 
-        @saved="handleBillingSaved" 
-      />
-    </template>
-  </UModal>
 </template>

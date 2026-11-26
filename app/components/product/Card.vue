@@ -85,9 +85,9 @@ const toggleFavorite = async () => {
                 color="primary"
                 variant="solid"
                 class="rounded-sm flex-1 justify-center text-center text-xs lg:text-sm"
-                @click.prevent="add"
                 :loading="adding"
                 :disabled="product.stock === 0"
+                @click.prevent="add"
               >
                 Adauga in cos
               </UButton>
