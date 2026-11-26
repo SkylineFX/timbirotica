@@ -115,7 +115,7 @@ const accordionItems = [
   {
     label: 'Livrare',
     icon: 'i-lucide-truck',
-    text: 'Livrarea se face in 24-48 de ore de la confirmarea comenzii. Costul transportului este de 30 RON pentru comenzile sub 200 RON. Afla mai multe detalii:',
+    text: 'Livrarea se face in 2-3 zile lucratoare de la confirmarea comenzii. Costul transportului este de 30 RON pentru comenzile sub 200 RON. Afla mai multe detalii:',
     link: { to: '/termeni-si-conditii#livrare', label: 'Livrare' },
   },
   {
