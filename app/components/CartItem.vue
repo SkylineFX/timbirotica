@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useCart } from '~/composables/useCart'
+import { useCart, type CartLine } from '~/composables/useCart'
 import { CART_MAX_QUANTITY } from '~~/shared/schemas/cart'
 
 const { item, variant = 'slideover' } = defineProps<{
-  item: any
+  item: CartLine
   variant?: string
 }>()
 

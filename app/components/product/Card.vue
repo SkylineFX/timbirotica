@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { CartProduct } from '~/composables/useCart'
+
 const props = defineProps<{
-  product: any
+  product: CartProduct
   to: string
 }>()
 
@@ -23,13 +25,13 @@ const add = async () => {
 }
 const { favorites, addToFavorites, removeFromFavorites } = useFavorites()
 
-const isFavorite = computed(() => favorites.value.some((f: any) => f.productId === props.product.id))
+const isFavorite = computed(() => favorites.value.some(f => f.productId === props.product.id))
 
 const imageLoaded = ref(false)
 
 const toggleFavorite = async () => {
     if (isFavorite.value) {
-        const fav = favorites.value.find((f: any) => f.productId === props.product.id)
+        const fav = favorites.value.find(f => f.productId === props.product.id)
         if (fav) await removeFromFavorites(fav.id)
     } else {
         await addToFavorites(props.product)

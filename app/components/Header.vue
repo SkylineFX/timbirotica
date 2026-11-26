@@ -8,7 +8,9 @@ const { cartItems, total, fetchCart, isCartOpen, isLoading } = useCart()
 
 const { isFavoritesOpen, favorites } = useFavorites()
 const isNavOpen = ref(false)
-const activeMenus = ref<any[]>([])
+// A menu the navigation slideover opens: the brand list or a category.
+type NavMenu = { label: string; to?: string; children?: NavMenu[] }
+const activeMenus = ref<NavMenu[]>([])
 const searchQuery = ref('')
 
 function closeAll() {
@@ -67,7 +69,7 @@ const loggedOutItems: DropdownMenuItem[][] = [
   }]
 ]
 
-const loggedInItems = computed(() => [
+const loggedInItems = computed<DropdownMenuItem[][]>(() => [
   [{
     label: 'Salut ' + (user.value?.firstName || 'Client'),
     disabled: true,
@@ -98,7 +100,7 @@ const loggedInItems = computed(() => [
   }]
 ])
 
-const dropdownItems = computed<any[][]>(() => loggedIn.value ? loggedInItems.value : loggedOutItems)
+const dropdownItems = computed<DropdownMenuItem[][]>(() => loggedIn.value ? loggedInItems.value : loggedOutItems)
 
 const { data: categoryTree } = useCategoryTree()
 const { data: brands } = useBrandList()
@@ -316,7 +318,7 @@ const navigation = computed(() => [
             variant="ghost" 
             icon="i-lucide-arrow-left" 
             class="text-base font-semibold px-2 -ml-2"
-            @click="activeMenus.splice(index)"
+            @click="() => { activeMenus.splice(index) }"
           >
             {{ menu.label }}
           </UButton>

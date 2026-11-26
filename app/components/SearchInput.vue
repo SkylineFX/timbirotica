@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
+import type { InternalApi } from 'nitropack/types'
+
+// A product in the preview, as GET /api/products sends it.
+type PreviewProduct = InternalApi['/api/products']['get']['products'][number]
 
 const props = defineProps({
   modelValue: { type: String, default: '' }
@@ -14,11 +18,11 @@ const localQuery = computed({
 
 const isOpen = ref(false)
 const isLoading = ref(false)
-const products = ref<any[]>([])
+const products = ref<PreviewProduct[]>([])
 const containerRef = ref<HTMLElement | null>(null)
 
 // Cache: simple LRU map limit to 50
-const searchCache = new Map<string, any[]>()
+const searchCache = new Map<string, PreviewProduct[]>()
 let abortController: AbortController | null = null
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -44,7 +48,7 @@ const fetchPreview = async (query: string) => {
     const res = await $fetch('/api/products', {
       query: { q: query, limit: 5, facets: 0 },
       signal: abortController.signal
-    }) as any
+    })
     
     products.value = res.products || []
     searchCache.set(query, products.value)
@@ -56,8 +60,8 @@ const fetchPreview = async (query: string) => {
         searchCache.delete(firstKey)
       }
     }
-  } catch (error: any) {
-    if (error.name === 'AbortError') {
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
       // Ignored
     } else {
       console.error('Search preview error:', error)

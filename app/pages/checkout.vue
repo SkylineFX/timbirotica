@@ -3,6 +3,7 @@ import { ref, computed, watch, watchEffect, onMounted, onUnmounted } from 'vue'
 import { useCart } from '~/composables/useCart'
 import { COURIER_DELIVERY_DAYS, getCourierShippingCost } from '~~/shared/constants/order'
 import { sameCartQuantities } from '~~/shared/utils/cart'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
 import { fromBani, toBani, vatBreakdown } from '~~/shared/utils/money'
 
 definePageMeta({
@@ -30,7 +31,7 @@ type Address = {
 }
 
 const { data: userAddresses, refresh: refreshAddresses } = await useFetch<Address[]>('/api/user/addresses')
-const { data: userBillingAddresses, refresh: refreshBillingAddresses } = await useFetch<any[]>('/api/user/billing-addresses')
+const { data: userBillingAddresses, refresh: refreshBillingAddresses } = await useFetch('/api/user/billing-addresses')
 const { data: verificationStatus, refresh: refreshVerification } = await useFetch<{ verified: boolean }>('/api/auth/verification-status')
 
 const isEmailVerified = computed(() => !!verificationStatus.value?.verified)
@@ -60,11 +61,13 @@ async function resendVerificationEmail() {
     await $fetch('/api/auth/send-verification', { method: 'POST' })
     toast.add({ title: 'Email trimis', description: 'Verifica inbox-ul sau folderul de spam pentru linkul de confirmare.', color: 'success' })
     startCooldown(60)
-  } catch (e: any) {
-    if (e?.statusCode === 429 && e?.data?.data?.retryAfter) {
-      startCooldown(e.data.data.retryAfter)
+  } catch (e) {
+    const failure = fetchFailure(e)
+    const retryAfter = failure.data.retryAfter
+    if (failure.status === 429 && typeof retryAfter === 'number' && retryAfter) {
+      startCooldown(retryAfter)
     }
-    toast.add({ title: 'Eroare', description: e?.data?.message || 'Nu am putut trimite emailul. Incearca din nou.', color: 'error' })
+    toast.add({ title: 'Eroare', description: failure.message || 'Nu am putut trimite emailul. Incearca din nou.', color: 'error' })
   } finally {
     isResendingVerification.value = false
   }
@@ -296,22 +299,27 @@ async function submitOrder() {
         shipping: deliveryMethod.value
       }
     }, { replace: true })
-  } catch(e: any) {
+  } catch(e) {
+    const failure = fetchFailure(e)
     // Price-change retry path: refresh the cart so the right column reflects
     // the new prices and the user can re-confirm.
-    if (e?.statusCode === 409 && e?.data?.data?.priceChanged) {
+    if (failure.status === 409 && failure.data.priceChanged) {
       await fetchCart()
       toast.add({ title: 'Preturi actualizate', description: 'Verifica suma totala si reincearca.', color: 'warning' })
       return
     }
     // The server's cart differs from the one shown (see the check before the
     // order): show its cart, and the next click orders what is shown.
-    if (e?.statusCode === 409 && e?.data?.data?.cartChanged) {
+    if (failure.status === 409 && failure.data.cartChanged) {
       await fetchCart()
       toast.add({ title: 'Cosul s-a actualizat', description: 'Verifica produsele si cantitatile, apoi plaseaza comanda din nou.', color: 'warning' })
       return
     }
-    toast.add({ title: 'Eroare la procesare', description: e?.data?.message || e.statusMessage || e.message || 'Te rugam sa incerci din nou.', color: 'error' })
+    // Without a message from the server: a FetchError's status text, then its
+    // summary ("[POST] "/api/orders": ..."), or the message of any other error.
+    const statusText = typeof e === 'object' && e !== null && 'statusMessage' in e && typeof e.statusMessage === 'string' ? e.statusMessage : ''
+    const errorText = e instanceof Error ? e.message : ''
+    toast.add({ title: 'Eroare la procesare', description: failure.message || statusText || errorText || 'Te rugam sa incerci din nou.', color: 'error' })
     // Show the server's cart after a failure (e.g. a product just became
     // unavailable), so the page never keeps showing a cart that can't be ordered.
     await fetchCart()

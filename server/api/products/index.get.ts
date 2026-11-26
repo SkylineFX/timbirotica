@@ -1,4 +1,4 @@
-import { inArray, and, eq, gte, lte, gt, sql } from "drizzle-orm"
+import { inArray, and, eq, gte, lte, gt, sql, type SQL } from "drizzle-orm"
 import { parseSearchTerms, buildSearchMatch, isSearchLongEnough } from '~~/shared/utils/search'
 
 export default eventHandler(async (event) => {
@@ -21,7 +21,7 @@ export default eventHandler(async (event) => {
   const db = useDrizzle()
 
   const emptyResponse = {
-    products: [] as any[],
+    products: [] as Awaited<ReturnType<typeof findProducts>>,
     total: 0,
     page,
     limit,
@@ -51,7 +51,7 @@ export default eventHandler(async (event) => {
     scopeBrand = { id: brand.id, slug: brand.slug, name: brand.name }
   }
 
-  const scopeConditions: any[] = []
+  const scopeConditions: SQL[] = []
   if (query.recommended === 'true') scopeConditions.push(eq(tables.products.isRecommended, true))
   if (scopeCategoryIds.length) scopeConditions.push(inArray(tables.products.categoryId, scopeCategoryIds))
   if (scopeBrand) scopeConditions.push(eq(tables.products.brandId, scopeBrand.id))
@@ -86,7 +86,7 @@ export default eventHandler(async (event) => {
       : Promise.resolve([] as Array<{ id: number }>)
   ])
 
-  const priceConds: any[] = []
+  const priceConds: SQL[] = []
   if (minPrice !== undefined) priceConds.push(gte(tables.products.price, minPrice))
   if (maxPrice !== undefined) priceConds.push(lte(tables.products.price, maxPrice))
   const availabilityCond = onlyAvailable ? gt(tables.products.stock, 0) : undefined

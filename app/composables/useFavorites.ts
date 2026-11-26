@@ -1,8 +1,18 @@
+import type { InternalApi } from 'nitropack/types'
+
+/** A favorite, as GET /api/favorites sends it. */
+export type Favorite = InternalApi['/api/favorites']['get'][number]
+
+/**
+ * A product as the favorites list holds it. Product listings and the product
+ * page send these fields and more, so their products can be added as they are.
+ */
+export type FavoriteProduct = Favorite['product']
 
 export const useFavorites = () => {
   const { loggedIn, user } = useUserSession()
   const route = useRoute()
-  const favorites = useState<any[]>('favorites', () => [])
+  const favorites = useState<Favorite[]>('favorites', () => [])
   const isFavoritesOpen = useState<boolean>('favorites-open', () => false)
   const isLoading = useState<boolean>('favorites-loading', () => false)
   const toast = useToast()
@@ -31,8 +41,10 @@ export const useFavorites = () => {
     }
   }
 
-  const addToFavorites = async (product: any) => {
-    if (!loggedIn.value) {
+  const addToFavorites = async (product: FavoriteProduct) => {
+    // loggedIn is true exactly when the session has a user; both are checked
+    // so the user's id below is known to be there.
+    if (!loggedIn.value || !user.value) {
       toast.add({ title: 'Trebuie sa fii autentificat', color: 'warning' })
       // Return to this page after signing in.
       return navigateTo({ path: '/user/login', query: { redirect: route.fullPath } })
@@ -49,7 +61,7 @@ export const useFavorites = () => {
     const tempId = Date.now() // placeholder ID
     favorites.value.unshift({
       id: tempId,
-      userId: user.value?.id,
+      userId: user.value.id,
       productId: product.id,
       createdAt: new Date().toISOString(),
       product: product
@@ -73,7 +85,7 @@ export const useFavorites = () => {
           await $fetch(`/api/favorites/${res.id}`, { method: 'DELETE' }).catch(() => {})
         }
       } else {
-        throw new Error((res as any).message)
+        throw new Error('message' in res ? res.message : undefined)
       }
     } catch {
       // Rollback

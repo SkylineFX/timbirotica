@@ -101,11 +101,11 @@ const add = async () => {
 }
 
 const { favorites, addToFavorites, removeFromFavorites } = useFavorites()
-const isFavorite = computed(() => favorites.value.some((f: any) => f.productId === product.value?.id))
+const isFavorite = computed(() => favorites.value.some(f => f.productId === product.value?.id))
 
 const toggleFavorite = async () => {
     if (isFavorite.value) {
-        const fav = favorites.value.find((f: any) => f.productId === product.value?.id)
+        const fav = favorites.value.find(f => f.productId === product.value?.id)
         if (fav) await removeFromFavorites(fav.id)
     } else if (product.value) {
         await addToFavorites(product.value)

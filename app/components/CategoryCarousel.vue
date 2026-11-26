@@ -1,25 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import type { InternalApi } from 'nitropack/types'
 import { findCategory } from '~~/shared/utils/categoryTree'
 
-interface Product {
-  id: number
-  name: string
-  slug: string
-  price: number
-  image: string | null
-  category?: {
-    slug: string
-  } | null
-  sku?: string
-}
-
-interface ApiResponse {
-  products: Product[]
-  total: number | null
-  page: number
-  limit: number
-}
+// The listing endpoint's own response type: a hand-written copy here had
+// drifted (an `image` field the API doesn't send, no `stock`).
+type ApiResponse = InternalApi['/api/products']['get']
 
 const props = defineProps<{
     categoryId?: number

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { LocationQueryRaw } from 'vue-router'
+
 type FacetItem = { slug: string; name: string; count: number }
 type Facets = {
   price: { min: number; max: number } | null
@@ -14,7 +16,7 @@ const props = defineProps<{
 const route = useRoute()
 
 const updateQuery = (changes: Record<string, string | undefined>) => {
-  const next: Record<string, any> = { ...route.query, ...changes, page: 1 }
+  const next: LocationQueryRaw = { ...route.query, ...changes, page: 1 }
   for (const k of Object.keys(next)) {
     if (next[k] === undefined || next[k] === '') delete next[k]
   }

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { FavoriteProduct } from '~/composables/useFavorites'
+
 const { favorites, isFavoritesOpen, removeFromFavorites } = useFavorites()
 const { addToCart, cartLocked } = useCart()
 
@@ -7,7 +9,7 @@ const { addToCart, cartLocked } = useCart()
 // a double click adds once. A different product's button still works; useCart
 // sends the adds one at a time.
 const addingProductIds = ref(new Set<number>())
-const add = async (product: any) => {
+const add = async (product: FavoriteProduct) => {
   if (!product || addingProductIds.value.has(product.id)) return
   addingProductIds.value.add(product.id)
   try {

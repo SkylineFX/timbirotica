@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import type { BreadcrumbItem } from '@nuxt/ui'
+import type { LocationQueryRaw } from 'vue-router'
+
 const props = defineProps<{
   title: string
   subtitle?: string
-  apiQuery: Record<string, any>
+  // What the page lists, sent to GET /api/products: q, category, brand or recommended.
+  apiQuery: Record<string, string>
   emptyMessage: string
-  breadcrumbs?: any[]
+  breadcrumbs?: BreadcrumbItem[]
 }>()
 
 const route = useRoute()
@@ -95,8 +99,8 @@ const normalizePriceQuery = () => {
   const parsedMin = rawMin != null && rawMin !== '' ? Number(rawMin) : null
   const parsedMax = rawMax != null && rawMax !== '' ? Number(rawMax) : null
 
-  let nextMin: any = rawMin
-  let nextMax: any = rawMax
+  let nextMin: typeof rawMin | undefined = rawMin
+  let nextMax: typeof rawMax | undefined = rawMax
 
   if (parsedMin !== null && (!Number.isFinite(parsedMin) || parsedMin <= min || parsedMin > max)) nextMin = undefined
   if (parsedMax !== null && (!Number.isFinite(parsedMax) || parsedMax >= max || parsedMax < min)) nextMax = undefined
@@ -112,7 +116,7 @@ const normalizePriceQuery = () => {
 
   if (nextMin === rawMin && nextMax === rawMax) return
 
-  const next: Record<string, any> = { ...route.query, minPrice: nextMin, maxPrice: nextMax }
+  const next: LocationQueryRaw = { ...route.query, minPrice: nextMin, maxPrice: nextMax }
   for (const k of Object.keys(next)) {
     if (next[k] === undefined || next[k] === '') delete next[k]
   }
