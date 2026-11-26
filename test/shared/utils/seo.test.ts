@@ -72,7 +72,16 @@ describe('productStructuredData', () => {
         shippingDetails: {
           '@type': 'OfferShippingDetails',
           shippingRate: { '@type': 'MonetaryAmount', value: 30, currency: 'RON' },
-          shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'RO' }
+          shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'RO' },
+          deliveryTime: {
+            '@type': 'ShippingDeliveryTime',
+            businessDays: {
+              '@type': 'OpeningHoursSpecification',
+              dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => `https://schema.org/${day}`)
+            },
+            handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+            transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 1, unitCode: 'DAY' }
+          }
         },
         hasMerchantReturnPolicy: {
           '@type': 'MerchantReturnPolicy',
