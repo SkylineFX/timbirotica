@@ -1,3 +1,5 @@
+import { getCourierShippingCost, RETURN_SHIPPING_COST, RETURN_WINDOW_DAYS } from '~~/shared/constants/order'
+
 /**
  * A page's canonical address: the site URL and the path, keeping only `page`
  * from the query (when it is above 1). Filters, sort order and page size show
@@ -29,8 +31,33 @@ export interface StructuredDataProduct {
 }
 
 /**
+ * The cost of sending one product by courier within Romania, and the return
+ * terms, for Google's merchant listings. A product priced at or above the
+ * free-shipping threshold ships free on its own.
+ */
+function offerShippingAndReturns(price: number) {
+  return {
+    shippingDetails: {
+      '@type': 'OfferShippingDetails',
+      shippingRate: { '@type': 'MonetaryAmount', value: getCourierShippingCost(price), currency: 'RON' },
+      shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'RO' }
+    },
+    hasMerchantReturnPolicy: {
+      '@type': 'MerchantReturnPolicy',
+      applicableCountry: 'RO',
+      returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+      merchantReturnDays: RETURN_WINDOW_DAYS,
+      returnMethod: 'https://schema.org/ReturnByMail',
+      returnFees: 'https://schema.org/ReturnShippingFees',
+      returnShippingFeesAmount: { '@type': 'MonetaryAmount', value: RETURN_SHIPPING_COST, currency: 'RON' }
+    }
+  }
+}
+
+/**
  * schema.org Product data for a product page, which Google reads to show the
- * price and availability in its results. Prices include VAT, in lei.
+ * price, availability, shipping cost and return terms in its results. Prices
+ * include VAT, in lei.
  */
 export function productStructuredData(product: StructuredDataProduct, { url, siteUrl }: { url: string, siteUrl: string }) {
   const images = (product.images ?? []).map(image => absoluteUrl(siteUrl, image))
@@ -48,7 +75,8 @@ export function productStructuredData(product: StructuredDataProduct, { url, sit
       priceCurrency: 'RON',
       price: product.price.toFixed(2),
       availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      itemCondition: 'https://schema.org/NewCondition'
+      itemCondition: 'https://schema.org/NewCondition',
+      ...offerShippingAndReturns(product.price)
     }
   }
 }

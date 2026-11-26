@@ -61,6 +61,11 @@ export const COURIER_SHIPPING_COST = 30
 export const getCourierShippingCost = (subtotal: number): number =>
   subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : COURIER_SHIPPING_COST
 
+// Return terms, as stated on the terms page (/termeni-si-conditii#retur), which
+// hardcodes them: change both together. The customer pays the return shipping.
+export const RETURN_WINDOW_DAYS = 14
+export const RETURN_SHIPPING_COST = 30
+
 /** Shipping cost for a method + subtotal (pickup is always free). */
 export const getShippingCost = (method: ShippingMethod, subtotal: number): number =>
   method === 'courier' ? getCourierShippingCost(subtotal) : 0
