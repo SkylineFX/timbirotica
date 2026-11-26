@@ -29,7 +29,7 @@ export function planReorder(
   lines: readonly CartLine[],
   products: readonly { id: number; name: string; stock: number }[]
 ): { available: CartLine[]; skipped: string[] } {
-  const productById = new Map(products.map(p => [p.id, p]))
+  const productById = new Map(products.map((p) => [p.id, p]))
   const availableLines: CartLine[] = []
   const skipped = new Set<string>()
   for (const line of lines) {
@@ -51,9 +51,10 @@ export async function reorderIntoCart(
   db: Db,
   { cartId, lines, replace }: { cartId: number; lines: readonly CartLine[]; replace: boolean }
 ): Promise<ReorderResult> {
-  const productIds = [...new Set(lines.map(l => l.productId))]
-  const lookups = splitIntoChunks(productIds, PRODUCT_IDS_PER_LOOKUP).map(ids =>
-    db.select({ id: schema.products.id, name: schema.products.name, stock: schema.products.stock })
+  const productIds = [...new Set(lines.map((l) => l.productId))]
+  const lookups = splitIntoChunks(productIds, PRODUCT_IDS_PER_LOOKUP).map((ids) =>
+    db
+      .select({ id: schema.products.id, name: schema.products.name, stock: schema.products.stock })
       .from(schema.products)
       .where(inArray(schema.products.id, ids))
   )
@@ -65,17 +66,27 @@ export async function reorderIntoCart(
 
   const existingItems = replace
     ? []
-    : await db.select({ id: schema.cartItems.id, productId: schema.cartItems.productId, quantity: schema.cartItems.quantity })
+    : await db
+        .select({
+          id: schema.cartItems.id,
+          productId: schema.cartItems.productId,
+          quantity: schema.cartItems.quantity
+        })
         .from(schema.cartItems)
         .where(eq(schema.cartItems.cartId, cartId))
 
   const writes: BatchItem<'sqlite'>[] = []
   if (replace) writes.push(db.delete(schema.cartItems).where(eq(schema.cartItems.cartId, cartId)))
-  writes.push(...buildCartMergeWrites(db, {
-    cartId,
-    merged: mergeCartItems(existingItems.map(i => ({ productId: i.productId, quantity: i.quantity })), available),
-    existingItems,
-  }))
+  writes.push(
+    ...buildCartMergeWrites(db, {
+      cartId,
+      merged: mergeCartItems(
+        existingItems.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+        available
+      ),
+      existingItems
+    })
+  )
   const [firstWrite, ...moreWrites] = writes
   await db.batch([firstWrite!, ...moreWrites])
 

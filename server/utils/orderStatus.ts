@@ -13,7 +13,8 @@ type Db = LibSQLDatabase<typeof schema>
  * `from`.
  */
 export async function changeOrderStatus(db: Db, id: number, from: string, to: OrderStatus) {
-  const [updated] = await db.update(schema.orders)
+  const [updated] = await db
+    .update(schema.orders)
     .set({ status: to })
     .where(and(eq(schema.orders.id, id), eq(schema.orders.status, from)))
     .returning()

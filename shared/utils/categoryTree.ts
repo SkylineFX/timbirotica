@@ -29,7 +29,7 @@ export function buildCategoryTree(rows: CategoryRow[]): CategoryNode[] {
       label: row.name,
       to: `/c/${row.slug}`,
       ...(row.image ? { image: row.image } : {}),
-      children: [],
+      children: []
     })
   }
 
@@ -43,7 +43,10 @@ export function buildCategoryTree(rows: CategoryRow[]): CategoryNode[] {
 }
 
 /** The first category, at any depth, that matches. */
-export function findCategory(nodes: CategoryNode[], match: (node: CategoryNode) => boolean): CategoryNode | undefined {
+export function findCategory(
+  nodes: CategoryNode[],
+  match: (node: CategoryNode) => boolean
+): CategoryNode | undefined {
   for (const node of nodes) {
     if (match(node)) return node
     const found = findCategory(node.children, match)

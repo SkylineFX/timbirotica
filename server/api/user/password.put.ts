@@ -4,10 +4,11 @@ import bcrypt from 'bcryptjs'
 
 const bodySchema = z.object({
   currentPassword: z.string().min(1),
-  newPassword: z.string()
+  newPassword: z
+    .string()
     .min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
     .regex(/[A-Z]/, 'Parola trebuie sa contina cel putin o litera mare')
-    .regex(/[0-9]/, 'Parola trebuie sa contina cel putin o cifra'),
+    .regex(/[0-9]/, 'Parola trebuie sa contina cel putin o cifra')
 })
 
 export default eventHandler(async (event) => {
@@ -27,7 +28,10 @@ export default eventHandler(async (event) => {
   // Google-only accounts. Without this check they would get "Parola curenta
   // este incorecta." for a password they never had.
   if (!hasOwnPassword(user.password)) {
-    throw createError({ statusCode: 400, message: 'Contul tau nu are inca o parola. Cere pe email un link ca sa setezi una.' })
+    throw createError({
+      statusCode: 400,
+      message: 'Contul tau nu are inca o parola. Cere pe email un link ca sa setezi una.'
+    })
   }
 
   const isCurrentValid = await bcrypt.compare(currentPassword, user.password)
@@ -36,7 +40,10 @@ export default eventHandler(async (event) => {
   }
 
   if (await bcrypt.compare(newPassword, user.password)) {
-    throw createError({ statusCode: 400, message: 'Noua parola nu poate fi identica cu cea curenta.' })
+    throw createError({
+      statusCode: 400,
+      message: 'Noua parola nu poate fi identica cu cea curenta.'
+    })
   }
 
   const hashed = await bcrypt.hash(newPassword, 10)
@@ -48,8 +55,8 @@ export default eventHandler(async (event) => {
   await saveUserSession(event, {
     secure: {
       passwordStamp: passwordStamp(hashed),
-      expiresAt: session.secure?.expiresAt ?? Date.now() + SESSION_MAX_AGE * 1000,
-    },
+      expiresAt: session.secure?.expiresAt ?? Date.now() + SESSION_MAX_AGE * 1000
+    }
   })
 
   return { message: 'Parola a fost actualizata.' }

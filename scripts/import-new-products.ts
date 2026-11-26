@@ -25,7 +25,7 @@ const STOCK_MAP: Record<string, number> = {
   'in stoc': 1,
   'stoc limitat': 1,
   'produs momentan indisponibil': 0,
-  'nu este in stoc': 0,
+  'nu este in stoc': 0
 }
 
 const dryRun = process.argv.includes('--dry-run')
@@ -36,7 +36,9 @@ function resolveInputPath(): string {
     if (existsSync(fileArg)) return resolve(fileArg)
     const inDataDir = join(process.cwd(), 'scripts', 'data', fileArg)
     if (existsSync(inDataDir)) return inDataDir
-    throw new Error(`File not found: "${fileArg}" (checked "${resolve(fileArg)}" and "${inDataDir}")`)
+    throw new Error(
+      `File not found: "${fileArg}" (checked "${resolve(fileArg)}" and "${inDataDir}")`
+    )
   }
 
   // Auto-pick newest details_*.json in scripts/data/
@@ -216,12 +218,16 @@ async function main() {
     )
   }
 
-  function resolveLocalImages(entry: DetailEntry): { paths: string[] | null; missingFiles: number } {
-    const rawUrls = Array.isArray(entry.images) && entry.images.length > 0
-      ? entry.images
-      : entry.image_url
-        ? [entry.image_url]
-        : []
+  function resolveLocalImages(entry: DetailEntry): {
+    paths: string[] | null
+    missingFiles: number
+  } {
+    const rawUrls =
+      Array.isArray(entry.images) && entry.images.length > 0
+        ? entry.images
+        : entry.image_url
+          ? [entry.image_url]
+          : []
 
     if (rawUrls.length === 0) return { paths: null, missingFiles: 0 }
 
@@ -305,7 +311,9 @@ async function main() {
       const globalBySlug = subcatsBySlugGlobal.get(subSlug)
       if (globalBySlug) return { id: globalBySlug.id, crossParent: true }
 
-      console.warn(`Unknown subcategory "${subName}" (parent: "${parentName ?? 'none'}") for "${entry.name}"`)
+      console.warn(
+        `Unknown subcategory "${subName}" (parent: "${parentName ?? 'none'}") for "${entry.name}"`
+      )
     }
 
     return { id: parent?.id ?? null, crossParent: false }
@@ -321,7 +329,10 @@ async function main() {
     const upper = productName.toUpperCase()
     for (const b of sortedBrands) {
       const bUpper = b.name.toUpperCase()
-      const regex = new RegExp(`(?:^|[^A-Z0-9])${bUpper.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}(?:$|[^A-Z0-9])`, 'i')
+      const regex = new RegExp(
+        `(?:^|[^A-Z0-9])${bUpper.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}(?:$|[^A-Z0-9])`,
+        'i'
+      )
       if (regex.test(upper)) {
         return b.id
       }
@@ -332,7 +343,7 @@ async function main() {
   // 3. Index existing products (SKUs, slugs, and current images) for deduplication, image backfill & unique slugs
   console.log('Loading existing products...')
   const existingProducts = await db.query.products.findMany({
-    columns: { id: true, sku: true, slug: true, images: true },
+    columns: { id: true, sku: true, slug: true, images: true }
   })
 
   const existingBySku = new Map<string, (typeof existingProducts)[number]>()
@@ -373,12 +384,16 @@ async function main() {
 
     // Check if already in DB by SKU
     const existingProd = skuKey
-      ? existingBySku.get(skuKey) ?? existingBySku.get(skuKey.replace(/[^a-z0-9]+/g, '-'))
+      ? (existingBySku.get(skuKey) ?? existingBySku.get(skuKey.replace(/[^a-z0-9]+/g, '-')))
       : undefined
 
     if (existingProd) {
       // Backfill images if the existing product currently has no images
-      if ((!existingProd.images || existingProd.images.length === 0) && localImages && localImages.length > 0) {
+      if (
+        (!existingProd.images || existingProd.images.length === 0) &&
+        localImages &&
+        localImages.length > 0
+      ) {
         productsToUpdateImages.push({ id: existingProd.id, images: localImages })
         existingProd.images = localImages
         totalLocalImageLinks += localImages.length
@@ -444,7 +459,7 @@ async function main() {
       images: localImages,
       stock,
       isRecommended: false,
-      createdAt: new Date(),
+      createdAt: new Date()
     }
     productsToInsert.push(newRecord)
 

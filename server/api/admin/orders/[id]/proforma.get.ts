@@ -22,7 +22,11 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Comanda nu a fost gasita.' })
   }
 
-  const customer = proformaCustomerFromSnapshots(order.billingAddressSnapshot, order.shippingAddressSnapshot, order.user)
+  const customer = proformaCustomerFromSnapshots(
+    order.billingAddressSnapshot,
+    order.shippingAddressSnapshot,
+    order.user
+  )
 
   const pdf = await generateProformaPdf({
     orderNumber: order.orderNumber,
@@ -31,7 +35,7 @@ export default eventHandler(async (event) => {
     shippingMethod: order.shippingMethod,
     shippingCost: order.shippingCost,
     total: order.total,
-    items: order.items.map(it => ({
+    items: order.items.map((it) => ({
       name: it.product.name,
       quantity: it.quantity,
       priceAtBuy: it.priceAtBuy
@@ -40,6 +44,10 @@ export default eventHandler(async (event) => {
   })
 
   setHeader(event, 'Content-Type', 'application/pdf')
-  setHeader(event, 'Content-Disposition', `attachment; filename="Proforma-${order.orderNumber}.pdf"`)
+  setHeader(
+    event,
+    'Content-Disposition',
+    `attachment; filename="Proforma-${order.orderNumber}.pdf"`
+  )
   return pdf
 })

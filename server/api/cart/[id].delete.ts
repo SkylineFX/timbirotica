@@ -18,8 +18,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 404, message: 'Item not found' })
   }
 
-  await db.delete(tables.cartItems)
-    .where(eq(tables.cartItems.id, Number(itemId)))
+  await db.delete(tables.cartItems).where(eq(tables.cartItems.id, Number(itemId)))
 
   return { success: true }
 })

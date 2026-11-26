@@ -12,7 +12,11 @@ import {
  * the same products under many URLs, so search engines should count them as
  * one page. Each page of a listing stays its own page.
  */
-export function canonicalUrl(siteUrl: string, path: string, query: Record<string, unknown> = {}): string {
+export function canonicalUrl(
+  siteUrl: string,
+  path: string,
+  query: Record<string, unknown> = {}
+): string {
   const origin = siteUrl.replace(/\/+$/, '')
   const cleanPath = path.replace(/\/+$/, '') || '/'
   const page = Number(query.page)
@@ -39,7 +43,7 @@ export interface StructuredDataProduct {
 const WORKING_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
 /** A range of days, as schema.org writes it. */
-function days({ min, max }: { min: number, max: number }) {
+function days({ min, max }: { min: number; max: number }) {
   return { '@type': 'QuantitativeValue', minValue: min, maxValue: max, unitCode: 'DAY' }
 }
 
@@ -52,13 +56,17 @@ function offerShippingAndReturns(price: number) {
   return {
     shippingDetails: {
       '@type': 'OfferShippingDetails',
-      shippingRate: { '@type': 'MonetaryAmount', value: getCourierShippingCost(price), currency: 'RON' },
+      shippingRate: {
+        '@type': 'MonetaryAmount',
+        value: getCourierShippingCost(price),
+        currency: 'RON'
+      },
       shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'RO' },
       deliveryTime: {
         '@type': 'ShippingDeliveryTime',
         businessDays: {
           '@type': 'OpeningHoursSpecification',
-          dayOfWeek: WORKING_DAYS.map(day => `https://schema.org/${day}`)
+          dayOfWeek: WORKING_DAYS.map((day) => `https://schema.org/${day}`)
         },
         handlingTime: days(COURIER_HANDLING_DAYS),
         transitTime: days(COURIER_TRANSIT_DAYS)
@@ -71,7 +79,11 @@ function offerShippingAndReturns(price: number) {
       merchantReturnDays: RETURN_WINDOW_DAYS,
       returnMethod: 'https://schema.org/ReturnByMail',
       returnFees: 'https://schema.org/ReturnShippingFees',
-      returnShippingFeesAmount: { '@type': 'MonetaryAmount', value: RETURN_SHIPPING_COST, currency: 'RON' }
+      returnShippingFeesAmount: {
+        '@type': 'MonetaryAmount',
+        value: RETURN_SHIPPING_COST,
+        currency: 'RON'
+      }
     }
   }
 }
@@ -81,8 +93,11 @@ function offerShippingAndReturns(price: number) {
  * price, availability, shipping cost and return terms in its results. Prices
  * include VAT, in lei.
  */
-export function productStructuredData(product: StructuredDataProduct, { url, siteUrl }: { url: string, siteUrl: string }) {
-  const images = (product.images ?? []).map(image => absoluteUrl(siteUrl, image))
+export function productStructuredData(
+  product: StructuredDataProduct,
+  { url, siteUrl }: { url: string; siteUrl: string }
+) {
+  const images = (product.images ?? []).map((image) => absoluteUrl(siteUrl, image))
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -96,7 +111,8 @@ export function productStructuredData(product: StructuredDataProduct, { url, sit
       url,
       priceCurrency: 'RON',
       price: product.price.toFixed(2),
-      availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      availability:
+        product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       itemCondition: 'https://schema.org/NewCondition',
       ...offerShippingAndReturns(product.price)
     }

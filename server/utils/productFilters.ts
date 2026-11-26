@@ -13,6 +13,9 @@ export const PRODUCT_FILTER_MAX_VALUES = 20
  */
 export function parseFilterList(value: unknown): string[] {
   if (value === undefined || value === null || value === '') return []
-  const values = String(value).split(',').map(s => s.trim()).filter(Boolean)
+  const values = String(value)
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
   return [...new Set(values)].slice(0, PRODUCT_FILTER_MAX_VALUES)
 }

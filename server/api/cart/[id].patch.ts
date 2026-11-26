@@ -1,9 +1,12 @@
 import { z } from 'zod'
 import { cartQuantitySchema } from '~~/shared/schemas/cart'
 
-const updateCartItemSchema = z.object({
-  quantity: cartQuantitySchema
-}, { error: 'Date invalide.' })
+const updateCartItemSchema = z.object(
+  {
+    quantity: cartQuantitySchema
+  },
+  { error: 'Date invalide.' }
+)
 
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
@@ -27,7 +30,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 404, message: 'Item not found' })
   }
 
-  await db.update(tables.cartItems)
+  await db
+    .update(tables.cartItems)
     .set({ quantity })
     .where(eq(tables.cartItems.id, Number(itemId)))
 

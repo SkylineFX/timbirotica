@@ -1,4 +1,3 @@
-
 import { z } from 'zod'
 
 const addToFavoritesSchema = z.object({
@@ -17,10 +16,7 @@ export default defineEventHandler(async (event) => {
 
   // Check if already in favorites
   const existing = await db.query.favorites.findFirst({
-    where: and(
-      eq(tables.favorites.userId, userId),
-      eq(tables.favorites.productId, productId)
-    )
+    where: and(eq(tables.favorites.userId, userId), eq(tables.favorites.productId, productId))
   })
 
   // Both answers include the row's id: the client shows the favorite at once
@@ -38,11 +34,15 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Produsul nu a fost gasit.' })
   }
 
-  const created = await db.insert(tables.favorites).values({
-    userId,
-    productId,
-    createdAt: new Date()
-  }).returning({ id: tables.favorites.id }).get()
+  const created = await db
+    .insert(tables.favorites)
+    .values({
+      userId,
+      productId,
+      createdAt: new Date()
+    })
+    .returning({ id: tables.favorites.id })
+    .get()
 
   return { success: true, id: created.id }
 })

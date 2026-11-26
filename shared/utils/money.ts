@@ -54,7 +54,7 @@ export function splitGross(grossBani: number): NetAndVat {
  * net plus VAT is exactly the gross total.
  */
 export function vatBreakdown(lines: readonly GrossLine[], shippingCost = 0) {
-  const rows = lines.map(line => splitGross(toBani(line.price) * line.quantity))
+  const rows = lines.map((line) => splitGross(toBani(line.price) * line.quantity))
   const shipping = shippingCost > 0 ? splitGross(toBani(shippingCost)) : null
   const all = shipping ? [...rows, shipping] : rows
   return {

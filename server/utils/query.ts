@@ -13,7 +13,10 @@ export function queryString(value: unknown): string | undefined {
  * min and max. The fallback when it is missing or not a finite number, so a
  * bad value can never remove a LIMIT or produce an offset D1 refuses.
  */
-export function queryInteger(value: unknown, { fallback, min, max }: { fallback: number, min: number, max: number }): number {
+export function queryInteger(
+  value: unknown,
+  { fallback, min, max }: { fallback: number; min: number; max: number }
+): number {
   const number = queryNumber(value)
   return number === undefined ? fallback : Math.min(Math.max(Math.floor(number), min), max)
 }

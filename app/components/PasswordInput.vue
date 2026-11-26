@@ -24,7 +24,11 @@ const show = ref(false)
         :icon="show ? 'i-lucide-eye-off' : 'i-lucide-eye'"
         :aria-label="show ? 'Ascunde parola' : 'Afiseaza parola'"
         :aria-pressed="show"
-        @click="() => { show = !show }"
+        @click="
+          () => {
+            show = !show
+          }
+        "
       />
     </template>
   </UInput>

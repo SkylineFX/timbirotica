@@ -26,30 +26,34 @@ const form = ref<Partial<AddressForm>>({
 // Account holder's saved details, used to prefill a brand-new address
 const { data: userProfile } = await useFetch('/api/user')
 
-watch(() => address, (newAddr) => {
-  if (newAddr) {
-    form.value = {
-      ...newAddr,
-      phone: newAddr.phone ? newAddr.phone.replace(/\s+/g, '') : '',
-      postalCode: newAddr.postalCode || '',
-      isDefaultShipping: newAddr.isDefaultShipping ?? false
+watch(
+  () => address,
+  (newAddr) => {
+    if (newAddr) {
+      form.value = {
+        ...newAddr,
+        phone: newAddr.phone ? newAddr.phone.replace(/\s+/g, '') : '',
+        postalCode: newAddr.postalCode || '',
+        isDefaultShipping: newAddr.isDefaultShipping ?? false
+      }
+    } else {
+      form.value = {
+        firstName: userProfile.value?.firstName || '',
+        lastName: userProfile.value?.lastName || '',
+        phone: userProfile.value?.phone || '',
+        county: undefined,
+        city: '',
+        street: '',
+        postalCode: '',
+        isDefaultShipping: true
+      }
     }
-  } else {
-    form.value = {
-      firstName: userProfile.value?.firstName || '',
-      lastName: userProfile.value?.lastName || '',
-      phone: userProfile.value?.phone || '',
-      county: undefined,
-      city: '',
-      street: '',
-      postalCode: '',
-      isDefaultShipping: true
-    }
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+)
 
 const { data: countiesData } = await useFetch('/api/locations/counties')
-const countyNames = computed(() => countiesData.value?.map(c => c.name) || [])
+const countyNames = computed(() => countiesData.value?.map((c) => c.name) || [])
 const citiesData = ref<string[]>([])
 const isFetchingCities = ref(false)
 
@@ -61,7 +65,7 @@ const loadCities = async (countyName: string) => {
   isFetchingCities.value = true
   try {
     const res = await $fetch('/api/locations/cities', { params: { countyName } })
-    citiesData.value = res.map(c => c.name)
+    citiesData.value = res.map((c) => c.name)
   } catch (e) {
     console.error('Failed to load cities', e)
   } finally {
@@ -69,14 +73,17 @@ const loadCities = async (countyName: string) => {
   }
 }
 
-watch(() => form.value.county, (newCounty, oldCounty) => {
-  if (newCounty !== oldCounty && oldCounty !== undefined) {
-    form.value.city = ''
+watch(
+  () => form.value.county,
+  (newCounty, oldCounty) => {
+    if (newCounty !== oldCounty && oldCounty !== undefined) {
+      form.value.city = ''
+    }
+    if (newCounty) {
+      loadCities(newCounty)
+    }
   }
-  if (newCounty) {
-    loadCities(newCounty)
-  }
-})
+)
 
 const isLoading = ref(false)
 const toast = useToast()
@@ -98,8 +105,12 @@ async function submit(event: FormSubmitEvent<AddressForm>) {
       toast.add({ title: 'Adresa adaugata cu succes', color: 'success' })
     }
     emit('saved')
-  } catch(err) {
-     toast.add({ title: 'Eroare la salvarea adresei', description: fetchFailure(err).message ?? (err instanceof Error ? err.message : undefined), color: 'error' })
+  } catch (err) {
+    toast.add({
+      title: 'Eroare la salvarea adresei',
+      description: fetchFailure(err).message ?? (err instanceof Error ? err.message : undefined),
+      color: 'error'
+    })
   } finally {
     isLoading.value = false
   }
@@ -109,46 +120,85 @@ async function submit(event: FormSubmitEvent<AddressForm>) {
 <template>
   <UForm :schema="addressFormSchema" :state="form" class="space-y-6 px-2" @submit="submit">
     <div>
-      <h4 class="font-bold text-gray-900 mb-4 text-sm mt-2">Persoana de contact</h4>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <h4 class="mt-2 mb-4 text-sm font-bold text-gray-900">Persoana de contact</h4>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <UFormField label="Prenume" name="firstName" required>
-           <UInput v-model="form.firstName" size="lg" class="w-full" />
+          <UInput v-model="form.firstName" size="lg" class="w-full" />
         </UFormField>
         <UFormField label="Nume" name="lastName" required>
-           <UInput v-model="form.lastName" size="lg" class="w-full" />
+          <UInput v-model="form.lastName" size="lg" class="w-full" />
         </UFormField>
         <UFormField label="Numar de telefon" name="phone" class="sm:col-span-2" required>
-           <UInput v-model="form.phone" v-maska="'#### ### ###'" size="lg" class="w-full" type="tel" autocomplete="tel" />
+          <UInput
+            v-model="form.phone"
+            v-maska="'#### ### ###'"
+            size="lg"
+            class="w-full"
+            type="tel"
+            autocomplete="tel"
+          />
         </UFormField>
       </div>
     </div>
 
     <div>
-       <h4 class="font-bold text-gray-900 mb-4 text-sm mt-4">Detalii adresa</h4>
-       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          <UFormField label="Judet" name="county" required>
-             <USelectMenu v-model="form.county" :items="countyNames" placeholder="Selectati" size="lg" class="w-full" />
-          </UFormField>
-          <UFormField label="Localitate" name="city" required>
-             <USelectMenu v-model="form.city" :items="citiesData" placeholder="Selectati" size="lg" class="w-full" :disabled="!form.county || isFetchingCities" :loading="isFetchingCities" />
-          </UFormField>
-       </div>
-        <div class="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4">
-          <UFormField label="Adresa" name="street" required>
-             <UInput v-model="form.street" placeholder="Strada, numar, bloc, scara, etaj, apartament" size="lg" class="w-full" :ui="{base: 'text-sm'}" />
-          </UFormField>
-          <UFormField label="Cod Postal" name="postalCode">
-             <UInput v-model="form.postalCode" size="lg" class="w-full" />
-          </UFormField>
-       </div>
+      <h4 class="mt-4 mb-4 text-sm font-bold text-gray-900">Detalii adresa</h4>
+      <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <UFormField label="Judet" name="county" required>
+          <USelectMenu
+            v-model="form.county"
+            :items="countyNames"
+            placeholder="Selectati"
+            size="lg"
+            class="w-full"
+          />
+        </UFormField>
+        <UFormField label="Localitate" name="city" required>
+          <USelectMenu
+            v-model="form.city"
+            :items="citiesData"
+            placeholder="Selectati"
+            size="lg"
+            class="w-full"
+            :disabled="!form.county || isFetchingCities"
+            :loading="isFetchingCities"
+          />
+        </UFormField>
+      </div>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-[2fr_1fr]">
+        <UFormField label="Adresa" name="street" required>
+          <UInput
+            v-model="form.street"
+            placeholder="Strada, numar, bloc, scara, etaj, apartament"
+            size="lg"
+            class="w-full"
+            :ui="{ base: 'text-sm' }"
+          />
+        </UFormField>
+        <UFormField label="Cod Postal" name="postalCode">
+          <UInput v-model="form.postalCode" size="lg" class="w-full" />
+        </UFormField>
+      </div>
     </div>
 
-    <div class="pt-2 flex flex-col gap-3">
-         <UCheckbox v-model="form.isDefaultShipping" name="isDefaultShipping" label="Seteaza ca adresa implicita de livrare" />
+    <div class="flex flex-col gap-3 pt-2">
+      <UCheckbox
+        v-model="form.isDefaultShipping"
+        name="isDefaultShipping"
+        label="Seteaza ca adresa implicita de livrare"
+      />
     </div>
 
     <div class="pt-4 pb-2">
-       <UButton type="submit" color="primary" block size="xl" class="rounded-md font-semibold justify-center" :loading="isLoading">Salveaza</UButton>
+      <UButton
+        type="submit"
+        color="primary"
+        block
+        size="xl"
+        class="justify-center rounded-md font-semibold"
+        :loading="isLoading"
+        >Salveaza</UButton
+      >
     </div>
   </UForm>
 </template>

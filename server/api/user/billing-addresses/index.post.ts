@@ -15,26 +15,30 @@ export default eventHandler(async (event) => {
   const shouldBeDefault = isFirstAddress || body.isDefaultBilling ? true : false
 
   if (shouldBeDefault && !isFirstAddress) {
-    await db.update(tables.billingAddresses)
+    await db
+      .update(tables.billingAddresses)
       .set({ isDefaultBilling: false })
       .where(eq(tables.billingAddresses.userId, session.user.id))
   }
 
-  const nAddress = await db.insert(tables.billingAddresses).values({
-    userId: session.user.id,
-    companyName: body.companyName,
-    cui: body.cui,
-    hasRo: body.hasRo,
-    onrc: body.onrc || null,
-    bankName: body.bankName || null,
-    iban: body.iban || null,
-    phone: body.phone,
-    street: body.street,
-    city: body.city,
-    county: body.county,
-    isDefaultBilling: shouldBeDefault,
-    createdAt: new Date()
-  }).returning()
+  const nAddress = await db
+    .insert(tables.billingAddresses)
+    .values({
+      userId: session.user.id,
+      companyName: body.companyName,
+      cui: body.cui,
+      hasRo: body.hasRo,
+      onrc: body.onrc || null,
+      bankName: body.bankName || null,
+      iban: body.iban || null,
+      phone: body.phone,
+      street: body.street,
+      city: body.city,
+      county: body.county,
+      isDefaultBilling: shouldBeDefault,
+      createdAt: new Date()
+    })
+    .returning()
 
   return nAddress[0]
 })

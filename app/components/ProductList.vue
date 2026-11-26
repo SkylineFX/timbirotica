@@ -50,7 +50,7 @@ const sortOptions = computed(() => [
 ])
 
 const sort = computed({
-  get: () => route.query.sort as string || (isSearch.value ? 'relevance' : 'default'),
+  get: () => (route.query.sort as string) || (isSearch.value ? 'relevance' : 'default'),
   set: async (val) => {
     if (val === sort.value) return
     await navigateTo({ query: { ...route.query, sort: val, page: 1 } })
@@ -72,8 +72,8 @@ const fetchQuery = computed(() => {
 })
 
 const { data, status, error, refresh } = await useFetch('/api/products', {
-    query: fetchQuery,
-    watch: [fetchQuery]
+  query: fetchQuery,
+  watch: [fetchQuery]
 })
 
 // A failed load is an error, not an empty list. During server rendering the
@@ -85,7 +85,9 @@ if (import.meta.server && error.value) {
 
 const products = computed(() => data.value?.products || [])
 const total = computed(() => data.value?.total || 0)
-const facets = computed(() => data.value?.facets || { price: null, brands: null, subcategories: null })
+const facets = computed(
+  () => data.value?.facets || { price: null, brands: null, subcategories: null }
+)
 
 const normalizePriceQuery = () => {
   const priceFacet = facets.value.price
@@ -102,12 +104,17 @@ const normalizePriceQuery = () => {
   let nextMin: typeof rawMin | undefined = rawMin
   let nextMax: typeof rawMax | undefined = rawMax
 
-  if (parsedMin !== null && (!Number.isFinite(parsedMin) || parsedMin <= min || parsedMin > max)) nextMin = undefined
-  if (parsedMax !== null && (!Number.isFinite(parsedMax) || parsedMax >= max || parsedMax < min)) nextMax = undefined
+  if (parsedMin !== null && (!Number.isFinite(parsedMin) || parsedMin <= min || parsedMin > max))
+    nextMin = undefined
+  if (parsedMax !== null && (!Number.isFinite(parsedMax) || parsedMax >= max || parsedMax < min))
+    nextMax = undefined
   if (
-    nextMin !== undefined && nextMax !== undefined &&
-    parsedMin !== null && parsedMax !== null &&
-    Number.isFinite(parsedMin) && Number.isFinite(parsedMax) &&
+    nextMin !== undefined &&
+    nextMax !== undefined &&
+    parsedMin !== null &&
+    parsedMax !== null &&
+    Number.isFinite(parsedMin) &&
+    Number.isFinite(parsedMax) &&
     parsedMin > parsedMax
   ) {
     nextMin = undefined
@@ -124,7 +131,12 @@ const normalizePriceQuery = () => {
 }
 
 watch(
-  () => [facets.value.price?.min, facets.value.price?.max, route.query.minPrice, route.query.maxPrice],
+  () => [
+    facets.value.price?.min,
+    facets.value.price?.max,
+    route.query.minPrice,
+    route.query.maxPrice
+  ],
   () => normalizePriceQuery(),
   { immediate: true }
 )
@@ -144,67 +156,110 @@ const activeFilterCount = computed(() => {
 const isFiltersOpen = ref(false)
 
 const resetFilters = () => {
-  navigateTo({ query: { ...route.query, minPrice: undefined, maxPrice: undefined, available: undefined, sub: undefined, b: undefined, page: 1 } })
+  navigateTo({
+    query: {
+      ...route.query,
+      minPrice: undefined,
+      maxPrice: undefined,
+      available: undefined,
+      sub: undefined,
+      b: undefined,
+      page: 1
+    }
+  })
 }
 </script>
 
 <template>
   <UContainer class="py-6">
-    <UBreadcrumb v-if="breadcrumbs?.length" :items="breadcrumbs" :ui="{ separatorIcon: 'w-4 h-4' }" class="mb-6 [&_ol]:flex-nowrap [&_ol]:overflow-hidden [&_li]:shrink-0 [&_li:last-child]:shrink-1 [&_li:last-child]:min-w-0" />
-    <div class="flex flex-col mb-8 gap-4 rounded-md p-4 bg-white">
-      <h1 class="text-xl font-bold flex flex-wrap items-baseline gap-2 xl:text-2xl wrap-anywhere">
+    <UBreadcrumb
+      v-if="breadcrumbs?.length"
+      :items="breadcrumbs"
+      :ui="{ separatorIcon: 'w-4 h-4' }"
+      class="mb-6 [&_li]:shrink-0 [&_li:last-child]:min-w-0 [&_li:last-child]:shrink-1 [&_ol]:flex-nowrap [&_ol]:overflow-hidden"
+    />
+    <div class="mb-8 flex flex-col gap-4 rounded-md bg-white p-4">
+      <h1 class="flex flex-wrap items-baseline gap-2 text-xl font-bold wrap-anywhere xl:text-2xl">
         {{ title }} <span v-if="subtitle" class="font-normal italic">"{{ subtitle }}"</span>
-        <span v-if="total !== undefined && !error" class="text-sm font-medium text-gray-500 normal-case">
+        <span
+          v-if="total !== undefined && !error"
+          class="text-sm font-medium text-gray-500 normal-case"
+        >
           ({{ total }} produse)
         </span>
       </h1>
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 xl:gap-4">
-        <div class="w-full flex gap-2">
-          <div class="flex items-center gap-2 flex-1 sm:flex-none">
+      <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-center xl:gap-4">
+        <div class="flex w-full gap-2">
+          <div class="flex flex-1 items-center gap-2 sm:flex-none">
             <UButton
               color="neutral"
               variant="outline"
               icon="i-lucide-sliders-horizontal"
-              class="rounded-sm sm:text-sm w-full sm:w-auto"
+              class="w-full rounded-sm sm:w-auto sm:text-sm"
               size="lg"
-              @click="() => { isFiltersOpen = true }"
+              @click="
+                () => {
+                  isFiltersOpen = true
+                }
+              "
             >
-              <span class="flex justify-between items-center gap-2 w-full">Filtreaza
-              <UBadge v-if="activeFilterCount > 0" color="primary" variant="solid" class="ml-1 rounded-sm w-5 h-5 p-0 flex items-center justify-center text-xs">
-                {{ activeFilterCount }}
-              </UBadge>
+              <span class="flex w-full items-center justify-between gap-2"
+                >Filtreaza
+                <UBadge
+                  v-if="activeFilterCount > 0"
+                  color="primary"
+                  variant="solid"
+                  class="ml-1 flex h-5 w-5 items-center justify-center rounded-sm p-0 text-xs"
+                >
+                  {{ activeFilterCount }}
+                </UBadge>
               </span>
             </UButton>
           </div>
-          <div class="flex items-center justify-between gap-2 sm:ml-auto flex-1 sm:flex-none">
-            <p class="hidden md:block text-sm font-medium text-gray-500">Sorteaza dupa:</p>
-            <USelect v-model="sort" :items="sortOptions" value-key="value" label-key="label" size="lg" class="w-full sm:w-36 rounded-sm" />
+          <div class="flex flex-1 items-center justify-between gap-2 sm:ml-auto sm:flex-none">
+            <p class="hidden text-sm font-medium text-gray-500 md:block">Sorteaza dupa:</p>
+            <USelect
+              v-model="sort"
+              :items="sortOptions"
+              value-key="value"
+              label-key="label"
+              size="lg"
+              class="w-full rounded-sm sm:w-36"
+            />
           </div>
         </div>
 
-        <div class="hidden md:flex items-center gap-2">
-           <p class="text-sm font-medium text-gray-500">Produse:</p>
-           <USelect v-model="limit" :items="limitOptions" value-key="value" label-key="label" size="lg" class="w-36 rounded-sm" />
+        <div class="hidden items-center gap-2 md:flex">
+          <p class="text-sm font-medium text-gray-500">Produse:</p>
+          <USelect
+            v-model="limit"
+            :items="limitOptions"
+            value-key="value"
+            label-key="label"
+            size="lg"
+            class="w-36 rounded-sm"
+          />
         </div>
       </div>
     </div>
 
     <USlideover v-model:open="isFiltersOpen" side="left" title="Filtre">
       <template #body>
-        <ProductFilters
-          :facets="facets"
-          :hide-brand="hideBrand"
-        />
+        <ProductFilters :facets="facets" :hide-brand="hideBrand" />
       </template>
       <template #footer>
-        <div class="flex gap-2 w-full">
+        <div class="flex w-full gap-2">
           <UButton
             color="primary"
             variant="subtle"
             trailing-icon="i-lucide-arrow-right"
             block
-            class="rounded-sm p-3 flex-1 justify-between"
-            @click="() => { isFiltersOpen = false }"
+            class="flex-1 justify-between rounded-sm p-3"
+            @click="
+              () => {
+                isFiltersOpen = false
+              }
+            "
           >
             Aplica filtrele
           </UButton>
@@ -214,40 +269,41 @@ const resetFilters = () => {
             variant="subtle"
             icon="i-lucide-rotate-ccw"
             aria-label="Sterge filtrele"
-            class="rounded-sm p-3 aspect-square justify-center"
+            class="aspect-square justify-center rounded-sm p-3"
             @click="resetFilters"
           />
         </div>
       </template>
     </USlideover>
 
-    <div v-if="status === 'pending'" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 lg:gap-4">
-        <ProductCardSkeleton v-for="i in limit" :key="i" />
+    <div
+      v-if="status === 'pending'"
+      class="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-4 xl:grid-cols-5"
+    >
+      <ProductCardSkeleton v-for="i in limit" :key="i" />
     </div>
-    <div v-else-if="error" class="text-center py-12 text-gray-500 space-y-4">
-        <p>Nu am putut incarca produsele.</p>
-        <UButton color="neutral" variant="outline" icon="i-lucide-rotate-ccw" @click="refresh()">Reincearca</UButton>
+    <div v-else-if="error" class="space-y-4 py-12 text-center text-gray-500">
+      <p>Nu am putut incarca produsele.</p>
+      <UButton color="neutral" variant="outline" icon="i-lucide-rotate-ccw" @click="refresh()"
+        >Reincearca</UButton
+      >
     </div>
     <div v-else-if="products?.length" class="space-y-8">
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 lg:gap-4">
-            <ProductCard
-                v-for="product in products"
-                :key="product.id"
-                :to="`/c/${product.category?.slug || 'toate'}/${product.slug}`"
-                :product="product"
-            />
-        </div>
+      <div class="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-4 xl:grid-cols-5">
+        <ProductCard
+          v-for="product in products"
+          :key="product.id"
+          :to="`/c/${product.category?.slug || 'toate'}/${product.slug}`"
+          :product="product"
+        />
+      </div>
 
-        <div class="flex justify-center">
-            <UPagination
-                v-model:page="page"
-                :total="total"
-                :items-per-page="limit"
-            />
-        </div>
+      <div class="flex justify-center">
+        <UPagination v-model:page="page" :total="total" :items-per-page="limit" />
+      </div>
     </div>
-    <div v-else class="text-center py-12 text-gray-500 wrap-anywhere">
-        {{ emptyMessage }}
+    <div v-else class="py-12 text-center wrap-anywhere text-gray-500">
+      {{ emptyMessage }}
     </div>
   </UContainer>
 </template>

@@ -18,4 +18,4 @@ declare module '#auth-utils' {
   }
 }
 
-export { }
+export {}

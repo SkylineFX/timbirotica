@@ -11,16 +11,16 @@ const columns: FooterColumn[] = [
         target: '_blank'
       },
       {
-        label: 'RO18034200',
+        label: 'RO18034200'
       },
       {
-        label: 'J2005017160400',
+        label: 'J2005017160400'
       },
       {
-        label: 'Strada Drumul Taberei Nr. 92',
+        label: 'Strada Drumul Taberei Nr. 92'
       },
       {
-        label: 'Sector 6, Bucuresti',
+        label: 'Sector 6, Bucuresti'
       }
     ]
   },
@@ -51,24 +51,32 @@ const columns: FooterColumn[] = [
         target: '_blank'
       }
     ]
-  },
+  }
 ]
 </script>
 
 <template>
-  <div class="bg-white border-t border-gray-200 dark:border-gray-800">
+  <div class="border-t border-gray-200 bg-white dark:border-gray-800">
     <UContainer>
       <UFooterColumns :columns="columns" class="py-8" :ui="{ list: 'mt-4 space-y-2' }">
         <template #right>
           <div class="flex flex-col gap-5">
             <div class="flex flex-col">
               <NuxtLink class="text-sm font-semibold underline" to="/contact">Contact</NuxtLink>
-              <div class="flex flex-col mt-4 space-y-2">
-                <span class="text-sm text-muted">Telefon:
-                  <a href="tel:0751022882" class="text-sm hover:text-primary transition-colors">0751 022 882</a>
+              <div class="mt-4 flex flex-col space-y-2">
+                <span class="text-sm text-muted"
+                  >Telefon:
+                  <a href="tel:0751022882" class="text-sm transition-colors hover:text-primary"
+                    >0751 022 882</a
+                  >
                 </span>
-                <span class="text-sm text-muted">Email:
-                  <a href="mailto:eurotimalex@yahoo.com" class="text-sm hover:text-primary transition-colors">eurotimalex@yahoo.com</a>
+                <span class="text-sm text-muted"
+                  >Email:
+                  <a
+                    href="mailto:eurotimalex@yahoo.com"
+                    class="text-sm transition-colors hover:text-primary"
+                    >eurotimalex@yahoo.com</a
+                  >
                 </span>
               </div>
             </div>
@@ -81,8 +89,18 @@ const columns: FooterColumn[] = [
               </a> -->
               <a href="https://reclamatiisal.anpc.ro/" target="_blank">
                 <div class="flex gap-2">
-                    <img src="https://cdn.timbirotica.ro/uploads/footer/sal.webp" alt="SAL" loading="lazy" class="h-8" />
-                    <img src="https://cdn.timbirotica.ro/uploads/footer/sol.webp" alt="SOL" loading="lazy" class="h-8" />
+                  <img
+                    src="https://cdn.timbirotica.ro/uploads/footer/sal.webp"
+                    alt="SAL"
+                    loading="lazy"
+                    class="h-8"
+                  />
+                  <img
+                    src="https://cdn.timbirotica.ro/uploads/footer/sol.webp"
+                    alt="SOL"
+                    loading="lazy"
+                    class="h-8"
+                  />
                 </div>
               </a>
             </div>

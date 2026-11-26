@@ -8,7 +8,7 @@ const validForm = {
   county: 'Cluj',
   city: 'Cluj-Napoca',
   street: 'Strada Exemplu 10',
-  postalCode: '',
+  postalCode: ''
 }
 
 describe('addressFormSchema', () => {
@@ -48,6 +48,8 @@ describe('addressFormSchema', () => {
 describe('addressPayloadSchema', () => {
   it('requires the space-stripped national phone format', () => {
     expect(addressPayloadSchema.safeParse({ ...validForm, phone: '0721234567' }).success).toBe(true)
-    expect(addressPayloadSchema.safeParse({ ...validForm, phone: '0721 234 567' }).success).toBe(false)
+    expect(addressPayloadSchema.safeParse({ ...validForm, phone: '0721 234 567' }).success).toBe(
+      false
+    )
   })
 })

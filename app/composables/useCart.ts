@@ -33,9 +33,14 @@ const parseGuestCart = (saved: string): CartLine[] => {
   if (!Array.isArray(parsed)) return []
   // The product isn't checked field by field: it is saved as the page that
   // added it had it (see addOne).
-  return parsed.filter((line): line is CartLine =>
-    isRecord(line) && typeof line.id === 'number' && typeof line.productId === 'number' &&
-    typeof line.quantity === 'number' && isRecord(line.product))
+  return parsed.filter(
+    (line): line is CartLine =>
+      isRecord(line) &&
+      typeof line.id === 'number' &&
+      typeof line.productId === 'number' &&
+      typeof line.quantity === 'number' &&
+      isRecord(line.product)
+  )
 }
 
 // The guest-cart merge currently running in this browser, shared by every
@@ -85,7 +90,8 @@ const changedSince = (itemId: number, mark: number) => (lastQuantityChange.get(i
  * server holds, and a toast says so). Call it before ending the session: a
  * change sent after logout is refused and lost.
  */
-export const flushCartQuantityUpdates = (): Promise<boolean> => quantityUpdates?.flush() ?? Promise.resolve(true)
+export const flushCartQuantityUpdates = (): Promise<boolean> =>
+  quantityUpdates?.flush() ?? Promise.resolve(true)
 
 export const useCart = () => {
   const { loggedIn } = useUserSession()
@@ -103,16 +109,25 @@ export const useCart = () => {
       // Awaited inside a function typed Promise<void>: returning $fetch's own
       // type made TypeScript compare every API route type (TS2321).
       async (id, value, { keepalive }): Promise<void> => {
-        await $fetch(`/api/cart/${id}`, { method: 'PATCH', body: { quantity: value }, keepalive, timeout: CART_REQUEST_TIMEOUT_MS })
+        await $fetch(`/api/cart/${id}`, {
+          method: 'PATCH',
+          body: { quantity: value },
+          keepalive,
+          timeout: CART_REQUEST_TIMEOUT_MS
+        })
       },
       (id, confirmed, e) => {
         console.error('Failed to update quantity', e)
         // A line removed meanwhile needs no correction or message.
-        const line = cartItems.value.find(i => i.id === id)
+        const line = cartItems.value.find((i) => i.id === id)
         if (!line) return
         // Show the quantity the server still holds.
         line.quantity = confirmed
-        toast.add({ title: 'Nu s-a putut actualiza cantitatea', description: fetchFailure(e).message, color: 'error' })
+        toast.add({
+          title: 'Nu s-a putut actualiza cantitatea',
+          description: fetchFailure(e).message,
+          color: 'error'
+        })
       },
       { delayMs: QUANTITY_SEND_DELAY_MS }
     )
@@ -121,7 +136,9 @@ export const useCart = () => {
     // changes at once, as keepalive requests that finish after the page is
     // gone. A change still queued behind a request in flight can be lost if
     // the page closes before that request answers (one round trip).
-    const sendBeforeLeaving = () => { void quantityUpdates?.flush({ keepalive: true }) }
+    const sendBeforeLeaving = () => {
+      void quantityUpdates?.flush({ keepalive: true })
+    }
     window.addEventListener('pagehide', sendBeforeLeaving)
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') sendBeforeLeaving()
@@ -145,11 +162,11 @@ export const useCart = () => {
         // Use $fetch, not useFetch, to avoid stale cache in actions
         const data = await $fetch('/api/cart', { timeout: CART_REQUEST_TIMEOUT_MS })
         if (data && data.items) {
-          cartItems.value = data.items.map(item => ({
+          cartItems.value = data.items.map((item) => ({
             id: item.id,
             productId: item.productId,
             quantity: changedSince(item.id, readStartedAt)
-              ? (cartItems.value.find(i => i.id === item.id)?.quantity ?? item.quantity)
+              ? (cartItems.value.find((i) => i.id === item.id)?.quantity ?? item.quantity)
               : item.quantity,
             product: item.product
           }))
@@ -183,15 +200,19 @@ export const useCart = () => {
   // Remove the key when the cart is empty so no stale entry (e.g. "[]") is left
   // behind after logout — that would otherwise cause an unnecessary syncCart()
   // call on the next OAuth login.
-  watch(cartItems, (newItems) => {
-    if (!loggedIn.value && import.meta.client) {
-      if (newItems.length > 0) {
-        localStorage.setItem('guest-cart', JSON.stringify(newItems))
-      } else {
-        localStorage.removeItem('guest-cart')
+  watch(
+    cartItems,
+    (newItems) => {
+      if (!loggedIn.value && import.meta.client) {
+        if (newItems.length > 0) {
+          localStorage.setItem('guest-cart', JSON.stringify(newItems))
+        } else {
+          localStorage.removeItem('guest-cart')
+        }
       }
-    }
-  }, { deep: true })
+    },
+    { deep: true }
+  )
 
   // Initialize: If client-side and empty, load the guest cart. On a page load,
   // wait until hydration has finished: the server can't see localStorage and
@@ -203,7 +224,9 @@ export const useCart = () => {
       if (saved && !loggedIn.value && cartItems.value.length === 0) {
         try {
           cartItems.value = parseGuestCart(saved)
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
       }
     }
     const nuxtApp = useNuxtApp()
@@ -215,7 +238,7 @@ export const useCart = () => {
     const add = addQueue.then(() => addOne(product, quantity))
     addQueue = add.catch(() => {}) // a failed add must not stop the ones after it
     // The wait runs alongside the add, so it delays neither the add nor the queue.
-    await Promise.all([add, new Promise(resolve => setTimeout(resolve, ADD_MIN_BUSY_MS))])
+    await Promise.all([add, new Promise((resolve) => setTimeout(resolve, ADD_MIN_BUSY_MS))])
   }
 
   const addOne = async (product: CartProduct, quantity: number) => {
@@ -235,7 +258,7 @@ export const useCart = () => {
       } else {
         // Guest Logic. Cap at the same maximum the server applies to a
         // logged-in cart, so a guest line never exceeds it.
-        const existing = cartItems.value.find(item => item.productId === product.id)
+        const existing = cartItems.value.find((item) => item.productId === product.id)
         if (existing) {
           existing.quantity = Math.min(existing.quantity + quantity, CART_MAX_QUANTITY)
         } else {
@@ -257,7 +280,9 @@ export const useCart = () => {
       const noAnswer = loggedIn.value && !failure.answered
       toast.add({
         title: 'Eroare la adaugarea in cos',
-        description: noAnswer ? 'Serverul nu a raspuns. Verifica cosul inainte sa adaugi din nou.' : failure.message,
+        description: noAnswer
+          ? 'Serverul nu a raspuns. Verifica cosul inainte sa adaugi din nou.'
+          : failure.message,
         color: 'error'
       })
       if (noAnswer) await fetchCart()
@@ -271,7 +296,7 @@ export const useCart = () => {
 
     // Optimistic Update
     const previousItems = [...cartItems.value]
-    cartItems.value = cartItems.value.filter(item => item.id !== itemId)
+    cartItems.value = cartItems.value.filter((item) => item.id !== itemId)
 
     if (loggedIn.value) {
       try {
@@ -290,7 +315,7 @@ export const useCart = () => {
   const updateQuantity = async (itemId: number, value: number) => {
     if (!itemId || cartLocked.value) return
 
-    const item = cartItems.value.find(i => i.id === itemId)
+    const item = cartItems.value.find((i) => i.id === itemId)
     if (!item) return
 
     // Nothing for an emptied field or an unchanged quantity (shared/utils/cart.ts).
@@ -327,7 +352,9 @@ export const useCart = () => {
    */
   const syncCart = (): Promise<void> => {
     if (!import.meta.client || !loggedIn.value) return Promise.resolve()
-    guestCartMerge ??= mergeGuestCart().finally(() => { guestCartMerge = null })
+    guestCartMerge ??= mergeGuestCart().finally(() => {
+      guestCartMerge = null
+    })
     return guestCartMerge
   }
 
@@ -349,7 +376,7 @@ export const useCart = () => {
         await $fetch('/api/cart/sync', {
           method: 'POST',
           body: {
-            items: itemsToSync.map(i => ({
+            items: itemsToSync.map((i) => ({
               productId: i.productId,
               quantity: i.quantity
             }))
@@ -360,7 +387,7 @@ export const useCart = () => {
         // overwrite the in-memory guest cart with an empty DB cart.
         await fetchCart()
       } catch (e) {
-        console.error("Sync failed", e)
+        console.error('Sync failed', e)
         // Keep the current in-memory cart state on failure.
       }
     } else {
@@ -371,10 +398,16 @@ export const useCart = () => {
 
   // Added up in whole bani like the order's subtotal on the server, so checkout
   // shows the same free-shipping decision the order is charged with.
-  const total = computed(() => fromBani(sumLines(cartItems.value.map(item => ({
-    price: item.product?.price || 0,
-    quantity: item.quantity
-  })))))
+  const total = computed(() =>
+    fromBani(
+      sumLines(
+        cartItems.value.map((item) => ({
+          price: item.product?.price || 0,
+          quantity: item.quantity
+        }))
+      )
+    )
+  )
 
   return {
     cartItems,

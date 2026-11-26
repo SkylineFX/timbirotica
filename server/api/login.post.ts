@@ -2,12 +2,17 @@ import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 
 // Messages match the login form's own validation (app/pages/user/login.vue).
-const bodySchema = z.object({
-  email: z.email('Adresa de email nu este valida'),
-  password: z.string('Parola este obligatorie').min(1, 'Parola este obligatorie'),
-  remember: z.boolean().optional(),
-  turnstileToken: z.string('Verificare lipsa. Reincarca pagina si incearca din nou.').min(1, 'Verificare lipsa. Reincarca pagina si incearca din nou.'),
-}, { error: 'Date invalide.' })
+const bodySchema = z.object(
+  {
+    email: z.email('Adresa de email nu este valida'),
+    password: z.string('Parola este obligatorie').min(1, 'Parola este obligatorie'),
+    remember: z.boolean().optional(),
+    turnstileToken: z
+      .string('Verificare lipsa. Reincarca pagina si incearca din nou.')
+      .min(1, 'Verificare lipsa. Reincarca pagina si incearca din nou.')
+  },
+  { error: 'Date invalide.' }
+)
 
 // Pre-computed bcrypt hash used to equalize response time when the email
 // isn't found, preventing user enumeration via timing of login attempts.
@@ -19,7 +24,10 @@ export default defineEventHandler(async (event) => {
   // Cloudflare Turnstile verification — rejects bots/credential-stuffing before DB or bcrypt work.
   const turnstile = await verifyTurnstileToken(turnstileToken, event)
   if (!turnstile.success) {
-    throw createError({ statusCode: 400, message: 'Verificare esuata. Reincarca pagina si incearca din nou.' })
+    throw createError({
+      statusCode: 400,
+      message: 'Verificare esuata. Reincarca pagina si incearca din nou.'
+    })
   }
 
   const normalizedEmail = email.trim().toLowerCase()
@@ -28,7 +36,7 @@ export default defineEventHandler(async (event) => {
   if (!config.session.password) {
     throw createError({
       status: 500,
-      message: 'Missing NUXT_SESSION_PASSWORD environment variable',
+      message: 'Missing NUXT_SESSION_PASSWORD environment variable'
     })
   }
 
@@ -42,7 +50,7 @@ export default defineEventHandler(async (event) => {
     await bcrypt.compare(password, DUMMY_HASH)
     throw createError({
       status: 401,
-      message: 'Adresa de email sau parola incorecta.',
+      message: 'Adresa de email sau parola incorecta.'
     })
   }
 
@@ -51,12 +59,13 @@ export default defineEventHandler(async (event) => {
   // takes as long as any wrong password and doesn't reveal how the account
   // signs in.
   const canUsePassword = hasOwnPassword(user.password)
-  const isPasswordValid = await bcrypt.compare(password, canUsePassword ? user.password : DUMMY_HASH) && canUsePassword
+  const isPasswordValid =
+    (await bcrypt.compare(password, canUsePassword ? user.password : DUMMY_HASH)) && canUsePassword
 
   if (!isPasswordValid) {
     throw createError({
       status: 401,
-      message: 'Adresa de email sau parola incorecta.',
+      message: 'Adresa de email sau parola incorecta.'
     })
   }
 
@@ -67,9 +76,9 @@ export default defineEventHandler(async (event) => {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
-      role: user.role as 'user' | 'admin',
+      role: user.role as 'user' | 'admin'
     },
-    secure: newSessionGuard(user.password, Boolean(remember)),
+    secure: newSessionGuard(user.password, Boolean(remember))
   })
 
   return {}

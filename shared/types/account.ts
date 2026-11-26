@@ -17,7 +17,10 @@ export type SavedAddress = Omit<AddressForm, 'postalCode' | 'isDefaultShipping'>
  * GET /api/user/billing-addresses. Optional fields left blank are NULL, and
  * rows saved before the phone column have no phone.
  */
-export type SavedBillingAddress = Omit<BillingAddress, 'hasRo' | 'onrc' | 'bankName' | 'iban' | 'phone' | 'isDefaultBilling'> & {
+export type SavedBillingAddress = Omit<
+  BillingAddress,
+  'hasRo' | 'onrc' | 'bankName' | 'iban' | 'phone' | 'isDefaultBilling'
+> & {
   id: number
   hasRo?: boolean | null
   onrc?: string | null

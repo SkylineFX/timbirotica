@@ -22,7 +22,7 @@ export interface GoogleProfile {
 
 export type GoogleSignInResult =
   | { status: 'unverified' }
-  | { status: 'signed-in', user: typeof schema.users.$inferSelect, isNewUser: boolean }
+  | { status: 'signed-in'; user: typeof schema.users.$inferSelect; isNewUser: boolean }
 
 type Db = LibSQLDatabase<typeof schema>
 
@@ -49,7 +49,11 @@ async function findUserByEmail(db: Db, email: string) {
  * deleted. Otherwise whoever registered the address could keep logging in to
  * the account the real owner now uses.
  */
-export async function signInWithGoogle(db: Db, profile: GoogleProfile, now = new Date()): Promise<GoogleSignInResult> {
+export async function signInWithGoogle(
+  db: Db,
+  profile: GoogleProfile,
+  now = new Date()
+): Promise<GoogleSignInResult> {
   const email = text(profile.email).toLowerCase()
   const verified = profile.email_verified === true || profile.verified_email === true
   if (!email || !verified) return { status: 'unverified' }
@@ -58,30 +62,36 @@ export async function signInWithGoogle(db: Db, profile: GoogleProfile, now = new
 
   if (!existing) {
     const fullName = text(profile.name)
-    const user = await db.insert(schema.users).values({
-      email,
-      firstName: text(profile.given_name) || fullName.split(' ')[0] || 'Utilizator',
-      lastName: text(profile.family_name) || fullName.split(' ').slice(1).join(' '),
-      password: GOOGLE_ONLY_PASSWORD,
-      emailVerifiedAt: now,
-      createdAt: now,
-    }).returning().get()
+    const user = await db
+      .insert(schema.users)
+      .values({
+        email,
+        firstName: text(profile.given_name) || fullName.split(' ')[0] || 'Utilizator',
+        lastName: text(profile.family_name) || fullName.split(' ').slice(1).join(' '),
+        password: GOOGLE_ONLY_PASSWORD,
+        emailVerifiedAt: now,
+        createdAt: now
+      })
+      .returning()
+      .get()
     return { status: 'signed-in', user, isNewUser: true }
   }
 
   if (!existing.emailVerifiedAt) {
     // The update and the token cleanup run in one batch, so they are saved together.
     await db.batch([
-      db.update(schema.users)
+      db
+        .update(schema.users)
         .set({ emailVerifiedAt: now, password: GOOGLE_ONLY_PASSWORD })
         .where(eq(schema.users.id, existing.id)),
-      db.delete(schema.emailVerificationTokens)
-        .where(eq(schema.emailVerificationTokens.userId, existing.id)),
+      db
+        .delete(schema.emailVerificationTokens)
+        .where(eq(schema.emailVerificationTokens.userId, existing.id))
     ])
     return {
       status: 'signed-in',
       user: { ...existing, emailVerifiedAt: now, password: GOOGLE_ONLY_PASSWORD },
-      isNewUser: false,
+      isNewUser: false
     }
   }
 

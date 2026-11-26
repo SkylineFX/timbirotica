@@ -13,6 +13,6 @@ import { sessionCookieExpires } from './sessionCheck'
 export async function saveUserSession(event: H3Event, data: Parameters<typeof setUserSession>[1]) {
   const { secure } = await getUserSession(event)
   return setUserSession(event, data, {
-    cookie: { expires: sessionCookieExpires({ ...secure, ...data.secure }) },
+    cookie: { expires: sessionCookieExpires({ ...secure, ...data.secure }) }
   })
 }

@@ -6,19 +6,22 @@ export const SEARCH_MAX_TERM_LENGTH = 48
 export const SEARCH_MIN_LENGTH = 2
 
 /** Whether a typed search is long enough to run: at least 2 characters, not counting spaces around it. */
-export const isSearchLongEnough = (q: string): boolean => Array.from(q.trim()).length >= SEARCH_MIN_LENGTH
+export const isSearchLongEnough = (q: string): boolean =>
+  Array.from(q.trim()).length >= SEARCH_MIN_LENGTH
 
 /**
  * The words of a search query, without diacritics. Control characters count as
  * spaces: FTS5 reads a NUL (`%00` in the URL) as the end of a quoted word.
  */
 export function parseSearchTerms(q: string): string[] {
-  return q.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  return q
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/\p{Cc}/gu, ' ')
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, SEARCH_MAX_TERMS)
-    .map(term => Array.from(term).slice(0, SEARCH_MAX_TERM_LENGTH).join(''))
+    .map((term) => Array.from(term).slice(0, SEARCH_MAX_TERM_LENGTH).join(''))
 }
 
 // Units that product names write both glued to the number ("0.7MM", "80G",
@@ -41,7 +44,7 @@ const NUMBER_AND_UNIT = /^(\d+(?:[.,]\d+)?)(\p{L}+)$/u
 export function buildSearchMatch(terms: string[], { wholeWords = false } = {}): string | null {
   // A quoted FTS5 phrase. With `*` its last word may continue: "pix gel"* matches "PIX GELLY".
   const phrase = (text: string) => `"${text.replaceAll('"', '""')}"${wholeWords ? '' : '*'}`
-  const words = terms.filter(term => /[\p{L}\p{N}]/u.test(term))
+  const words = terms.filter((term) => /[\p{L}\p{N}]/u.test(term))
   const parts: string[] = []
   for (let i = 0; i < words.length; i++) {
     const word = words[i]!

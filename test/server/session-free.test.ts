@@ -13,8 +13,8 @@ const handlerFiles = SESSION_FREE_PATHS.flatMap((prefix) => {
   const dir = join(apiDir, prefix.replace(/^\/api\//, ''))
   return existsSync(dir)
     ? readdirSync(dir, { recursive: true, encoding: 'utf8' })
-      .filter(file => file.endsWith('.ts'))
-      .map(file => join(prefix, file))
+        .filter((file) => file.endsWith('.ts'))
+        .map((file) => join(prefix, file))
     : []
 }).sort()
 
@@ -25,6 +25,8 @@ describe('session-free API handlers', () => {
 
   it.each(handlerFiles)('%s does not use the session', (file) => {
     const source = readFileSync(join(apiDir, file.replace(/^\/api\//, '')), 'utf8')
-    expect(source).not.toMatch(/\b(get|require|set|replace|clear)UserSession\b|requireAdminSession|useSession\(/)
+    expect(source).not.toMatch(
+      /\b(get|require|set|replace|clear)UserSession\b|requireAdminSession|useSession\(/
+    )
   })
 })

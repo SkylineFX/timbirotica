@@ -1,6 +1,10 @@
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { ORDER_STATUS_LABEL, ORDER_STATUS_VALUES, canChangeOrderStatus } from '~~/shared/constants/order'
+import {
+  ORDER_STATUS_LABEL,
+  ORDER_STATUS_VALUES,
+  canChangeOrderStatus
+} from '~~/shared/constants/order'
 
 const bodySchema = z.object({
   status: z.enum(ORDER_STATUS_VALUES)
@@ -29,14 +33,25 @@ export default eventHandler(async (event) => {
   if (!canChangeOrderStatus(order.status, status)) {
     const from = ORDER_STATUS_LABEL[order.status] ?? order.status
     // The current status goes back too, for an admin page showing an older one.
-    throw createError({ statusCode: 400, message: `Statusul nu poate fi schimbat din ${from} in ${ORDER_STATUS_LABEL[status]}.`, data: { status: order.status } })
+    throw createError({
+      statusCode: 400,
+      message: `Statusul nu poate fi schimbat din ${from} in ${ORDER_STATUS_LABEL[status]}.`,
+      data: { status: order.status }
+    })
   }
 
   const updated = await changeOrderStatus(db, id, order.status, status)
 
   if (!updated) {
-    const current = await db.query.orders.findFirst({ where: eq(tables.orders.id, id), columns: { status: true } })
-    throw createError({ statusCode: 409, message: 'Statusul comenzii s-a schimbat intre timp.', data: { status: current?.status } })
+    const current = await db.query.orders.findFirst({
+      where: eq(tables.orders.id, id),
+      columns: { status: true }
+    })
+    throw createError({
+      statusCode: 409,
+      message: 'Statusul comenzii s-a schimbat intre timp.',
+      data: { status: current?.status }
+    })
   }
 
   return updated

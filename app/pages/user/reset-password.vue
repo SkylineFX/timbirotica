@@ -18,28 +18,34 @@ if (!token.value) {
   await navigateTo('/user/forgot-password')
 }
 
-const fields: AuthFormField[] = [{
-  name: 'password',
-  type: 'password',
-  label: 'Parola noua',
-  required: true
-}, {
-  name: 'confirmPassword',
-  type: 'password',
-  label: 'Confirma parola',
-  required: true
-}]
+const fields: AuthFormField[] = [
+  {
+    name: 'password',
+    type: 'password',
+    label: 'Parola noua',
+    required: true
+  },
+  {
+    name: 'confirmPassword',
+    type: 'password',
+    label: 'Confirma parola',
+    required: true
+  }
+]
 
-const schema = z.object({
-  password: z.string('Parola este obligatorie')
-    .min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
-    .regex(/[A-Z]/, 'Parola trebuie sa contina cel putin o litera mare')
-    .regex(/[0-9]/, 'Parola trebuie sa contina cel putin o cifra'),
-  confirmPassword: z.string('Confirmarea parolei este obligatorie')
-}).refine(data => data.password === data.confirmPassword, {
-  message: 'Parolele nu coincid',
-  path: ['confirmPassword']
-})
+const schema = z
+  .object({
+    password: z
+      .string('Parola este obligatorie')
+      .min(8, 'Parola trebuie sa aiba cel putin 8 caractere')
+      .regex(/[A-Z]/, 'Parola trebuie sa contina cel putin o litera mare')
+      .regex(/[0-9]/, 'Parola trebuie sa contina cel putin o cifra'),
+    confirmPassword: z.string('Confirmarea parolei este obligatorie')
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Parolele nu coincid',
+    path: ['confirmPassword']
+  })
 
 type Schema = z.output<typeof schema>
 
@@ -59,14 +65,22 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       toast.add({ title: 'Parola a fost salvata', color: 'success' })
       await navigateTo('/user')
     } else {
-      toast.add({ title: 'Parola resetata', description: 'Te poti autentifica cu noua parola.', color: 'success' })
+      toast.add({
+        title: 'Parola resetata',
+        description: 'Te poti autentifica cu noua parola.',
+        color: 'success'
+      })
       await navigateTo('/user/login')
     }
   } catch (err) {
     if (fetchFailure(err).status === 400) {
       tokenInvalid.value = true
     } else {
-      toast.add({ title: 'Eroare', description: 'A aparut o eroare. Te rugam sa incerci din nou.', color: 'error' })
+      toast.add({
+        title: 'Eroare',
+        description: 'A aparut o eroare. Te rugam sa incerci din nou.',
+        color: 'error'
+      })
     }
   }
 }
@@ -76,11 +90,12 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   <div class="flex flex-col items-center justify-center gap-4 p-4">
     <UPageCard class="w-full max-w-md">
       <template v-if="tokenInvalid">
-        <div class="flex flex-col items-center gap-4 py-6 px-2 text-center">
-          <UIcon name="i-lucide-link-2-off" class="w-12 h-12 text-red-500" />
+        <div class="flex flex-col items-center gap-4 px-2 py-6 text-center">
+          <UIcon name="i-lucide-link-2-off" class="h-12 w-12 text-red-500" />
           <h2 class="text-xl font-bold text-gray-900">Link invalid sau expirat</h2>
-          <p class="text-gray-500 text-sm">
-            Acest link de resetare nu mai este valabil. Linkurile expira dupa 1 ora si pot fi folosite o singura data.
+          <p class="text-sm text-gray-500">
+            Acest link de resetare nu mai este valabil. Linkurile expira dupa 1 ora si pot fi
+            folosite o singura data.
           </p>
           <UButton to="/user/forgot-password" color="primary" variant="subtle" class="mt-2">
             Solicita un nou link
@@ -97,9 +112,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
           :submit="{ label: 'Seteaza parola noua' }"
           @submit="onSubmit"
         >
-          <template #description>
-            Introdu noua parola pentru contul tau.
-          </template>
+          <template #description> Introdu noua parola pentru contul tau. </template>
 
           <template #password-field="{ state }">
             <PasswordInput v-model="state.password" placeholder="Introduceti parola noua" />

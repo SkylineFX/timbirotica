@@ -4,7 +4,11 @@ import * as Sentry from '@sentry/nuxt'
 import { dispatchOrderEmails } from '../../utils/email'
 import { generateProformaPdf, resolveProformaCustomer } from '../../utils/proforma'
 import { buildOrderWrites } from '../../utils/orderWrites'
-import { orderPayloadSchema, computeOrderTotals, MAX_ORDERS_PER_HOUR } from '~~/shared/constants/order'
+import {
+  orderPayloadSchema,
+  computeOrderTotals,
+  MAX_ORDERS_PER_HOUR
+} from '~~/shared/constants/order'
 import { productsWithInvalidQuantity, sameCartQuantities } from '~~/shared/utils/cart'
 
 // CSRF posture: state-changing endpoints rely on nuxt-auth-utils' session cookie
@@ -13,13 +17,16 @@ import { productsWithInvalidQuantity, sameCartQuantities } from '~~/shared/utils
 // is used. Revisit if any future flow needs a stricter (SameSite=Strict) posture.
 
 interface OrderCartItem {
-  productId: number;
-  quantity: number;
-  product: { name: string; price: number };
+  productId: number
+  quantity: number
+  product: { name: string; price: number }
 }
 
 /** Random 8-char hex order number, retrying on the (statistically negligible) collision. */
-async function generateUniqueOrderNumber(db: ReturnType<typeof useDrizzle>, maxAttempts = 5): Promise<string> {
+async function generateUniqueOrderNumber(
+  db: ReturnType<typeof useDrizzle>,
+  maxAttempts = 5
+): Promise<string> {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const candidate = randomBytes(4).toString('hex').toUpperCase()
     const existing = await db.query.orders.findFirst({
@@ -27,7 +34,10 @@ async function generateUniqueOrderNumber(db: ReturnType<typeof useDrizzle>, maxA
     })
     if (!existing) return candidate
   }
-  throw createError({ statusCode: 500, message: 'Nu am putut genera un numar de comanda. Incearca din nou.' })
+  throw createError({
+    statusCode: 500,
+    message: 'Nu am putut genera un numar de comanda. Incearca din nou.'
+  })
 }
 
 export default eventHandler(async (event) => {
@@ -44,17 +54,23 @@ export default eventHandler(async (event) => {
   }
 
   if (!userRecord.emailVerifiedAt) {
-    throw createError({ statusCode: 403, message: 'Trebuie sa confirmi adresa de email inainte de a plasa o comanda.' })
+    throw createError({
+      statusCode: 403,
+      message: 'Trebuie sa confirmi adresa de email inainte de a plasa o comanda.'
+    })
   }
 
   // Rate limit per account (see MAX_ORDERS_PER_HOUR). orders_user_id_idx keeps
   // this to the account's own order rows.
-  const [recent] = await db.select({ count: sql<number>`count(*)` })
+  const [recent] = await db
+    .select({ count: sql<number>`count(*)` })
     .from(tables.orders)
-    .where(and(
-      eq(tables.orders.userId, session.user.id),
-      gt(tables.orders.createdAt, new Date(Date.now() - 60 * 60 * 1000))
-    ))
+    .where(
+      and(
+        eq(tables.orders.userId, session.user.id),
+        gt(tables.orders.createdAt, new Date(Date.now() - 60 * 60 * 1000))
+      )
+    )
   if ((recent?.count ?? 0) >= MAX_ORDERS_PER_HOUR) {
     throw createError({
       statusCode: 429,
@@ -84,28 +100,30 @@ export default eventHandler(async (event) => {
   // Two rows of one product are checked together, so they can't pass the maximum.
   const invalidProducts = productsWithInvalidQuantity(cart.items)
   if (invalidProducts.size) {
-    const names = new Set(cart.items.filter(i => invalidProducts.has(i.productId)).map(i => i.product.name))
+    const names = new Set(
+      cart.items.filter((i) => invalidProducts.has(i.productId)).map((i) => i.product.name)
+    )
     throw createError({
       statusCode: 400,
       message: `Cantitate invalida pentru: ${[...names].join(', ')}. Actualizeaza cosul si reincearca.`
     })
   }
 
-  const unavailable = cart.items.filter(i => (i.product?.stock ?? 0) <= 0)
+  const unavailable = cart.items.filter((i) => (i.product?.stock ?? 0) <= 0)
   if (unavailable.length) {
     throw createError({
       statusCode: 409,
-      message: `Urmatoarele produse nu mai sunt disponibile: ${unavailable.map(i => i.product.name).join(', ')}.`
+      message: `Urmatoarele produse nu mai sunt disponibile: ${unavailable.map((i) => i.product.name).join(', ')}.`
     })
   }
 
   // Never sell a product without a valid price. A price of 0 or less can only
   // come from bad catalog data (e.g. an empty price in a scraper file).
-  const unpriced = cart.items.filter(i => !(i.product.price > 0))
+  const unpriced = cart.items.filter((i) => !(i.product.price > 0))
   if (unpriced.length) {
     throw createError({
       statusCode: 409,
-      message: `Pretul nu este disponibil pentru: ${unpriced.map(i => i.product.name).join(', ')}. Te rugam sa ne contactezi.`
+      message: `Pretul nu este disponibil pentru: ${unpriced.map((i) => i.product.name).join(', ')}. Te rugam sa ne contactezi.`
     })
   }
 
@@ -113,12 +131,13 @@ export default eventHandler(async (event) => {
   // too, but a quantity change it gave up on can still be saved after its last
   // read, and another tab can change the cart. Older pages send no quantities.
   const shown = body.priceSnapshots
-  if (shown?.length && shown.every(s => s.quantity !== undefined)) {
-    const shownCart = shown.map(s => ({ productId: s.productId, quantity: s.quantity! }))
+  if (shown?.length && shown.every((s) => s.quantity !== undefined)) {
+    const shownCart = shown.map((s) => ({ productId: s.productId, quantity: s.quantity! }))
     if (!sameCartQuantities(shownCart, cart.items)) {
       throw createError({
         statusCode: 409,
-        message: 'Cosul s-a actualizat. Verifica produsele si cantitatile, apoi plaseaza comanda din nou.',
+        message:
+          'Cosul s-a actualizat. Verifica produsele si cantitatile, apoi plaseaza comanda din nou.',
         data: { cartChanged: true }
       })
     }
@@ -129,8 +148,8 @@ export default eventHandler(async (event) => {
   // cart and have the user re-confirm. Snapshots are optional so older clients
   // still work (they'd just lose the guard).
   if (body.priceSnapshots && body.priceSnapshots.length > 0) {
-    const snapByProduct = new Map(body.priceSnapshots.map(s => [s.productId, s.price]))
-    const changed = cart.items.some(item => {
+    const snapByProduct = new Map(body.priceSnapshots.map((s) => [s.productId, s.price]))
+    const changed = cart.items.some((item) => {
       const snap = snapByProduct.get(item.productId)
       return snap !== undefined && snap !== item.product.price
     })
@@ -153,12 +172,13 @@ export default eventHandler(async (event) => {
     if (!body.shippingAddressId) {
       throw createError({ statusCode: 400, message: 'Adresa este obligatorie.' })
     }
-    shippingAddress = await db.query.addresses.findFirst({
-      where: and(
-        eq(tables.addresses.id, body.shippingAddressId),
-        eq(tables.addresses.userId, session.user.id)
-      )
-    }) ?? null
+    shippingAddress =
+      (await db.query.addresses.findFirst({
+        where: and(
+          eq(tables.addresses.id, body.shippingAddressId),
+          eq(tables.addresses.userId, session.user.id)
+        )
+      })) ?? null
     if (!shippingAddress) {
       throw createError({ statusCode: 404, message: 'Adresa selectata nu a fost gasita.' })
     }
@@ -169,28 +189,36 @@ export default eventHandler(async (event) => {
     if (!body.billingAddressId) {
       throw createError({ statusCode: 400, message: 'Datele de facturare sunt obligatorii.' })
     }
-    billingAddress = await db.query.billingAddresses.findFirst({
-      where: and(
-        eq(tables.billingAddresses.id, body.billingAddressId),
-        eq(tables.billingAddresses.userId, session.user.id)
-      )
-    }) ?? null
+    billingAddress =
+      (await db.query.billingAddresses.findFirst({
+        where: and(
+          eq(tables.billingAddresses.id, body.billingAddressId),
+          eq(tables.billingAddresses.userId, session.user.id)
+        )
+      })) ?? null
     if (!billingAddress) {
-      throw createError({ statusCode: 404, message: 'Adresa de facturare selectata nu a fost gasita.' })
+      throw createError({
+        statusCode: 404,
+        message: 'Adresa de facturare selectata nu a fost gasita.'
+      })
     }
   }
 
   // Individual invoice billed to a different saved address (Persoana fizica + "alta adresa")
   let billingPersonalAddress: typeof tables.addresses.$inferSelect | null = null
   if (body.billingSameAsShipping && body.billingPersonalAddressId) {
-    billingPersonalAddress = await db.query.addresses.findFirst({
-      where: and(
-        eq(tables.addresses.id, body.billingPersonalAddressId),
-        eq(tables.addresses.userId, session.user.id)
-      )
-    }) ?? null
+    billingPersonalAddress =
+      (await db.query.addresses.findFirst({
+        where: and(
+          eq(tables.addresses.id, body.billingPersonalAddressId),
+          eq(tables.addresses.userId, session.user.id)
+        )
+      })) ?? null
     if (!billingPersonalAddress) {
-      throw createError({ statusCode: 404, message: 'Adresa de facturare selectata nu a fost gasita.' })
+      throw createError({
+        statusCode: 404,
+        message: 'Adresa de facturare selectata nu a fost gasita.'
+      })
     }
   }
 
@@ -198,7 +226,10 @@ export default eventHandler(async (event) => {
   //    Totals (incl. the pickup-is-free shipping rule) come from the shared
   //    computeOrderTotals so they can't drift from the summed line items.
   const { shippingCost, total } = computeOrderTotals(
-    cart.items.map((item: OrderCartItem) => ({ quantity: item.quantity, price: item.product.price })),
+    cart.items.map((item: OrderCartItem) => ({
+      quantity: item.quantity,
+      price: item.product.price
+    })),
     body.shippingMethod
   )
 
@@ -219,40 +250,50 @@ export default eventHandler(async (event) => {
   //    splits the lines to fit D1's limit of 100 parameters per statement, so
   //    the number of products in an order is not limited.
   try {
-    await db.batch(buildOrderWrites(db, {
-      order: {
-        userId: session.user.id,
-        orderNumber,
-        total,
-        status: 'processing',
-        shippingMethod: body.shippingMethod,
-        paymentMethod: body.paymentMethod,
-        shippingCost,
-        shippingAddressSnapshot,
-        billingAddressSnapshot,
-        termsAcceptedAt: date,
-        createdAt: date,
-      },
-      lines: cart.items.map((item: OrderCartItem) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        priceAtBuy: item.product.price
-      })),
-      cartId: cart.id,
-    }))
+    await db.batch(
+      buildOrderWrites(db, {
+        order: {
+          userId: session.user.id,
+          orderNumber,
+          total,
+          status: 'processing',
+          shippingMethod: body.shippingMethod,
+          paymentMethod: body.paymentMethod,
+          shippingCost,
+          shippingAddressSnapshot,
+          billingAddressSnapshot,
+          termsAcceptedAt: date,
+          createdAt: date
+        },
+        lines: cart.items.map((item: OrderCartItem) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          priceAtBuy: item.product.price
+        })),
+        cartId: cart.id
+      })
+    )
   } catch (err) {
     // An emptied cart means another submit of this cart (a second tab, a retry)
     // saved the order first, and buildOrderWrites refused to order it twice.
-    const cartStillHasItems = await db.query.cartItems.findFirst({
-      where: eq(tables.cartItems.cartId, cart.id),
-      columns: { id: true }
-    }).catch(() => true)
+    const cartStillHasItems = await db.query.cartItems
+      .findFirst({
+        where: eq(tables.cartItems.cartId, cart.id),
+        columns: { id: true }
+      })
+      .catch(() => true)
     if (!cartStillHasItems) {
-      throw createError({ statusCode: 409, message: 'Comanda pentru acest cos a fost deja plasata. O gasesti in Comenzile mele.' })
+      throw createError({
+        statusCode: 409,
+        message: 'Comanda pentru acest cos a fost deja plasata. O gasesti in Comenzile mele.'
+      })
     }
     console.error(`Saving order ${orderNumber} failed; nothing was saved.`, err)
     Sentry.captureException(err, { tags: { area: 'order-create', orderNumber } })
-    throw createError({ statusCode: 500, message: 'Nu am putut plasa comanda. Te rugam sa incerci din nou.' })
+    throw createError({
+      statusCode: 500,
+      message: 'Nu am putut plasa comanda. Te rugam sa incerci din nou.'
+    })
   }
 
   // 7. Dispatch the order confirmation email asynchronously
@@ -266,42 +307,53 @@ export default eventHandler(async (event) => {
   // pickup + Persoana fizica the shipping record still exists (it's the
   // personal/invoice address picked under Persoana fizica), but it isn't a
   // delivery address — it's already surfaced via the billing snapshot.
-  const emailShippingAddress = (shippingAddress && body.shippingMethod === 'courier') ? {
-    fullName: `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim(),
-    address: shippingAddress.street || '',
-    city: shippingAddress.city || '',
-    county: shippingAddress.county || '',
-    phone: shippingAddress.phone || ''
-  } : undefined
+  const emailShippingAddress =
+    shippingAddress && body.shippingMethod === 'courier'
+      ? {
+          fullName: `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim(),
+          address: shippingAddress.street || '',
+          city: shippingAddress.city || '',
+          county: shippingAddress.county || '',
+          phone: shippingAddress.phone || ''
+        }
+      : undefined
 
   // Always render the "Date de facturare" block — pick whichever billing source
   // resolved: company billing (Persoana juridica) → different individual billing
   // → shipping/personal address.
   const individualBilling = billingPersonalAddress ?? shippingAddress
-  const emailBillingAddress = billingAddress ? {
-    companyName: billingAddress.companyName,
-    cui: (billingAddress.hasRo ? 'RO' : '') + (billingAddress.cui || ''),
-    onrc: billingAddress.onrc || '',
-    bankName: billingAddress.bankName || '',
-    iban: billingAddress.iban || '',
-    address: billingAddress.street || '',
-    city: billingAddress.city || '',
-    county: billingAddress.county || ''
-  } : individualBilling ? {
-    firstName: individualBilling.firstName || '',
-    lastName: individualBilling.lastName || '',
-    address: individualBilling.street || '',
-    city: individualBilling.city || '',
-    county: individualBilling.county || ''
-  } : undefined
+  const emailBillingAddress = billingAddress
+    ? {
+        companyName: billingAddress.companyName,
+        cui: (billingAddress.hasRo ? 'RO' : '') + (billingAddress.cui || ''),
+        onrc: billingAddress.onrc || '',
+        bankName: billingAddress.bankName || '',
+        iban: billingAddress.iban || '',
+        address: billingAddress.street || '',
+        city: billingAddress.city || '',
+        county: billingAddress.county || ''
+      }
+    : individualBilling
+      ? {
+          firstName: individualBilling.firstName || '',
+          lastName: individualBilling.lastName || '',
+          address: individualBilling.street || '',
+          city: individualBilling.city || '',
+          county: individualBilling.county || ''
+        }
+      : undefined
 
   // 8. Generate the proforma PDF (best-effort — order succeeds even if PDF fails)
   let proformaPdf: Uint8Array | undefined
   try {
-    const customer = resolveProformaCustomer(billingAddress, billingPersonalAddress ?? shippingAddress, {
-      firstName: userRecord.firstName,
-      lastName: userRecord.lastName
-    })
+    const customer = resolveProformaCustomer(
+      billingAddress,
+      billingPersonalAddress ?? shippingAddress,
+      {
+        firstName: userRecord.firstName,
+        lastName: userRecord.lastName
+      }
+    )
     proformaPdf = await generateProformaPdf({
       orderNumber,
       orderDate: date,
@@ -324,14 +376,19 @@ export default eventHandler(async (event) => {
   const emailData = {
     orderNumber,
     customerName: shippingAddress?.firstName || session.user.firstName || 'Client',
-    customerFullName: `${shippingAddress?.firstName || session.user.firstName || ''} ${shippingAddress?.lastName || session.user.lastName || ''}`.trim() || 'Client',
+    customerFullName:
+      `${shippingAddress?.firstName || session.user.firstName || ''} ${shippingAddress?.lastName || session.user.lastName || ''}`.trim() ||
+      'Client',
     customerEmail: userRecord.email,
     // The order's contact phone is the BILLING snapshot's phone — whichever billing
     // source resolved (company → different individual addr → shipping/personal addr).
     // Shipping's phone is kept separately in the shipping snapshot for the Livrare
     // box on the admin page. Account phone is a last-resort fallback for legacy
     // orders whose billing snapshot has no phone.
-    customerPhone: (billingAddress ?? billingPersonalAddress ?? shippingAddress)?.phone || userRecord.phone || '',
+    customerPhone:
+      (billingAddress ?? billingPersonalAddress ?? shippingAddress)?.phone ||
+      userRecord.phone ||
+      '',
     orderDate: date.toISOString(),
     paymentMethod: body.paymentMethod,
     shippingMethod: body.shippingMethod,
@@ -340,10 +397,12 @@ export default eventHandler(async (event) => {
     items: emailItems,
     shippingAddress: emailShippingAddress,
     billingAddress: emailBillingAddress,
-    attachment: proformaPdf ? {
-      filename: `Proforma-${orderNumber}.pdf`,
-      content: proformaPdf
-    } : undefined
+    attachment: proformaPdf
+      ? {
+          filename: `Proforma-${orderNumber}.pdf`,
+          content: proformaPdf
+        }
+      : undefined
   }
 
   // Dispatch customer + admin emails in the background; failures are logged and

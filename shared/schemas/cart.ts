@@ -25,7 +25,7 @@ export const productIdSchema = z
 
 export const cartLineSchema = z.object({
   productId: productIdSchema,
-  quantity: cartQuantitySchema,
+  quantity: cartQuantitySchema
 })
 
 export type CartLineInput = z.infer<typeof cartLineSchema>

@@ -29,7 +29,7 @@ export async function validateUserSession(event: H3Event): Promise<void> {
 
   const account = await useDrizzle().query.users.findFirst({
     where: eq(tables.users.id, session.user.id),
-    columns: { password: true, role: true },
+    columns: { password: true, role: true }
   })
   if (isSessionCurrent(session, account)) return
 

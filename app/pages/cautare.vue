@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
-const searchQuery = computed(() => route.query.q as string || '')
+const searchQuery = computed(() => (route.query.q as string) || '')
 const apiQuery = computed(() => ({ q: searchQuery.value }))
 </script>
 

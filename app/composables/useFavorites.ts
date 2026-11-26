@@ -22,11 +22,11 @@ export const useFavorites = () => {
       favorites.value = []
       return
     }
-    
+
     // Auto-block SSR fetching (Nuxt SSR $fetch doesn't natively forward your browser cookie without proxying)
     if (import.meta.server) return
-    
-    // Prevent duplicated fetch spam if multiple components initialize the composable 
+
+    // Prevent duplicated fetch spam if multiple components initialize the composable
     if (isLoading.value || favorites.value.length > 0) return
 
     isLoading.value = true
@@ -51,7 +51,7 @@ export const useFavorites = () => {
     }
 
     // Optimistic update
-    const exists = favorites.value.some(f => f.productId === product.id)
+    const exists = favorites.value.some((f) => f.productId === product.id)
     if (exists) {
       toast.add({ title: 'Produsul este deja la favorite', color: 'info' })
       return
@@ -77,7 +77,7 @@ export const useFavorites = () => {
         // Swap the temporary id for the saved row's id, so removing it later
         // deletes the right row. (Refetching didn't do this: fetchFavorites
         // skips the request when the list isn't empty.)
-        const item = favorites.value.find(f => f.id === tempId)
+        const item = favorites.value.find((f) => f.id === tempId)
         if (item) {
           item.id = res.id
         } else {
@@ -89,7 +89,7 @@ export const useFavorites = () => {
       }
     } catch {
       // Rollback
-      favorites.value = favorites.value.filter(f => f.id !== tempId)
+      favorites.value = favorites.value.filter((f) => f.id !== tempId)
       toast.add({ title: 'Eroare la adaugare', color: 'error' })
     }
   }
@@ -97,7 +97,7 @@ export const useFavorites = () => {
   const removeFromFavorites = async (favoriteId: number) => {
     // Optimistic
     const prev = [...favorites.value]
-    favorites.value = favorites.value.filter(f => f.id !== favoriteId)
+    favorites.value = favorites.value.filter((f) => f.id !== favoriteId)
 
     try {
       await $fetch(`/api/favorites/${favoriteId}`, {
@@ -111,10 +111,14 @@ export const useFavorites = () => {
   }
 
   // Auto-fetch when logged in
-  watch(loggedIn, (val) => {
-    if (val) fetchFavorites()
-    else favorites.value = []
-  }, { immediate: true })
+  watch(
+    loggedIn,
+    (val) => {
+      if (val) fetchFavorites()
+      else favorites.value = []
+    },
+    { immediate: true }
+  )
 
   return {
     favorites,

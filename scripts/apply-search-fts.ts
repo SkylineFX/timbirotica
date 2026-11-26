@@ -17,5 +17,7 @@ const [products, indexed] = await Promise.all([
   client.execute('SELECT count(*) AS n FROM products'),
   client.execute(`SELECT count(*) AS n FROM products_fts_docsize`)
 ])
-console.log(`Search index rebuilt: ${indexed.rows[0]!.n} of ${products.rows[0]!.n} products indexed.`)
+console.log(
+  `Search index rebuilt: ${indexed.rows[0]!.n} of ${products.rows[0]!.n} products indexed.`
+)
 client.close()

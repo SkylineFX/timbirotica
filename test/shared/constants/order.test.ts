@@ -11,7 +11,7 @@ import {
   COURIER_SHIPPING_COST,
   ORDER_STATUS_VALUES,
   ORDER_STATUS_TRANSITIONS,
-  canChangeOrderStatus,
+  canChangeOrderStatus
 } from '~~/shared/constants/order'
 
 describe('getCourierShippingCost', () => {
@@ -56,7 +56,7 @@ describe('method labels', () => {
 describe('computeOrderTotals', () => {
   const items = [
     { quantity: 2, price: 50 }, // 100
-    { quantity: 1, price: 30 }, // 30
+    { quantity: 1, price: 30 } // 30
   ]
 
   it('sums line items into the subtotal', () => {
@@ -82,28 +82,53 @@ describe('computeOrderTotals', () => {
   })
 
   it('returns zeroed totals for an empty cart', () => {
-    expect(computeOrderTotals([], 'courier')).toEqual({ subtotal: 0, shippingCost: COURIER_SHIPPING_COST, total: COURIER_SHIPPING_COST })
+    expect(computeOrderTotals([], 'courier')).toEqual({
+      subtotal: 0,
+      shippingCost: COURIER_SHIPPING_COST,
+      total: COURIER_SHIPPING_COST
+    })
   })
 
   it('rounds the totals to whole bani', () => {
     // 3 x 9.99 sums to 29.970000000000002 in floating point
-    const { subtotal, total } = computeOrderTotals([{ quantity: 1, price: 9.99 }, { quantity: 1, price: 9.99 }, { quantity: 1, price: 9.99 }, { quantity: 1, price: 0.1 }, { quantity: 1, price: 0.2 }], 'pickup')
+    const { subtotal, total } = computeOrderTotals(
+      [
+        { quantity: 1, price: 9.99 },
+        { quantity: 1, price: 9.99 },
+        { quantity: 1, price: 9.99 },
+        { quantity: 1, price: 0.1 },
+        { quantity: 1, price: 0.2 }
+      ],
+      'pickup'
+    )
     expect(subtotal).toBe(30.27)
     expect(total).toBe(30.27)
   })
 
   it('gives free shipping to a cart of exactly 200 lei that floating point sums just below it', () => {
     // 0.01 + 129.14 + 70.85 is 199.99999999999997 in floating point
-    const cart = [{ quantity: 1, price: 0.01 }, { quantity: 1, price: 129.14 }, { quantity: 1, price: 70.85 }]
-    expect(computeOrderTotals(cart, 'courier')).toEqual({ subtotal: 200, shippingCost: 0, total: 200 })
+    const cart = [
+      { quantity: 1, price: 0.01 },
+      { quantity: 1, price: 129.14 },
+      { quantity: 1, price: 70.85 }
+    ]
+    expect(computeOrderTotals(cart, 'courier')).toEqual({
+      subtotal: 200,
+      shippingCost: 0,
+      total: 200
+    })
   })
 
   it('charges shipping one ban below the threshold, and adds quantities exactly', () => {
-    expect(computeOrderTotals([{ quantity: 1, price: 199.99 }], 'courier')).toEqual({ subtotal: 199.99, shippingCost: 30, total: 229.99 })
+    expect(computeOrderTotals([{ quantity: 1, price: 199.99 }], 'courier')).toEqual({
+      subtotal: 199.99,
+      shippingCost: 30,
+      total: 229.99
+    })
     expect(computeOrderTotals([{ quantity: 3, price: 19.99 }], 'pickup').subtotal).toBe(59.97)
     expect(computeOrderTotals([{ quantity: 3, price: 0.1 }], 'pickup').subtotal).toBe(0.3)
     // 170.07 + 2.23 + 22.11 + 5.59 is 199.99999999999997 in floating point
-    const cart = [170.07, 2.23, 22.11, 5.59].map(price => ({ quantity: 1, price }))
+    const cart = [170.07, 2.23, 22.11, 5.59].map((price) => ({ quantity: 1, price }))
     expect(computeOrderTotals(cart, 'courier').shippingCost).toBe(0)
   })
 })
@@ -121,17 +146,35 @@ describe('orderPayloadSchema', () => {
     shippingMethod: 'courier',
     paymentMethod: 'transfer',
     billingSameAsShipping: true,
-    termsAccepted: true,
+    termsAccepted: true
   }
 
   it('accepts cart snapshots with the quantity shown, and without it (pages loaded before it was sent)', () => {
-    expect(orderPayloadSchema.safeParse({ ...valid, priceSnapshots: [{ productId: 1, price: 9.99, quantity: 2 }] }).success).toBe(true)
-    expect(orderPayloadSchema.safeParse({ ...valid, priceSnapshots: [{ productId: 1, price: 9.99 }] }).success).toBe(true)
+    expect(
+      orderPayloadSchema.safeParse({
+        ...valid,
+        priceSnapshots: [{ productId: 1, price: 9.99, quantity: 2 }]
+      }).success
+    ).toBe(true)
+    expect(
+      orderPayloadSchema.safeParse({ ...valid, priceSnapshots: [{ productId: 1, price: 9.99 }] })
+        .success
+    ).toBe(true)
   })
 
   it('refuses a snapshot quantity that is not a positive whole number', () => {
-    expect(orderPayloadSchema.safeParse({ ...valid, priceSnapshots: [{ productId: 1, price: 9.99, quantity: 0 }] }).success).toBe(false)
-    expect(orderPayloadSchema.safeParse({ ...valid, priceSnapshots: [{ productId: 1, price: 9.99, quantity: 1.5 }] }).success).toBe(false)
+    expect(
+      orderPayloadSchema.safeParse({
+        ...valid,
+        priceSnapshots: [{ productId: 1, price: 9.99, quantity: 0 }]
+      }).success
+    ).toBe(false)
+    expect(
+      orderPayloadSchema.safeParse({
+        ...valid,
+        priceSnapshots: [{ productId: 1, price: 9.99, quantity: 1.5 }]
+      }).success
+    ).toBe(false)
   })
 
   it('accepts a minimal valid payload', () => {

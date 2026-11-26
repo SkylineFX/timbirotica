@@ -3,14 +3,20 @@ import { createLatestWinsSender } from '~~/shared/utils/latestWins'
 
 // A send function whose requests stay open until the test settles them.
 function fakeServer() {
-  const requests: Array<{ key: number; value: number; resolve: () => void; reject: (e: Error) => void }> = []
-  const send = (key: number, value: number) => new Promise<void>((resolve, reject) => {
-    requests.push({ key, value, resolve, reject })
-  })
+  const requests: Array<{
+    key: number
+    value: number
+    resolve: () => void
+    reject: (e: Error) => void
+  }> = []
+  const send = (key: number, value: number) =>
+    new Promise<void>((resolve, reject) => {
+      requests.push({ key, value, resolve, reject })
+    })
   return { requests, send }
 }
 
-const tick = () => new Promise(r => setTimeout(r, 0))
+const tick = () => new Promise((r) => setTimeout(r, 0))
 
 describe('createLatestWinsSender', () => {
   it('sends the first value at once and only the latest of the ones that waited', async () => {
@@ -20,10 +26,10 @@ describe('createLatestWinsSender', () => {
     sender.set(1, 3, 1)
     sender.set(1, 4, 1)
     await tick()
-    expect(requests.map(r => r.value)).toEqual([2])
+    expect(requests.map((r) => r.value)).toEqual([2])
     requests[0]!.resolve()
     await tick()
-    expect(requests.map(r => r.value)).toEqual([2, 4])
+    expect(requests.map((r) => r.value)).toEqual([2, 4])
     requests[1]!.resolve()
     await sender.flush()
     expect(requests).toHaveLength(2)
@@ -36,10 +42,17 @@ describe('createLatestWinsSender', () => {
     sender.set(2, 7, 1)
     sender.set(1, 6, 1)
     await tick()
-    expect(requests.map(r => [r.key, r.value])).toEqual([[1, 5], [2, 7]])
-    requests.forEach(r => r.resolve())
+    expect(requests.map((r) => [r.key, r.value])).toEqual([
+      [1, 5],
+      [2, 7]
+    ])
+    requests.forEach((r) => r.resolve())
     await tick()
-    expect(requests.map(r => [r.key, r.value])).toEqual([[1, 5], [2, 7], [1, 6]])
+    expect(requests.map((r) => [r.key, r.value])).toEqual([
+      [1, 5],
+      [2, 7],
+      [1, 6]
+    ])
     requests[2]!.resolve()
     await sender.flush()
   })
@@ -50,7 +63,9 @@ describe('createLatestWinsSender', () => {
     sender.set(1, 2, 1)
     sender.set(1, 3, 1)
     let flushed = false
-    const flushing = sender.flush().then(() => { flushed = true })
+    const flushing = sender.flush().then(() => {
+      flushed = true
+    })
     await tick()
     requests[0]!.resolve()
     await tick()
@@ -91,7 +106,7 @@ describe('createLatestWinsSender', () => {
     requests[1]!.reject(error)
     await sender.flush()
     expect(onError).toHaveBeenCalledWith(1, 2, error)
-    expect(requests.map(r => r.value)).toEqual([2, 3])
+    expect(requests.map((r) => r.value)).toEqual([2, 3])
   })
 
   it('reports the value the server held before, when the first request fails', async () => {
@@ -112,13 +127,15 @@ describe('createLatestWinsSender', () => {
     sender.set(1, 3, 1)
     await tick()
     let cancelled = false
-    const cancelling = sender.cancel(1).then(() => { cancelled = true })
+    const cancelling = sender.cancel(1).then(() => {
+      cancelled = true
+    })
     await tick()
     expect(cancelled).toBe(false)
     requests[0]!.resolve()
     await cancelling
     await sender.flush()
-    expect(requests.map(r => r.value)).toEqual([2])
+    expect(requests.map((r) => r.value)).toEqual([2])
   })
 
   it('starts fresh for a key once it is idle', async () => {
@@ -130,7 +147,7 @@ describe('createLatestWinsSender', () => {
     await sender.flush()
     sender.set(1, 8, 2)
     await tick()
-    expect(requests.map(r => r.value)).toEqual([2, 8])
+    expect(requests.map((r) => r.value)).toEqual([2, 8])
     requests[1]!.resolve()
     await sender.flush()
   })
@@ -157,7 +174,7 @@ describe('createLatestWinsSender with a wait', () => {
     }
     expect(requests).toHaveLength(0)
     await vi.advanceTimersByTimeAsync(DELAY)
-    expect(requests.map(r => r.value)).toEqual([6])
+    expect(requests.map((r) => r.value)).toEqual([6])
     requests[0]!.resolve()
     await sender.flush()
     vi.useRealTimers()
@@ -171,7 +188,7 @@ describe('createLatestWinsSender with a wait', () => {
     await vi.advanceTimersByTimeAsync(DELAY - 1)
     expect(requests).toHaveLength(0)
     await vi.advanceTimersByTimeAsync(1)
-    expect(requests.map(r => r.value)).toEqual([3])
+    expect(requests.map((r) => r.value)).toEqual([3])
     requests[0]!.resolve()
     await sender.flush()
     vi.useRealTimers()
@@ -181,9 +198,11 @@ describe('createLatestWinsSender with a wait', () => {
     const { requests, sender } = setup()
     sender.set(1, 4, 1)
     let flushed = false
-    const flushing = sender.flush().then(() => { flushed = true })
+    const flushing = sender.flush().then(() => {
+      flushed = true
+    })
     await settle()
-    expect(requests.map(r => r.value)).toEqual([4])
+    expect(requests.map((r) => r.value)).toEqual([4])
     expect(flushed).toBe(false)
     requests[0]!.resolve()
     await flushing
@@ -208,9 +227,9 @@ describe('createLatestWinsSender with a wait', () => {
     sender.set(1, 5, 1) // while "2" is in flight
     requests[0]!.resolve()
     await settle()
-    expect(requests.map(r => r.value)).toEqual([2]) // "5" still waits for its timer
+    expect(requests.map((r) => r.value)).toEqual([2]) // "5" still waits for its timer
     await vi.advanceTimersByTimeAsync(DELAY)
-    expect(requests.map(r => r.value)).toEqual([2, 5])
+    expect(requests.map((r) => r.value)).toEqual([2, 5])
     requests[1]!.resolve()
     await sender.flush()
     vi.useRealTimers()
@@ -222,10 +241,10 @@ describe('createLatestWinsSender with a wait', () => {
     await vi.advanceTimersByTimeAsync(DELAY)
     sender.set(1, 7, 1)
     await vi.advanceTimersByTimeAsync(DELAY) // the wait is over, "2" still in flight
-    expect(requests.map(r => r.value)).toEqual([2])
+    expect(requests.map((r) => r.value)).toEqual([2])
     requests[0]!.resolve()
     await settle()
-    expect(requests.map(r => r.value)).toEqual([2, 7])
+    expect(requests.map((r) => r.value)).toEqual([2, 7])
     requests[1]!.resolve()
     await sender.flush()
     vi.useRealTimers()
@@ -236,8 +255,11 @@ describe('createLatestWinsSender with a wait', () => {
     sender.set(1, 3, 1)
     sender.set(2, 9, 1)
     await vi.advanceTimersByTimeAsync(DELAY)
-    expect(requests.map(r => [r.key, r.value])).toEqual([[1, 3], [2, 9]])
-    requests.forEach(r => r.resolve())
+    expect(requests.map((r) => [r.key, r.value])).toEqual([
+      [1, 3],
+      [2, 9]
+    ])
+    requests.forEach((r) => r.resolve())
     await sender.flush()
     vi.useRealTimers()
   })
@@ -250,7 +272,7 @@ describe('createLatestWinsSender with a wait', () => {
     requests[0]!.reject(new Error('429'))
     await vi.advanceTimersByTimeAsync(DELAY * 2)
     expect(onError).toHaveBeenCalledWith(1, 1, expect.any(Error))
-    expect(requests.map(r => r.value)).toEqual([2])
+    expect(requests.map((r) => r.value)).toEqual([2])
     await sender.flush()
     vi.useRealTimers()
   })
@@ -261,7 +283,9 @@ describe('flush with keepalive', () => {
     vi.useFakeTimers()
     const sent: Array<{ key: number; value: number; keepalive: boolean }> = []
     const sender = createLatestWinsSender(
-      async (key: number, value: number, { keepalive }: { keepalive: boolean }) => { sent.push({ key, value, keepalive }) },
+      async (key: number, value: number, { keepalive }: { keepalive: boolean }) => {
+        sent.push({ key, value, keepalive })
+      },
       vi.fn(),
       { delayMs: 300 }
     )
@@ -270,7 +294,10 @@ describe('flush with keepalive', () => {
     sender.set(1, 3, 2)
     await vi.advanceTimersByTimeAsync(300)
     await sender.flush()
-    expect(sent).toEqual([{ key: 1, value: 2, keepalive: true }, { key: 1, value: 3, keepalive: false }])
+    expect(sent).toEqual([
+      { key: 1, value: 2, keepalive: true },
+      { key: 1, value: 3, keepalive: false }
+    ])
     vi.useRealTimers()
   })
 })

@@ -22,6 +22,10 @@ export const productSearchFilter = (match: string): SQL =>
  * in 2 minutes.
  */
 export const productSearchOrder = (match: string, wholeWordsMatch: string): SQL[] => [
-  desc(sql`${schema.products.id} IN (SELECT rowid FROM products_fts WHERE products_fts MATCH ${wholeWordsMatch})`),
-  asc(sql`(SELECT r.rank FROM (SELECT rowid AS id, rank FROM products_fts WHERE products_fts MATCH ${match} LIMIT -1) AS r WHERE r.id = ${schema.products.id})`),
+  desc(
+    sql`${schema.products.id} IN (SELECT rowid FROM products_fts WHERE products_fts MATCH ${wholeWordsMatch})`
+  ),
+  asc(
+    sql`(SELECT r.rank FROM (SELECT rowid AS id, rank FROM products_fts WHERE products_fts MATCH ${match} LIMIT -1) AS r WHERE r.id = ${schema.products.id})`
+  )
 ]

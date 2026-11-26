@@ -26,7 +26,11 @@ describe('fetchFailure', () => {
   })
 
   it('leaves out a message or data of the wrong kind', () => {
-    const failure = fetchFailure({ statusCode: 500, response: {}, data: { message: '', data: 'x' } })
+    const failure = fetchFailure({
+      statusCode: 500,
+      response: {},
+      data: { message: '', data: 'x' }
+    })
     expect(failure.message).toBeUndefined()
     expect(failure.data).toEqual({})
   })

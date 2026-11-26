@@ -1,11 +1,16 @@
 import { describe, it, expect } from 'vitest'
 import {
-  parseSearchTerms, buildSearchMatch, isSearchLongEnough, SEARCH_MAX_TERMS, SEARCH_MAX_TERM_LENGTH,
+  parseSearchTerms,
+  buildSearchMatch,
+  isSearchLongEnough,
+  SEARCH_MAX_TERMS,
+  SEARCH_MAX_TERM_LENGTH
 } from '~~/shared/utils/search'
 
 describe('isSearchLongEnough', () => {
   it('runs a search of 2 characters or more, whatever they are', () => {
-    for (const q of ['ab', 'a4', '80', 'g.', '..', 'ș ș', 'pix']) expect(isSearchLongEnough(q), q).toBe(true)
+    for (const q of ['ab', 'a4', '80', 'g.', '..', 'ș ș', 'pix'])
+      expect(isSearchLongEnough(q), q).toBe(true)
   })
 
   it('does not run a shorter search, not counting spaces around it', () => {
@@ -46,7 +51,9 @@ describe('buildSearchMatch', () => {
   })
 
   it('searches FTS5 operators as plain words', () => {
-    expect(buildSearchMatch(['pix', 'OR', 'NEAR', 'caiet*'])).toBe('"pix"* AND "OR"* AND "NEAR"* AND "caiet*"*')
+    expect(buildSearchMatch(['pix', 'OR', 'NEAR', 'caiet*'])).toBe(
+      '"pix"* AND "OR"* AND "NEAR"* AND "caiet*"*'
+    )
   })
 
   it('doubles quotes inside a word', () => {
@@ -70,7 +77,9 @@ describe('buildSearchMatch', () => {
 
   it('asks for whole words when told to', () => {
     expect(buildSearchMatch(['pix', 'albastru'], { wholeWords: true })).toBe('"pix" AND "albastru"')
-    expect(buildSearchMatch(['pix', '0.7', 'mm'], { wholeWords: true })).toBe('"pix" AND ("0.7 mm" OR "0.7mm")')
+    expect(buildSearchMatch(['pix', '0.7', 'mm'], { wholeWords: true })).toBe(
+      '"pix" AND ("0.7 mm" OR "0.7mm")'
+    )
   })
 
   it('drops words that have no letter or digit', () => {

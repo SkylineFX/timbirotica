@@ -8,17 +8,17 @@ import { fromBani, sumLines, toBani } from '~~/shared/utils/money'
 export const SHIPPING_METHODS = ['courier', 'pickup'] as const
 export const PAYMENT_METHODS = ['transfer', 'cash'] as const
 
-export type ShippingMethod = typeof SHIPPING_METHODS[number]
-export type PaymentMethod = typeof PAYMENT_METHODS[number]
+export type ShippingMethod = (typeof SHIPPING_METHODS)[number]
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number]
 
 // Customer-facing labels (unaccented Romanian)
 export const SHIPPING_METHOD_LABELS: Record<ShippingMethod, string> = {
   courier: 'Curier',
-  pickup: 'Ridicare personala',
+  pickup: 'Ridicare personala'
 }
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   transfer: 'Transfer bancar',
-  cash: 'Ramburs',
+  cash: 'Ramburs'
 }
 
 export const shippingMethodLabel = (m: string): string =>
@@ -27,16 +27,22 @@ export const paymentMethodLabel = (m: string): string =>
   PAYMENT_METHOD_LABELS[m as PaymentMethod] ?? m
 
 // Order statuses. A new order starts as 'processing'.
-export const ORDER_STATUS_VALUES = ['processing', 'confirmed', 'shipped', 'completed', 'cancelled'] as const
+export const ORDER_STATUS_VALUES = [
+  'processing',
+  'confirmed',
+  'shipped',
+  'completed',
+  'cancelled'
+] as const
 
-export type OrderStatus = typeof ORDER_STATUS_VALUES[number]
+export type OrderStatus = (typeof ORDER_STATUS_VALUES)[number]
 
 export const ORDER_STATUS_LABEL: Record<string, string> = {
   processing: 'In procesare',
   confirmed: 'Confirmata',
   shipped: 'Expediata',
   completed: 'Finalizata',
-  cancelled: 'Anulata',
+  cancelled: 'Anulata'
 }
 
 // The statuses an admin can move an order to from each status. Completed and
@@ -46,7 +52,7 @@ export const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, readonly OrderStatus[
   confirmed: ['shipped', 'cancelled', 'processing'],
   shipped: ['completed'],
   completed: [],
-  cancelled: [],
+  cancelled: []
 }
 
 /** Whether an admin can move an order from one status to another. */
@@ -68,8 +74,7 @@ export const getCourierShippingCost = (subtotal: number): number =>
 export const COURIER_HANDLING_DAYS = { min: 1, max: 2 }
 export const COURIER_TRANSIT_DAYS = { min: 1, max: 1 }
 /** The whole courier delivery time for the shop's texts: "2-3" (working days). */
-export const COURIER_DELIVERY_DAYS =
-  `${COURIER_HANDLING_DAYS.min + COURIER_TRANSIT_DAYS.min}-${COURIER_HANDLING_DAYS.max + COURIER_TRANSIT_DAYS.max}`
+export const COURIER_DELIVERY_DAYS = `${COURIER_HANDLING_DAYS.min + COURIER_TRANSIT_DAYS.min}-${COURIER_HANDLING_DAYS.max + COURIER_TRANSIT_DAYS.max}`
 
 // Return terms, as stated on the terms page (/termeni-si-conditii#retur), which
 // hardcodes them: change both together. The customer pays the return shipping.
@@ -104,7 +109,7 @@ export const roundToBani = (amount: number): number => fromBani(toBani(amount))
  */
 export const computeOrderTotals = (
   items: OrderLineItem[],
-  shippingMethod: ShippingMethod,
+  shippingMethod: ShippingMethod
 ): OrderTotals => {
   // Added up in whole bani (shared/utils/money.ts), so the free-shipping test
   // and the stored total see the exact amount.
@@ -137,11 +142,15 @@ export const orderPayloadSchema = z.object({
   // quantities to the cart it orders, and rejects with 409 on any difference so
   // the customer can re-confirm. Quantity is optional for pages loaded before it
   // was sent; without it only the prices are checked.
-  priceSnapshots: z.array(z.object({
-    productId: z.number().int().positive(),
-    price: z.number().nonnegative(),
-    quantity: z.number().int().positive().optional()
-  })).optional()
+  priceSnapshots: z
+    .array(
+      z.object({
+        productId: z.number().int().positive(),
+        price: z.number().nonnegative(),
+        quantity: z.number().int().positive().optional()
+      })
+    )
+    .optional()
 })
 
 export type OrderPayload = z.infer<typeof orderPayloadSchema>

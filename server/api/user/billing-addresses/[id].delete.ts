@@ -21,11 +21,11 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Address not found' })
   }
 
-  await db.delete(tables.billingAddresses)
-    .where(and(
-      eq(tables.billingAddresses.id, id),
-      eq(tables.billingAddresses.userId, session.user.id)
-    ))
+  await db
+    .delete(tables.billingAddresses)
+    .where(
+      and(eq(tables.billingAddresses.id, id), eq(tables.billingAddresses.userId, session.user.id))
+    )
 
   return { success: true }
 })

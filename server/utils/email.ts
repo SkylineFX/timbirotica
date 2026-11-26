@@ -86,14 +86,22 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
     to: data.customerEmail,
     subject: emailSubject(`Confirmare înregistrare comandă #${data.orderNumber}`),
     html: htmlContent,
-    attachments: data.attachment ? [{
-      filename: data.attachment.filename,
-      content: Buffer.from(data.attachment.content)
-    }] : undefined
+    attachments: data.attachment
+      ? [
+          {
+            filename: data.attachment.filename,
+            content: Buffer.from(data.attachment.content)
+          }
+        ]
+      : undefined
   })
 
   if (error) {
-    console.error('Resend API Error:', { statusCode: error.statusCode, name: error.name, message: error.message })
+    console.error('Resend API Error:', {
+      statusCode: error.statusCode,
+      name: error.name,
+      message: error.message
+    })
     throw new Error(error.message)
   }
 
@@ -101,7 +109,11 @@ export async function sendOrderConfirmation(data: OrderEmailData): Promise<void>
   console.log(`Order confirmation email sent for order ${data.orderNumber}`)
 }
 
-export async function sendEmailVerification(data: { email: string; firstName: string; verifyLink: string }): Promise<void> {
+export async function sendEmailVerification(data: {
+  email: string
+  firstName: string
+  verifyLink: string
+}): Promise<void> {
   const config = useRuntimeConfig()
 
   if (!config.resendApiKey) {
@@ -126,7 +138,11 @@ export async function sendEmailVerification(data: { email: string; firstName: st
   })
 
   if (error) {
-    console.error('Resend API Error:', { statusCode: error.statusCode, name: error.name, message: error.message })
+    console.error('Resend API Error:', {
+      statusCode: error.statusCode,
+      name: error.name,
+      message: error.message
+    })
     throw new Error(error.message)
   }
 }
@@ -165,14 +181,22 @@ export async function sendNewOrderAdminNotification(data: OrderEmailData): Promi
     replyTo: data.customerEmail, // Admin can reply straight to the customer
     subject: emailSubject(`Comanda noua #${data.orderNumber}`),
     html: htmlContent,
-    attachments: data.attachment ? [{
-      filename: data.attachment.filename,
-      content: Buffer.from(data.attachment.content)
-    }] : undefined
+    attachments: data.attachment
+      ? [
+          {
+            filename: data.attachment.filename,
+            content: Buffer.from(data.attachment.content)
+          }
+        ]
+      : undefined
   })
 
   if (error) {
-    console.error('Resend API Error:', { statusCode: error.statusCode, name: error.name, message: error.message })
+    console.error('Resend API Error:', {
+      statusCode: error.statusCode,
+      name: error.name,
+      message: error.message
+    })
     throw new Error(error.message)
   }
 
@@ -195,7 +219,9 @@ export async function dispatchOrderEmails(data: OrderEmailData): Promise<void> {
   for (const r of results) {
     if (r.status === 'rejected') {
       console.error('Background order email dispatch failed:', r.reason)
-      Sentry.captureException(r.reason, { tags: { area: 'order-email', orderNumber: data.orderNumber } })
+      Sentry.captureException(r.reason, {
+        tags: { area: 'order-email', orderNumber: data.orderNumber }
+      })
     }
   }
 }
@@ -235,7 +261,11 @@ export async function sendContactMessage(data: ContactMessageData): Promise<void
   })
 
   if (error) {
-    console.error('Resend API Error:', { statusCode: error.statusCode, name: error.name, message: error.message })
+    console.error('Resend API Error:', {
+      statusCode: error.statusCode,
+      name: error.name,
+      message: error.message
+    })
     throw new Error(error.message)
   }
 
@@ -243,7 +273,11 @@ export async function sendContactMessage(data: ContactMessageData): Promise<void
   console.log(`Contact message sent to ${config.adminEmail}`)
 }
 
-export async function sendPasswordReset(data: { email: string; firstName: string; resetLink: string }): Promise<void> {
+export async function sendPasswordReset(data: {
+  email: string
+  firstName: string
+  resetLink: string
+}): Promise<void> {
   const config = useRuntimeConfig()
 
   if (!config.resendApiKey) {
@@ -268,7 +302,11 @@ export async function sendPasswordReset(data: { email: string; firstName: string
   })
 
   if (error) {
-    console.error('Resend API Error:', { statusCode: error.statusCode, name: error.name, message: error.message })
+    console.error('Resend API Error:', {
+      statusCode: error.statusCode,
+      name: error.name,
+      message: error.message
+    })
     throw new Error(error.message)
   }
 }

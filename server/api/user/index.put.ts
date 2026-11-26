@@ -4,7 +4,10 @@ import { z } from 'zod'
 const bodySchema = z.object({
   firstName: z.string().min(2, 'Prenumele trebuie sa aiba cel putin 2 caractere'),
   lastName: z.string().min(2, 'Numele trebuie sa aiba cel putin 2 caractere'),
-  phone: z.string().regex(/^0\d{9}$/, 'Numar de telefon invalid').or(z.literal('')),
+  phone: z
+    .string()
+    .regex(/^0\d{9}$/, 'Numar de telefon invalid')
+    .or(z.literal(''))
 })
 
 export default eventHandler(async (event) => {
@@ -12,11 +15,12 @@ export default eventHandler(async (event) => {
   const body = await readBodyWithSchema(event, bodySchema)
   const db = useDrizzle()
 
-  const [updatedUser] = await db.update(tables.users)
+  const [updatedUser] = await db
+    .update(tables.users)
     .set({
       firstName: body.firstName,
       lastName: body.lastName,
-      phone: body.phone || null,
+      phone: body.phone || null
     })
     .where(eq(tables.users.id, session.user.id))
     .returning({
@@ -24,7 +28,7 @@ export default eventHandler(async (event) => {
       firstName: tables.users.firstName,
       lastName: tables.users.lastName,
       phone: tables.users.phone,
-      email: tables.users.email,
+      email: tables.users.email
     })
 
   if (!updatedUser) {
@@ -36,7 +40,7 @@ export default eventHandler(async (event) => {
       id: updatedUser.id,
       firstName: updatedUser.firstName,
       lastName: updatedUser.lastName,
-      role: session.user.role,
+      role: session.user.role
     }
   })
 

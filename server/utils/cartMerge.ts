@@ -22,8 +22,9 @@ type Db = LibSQLDatabase<typeof schema>
  * parameter limit. Run them in one `db.batch(...)` and flatten the results.
  */
 export function buildProductLookups(db: Db, productIds: readonly number[]) {
-  return splitIntoChunks(productIds, PRODUCT_IDS_PER_LOOKUP).map(ids =>
-    db.select({ id: schema.products.id })
+  return splitIntoChunks(productIds, PRODUCT_IDS_PER_LOOKUP).map((ids) =>
+    db
+      .select({ id: schema.products.id })
       .from(schema.products)
       .where(inArray(schema.products.id, ids))
   )
@@ -47,20 +48,25 @@ export function buildProductLookups(db: Db, productIds: readonly number[]) {
  */
 export function buildCartMergeWrites(
   db: Db,
-  { cartId, merged, existingItems }: {
+  {
+    cartId,
+    merged,
+    existingItems
+  }: {
     cartId: number
     merged: readonly CartLine[]
-    existingItems: readonly { id: number, productId: number }[]
+    existingItems: readonly { id: number; productId: number }[]
   }
 ): BatchItem<'sqlite'>[] {
   const writes: BatchItem<'sqlite'>[] = []
   const newLines: (typeof schema.cartItems.$inferInsert)[] = []
 
-  const mergedProductIds = new Set(merged.map(line => line.productId))
+  const mergedProductIds = new Set(merged.map((line) => line.productId))
   const existingItemIdByProduct = new Map<number, number>()
   const duplicateItemIds: number[] = []
   for (const item of existingItems) {
-    if (!existingItemIdByProduct.has(item.productId)) existingItemIdByProduct.set(item.productId, item.id)
+    if (!existingItemIdByProduct.has(item.productId))
+      existingItemIdByProduct.set(item.productId, item.id)
     else if (mergedProductIds.has(item.productId)) duplicateItemIds.push(item.id)
   }
   for (const ids of splitIntoChunks(duplicateItemIds, PRODUCT_IDS_PER_LOOKUP)) {
@@ -73,7 +79,9 @@ export function buildCartMergeWrites(
     if (existingItemId === undefined) {
       newLines.push({ cartId, productId: line.productId, quantity })
     } else {
-      writes.push(db.update(schema.cartItems).set({ quantity }).where(eq(schema.cartItems.id, existingItemId)))
+      writes.push(
+        db.update(schema.cartItems).set({ quantity }).where(eq(schema.cartItems.id, existingItemId))
+      )
     }
   }
 

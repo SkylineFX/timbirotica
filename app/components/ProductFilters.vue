@@ -25,23 +25,30 @@ const updateQuery = (changes: Record<string, string | undefined>) => {
 
 const onlyAvailable = computed({
   get: () => route.query.available === '1',
-  set: (val: boolean) => { updateQuery({ available: val ? '1' : undefined }) }
+  set: (val: boolean) => {
+    updateQuery({ available: val ? '1' : undefined })
+  }
 })
 
-const parseSlugList = (v: unknown): string[] =>
-  v ? String(v).split(',').filter(Boolean) : []
+const parseSlugList = (v: unknown): string[] => (v ? String(v).split(',').filter(Boolean) : [])
 
 const selectedSubs = ref<string[]>(parseSlugList(route.query.sub))
 const selectedBrands = ref<string[]>(parseSlugList(route.query.b))
 
-watch(() => route.query.sub, (v) => {
-  const next = parseSlugList(v)
-  if (next.join(',') !== selectedSubs.value.join(',')) selectedSubs.value = next
-})
-watch(() => route.query.b, (v) => {
-  const next = parseSlugList(v)
-  if (next.join(',') !== selectedBrands.value.join(',')) selectedBrands.value = next
-})
+watch(
+  () => route.query.sub,
+  (v) => {
+    const next = parseSlugList(v)
+    if (next.join(',') !== selectedSubs.value.join(',')) selectedSubs.value = next
+  }
+)
+watch(
+  () => route.query.b,
+  (v) => {
+    const next = parseSlugList(v)
+    if (next.join(',') !== selectedBrands.value.join(',')) selectedBrands.value = next
+  }
+)
 
 const toggleSub = (slug: string) => {
   const set = new Set(selectedSubs.value)
@@ -60,8 +67,8 @@ const toggleBrand = (slug: string) => {
 }
 
 const priceBounds = computed(() => props.facets.price ?? { min: 0, max: 0 })
-const showPrice = computed(() =>
-  !!props.facets.price && props.facets.price.min < props.facets.price.max
+const showPrice = computed(
+  () => !!props.facets.price && props.facets.price.min < props.facets.price.max
 )
 
 const parsePriceQuery = (v: unknown, fallback: number): number => {
@@ -85,7 +92,9 @@ const localPrice = ref<[number, number]>(initialPrice())
 
 watch(
   () => [priceBounds.value.min, priceBounds.value.max, route.query.minPrice, route.query.maxPrice],
-  () => { localPrice.value = initialPrice() }
+  () => {
+    localPrice.value = initialPrice()
+  }
 )
 
 let priceDebounce: ReturnType<typeof setTimeout> | null = null
@@ -108,19 +117,18 @@ onBeforeUnmount(() => {
   if (priceDebounce) clearTimeout(priceDebounce)
 })
 
-const showBrand = computed(() =>
-  !props.hideBrand && !!props.facets.brands && props.facets.brands.length > 0
+const showBrand = computed(
+  () => !props.hideBrand && !!props.facets.brands && props.facets.brands.length > 0
 )
-const showSub = computed(() =>
-  !!props.facets.subcategories && props.facets.subcategories.length > 0
+const showSub = computed(
+  () => !!props.facets.subcategories && props.facets.subcategories.length > 0
 )
-
 </script>
 
 <template>
   <div class="space-y-6">
     <section v-if="showPrice">
-      <h3 class="text-sm font-semibold mb-3">Pret</h3>
+      <h3 class="mb-3 text-sm font-semibold">Pret</h3>
       <USlider
         :model-value="localPrice"
         :min="priceBounds.min"
@@ -129,20 +137,20 @@ const showSub = computed(() =>
         class="mt-2"
         @update:model-value="onPriceChange"
       />
-      <div class="flex justify-between text-xs mt-3 text-gray-600">
+      <div class="mt-3 flex justify-between text-xs text-gray-600">
         <span>{{ Math.round(localPrice[0]) }} RON</span>
         <span>{{ Math.round(localPrice[1]) }} RON</span>
       </div>
     </section>
 
     <section>
-      <h3 class="text-sm font-semibold mb-3">Disponibilitate</h3>
+      <h3 class="mb-3 text-sm font-semibold">Disponibilitate</h3>
       <USwitch v-model="onlyAvailable" label="Doar produse disponibile" />
     </section>
 
     <section v-if="showSub">
-      <h3 class="text-sm font-semibold mb-3">Categorie</h3>
-      <div class="space-y-2 max-h-64 overflow-auto pr-1">
+      <h3 class="mb-3 text-sm font-semibold">Categorie</h3>
+      <div class="max-h-64 space-y-2 overflow-auto pr-1">
         <UCheckbox
           v-for="sub in facets.subcategories!"
           :key="sub.slug"
@@ -155,8 +163,8 @@ const showSub = computed(() =>
     </section>
 
     <section v-if="showBrand">
-      <h3 class="text-sm font-semibold mb-3">Brand</h3>
-      <div class="space-y-2 max-h-64 overflow-auto pr-1">
+      <h3 class="mb-3 text-sm font-semibold">Brand</h3>
+      <div class="max-h-64 space-y-2 overflow-auto pr-1">
         <UCheckbox
           v-for="brand in facets.brands!"
           :key="brand.slug"

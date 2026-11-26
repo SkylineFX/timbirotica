@@ -20,15 +20,23 @@ export default defineEventHandler(async (event) => {
 
   const now = Math.floor(Date.now() / 1000)
   if (record.expiresAt < now) {
-    await db.delete(tables.emailVerificationTokens).where(eq(tables.emailVerificationTokens.id, record.id))
-    throw createError({ statusCode: 400, message: 'Linkul de confirmare a expirat. Solicita unul nou.' })
+    await db
+      .delete(tables.emailVerificationTokens)
+      .where(eq(tables.emailVerificationTokens.id, record.id))
+    throw createError({
+      statusCode: 400,
+      message: 'Linkul de confirmare a expirat. Solicita unul nou.'
+    })
   }
 
-  await db.update(tables.users)
+  await db
+    .update(tables.users)
     .set({ emailVerifiedAt: new Date() })
     .where(eq(tables.users.id, record.userId))
 
-  await db.delete(tables.emailVerificationTokens).where(eq(tables.emailVerificationTokens.userId, record.userId))
+  await db
+    .delete(tables.emailVerificationTokens)
+    .where(eq(tables.emailVerificationTokens.userId, record.userId))
 
   return { verified: true }
 })

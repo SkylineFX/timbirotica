@@ -34,9 +34,17 @@ export function passwordStamp(passwordHash: string): string {
 }
 
 /** The guard for a new session: 7 days, or 30 when remembered. */
-export function newSessionGuard(passwordHash: string, remember: boolean, now = Date.now()): SessionGuard {
+export function newSessionGuard(
+  passwordHash: string,
+  remember: boolean,
+  now = Date.now()
+): SessionGuard {
   const maxAge = remember ? REMEMBERED_SESSION_MAX_AGE : SESSION_MAX_AGE
-  return { passwordStamp: passwordStamp(passwordHash), expiresAt: now + maxAge * 1000, persistent: remember }
+  return {
+    passwordStamp: passwordStamp(passwordHash),
+    expiresAt: now + maxAge * 1000,
+    persistent: remember
+  }
 }
 
 /**
@@ -44,7 +52,9 @@ export function newSessionGuard(passwordHash: string, remember: boolean, now = D
  * remembered, otherwise (undefined) when the browser closes.
  */
 export function sessionCookieExpires(guard: Partial<SessionGuard> | undefined): Date | undefined {
-  return guard?.persistent && typeof guard.expiresAt === 'number' ? new Date(guard.expiresAt) : undefined
+  return guard?.persistent && typeof guard.expiresAt === 'number'
+    ? new Date(guard.expiresAt)
+    : undefined
 }
 
 /**
@@ -55,7 +65,13 @@ export function sessionCookieExpires(guard: Partial<SessionGuard> | undefined): 
  * test/server/session-free.test.ts fails if a handler under these paths reads
  * the session.
  */
-export const SESSION_FREE_PATHS = ['/api/products', '/api/categories', '/api/brands', '/api/locations', '/api/__sitemap__']
+export const SESSION_FREE_PATHS = [
+  '/api/products',
+  '/api/categories',
+  '/api/brands',
+  '/api/locations',
+  '/api/__sitemap__'
+]
 
 /**
  * Whether the session middleware may skip a request. Pass event.path, the
@@ -63,7 +79,7 @@ export const SESSION_FREE_PATHS = ['/api/products', '/api/categories', '/api/bra
  */
 export function skipsSessionCheck(path: string): boolean {
   const route = (path.split('?')[0] ?? '').replace(/\/{2,}/g, '/')
-  return SESSION_FREE_PATHS.some(prefix => route === prefix || route.startsWith(`${prefix}/`))
+  return SESSION_FREE_PATHS.some((prefix) => route === prefix || route.startsWith(`${prefix}/`))
 }
 
 /**
@@ -74,12 +90,13 @@ export function skipsSessionCheck(path: string): boolean {
  * is signed out at once).
  */
 export function isSessionCurrent(
-  session: { user?: { role?: string }, secure?: Partial<SessionGuard> },
-  account: { password: string, role: string } | undefined,
-  now = Date.now(),
+  session: { user?: { role?: string }; secure?: Partial<SessionGuard> },
+  account: { password: string; role: string } | undefined,
+  now = Date.now()
 ): boolean {
   const guard = session.secure
-  if (!account || typeof guard?.passwordStamp !== 'string' || typeof guard.expiresAt !== 'number') return false
+  if (!account || typeof guard?.passwordStamp !== 'string' || typeof guard.expiresAt !== 'number')
+    return false
   if (now >= guard.expiresAt) return false
   if (session.user?.role !== account.role) return false
   return guard.passwordStamp === passwordStamp(account.password)

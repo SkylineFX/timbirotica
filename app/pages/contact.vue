@@ -7,7 +7,7 @@ useSeoMeta({
   title: 'Contact',
   description: 'Contacteaza echipa Timbirotica. Vezi datele companiei si programul de suport.',
   ogTitle: 'Contact · Timbirotica',
-  ogDescription: 'Contacteaza echipa Timbirotica. Vezi datele companiei si programul de suport.',
+  ogDescription: 'Contacteaza echipa Timbirotica. Vezi datele companiei si programul de suport.'
 })
 
 const schema = z.object({
@@ -37,7 +37,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   try {
     await $fetch('/api/contact', {
       method: 'POST',
-      body: { ...event.data, turnstileToken: turnstileToken.value },
+      body: { ...event.data, turnstileToken: turnstileToken.value }
     })
     toast.add({
       title: 'Mesaj trimis cu succes!',
@@ -68,43 +68,74 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   <UContainer class="py-8 lg:py-12">
     <!-- Header -->
     <div class="mb-8 lg:mb-12">
-      <h1 class="text-3xl lg:text-3xl font-bold mb-2 md:mb-4">Contacteaza-ne</h1>
-      <p class="text-gray-600 max-w-2xl text-md lg:text-lg">Ai o intrebare sau ai nevoie de asistenta? <br/> Completeaza formularul sau foloseste detaliile de contact de mai jos.</p>
+      <h1 class="mb-2 text-3xl font-bold md:mb-4 lg:text-3xl">Contacteaza-ne</h1>
+      <p class="text-md max-w-2xl text-gray-600 lg:text-lg">
+        Ai o intrebare sau ai nevoie de asistenta? <br />
+        Completeaza formularul sau foloseste detaliile de contact de mai jos.
+      </p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-      
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
       <!-- Stanga: Formular de contact -->
-      <div class="lg:col-span-2 h-full flex flex-col">
-        <UCard class="flex-1 flex flex-col" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8 flex-1 flex flex-col' }">
+      <div class="flex h-full flex-col lg:col-span-2">
+        <UCard
+          class="flex flex-1 flex-col"
+          :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8 flex-1 flex flex-col' }"
+        >
           <template #header>
-            <h2 class="text-xl font-bold flex items-center gap-2">
-              <UIcon name="i-lucide-mail" class="w-6 h-6 text-primary" />
+            <h2 class="flex items-center gap-2 text-xl font-bold">
+              <UIcon name="i-lucide-mail" class="h-6 w-6 text-primary" />
               Trimite-ne un mesaj
             </h2>
-            <p class="text-sm text-gray-500 mt-1">Timp estimat de raspuns: 24h.</p>
+            <p class="mt-1 text-sm text-gray-500">Timp estimat de raspuns: 24h.</p>
           </template>
 
-          <UForm :schema="schema" :state="state" class="space-y-6 flex-1 flex flex-col" @submit="onSubmit">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <UForm
+            :schema="schema"
+            :state="state"
+            class="flex flex-1 flex-col space-y-6"
+            @submit="onSubmit"
+          >
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <UFormField label="Nume complet" name="name" required>
                 <UInput v-model="state.name" placeholder="Popescu Ion" class="w-full" />
               </UFormField>
               <UFormField label="Adresa de email" name="email" required>
-                <UInput v-model="state.email" type="email" placeholder="email@exemplu.ro" class="w-full" />
+                <UInput
+                  v-model="state.email"
+                  type="email"
+                  placeholder="email@exemplu.ro"
+                  class="w-full"
+                />
               </UFormField>
             </div>
             <UFormField label="Subiect" name="subject" required>
-              <UInput v-model="state.subject" placeholder="Ex: Informatii comanda #1234" class="w-full" />
+              <UInput
+                v-model="state.subject"
+                placeholder="Ex: Informatii comanda #1234"
+                class="w-full"
+              />
             </UFormField>
-            
-            <div class="flex-1 flex flex-col">
-              <UFormField label="Mesajul tau" name="message" required class="flex-1 flex flex-col" :ui="{ container: 'flex-1 mt-1 flex flex-col' }">
-                <UTextarea v-model="state.message" :rows="6" placeholder="Cu ce te putem ajuta?" class="flex-1 flex flex-col w-full" :ui="{ base: 'flex-1 resize-none' }" />
+
+            <div class="flex flex-1 flex-col">
+              <UFormField
+                label="Mesajul tau"
+                name="message"
+                required
+                class="flex flex-1 flex-col"
+                :ui="{ container: 'flex-1 mt-1 flex flex-col' }"
+              >
+                <UTextarea
+                  v-model="state.message"
+                  :rows="6"
+                  placeholder="Cu ce te putem ajuta?"
+                  class="flex w-full flex-1 flex-col"
+                  :ui="{ base: 'flex-1 resize-none' }"
+                />
               </UFormField>
             </div>
 
-            <div class="flex justify-center pt-2 m-0">
+            <div class="m-0 flex justify-center pt-2">
               <NuxtTurnstile ref="turnstile" v-model="turnstileToken" />
             </div>
 
@@ -119,27 +150,30 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
       <!-- Dreapta: Informatii -->
       <div class="space-y-6">
-        
         <!-- Suport Clienti -->
         <UCard :ui="{ root: 'rounded-md' }">
           <template #header>
-            <h3 class="text-lg font-bold flex items-center gap-2">
-              <UIcon name="i-lucide-headset" class="w-5 h-5 text-primary" />
+            <h3 class="flex items-center gap-2 text-lg font-bold">
+              <UIcon name="i-lucide-headset" class="h-5 w-5 text-primary" />
               Suport Clienti
             </h3>
           </template>
           <div class="space-y-4">
             <div class="flex items-start gap-3">
-              <UIcon name="i-lucide-phone" class="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
+              <UIcon name="i-lucide-phone" class="mt-0.5 h-5 w-5 shrink-0 text-gray-500" />
               <div>
-                <p class="font-medium hover:text-primary transition-colors"><a href="tel:0751022882">0751 022 882</a></p>
+                <p class="font-medium transition-colors hover:text-primary">
+                  <a href="tel:0751022882">0751 022 882</a>
+                </p>
                 <p class="text-sm text-gray-500">Luni - Vineri: 09:00 - 18:00</p>
               </div>
             </div>
             <div class="flex items-start gap-3">
-              <UIcon name="i-lucide-at-sign" class="w-5 h-5 text-gray-500 shrink-0 mt-0.5" />
+              <UIcon name="i-lucide-at-sign" class="mt-0.5 h-5 w-5 shrink-0 text-gray-500" />
               <div>
-                <p class="font-medium hover:text-primary transition-colors"><a href="mailto:eurotimalex@yahoo.com">eurotimalex@yahoo.com</a></p>
+                <p class="font-medium transition-colors hover:text-primary">
+                  <a href="mailto:eurotimalex@yahoo.com">eurotimalex@yahoo.com</a>
+                </p>
                 <p class="text-sm text-gray-500">Raspuns in 24-48 ore lucratoare</p>
               </div>
             </div>
@@ -149,8 +183,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         <!-- Date Companie -->
         <UCard :ui="{ root: 'rounded-md' }">
           <template #header>
-            <h3 class="text-lg font-bold flex items-center gap-2">
-              <UIcon name="i-lucide-building-2" class="w-5 h-5 text-primary" />
+            <h3 class="flex items-center gap-2 text-lg font-bold">
+              <UIcon name="i-lucide-building-2" class="h-5 w-5 text-primary" />
               Datele Companiei
             </h3>
           </template>
@@ -161,7 +195,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
               <span class="text-gray-500">Denumire Legala</span>
-              <span class="font-medium text-right">EUROTIMALEX S.R.L.</span>
+              <span class="text-right font-medium">EUROTIMALEX S.R.L.</span>
             </div>
             <div class="flex justify-between border-b border-gray-200 pb-2">
               <span class="text-gray-500">CUI</span>
@@ -173,7 +207,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             </div>
             <div class="flex flex-col gap-1 border-b border-gray-200 pb-2">
               <span class="text-gray-500">Adresa Sediu Social</span>
-              <span class="font-medium">Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6, Bucuresti</span>
+              <span class="font-medium"
+                >Strada Drumul Taberei Nr. 92, Bloc C7, Sc. F, Et. 4, Ap. 216, Sector 6,
+                Bucuresti</span
+              >
             </div>
             <div class="flex justify-between">
               <span class="text-gray-500">Tara Inregistrare</span>
@@ -181,8 +218,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             </div>
           </div>
         </UCard>
-
-        
       </div>
     </div>
   </UContainer>

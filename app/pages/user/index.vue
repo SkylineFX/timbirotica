@@ -28,10 +28,11 @@ watchEffect(() => {
   }
 })
 
-const isDirty = computed(() =>
-  form.value.firstName !== (userProfile.value?.firstName ?? '') ||
-  form.value.lastName !== (userProfile.value?.lastName ?? '') ||
-  form.value.phone.replace(/\s+/g, '') !== (userProfile.value?.phone ?? '')
+const isDirty = computed(
+  () =>
+    form.value.firstName !== (userProfile.value?.firstName ?? '') ||
+    form.value.lastName !== (userProfile.value?.lastName ?? '') ||
+    form.value.phone.replace(/\s+/g, '') !== (userProfile.value?.phone ?? '')
 )
 
 const fullName = computed(() =>
@@ -43,11 +44,19 @@ async function saveProfile() {
   const firstName = form.value.firstName.trim()
   const lastName = form.value.lastName.trim()
   if (firstName.length < 2) {
-    toast.add({ title: 'Prenume prea scurt', description: 'Prenumele trebuie sa aiba cel putin 2 caractere', color: 'error' })
+    toast.add({
+      title: 'Prenume prea scurt',
+      description: 'Prenumele trebuie sa aiba cel putin 2 caractere',
+      color: 'error'
+    })
     return
   }
   if (lastName.length < 2) {
-    toast.add({ title: 'Nume prea scurt', description: 'Numele trebuie sa aiba cel putin 2 caractere', color: 'error' })
+    toast.add({
+      title: 'Nume prea scurt',
+      description: 'Numele trebuie sa aiba cel putin 2 caractere',
+      color: 'error'
+    })
     return
   }
   const phone = form.value.phone.replace(/\s+/g, '')
@@ -65,7 +74,11 @@ async function saveProfile() {
     await refreshSession()
     toast.add({ title: 'Profil actualizat cu succes', color: 'success' })
   } catch (err) {
-    toast.add({ title: 'Eroare la actualizarea profilului', description: fetchFailure(err).message || 'Te rugam sa incerci din nou.', color: 'error' })
+    toast.add({
+      title: 'Eroare la actualizarea profilului',
+      description: fetchFailure(err).message || 'Te rugam sa incerci din nou.',
+      color: 'error'
+    })
   } finally {
     isLoading.value = false
   }
@@ -80,9 +93,17 @@ async function sendPasswordEmail() {
   isSendingPasswordEmail.value = true
   try {
     await $fetch('/api/user/password-email', { method: 'POST' })
-    toast.add({ title: 'Email trimis', description: 'Linkul este valabil o ora.', color: 'success' })
+    toast.add({
+      title: 'Email trimis',
+      description: 'Linkul este valabil o ora.',
+      color: 'success'
+    })
   } catch (err) {
-    toast.add({ title: 'Emailul nu a fost trimis', description: fetchFailure(err).message || 'Te rugam sa incerci din nou.', color: 'error' })
+    toast.add({
+      title: 'Emailul nu a fost trimis',
+      description: fetchFailure(err).message || 'Te rugam sa incerci din nou.',
+      color: 'error'
+    })
   } finally {
     isSendingPasswordEmail.value = false
   }
@@ -97,8 +118,11 @@ const passwordForm = ref({
 const passwordError = ref<string | null>(null)
 const isPasswordSaving = ref(false)
 
-const passwordDirty = computed(() =>
-  !!passwordForm.value.currentPassword || !!passwordForm.value.newPassword || !!passwordForm.value.confirmPassword
+const passwordDirty = computed(
+  () =>
+    !!passwordForm.value.currentPassword ||
+    !!passwordForm.value.newPassword ||
+    !!passwordForm.value.confirmPassword
 )
 
 async function savePassword() {
@@ -151,20 +175,27 @@ async function savePassword() {
 <template>
   <div class="space-y-4 sm:space-y-6">
     <UCard class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
-      <div class="flex items-center gap-5 pb-6 border-b border-gray-100 mb-6">
-        <UAvatar :alt="fullName || 'Cont'" size="3xl" class="ring-2 ring-white shadow-sm" />
+      <div class="mb-6 flex items-center gap-5 border-b border-gray-100 pb-6">
+        <UAvatar :alt="fullName || 'Cont'" size="3xl" class="shadow-sm ring-2 ring-white" />
         <div>
           <h2 class="text-xl font-bold text-gray-900">{{ fullName }}</h2>
-          <p class="text-gray-500 text-sm">{{ userProfile?.email }}</p>
+          <p class="text-sm text-gray-500">{{ userProfile?.email }}</p>
         </div>
       </div>
 
       <form class="space-y-6" @submit.prevent="saveProfile">
         <UFormField label="Numar de telefon" name="phone">
-          <UInput v-model="form.phone" v-maska="'#### ### ###'" type="tel" autocomplete="tel" size="lg" class="w-full" />
+          <UInput
+            v-model="form.phone"
+            v-maska="'#### ### ###'"
+            type="tel"
+            autocomplete="tel"
+            size="lg"
+            class="w-full"
+          />
         </UFormField>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <UFormField label="Prenume" name="firstName">
             <UInput v-model="form.firstName" size="lg" class="w-full" required />
           </UFormField>
@@ -188,10 +219,14 @@ async function savePassword() {
       </form>
     </UCard>
 
-    <UCard v-if="userProfile && !userProfile.hasPassword" class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
+    <UCard
+      v-if="userProfile && !userProfile.hasPassword"
+      class="overflow-hidden"
+      :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }"
+    >
       <div class="mb-6">
         <h3 class="text-lg font-bold text-gray-900">Seteaza o parola</h3>
-        <p class="text-sm text-gray-500 mt-1">Acum te autentifici doar cu Google.</p>
+        <p class="mt-1 text-sm text-gray-500">Acum te autentifici doar cu Google.</p>
       </div>
       <div class="flex justify-end">
         <UButton
@@ -210,20 +245,44 @@ async function savePassword() {
     <UCard v-else class="overflow-hidden" :ui="{ root: 'rounded-md', body: 'p-6 sm:p-8' }">
       <div class="mb-6">
         <h3 class="text-lg font-bold text-gray-900">Schimba parola</h3>
-        <p class="text-sm text-gray-500 mt-1">Introdu parola curenta, apoi alege una noua cu cel putin 8 caractere, o litera mare si o cifra.</p>
+        <p class="mt-1 text-sm text-gray-500">
+          Introdu parola curenta, apoi alege una noua cu cel putin 8 caractere, o litera mare si o
+          cifra.
+        </p>
       </div>
 
       <form class="space-y-6" @submit.prevent="savePassword">
         <UFormField label="Parola curenta" name="currentPassword">
-          <UInput v-model="passwordForm.currentPassword" type="password" size="lg" class="w-full" autocomplete="current-password" required />
+          <UInput
+            v-model="passwordForm.currentPassword"
+            type="password"
+            size="lg"
+            class="w-full"
+            autocomplete="current-password"
+            required
+          />
         </UFormField>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <UFormField label="Parola noua" name="newPassword">
-            <UInput v-model="passwordForm.newPassword" type="password" size="lg" class="w-full" autocomplete="new-password" required />
+            <UInput
+              v-model="passwordForm.newPassword"
+              type="password"
+              size="lg"
+              class="w-full"
+              autocomplete="new-password"
+              required
+            />
           </UFormField>
           <UFormField label="Confirmare parola noua" name="confirmPassword">
-            <UInput v-model="passwordForm.confirmPassword" type="password" size="lg" class="w-full" autocomplete="new-password" required />
+            <UInput
+              v-model="passwordForm.confirmPassword"
+              type="password"
+              size="lg"
+              class="w-full"
+              autocomplete="new-password"
+              required
+            />
           </UFormField>
         </div>
 
