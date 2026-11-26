@@ -3,8 +3,9 @@ const { favorites, isFavoritesOpen, removeFromFavorites, isLoading } = useFavori
 const { addToCart, cartLocked } = useCart()
 
 // The products being added: each one's button shows a spinner and ignores a
-// second click, so a double click adds once. A different product's button
-// still works; useCart sends the adds one at a time.
+// second click until the add resolves, at least ADD_MIN_BUSY_MS (useCart), so
+// a double click adds once. A different product's button still works; useCart
+// sends the adds one at a time.
 const addingProductIds = ref(new Set<number>())
 const add = async (product: any) => {
   if (!product || addingProductIds.value.has(product.id)) return

@@ -19,10 +19,18 @@ const QUANTITY_SEND_DELAY_MS = 300
 
 // Adds to the cart, run one at a time. The server reads the cart line and then
 // writes it, so two adds at once could insert the product twice or lose one of
-// them. Each button also ignores clicks while its own add is saving (a double
-// click adds once); the queue covers adds from different buttons, such as two
-// product cards. Shared by every useCart() caller in this browser.
+// them. Each button also ignores clicks until its own add resolves (a double
+// click adds once, see ADD_MIN_BUSY_MS); the queue covers adds from different
+// buttons, such as two product cards. Shared by every useCart() caller in this
+// browser.
 let addQueue: Promise<void> = Promise.resolve()
+
+// The shortest time addToCart takes to resolve. The "Adauga in cos" buttons
+// show their spinner and ignore clicks until it does, so a guest add (saved in
+// the browser at once) or a quick server answer still shows the spinner, and a
+// double click adds once, signed in or not. A double click's second click
+// comes 100-300 ms after the first.
+const ADD_MIN_BUSY_MS = 400
 
 // How long a cart request (an add, a quantity change, a cart read) waits for
 // the server. Without a limit a request that never answers (a dropped
@@ -164,10 +172,11 @@ export const useCart = () => {
     else loadGuestCart()
   }
 
-  const addToCart = (product: any, quantity = 1): Promise<void> => {
+  const addToCart = async (product: any, quantity = 1): Promise<void> => {
     const add = addQueue.then(() => addOne(product, quantity))
     addQueue = add.catch(() => {}) // a failed add must not stop the ones after it
-    return add
+    // The wait runs alongside the add, so it delays neither the add nor the queue.
+    await Promise.all([add, new Promise(resolve => setTimeout(resolve, ADD_MIN_BUSY_MS))])
   }
 
   const addOne = async (product: any, quantity: number) => {
