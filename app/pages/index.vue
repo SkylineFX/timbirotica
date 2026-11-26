@@ -66,7 +66,7 @@ const featuredCategories = [
             <UIcon name="i-lucide-truck" class="text-4xl text-primary mb-1" />
             <h3 class="font-bold pb-1">Livrare Gratuita</h3>
             <p class="text-sm text-gray-500">
-              La comenzi de minimum {{ FREE_SHIPPING_THRESHOLD }} RON, la orice adresa din tara
+              La comenzi de minimum {{ FREE_SHIPPING_THRESHOLD }} RON, oriunde in tara
             </p>
           </UCard>
         </NuxtLink>
