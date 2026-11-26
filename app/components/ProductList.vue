@@ -163,7 +163,7 @@ const resetFilters = () => {
               icon="i-lucide-sliders-horizontal"
               class="rounded-sm sm:text-sm w-full sm:w-auto"
               size="lg"
-              @click="isFiltersOpen = true"
+              @click="() => { isFiltersOpen = true }"
             >
               <span class="flex justify-between items-center gap-2 w-full">Filtreaza
               <UBadge v-if="activeFilterCount > 0" color="primary" variant="solid" class="ml-1 rounded-sm w-5 h-5 p-0 flex items-center justify-center text-xs">
@@ -200,7 +200,7 @@ const resetFilters = () => {
             trailing-icon="i-lucide-arrow-right"
             block
             class="rounded-sm p-3 flex-1 justify-between"
-            @click="isFiltersOpen = false"
+            @click="() => { isFiltersOpen = false }"
           >
             Aplica filtrele
           </UButton>

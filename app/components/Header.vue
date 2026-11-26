@@ -128,7 +128,7 @@ const navigation = computed(() => [
             icon="i-lucide-menu" 
             color="neutral" 
             variant="ghost" 
-            @click="isNavOpen = true"
+            @click="() => { isNavOpen = true }"
             aria-label="Meniu"
           />
           <NuxtLink to="/" class="flex-shrink-0">
@@ -162,7 +162,7 @@ const navigation = computed(() => [
               variant="ghost" 
               icon="i-lucide-heart" 
               aria-label="Favorite"
-              @click="isFavoritesOpen = true"
+              @click="() => { isFavoritesOpen = true }"
               class="relative"
             >
                 <UBadge 
@@ -179,7 +179,7 @@ const navigation = computed(() => [
             variant="ghost" 
             icon="i-lucide-shopping-cart" 
             aria-label="Cosul meu"
-            @click="isCartOpen = true"
+            @click="() => { isCartOpen = true }"
             class="relative"
             :loading="isLoading"
           >
@@ -211,7 +211,7 @@ const navigation = computed(() => [
               variant="ghost"
               class="justify-between w-full"
               trailing-icon="i-lucide-chevron-right"
-              @click="activeMenus.push(item)"
+              @click="() => { activeMenus.push(item) }"
             >
               <span class="truncate">{{ item.label }}</span>
             </UButton>
@@ -237,7 +237,7 @@ const navigation = computed(() => [
                 variant="ghost"
                 class="justify-between w-full"
                 trailing-icon="i-lucide-chevron-right"
-                @click="activeMenus.push(cat)"
+                @click="() => { activeMenus.push(cat) }"
               >
                 <span class="truncate">{{ cat.label }}</span>
               </UButton>
@@ -339,7 +339,7 @@ const navigation = computed(() => [
               variant="ghost"
               class="justify-between w-full"
               trailing-icon="i-lucide-chevron-right"
-              @click="activeMenus.push(child)"
+              @click="() => { activeMenus.push(child) }"
             >
               <span class="truncate">{{ child.label }}</span>
             </UButton>
@@ -397,7 +397,7 @@ const navigation = computed(() => [
             color="primary" 
             variant="subtle" 
             to="/checkout" 
-            @click="isCartOpen = false"
+            @click="() => { isCartOpen = false }"
             trailing-icon="i-lucide-arrow-right"
             block
             class="rounded-sm p-3 justify-between"

@@ -54,7 +54,7 @@ const add = async (product: any) => {
              <UButton 
             color="neutral" 
             variant="subtle" 
-            @click="isFavoritesOpen = false"
+            @click="() => { isFavoritesOpen = false }"
             icon="i-lucide-arrow-left"
             block
             class="rounded-sm p-3 justify-start"

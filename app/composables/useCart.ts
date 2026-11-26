@@ -65,7 +65,11 @@ export const useCart = () => {
   const quantitySender = () => {
     if (quantityUpdates) return quantityUpdates
     quantityUpdates = createLatestWinsSender<number>(
-      (id, value, { keepalive }) => $fetch(`/api/cart/${id}`, { method: 'PATCH', body: { quantity: value }, keepalive, timeout: CART_REQUEST_TIMEOUT_MS }),
+      // Awaited inside a function typed Promise<void>: returning $fetch's own
+      // type made TypeScript compare every API route type (TS2321).
+      async (id, value, { keepalive }): Promise<void> => {
+        await $fetch(`/api/cart/${id}`, { method: 'PATCH', body: { quantity: value }, keepalive, timeout: CART_REQUEST_TIMEOUT_MS })
+      },
       (id, confirmed, e) => {
         console.error('Failed to update quantity', e)
         // A line removed meanwhile needs no correction or message.

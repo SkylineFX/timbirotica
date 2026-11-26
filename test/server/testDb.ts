@@ -1,12 +1,12 @@
 import { readFile } from 'node:fs/promises'
-import { createClient } from '@libsql/client'
+import { createClient, type Client } from '@libsql/client'
 import { drizzle, type LibSQLDatabase } from 'drizzle-orm/libsql'
 import { sql } from 'drizzle-orm'
 import { generateSQLiteDrizzleJson, generateSQLiteMigration } from 'drizzle-kit/api'
 import * as schema from '~~/server/db/schema'
 import { splitIntoChunks } from '~~/shared/utils/chunk'
 
-export type TestDb = LibSQLDatabase<typeof schema>
+export type TestDb = LibSQLDatabase<typeof schema> & { $client: Client }
 
 // libsql accepts far more bound parameters than D1, so a query that is too big
 // for production still runs in these tests. Check the limit on the SQL instead.
