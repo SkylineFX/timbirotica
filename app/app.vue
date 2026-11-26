@@ -10,7 +10,7 @@ useHead({
 })
 
 useSeoMeta({
-  description: 'Produse de birotica si papetarie la preturi avantajoase. Cumpara online cu livrare rapida in Bucuresti.',
+  description: 'Produse de birotica si papetarie la preturi avantajoase. Cumpara online cu livrare in toata Romania.',
   ogSiteName: 'Timbirotica',
   ogType: 'website',
   ogLocale: 'ro_RO',

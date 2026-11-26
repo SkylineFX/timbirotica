@@ -21,7 +21,7 @@ const breadcrumbs = computed(() => [
 ])
 
 const description = computed(() =>
-  `Produse marca ${title.value} la preturi avantajoase. Comanda online cu livrare rapida in Bucuresti.`
+  `Produse marca ${title.value} la preturi avantajoase. Comanda online cu livrare in toata Romania.`
 )
 
 useSeoMeta({
