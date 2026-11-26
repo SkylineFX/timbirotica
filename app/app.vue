@@ -1,5 +1,7 @@
 <script setup>
-import { canonicalUrl } from '~~/shared/utils/seo'
+import { absoluteUrl, canonicalUrl } from '~~/shared/utils/seo'
+
+const config = useRuntimeConfig()
 
 useHead({
   titleTemplate: (title) =>
@@ -17,7 +19,7 @@ useSeoMeta({
   // The logo, until there is a proper 1200x630 share image. Product pages
   // replace it with the product's photo. No size here: those pages would
   // otherwise inherit it for a photo of another size.
-  ogImage: 'https://timbirotica.ro/logo.png',
+  ogImage: absoluteUrl(config.public.siteUrl, '/logo.png'),
   twitterCard: 'summary',
 })
 
@@ -29,7 +31,6 @@ const toast = useToast()
 
 // Every page names its canonical address, without filter, sort or page size
 // parameters, and gives the same address as og:url.
-const config = useRuntimeConfig()
 const canonical = computed(() => canonicalUrl(config.public.siteUrl, route.path, route.query))
 useHead({ link: [{ rel: 'canonical', href: canonical }] })
 useSeoMeta({ ogUrl: canonical })
