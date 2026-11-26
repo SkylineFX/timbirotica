@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { FREE_SHIPPING_THRESHOLD, RETURN_WINDOW_DAYS } from "~~/shared/constants/order";
+
 useSeoMeta({
   title: "Articole de birotica si papetarie",
   ogTitle: "Timbirotica · Articole de birotica si papetarie",
@@ -64,7 +66,7 @@ const featuredCategories = [
             <UIcon name="i-lucide-truck" class="text-4xl text-primary mb-1" />
             <h3 class="font-bold pb-1">Livrare Gratuita</h3>
             <p class="text-sm text-gray-500">
-              La comenzi >200 RON, la orice adresa din tara
+              La comenzi de minimum {{ FREE_SHIPPING_THRESHOLD }} RON, la orice adresa din tara
             </p>
           </UCard>
         </NuxtLink>
@@ -79,7 +81,7 @@ const featuredCategories = [
             />
             <h3 class="font-bold pb-1">Moduri de plata</h3>
             <p class="text-sm text-gray-500">
-              Plata prin transfer bancar sau ramburs la livrare
+              Plata prin transfer bancar, pe baza facturii proforme
             </p>
           </UCard>
         </NuxtLink>
@@ -102,9 +104,9 @@ const featuredCategories = [
               name="i-lucide-refresh-cw"
               class="text-4xl text-primary mb-1"
             />
-            <h3 class="font-bold pb-1">Retur gratuit</h3>
+            <h3 class="font-bold pb-1">Retur in {{ RETURN_WINDOW_DAYS }} zile</h3>
             <p class="text-sm text-gray-500">
-              In decursul a 14 zile de la primirea coletului
+              De la primirea coletului
             </p>
           </UCard>
         </NuxtLink>
