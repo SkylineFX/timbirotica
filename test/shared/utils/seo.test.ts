@@ -68,9 +68,30 @@ describe('productStructuredData', () => {
         priceCurrency: 'RON',
         price: '2.50',
         availability: 'https://schema.org/InStock',
-        itemCondition: 'https://schema.org/NewCondition'
+        itemCondition: 'https://schema.org/NewCondition',
+        shippingDetails: {
+          '@type': 'OfferShippingDetails',
+          shippingRate: { '@type': 'MonetaryAmount', value: 30, currency: 'RON' },
+          shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'RO' }
+        },
+        hasMerchantReturnPolicy: {
+          '@type': 'MerchantReturnPolicy',
+          applicableCountry: 'RO',
+          returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+          merchantReturnDays: 14,
+          returnMethod: 'https://schema.org/ReturnByMail',
+          returnFees: 'https://schema.org/ReturnShippingFees',
+          returnShippingFeesAmount: { '@type': 'MonetaryAmount', value: 30, currency: 'RON' }
+        }
       }
     })
+  })
+
+  it('ships a product priced at the free-shipping threshold or above for free', () => {
+    const rate = (price: number) => productStructuredData({ ...product, price }, { url, siteUrl: SITE }).offers.shippingDetails.shippingRate.value
+    expect(rate(199.99)).toBe(30)
+    expect(rate(200)).toBe(0)
+    expect(rate(350)).toBe(0)
   })
 
   it('marks a product with no stock as out of stock', () => {
