@@ -61,6 +61,13 @@ export const COURIER_SHIPPING_COST = 30
 export const getCourierShippingCost = (subtotal: number): number =>
   subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : COURIER_SHIPPING_COST
 
+// Courier delivery time in working days, as the checkout states it: delivered
+// in 2-3 working days, made of 1-2 days to dispatch (the terms page's 24-48
+// hours) and 1 day with the courier. The checkout and terms pages hardcode
+// these: change them together.
+export const COURIER_HANDLING_DAYS = { min: 1, max: 2 }
+export const COURIER_TRANSIT_DAYS = { min: 1, max: 1 }
+
 // Return terms, as stated on the terms page (/termeni-si-conditii#retur), which
 // hardcodes them: change both together. The customer pays the return shipping.
 export const RETURN_WINDOW_DAYS = 14

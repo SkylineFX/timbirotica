@@ -1,4 +1,10 @@
-import { getCourierShippingCost, RETURN_SHIPPING_COST, RETURN_WINDOW_DAYS } from '~~/shared/constants/order'
+import {
+  COURIER_HANDLING_DAYS,
+  COURIER_TRANSIT_DAYS,
+  getCourierShippingCost,
+  RETURN_SHIPPING_COST,
+  RETURN_WINDOW_DAYS
+} from '~~/shared/constants/order'
 
 /**
  * A page's canonical address: the site URL and the path, keeping only `page`
@@ -30,17 +36,33 @@ export interface StructuredDataProduct {
   brand?: { name: string } | null
 }
 
+const WORKING_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
+/** A range of days, as schema.org writes it. */
+function days({ min, max }: { min: number, max: number }) {
+  return { '@type': 'QuantitativeValue', minValue: min, maxValue: max, unitCode: 'DAY' }
+}
+
 /**
- * The cost of sending one product by courier within Romania, and the return
- * terms, for Google's merchant listings. A product priced at or above the
- * free-shipping threshold ships free on its own.
+ * The cost and time of sending one product by courier within Romania, and the
+ * return terms, for Google's merchant listings. A product priced at or above
+ * the free-shipping threshold ships free on its own.
  */
 function offerShippingAndReturns(price: number) {
   return {
     shippingDetails: {
       '@type': 'OfferShippingDetails',
       shippingRate: { '@type': 'MonetaryAmount', value: getCourierShippingCost(price), currency: 'RON' },
-      shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'RO' }
+      shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'RO' },
+      deliveryTime: {
+        '@type': 'ShippingDeliveryTime',
+        businessDays: {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: WORKING_DAYS.map(day => `https://schema.org/${day}`)
+        },
+        handlingTime: days(COURIER_HANDLING_DAYS),
+        transitTime: days(COURIER_TRANSIT_DAYS)
+      }
     },
     hasMerchantReturnPolicy: {
       '@type': 'MerchantReturnPolicy',
