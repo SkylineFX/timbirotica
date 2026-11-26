@@ -23,7 +23,7 @@ const breadcrumbs = computed(() => [
 ])
 
 const description = computed(() =>
-  `Descopera ${title.value.toLowerCase()} la preturi avantajoase. Cumpara online cu livrare rapida in Bucuresti.`
+  `Descopera ${title.value.toLowerCase()} la preturi avantajoase. Cumpara online cu livrare in toata Romania.`
 )
 
 useSeoMeta({
