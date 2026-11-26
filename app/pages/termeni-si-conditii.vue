@@ -112,7 +112,7 @@ useSeoMeta({
 
           <p class="mt-4 font-medium">Costuri de livrare:</p>
           <ul class="list-disc pl-5 mt-2 space-y-2">
-            <li>Livrarea este <strong>GRATUITA</strong> pentru comenzi mai mari de 200 lei (TVA inclus) si care au maxim 40kg.</li>
+            <li>Livrarea este <strong>GRATUITA</strong> pentru comenzi de minimum 200 lei (TVA inclus) si care au maxim 40kg.</li>
             <li>Pentru comenzi mai mici de 200 lei si cu greutate sub 40kg, se va aplica o taxa de livrare de <strong>30.00 lei</strong> (TVA inclus).</li>
             <li>La comenzile mai grele de 40 kg se vor taxa kilogramele suplimentare cu <strong>2 lei/kg</strong> (TVA inclus).</li>
           </ul>
@@ -124,7 +124,7 @@ useSeoMeta({
 
           <p class="mt-4 font-semibold">Transport GRATUIT pentru comenzile eligibile:</p>
           <ul class="list-disc pl-5 mt-2 space-y-1">
-            <li>Transport gratuit pentru comenzile de peste 200 lei.</li>
+            <li>Transport gratuit pentru comenzile de minimum 200 lei.</li>
           </ul>
         </section>
 
