@@ -104,9 +104,9 @@ const featuredCategories = [
               name="i-lucide-refresh-cw"
               class="text-4xl text-primary mb-1"
             />
-            <h3 class="font-bold pb-1">Retur in {{ RETURN_WINDOW_DAYS }} zile</h3>
+            <h3 class="font-bold pb-1">Retur</h3>
             <p class="text-sm text-gray-500">
-              De la primirea coletului
+              In decursul a {{ RETURN_WINDOW_DAYS }} zile de la primirea coletului
             </p>
           </UCard>
         </NuxtLink>
