@@ -4,14 +4,16 @@ import {
   cartLineSchema,
   parseCartLines,
   CART_MAX_QUANTITY,
-  CART_SYNC_MAX_PRODUCTS,
+  CART_SYNC_MAX_PRODUCTS
 } from '~~/shared/schemas/cart'
 
 // The API returns the first validation issue as the error message shown to the
 // customer, so the first issue must be the Romanian text for each bad input.
 describe('first validation message', () => {
-  const firstMessage = (schema: { safeParse: (v: unknown) => { error?: { issues: { message: string }[] } } }, value: unknown) =>
-    schema.safeParse(value).error?.issues[0]?.message
+  const firstMessage = (
+    schema: { safeParse: (v: unknown) => { error?: { issues: { message: string }[] } } },
+    value: unknown
+  ) => schema.safeParse(value).error?.issues[0]?.message
 
   it('names the quantity problem in Romanian', () => {
     expect(firstMessage(cartQuantitySchema, 'x')).toBe('Cantitate invalida.')
@@ -56,29 +58,31 @@ describe('cartQuantitySchema', () => {
 
 describe('parseCartLines', () => {
   it('keeps valid lines', () => {
-    expect(parseCartLines([{ productId: 1, quantity: 2 }]))
-      .toEqual([{ productId: 1, quantity: 2 }])
+    expect(parseCartLines([{ productId: 1, quantity: 2 }])).toEqual([{ productId: 1, quantity: 2 }])
   })
 
   it('drops invalid lines but keeps the valid ones', () => {
-    expect(parseCartLines([
+    expect(
+      parseCartLines([
+        { productId: 1, quantity: 2 },
+        { productId: 2, quantity: -4 },
+        { productId: 3, quantity: 1.5 },
+        { productId: -1, quantity: 1 },
+        { productId: 4 },
+        null,
+        'garbage',
+        { productId: 5, quantity: 1 }
+      ])
+    ).toEqual([
       { productId: 1, quantity: 2 },
-      { productId: 2, quantity: -4 },
-      { productId: 3, quantity: 1.5 },
-      { productId: -1, quantity: 1 },
-      { productId: 4 },
-      null,
-      'garbage',
-      { productId: 5, quantity: 1 },
-    ])).toEqual([
-      { productId: 1, quantity: 2 },
-      { productId: 5, quantity: 1 },
+      { productId: 5, quantity: 1 }
     ])
   })
 
   it('strips extra fields sent with a line', () => {
-    expect(parseCartLines([{ productId: 1, quantity: 1, product: { price: 0 } }]))
-      .toEqual([{ productId: 1, quantity: 1 }])
+    expect(parseCartLines([{ productId: 1, quantity: 1, product: { price: 0 } }])).toEqual([
+      { productId: 1, quantity: 1 }
+    ])
   })
 
   it('returns an empty list for a non-array body', () => {
@@ -87,19 +91,25 @@ describe('parseCartLines', () => {
   })
 
   it('lowers a whole-number quantity above the maximum to the maximum', () => {
-    expect(parseCartLines([{ productId: 1, quantity: CART_MAX_QUANTITY * 2 }]))
-      .toEqual([{ productId: 1, quantity: CART_MAX_QUANTITY }])
+    expect(parseCartLines([{ productId: 1, quantity: CART_MAX_QUANTITY * 2 }])).toEqual([
+      { productId: 1, quantity: CART_MAX_QUANTITY }
+    ])
   })
 
   it('still drops large quantities that are not whole numbers', () => {
-    expect(parseCartLines([
-      { productId: 1, quantity: CART_MAX_QUANTITY + 0.5 },
-      { productId: 2, quantity: Infinity },
-    ])).toEqual([])
+    expect(
+      parseCartLines([
+        { productId: 1, quantity: CART_MAX_QUANTITY + 0.5 },
+        { productId: 2, quantity: Infinity }
+      ])
+    ).toEqual([])
   })
 
   it(`keeps at most ${CART_SYNC_MAX_PRODUCTS} distinct products`, () => {
-    const raw = Array.from({ length: CART_SYNC_MAX_PRODUCTS + 20 }, (_, i) => ({ productId: i + 1, quantity: 1 }))
+    const raw = Array.from({ length: CART_SYNC_MAX_PRODUCTS + 20 }, (_, i) => ({
+      productId: i + 1,
+      quantity: 1
+    }))
     const lines = parseCartLines(raw)
     expect(lines).toHaveLength(CART_SYNC_MAX_PRODUCTS)
     expect(lines.at(-1)).toEqual({ productId: CART_SYNC_MAX_PRODUCTS, quantity: 1 })
@@ -107,20 +117,26 @@ describe('parseCartLines', () => {
 
   it('accepts more lines for a product that is already kept after the limit is reached', () => {
     const raw = [
-      ...Array.from({ length: CART_SYNC_MAX_PRODUCTS }, (_, i) => ({ productId: i + 1, quantity: 1 })),
+      ...Array.from({ length: CART_SYNC_MAX_PRODUCTS }, (_, i) => ({
+        productId: i + 1,
+        quantity: 1
+      })),
       { productId: 9999999, quantity: 1 },
-      { productId: 1, quantity: 2 },
+      { productId: 1, quantity: 2 }
     ]
     const lines = parseCartLines(raw)
     expect(lines).toHaveLength(CART_SYNC_MAX_PRODUCTS + 1)
     expect(lines.at(-1)).toEqual({ productId: 1, quantity: 2 })
-    expect(lines.some(l => l.productId === 9999999)).toBe(false)
+    expect(lines.some((l) => l.productId === 9999999)).toBe(false)
   })
 
   it('does not count invalid lines toward the product limit', () => {
     const raw = [
-      ...Array.from({ length: CART_SYNC_MAX_PRODUCTS }, (_, i) => ({ productId: i + 1, quantity: -1 })),
-      { productId: 500, quantity: 1 },
+      ...Array.from({ length: CART_SYNC_MAX_PRODUCTS }, (_, i) => ({
+        productId: i + 1,
+        quantity: -1
+      })),
+      { productId: 500, quantity: 1 }
     ]
     expect(parseCartLines(raw)).toEqual([{ productId: 500, quantity: 1 }])
   })

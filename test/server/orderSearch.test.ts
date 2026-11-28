@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 import * as schema from '~~/server/db/schema'
-import { escapeLike, likeSearchPatterns, LIKE_PATTERN_MAX_BYTES, orderSearchFilter } from '~~/server/utils/orderSearch'
+import {
+  escapeLike,
+  likeSearchPatterns,
+  LIKE_PATTERN_MAX_BYTES,
+  orderSearchFilter
+} from '~~/server/utils/orderSearch'
 import { createTestDb, type TestDb } from './testDb'
 
 const bytes = (text: string) => new TextEncoder().encode(text).length
@@ -17,8 +22,13 @@ describe('likeSearchPatterns', () => {
     expect(likeSearchPatterns('%')).toEqual(['%\\%%'])
   })
 
-  it('keeps every pattern within D1\'s 50-byte limit, diacritics and escapes included', () => {
-    for (const word of ['x'.repeat(200), 'ă'.repeat(60), '%'.repeat(60), 'BANCA COMERCIALA ROMANA S.A. - SUCURSALA SECTOR 6'.replaceAll(' ', '')]) {
+  it("keeps every pattern within D1's 50-byte limit, diacritics and escapes included", () => {
+    for (const word of [
+      'x'.repeat(200),
+      'ă'.repeat(60),
+      '%'.repeat(60),
+      'BANCA COMERCIALA ROMANA S.A. - SUCURSALA SECTOR 6'.replaceAll(' ', '')
+    ]) {
       const [pattern] = likeSearchPatterns(word)
       expect(bytes(pattern!)).toBeLessThanOrEqual(LIKE_PATTERN_MAX_BYTES)
       expect(pattern!.endsWith('\\%')).toBe(false) // no cut inside an escape
@@ -32,8 +42,15 @@ describe('orderSearchFilter', () => {
   // re-qualifies column objects in `where`) and the plain count.
   const find = async (q: string) => {
     const where = orderSearchFilter(q)
-    const listed = (await db.query.orders.findMany({ where, with: { user: { columns: { id: true } } } })).map(o => o.orderNumber).sort()
-    const counted = await db.select({ number: schema.orders.orderNumber }).from(schema.orders).where(where)
+    const listed = (
+      await db.query.orders.findMany({ where, with: { user: { columns: { id: true } } } })
+    )
+      .map((o) => o.orderNumber)
+      .sort()
+    const counted = await db
+      .select({ number: schema.orders.orderNumber })
+      .from(schema.orders)
+      .where(where)
     expect(counted).toHaveLength(listed.length)
     return listed
   }
@@ -42,15 +59,56 @@ describe('orderSearchFilter', () => {
     db = await createTestDb()
     const now = new Date()
     await db.insert(schema.users).values([
-      { id: 1, firstName: 'Ion', lastName: 'Popescu', email: 'ion.popescu@example.com', password: 'x', createdAt: now },
-      { id: 2, firstName: 'Ana', lastName: 'Ionescu', email: 'ana@firma.ro', password: 'x', createdAt: now }
+      {
+        id: 1,
+        firstName: 'Ion',
+        lastName: 'Popescu',
+        email: 'ion.popescu@example.com',
+        password: 'x',
+        createdAt: now
+      },
+      {
+        id: 2,
+        firstName: 'Ana',
+        lastName: 'Ionescu',
+        email: 'ana@firma.ro',
+        password: 'x',
+        createdAt: now
+      }
     ])
     await db.insert(schema.orders).values([
       // Snapshots store the names apart, as the order endpoint does.
-      { userId: 1, orderNumber: 'A1B2C3D4', total: 10, shippingAddressSnapshot: JSON.stringify({ firstName: 'Ion', lastName: 'Popescu', street: 'Bl: A1, Sc: 2' }), createdAt: now },
+      {
+        userId: 1,
+        orderNumber: 'A1B2C3D4',
+        total: 10,
+        shippingAddressSnapshot: JSON.stringify({
+          firstName: 'Ion',
+          lastName: 'Popescu',
+          street: 'Bl: A1, Sc: 2'
+        }),
+        createdAt: now
+      },
       // A pickup order for a company: no delivery address at all.
-      { userId: 1, orderNumber: 'E5F6A7B8', total: 20, shippingAddressSnapshot: '{}', billingAddressSnapshot: JSON.stringify({ companyName: 'Firma SRL' }), createdAt: now },
-      { userId: 2, orderNumber: 'C9D0E1F2', total: 30, shippingAddressSnapshot: JSON.stringify({ firstName: 'Ana', lastName: 'Ionescu', street: 'Strada 50%' }), createdAt: now }
+      {
+        userId: 1,
+        orderNumber: 'E5F6A7B8',
+        total: 20,
+        shippingAddressSnapshot: '{}',
+        billingAddressSnapshot: JSON.stringify({ companyName: 'Firma SRL' }),
+        createdAt: now
+      },
+      {
+        userId: 2,
+        orderNumber: 'C9D0E1F2',
+        total: 30,
+        shippingAddressSnapshot: JSON.stringify({
+          firstName: 'Ana',
+          lastName: 'Ionescu',
+          street: 'Strada 50%'
+        }),
+        createdAt: now
+      }
     ])
   })
 

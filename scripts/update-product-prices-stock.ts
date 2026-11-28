@@ -22,7 +22,7 @@ const STOCK_MAP: Record<string, number> = {
   'in stoc': 1,
   'stoc limitat': 1,
   'produs momentan indisponibil': 0,
-  'nu este in stoc': 0,
+  'nu este in stoc': 0
 }
 
 const dryRun = process.argv.includes('--dry-run')
@@ -33,7 +33,9 @@ function resolveInputPath(): string {
     if (existsSync(fileArg)) return resolve(fileArg)
     const inDataDir = join(process.cwd(), 'scripts', 'data', fileArg)
     if (existsSync(inDataDir)) return inDataDir
-    throw new Error(`File not found: "${fileArg}" (checked "${resolve(fileArg)}" and "${inDataDir}")`)
+    throw new Error(
+      `File not found: "${fileArg}" (checked "${resolve(fileArg)}" and "${inDataDir}")`
+    )
   }
 
   // 1. Auto-pick newest listings_*.json in scripts/data/
@@ -86,7 +88,9 @@ async function main() {
   }
   const entries = Array.from(dedupMap.values())
   if (entries.length < rawEntries.length) {
-    console.log(`Deduplicated ${rawEntries.length - entries.length} duplicate URL listings (${entries.length} unique items to process).`)
+    console.log(
+      `Deduplicated ${rawEntries.length - entries.length} duplicate URL listings (${entries.length} unique items to process).`
+    )
   }
 
   // Pre-load all DB products into memory index maps for sub-second O(1) lookups
@@ -114,7 +118,9 @@ async function main() {
     }
   }
 
-  function findMatch(entry: JsonEntry): { product: DbProduct; method: 'sku' | 'url_sku' | 'name' } | null {
+  function findMatch(
+    entry: JsonEntry
+  ): { product: DbProduct; method: 'sku' | 'url_sku' | 'name' } | null {
     // 1. Direct SKU match (exact, slugified, or alphanumeric)
     if (entry.sku) {
       const raw = entry.sku.trim().toLowerCase()
@@ -122,16 +128,23 @@ async function main() {
       const slug = raw.replace(/[^a-z0-9]+/g, '-')
       if (dbBySlugSku.has(slug)) return { product: dbBySlugSku.get(slug)!, method: 'sku' }
       const an = raw.replace(/[^a-z0-9]/g, '')
-      if (an.length >= 3 && dbByAlphaNum.has(an)) return { product: dbByAlphaNum.get(an)!, method: 'sku' }
+      if (an.length >= 3 && dbByAlphaNum.has(an))
+        return { product: dbByAlphaNum.get(an)!, method: 'sku' }
     }
 
     // 2. URL slug SKU match (handles URL suffixes like -855011-00-tw, -kh18606b, -cars2228-1)
     if (entry.url) {
-      const filename = entry.url.split('/').pop()?.replace(/\.html$/, '').toLowerCase() || ''
+      const filename =
+        entry.url
+          .split('/')
+          .pop()
+          ?.replace(/\.html$/, '')
+          .toLowerCase() || ''
       const parts = filename.split('-')
       for (let len = Math.min(5, parts.length - 1); len >= 1; len--) {
         const candSlug = parts.slice(parts.length - len).join('-')
-        if (dbBySlugSku.has(candSlug)) return { product: dbBySlugSku.get(candSlug)!, method: 'url_sku' }
+        if (dbBySlugSku.has(candSlug))
+          return { product: dbBySlugSku.get(candSlug)!, method: 'url_sku' }
         if (dbBySku.has(candSlug)) return { product: dbBySku.get(candSlug)!, method: 'url_sku' }
         const candAn = candSlug.replace(/[^a-z0-9]/g, '')
         if (candAn.length >= 3 && dbByAlphaNum.has(candAn)) {
@@ -240,7 +253,10 @@ async function main() {
       if (!dryRun) {
         await db.update(schema.products).set(updates).where(eq(schema.products.id, existing.id))
       } else {
-        console.log(`Would update [${matchResult.method}] id=${existing.id} "${existing.name}" (SKU: ${existing.sku}):`, updates)
+        console.log(
+          `Would update [${matchResult.method}] id=${existing.id} "${existing.name}" (SKU: ${existing.sku}):`,
+          updates
+        )
       }
     } catch (err) {
       errors++
@@ -263,7 +279,9 @@ async function main() {
 
   console.log('---')
   console.log(`${dryRun ? '[DRY RUN] ' : ''}Summary:`)
-  console.log(`  Matched in DB:       ${matched} (direct SKU: ${matchedBySku}, URL SKU: ${matchedByUrlSku}, Name fallback: ${matchedByName})`)
+  console.log(
+    `  Matched in DB:       ${matched} (direct SKU: ${matchedBySku}, URL SKU: ${matchedByUrlSku}, Name fallback: ${matchedByName})`
+  )
   console.log(`  Not found in DB:     ${notFound} (unique new products: ${unmatched.length})`)
   console.log(`  Price changed:       ${priceChanged}`)
   console.log(`  Stock changed:       ${stockChanged}`)
@@ -275,9 +293,13 @@ async function main() {
 
   if (unmatched.length > 0) {
     if (!dryRun) {
-      console.log(`  Exported new items:  ${unmatched.length} items -> scripts/data/${outputBaseName}`)
+      console.log(
+        `  Exported new items:  ${unmatched.length} items -> scripts/data/${outputBaseName}`
+      )
     } else {
-      console.log(`  Would export new:    ${unmatched.length} items -> scripts/data/${outputBaseName}`)
+      console.log(
+        `  Would export new:    ${unmatched.length} items -> scripts/data/${outputBaseName}`
+      )
     }
   }
 }

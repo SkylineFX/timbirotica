@@ -17,8 +17,8 @@ export default defineSitemapEventHandler(async () => {
   ])
 
   return [
-    ...categories.map(c => ({ loc: `/c/${c.slug}` })),
-    ...products.map(p => ({ loc: `/c/${p.category?.slug ?? 'toate'}/${p.slug}` })),
-    ...brands.map(b => ({ loc: `/producatori/${b.slug}` }))
+    ...categories.map((c) => ({ loc: `/c/${c.slug}` })),
+    ...products.map((p) => ({ loc: `/c/${p.category?.slug ?? 'toate'}/${p.slug}` })),
+    ...brands.map((b) => ({ loc: `/producatori/${b.slug}` }))
   ]
 })

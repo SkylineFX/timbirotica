@@ -9,7 +9,10 @@ export const PASSWORD_EMAIL_INTERVAL = 60
  * email the link. Used by "Am uitat parola" and by "Seteaza o parola" for
  * accounts that sign in only with Google.
  */
-export async function issuePasswordReset(event: H3Event, user: { id: number, email: string, firstName: string }) {
+export async function issuePasswordReset(
+  event: H3Event,
+  user: { id: number; email: string; firstName: string }
+) {
   const db = useDrizzle()
   const rawToken = randomBytes(32).toString('hex')
   const tokenHash = createHash('sha256').update(rawToken).digest('hex')
@@ -18,7 +21,9 @@ export async function issuePasswordReset(event: H3Event, user: { id: number, ema
   // One active token per account: the old one is deleted in the same batch.
   await db.batch([
     db.delete(tables.passwordResetTokens).where(eq(tables.passwordResetTokens.userId, user.id)),
-    db.insert(tables.passwordResetTokens).values({ userId: user.id, tokenHash, expiresAt: now + 3600, createdAt: now }),
+    db
+      .insert(tables.passwordResetTokens)
+      .values({ userId: user.id, tokenHash, expiresAt: now + 3600, createdAt: now })
   ])
 
   const resetLink = `${siteOrigin(event)}/user/reset-password?token=${rawToken}`

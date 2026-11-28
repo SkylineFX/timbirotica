@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
+import type { InternalApi } from 'nitropack/types'
+
+// A product in the preview, as GET /api/products sends it.
+type PreviewProduct = InternalApi['/api/products']['get']['products'][number]
 
 const props = defineProps({
   modelValue: { type: String, default: '' }
@@ -14,11 +18,11 @@ const localQuery = computed({
 
 const isOpen = ref(false)
 const isLoading = ref(false)
-const products = ref<any[]>([])
+const products = ref<PreviewProduct[]>([])
 const containerRef = ref<HTMLElement | null>(null)
 
 // Cache: simple LRU map limit to 50
-const searchCache = new Map<string, any[]>()
+const searchCache = new Map<string, PreviewProduct[]>()
 let abortController: AbortController | null = null
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -27,7 +31,7 @@ const fetchPreview = async (query: string) => {
     products.value = []
     return
   }
-  
+
   if (searchCache.has(query)) {
     products.value = searchCache.get(query)!
     return
@@ -44,11 +48,11 @@ const fetchPreview = async (query: string) => {
     const res = await $fetch('/api/products', {
       query: { q: query, limit: 5, facets: 0 },
       signal: abortController.signal
-    }) as any
-    
+    })
+
     products.value = res.products || []
     searchCache.set(query, products.value)
-    
+
     // Enforce max cache size
     if (searchCache.size > 50) {
       const firstKey = searchCache.keys().next().value
@@ -56,8 +60,8 @@ const fetchPreview = async (query: string) => {
         searchCache.delete(firstKey)
       }
     }
-  } catch (error: any) {
-    if (error.name === 'AbortError') {
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
       // Ignored
     } else {
       console.error('Search preview error:', error)
@@ -69,13 +73,13 @@ const fetchPreview = async (query: string) => {
 
 watch(localQuery, (newQuery) => {
   if (debounceTimer) clearTimeout(debounceTimer)
-  
+
   const trimmed = newQuery.trim()
   if (trimmed.length < 3) {
     products.value = []
     return
   }
-  
+
   debounceTimer = setTimeout(() => {
     fetchPreview(trimmed)
   }, 300)
@@ -92,7 +96,9 @@ const onKeyDown = (e: KeyboardEvent) => {
 }
 
 const router = useRouter()
-const stopAfterEach = router.afterEach(() => { isOpen.value = false })
+const stopAfterEach = router.afterEach(() => {
+  isOpen.value = false
+})
 
 onMounted(() => {
   document.addEventListener('pointerdown', onPointerDown)
@@ -126,27 +132,27 @@ const performSearch = () => {
       >
         <div
           v-if="isOpen && localQuery.trim().length >= 3"
-          class="fixed inset-0 bg-black/20 z-40"
+          class="fixed inset-0 z-40 bg-black/20"
           aria-hidden="true"
         />
       </Transition>
     </Teleport>
   </ClientOnly>
 
-  <div ref="containerRef" class="relative w-full z-[60]">
+  <div ref="containerRef" class="relative z-[60] w-full">
     <!-- Typing opens the preview too, not just focusing the box: after Escape
          or a search the box keeps its focus, so no new focus event comes. -->
     <UInput
       v-model="localQuery"
-      @update:model-value="isOpen = true"
-      @keyup.enter="performSearch"
-      @focus="isOpen = true"
       size="md"
       variant="outline"
       placeholder="Cauta produse..."
       class="w-full"
       color="primary"
-      :ui="{base: 'text-sm'}"
+      :ui="{ base: 'text-sm' }"
+      @update:model-value="isOpen = true"
+      @keyup.enter="performSearch"
+      @focus="isOpen = true"
     >
       <template #trailing>
         <UButton
@@ -171,45 +177,65 @@ const performSearch = () => {
     >
       <div
         v-if="isOpen && localQuery.trim().length >= 3"
-        class="absolute top-full left-0 right-0 mt-3 sm:mt-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md rounded-t-none shadow-sm overflow-hidden flex flex-col max-h-[calc(100dvh-8rem)]"
+        class="absolute top-full right-0 left-0 mt-3 flex max-h-[calc(100dvh-8rem)] flex-col overflow-hidden rounded-md rounded-t-none border border-gray-200 bg-white shadow-sm sm:mt-4 dark:border-gray-800 dark:bg-gray-900"
       >
-        <div v-if="isLoading" class="p-8 flex justify-center items-center">
-          <UIcon name="i-lucide-loader-2" class="animate-spin text-primary w-6 h-6" />
+        <div v-if="isLoading" class="flex items-center justify-center p-8">
+          <UIcon name="i-lucide-loader-2" class="h-6 w-6 animate-spin text-primary" />
         </div>
 
-        <div v-else-if="products.length > 0" class="flex flex-col flex-1 min-h-0 overflow-y-auto">
-          <NuxtLink 
-            v-for="product in products" 
-            :key="product.id" 
-            :to="`/c/${product.category?.slug || 'toate'}/${product.slug}`" 
-            class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800 last:border-0 transition-colors"
+        <div v-else-if="products.length > 0" class="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <NuxtLink
+            v-for="product in products"
+            :key="product.id"
+            :to="`/c/${product.category?.slug || 'toate'}/${product.slug}`"
+            class="flex items-center gap-3 border-b border-gray-100 p-3 transition-colors last:border-0 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800"
           >
-            <div class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-sm overflow-hidden flex items-center justify-center">
-              <NuxtImg v-if="product.images && product.images.length > 0" :src="product.images[0]" alt="" loading="lazy" class="w-full h-full object-cover" />
-              <UIcon v-else name="i-lucide-image" class="text-gray-400 w-6 h-6" />
+            <div
+              class="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm bg-gray-100 dark:bg-gray-800"
+            >
+              <NuxtImg
+                v-if="product.images && product.images.length > 0"
+                :src="product.images[0]"
+                alt=""
+                loading="lazy"
+                class="h-full w-full object-cover"
+              />
+              <UIcon v-else name="i-lucide-image" class="h-6 w-6 text-gray-400" />
             </div>
-            
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 break-words leading-tight">{{ product.name }}</p>
-              <p class="text-xs font-semibold text-primary mt-1">{{ product.price.toFixed(2) }} RON</p>
+
+            <div class="min-w-0 flex-1">
+              <p
+                class="line-clamp-2 text-sm leading-tight font-medium break-words text-gray-900 dark:text-white"
+              >
+                {{ product.name }}
+              </p>
+              <p class="mt-1 text-xs font-semibold text-primary">
+                {{ product.price.toFixed(2) }} RON
+              </p>
             </div>
           </NuxtLink>
         </div>
-        
-        <div v-if="!isLoading && products.length > 0" class="border-t border-gray-200 dark:border-gray-800 p-2 bg-gray-50 dark:bg-gray-900/50 shrink-0">
-          <UButton 
-            variant="ghost" 
-            color="primary" 
-            block 
-            class="rounded-sm" 
+
+        <div
+          v-if="!isLoading && products.length > 0"
+          class="shrink-0 border-t border-gray-200 bg-gray-50 p-2 dark:border-gray-800 dark:bg-gray-900/50"
+        >
+          <UButton
+            variant="ghost"
+            color="primary"
+            block
+            class="rounded-sm"
             trailing-icon="i-lucide-arrow-right"
             @click="performSearch"
           >
             Vezi toate rezultatele
           </UButton>
         </div>
-        
-        <div v-else-if="!isLoading && products.length === 0" class="p-6 text-center text-sm text-gray-500">
+
+        <div
+          v-else-if="!isLoading && products.length === 0"
+          class="p-6 text-center text-sm text-gray-500"
+        >
           Nu s-au gasit produse.
         </div>
       </div>

@@ -33,7 +33,11 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    await issueVerificationToken(event, { id: user.id, email: user.email, firstName: user.firstName })
+    await issueVerificationToken(event, {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName
+    })
   } catch (e) {
     console.error('Failed to send verification email', e)
     throw createError({

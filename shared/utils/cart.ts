@@ -35,7 +35,7 @@ export function mergeCartItems(existing: CartLine[], incoming: CartLine[]): Cart
     indexByProduct.set(line.productId, result.length)
     result.push({
       productId: line.productId,
-      quantity: (existingQty.get(line.productId) ?? 0) + line.quantity,
+      quantity: (existingQty.get(line.productId) ?? 0) + line.quantity
     })
   }
 
@@ -80,9 +80,11 @@ export function productsWithInvalidQuantity(lines: readonly CartLine[]): Set<num
  */
 export function sameCartQuantities(a: readonly CartLine[], b: readonly CartLine[]): boolean {
   const totals = (lines: readonly CartLine[]) =>
-    lines.reduce((sum, line) => sum.set(line.productId, (sum.get(line.productId) ?? 0) + line.quantity), new Map<number, number>())
+    lines.reduce(
+      (sum, line) => sum.set(line.productId, (sum.get(line.productId) ?? 0) + line.quantity),
+      new Map<number, number>()
+    )
   const x = totals(a)
   const y = totals(b)
   return x.size === y.size && [...x].every(([productId, quantity]) => y.get(productId) === quantity)
 }
-

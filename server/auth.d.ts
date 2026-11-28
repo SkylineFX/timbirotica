@@ -6,10 +6,6 @@ declare module '#auth-utils' {
     role: 'user' | 'admin'
   }
 
-  interface UserSession {
-    // Add any other session properties if needed
-  }
-
   // Server-only: nuxt-auth-utils never sends `secure` to the browser.
   // Checked on every request by server/middleware/session.ts.
   interface SecureSessionData {
@@ -22,4 +18,4 @@ declare module '#auth-utils' {
   }
 }
 
-export { }
+export {}

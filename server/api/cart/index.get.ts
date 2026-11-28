@@ -1,4 +1,3 @@
-
 export default defineEventHandler(async (event) => {
   const session = await getUserSession(event)
   if (!session.user?.id) {
@@ -14,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const db = useDrizzle()
 
   // Find or create cart
-  let cart = await db.query.carts.findFirst({
+  const cart = await db.query.carts.findFirst({
     where: eq(tables.carts.userId, userId),
     with: {
       items: {
@@ -23,14 +22,14 @@ export default defineEventHandler(async (event) => {
             // The long description isn't shown in the cart.
             columns: { description: false },
             // The cart links each line to /c/<category slug>/<product slug>.
-            with: { category: { columns: { slug: true } } },
+            with: { category: { columns: { slug: true } } }
           }
         }
       }
     }
   })
 
-  // We don't necessarily need to create it on read if it's empty, 
+  // We don't necessarily need to create it on read if it's empty,
   // but it simplifies things to return a standard structure.
   if (!cart) {
     return {

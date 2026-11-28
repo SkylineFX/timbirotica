@@ -25,7 +25,10 @@ export default eventHandler(async (event) => {
   const updated = await changeOrderStatus(db, id, 'processing', 'cancelled')
 
   if (!updated) {
-    throw createError({ statusCode: 409, message: 'Comanda nu mai poate fi anulata. Statusul ei s-a schimbat intre timp.' })
+    throw createError({
+      statusCode: 409,
+      message: 'Comanda nu mai poate fi anulata. Statusul ei s-a schimbat intre timp.'
+    })
   }
 
   return updated

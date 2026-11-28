@@ -1,0 +1,20 @@
+{
+  // Type-checks what `nuxi typecheck` leaves out: the unit tests, the catalog
+  // scripts and the root config files. Run by `npm run typecheck`.
+  "extends": "./.nuxt/tsconfig.server.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": false,
+    "types": ["node"]
+  },
+  "include": [
+    ".nuxt/types/nitro-nuxt.d.ts",
+    ".nuxt/types/nitro.d.ts",
+    "server/**/*.d.ts",
+    "test/**/*.ts",
+    "scripts/**/*.ts",
+    "vitest.config.ts",
+    "drizzle.config.ts"
+  ],
+  "exclude": []
+}

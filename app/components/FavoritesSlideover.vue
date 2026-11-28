@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const { favorites, isFavoritesOpen, removeFromFavorites, isLoading } = useFavorites()
+import type { FavoriteProduct } from '~/composables/useFavorites'
+
+const { favorites, isFavoritesOpen, removeFromFavorites } = useFavorites()
 const { addToCart, cartLocked } = useCart()
 
 // The products being added: each one's button shows a spinner and ignores a
@@ -7,7 +9,7 @@ const { addToCart, cartLocked } = useCart()
 // a double click adds once. A different product's button still works; useCart
 // sends the adds one at a time.
 const addingProductIds = ref(new Set<number>())
-const add = async (product: any) => {
+const add = async (product: FavoriteProduct) => {
   if (!product || addingProductIds.value.has(product.id)) return
   addingProductIds.value.add(product.id)
   try {
@@ -21,47 +23,88 @@ const add = async (product: any) => {
 </script>
 
 <template>
-  <USlideover v-model:open="isFavoritesOpen" side="right" title="Lista Favorite" :ui="{ body: 'py-0 sm:py-0' }">
-      <template #body>
-          <div v-if="favorites.length === 0" class="p-8 text-center text-gray-500">
-            Lista ta de favorite este goala.
-          </div>
-          <ul v-else class="flex flex-col">
-            <li v-for="item in favorites" :key="item.id" class="flex gap-4 py-8 border-b border-gray-200 dark:border-gray-800">
-               <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`" class="flex-shrink-0 cursor-pointer border border-gray-200 rounded-sm flex items-center justify-center p-1">
-                  <NuxtImg :src="item.product?.images?.[0] || ''" :alt="item.product?.name" loading="lazy" class="w-16 h-16 object-contain bg-white rounded-sm" />
-               </NuxtLink>
-              <div class="flex-1 flex flex-col justify-between">
-                <div>
-                    <h3 class="font-medium text-sm line-clamp-2">
-                        <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`">{{ item.product?.name }}</NuxtLink>
-                    </h3>
-                </div>
-                <div class="flex justify-between items-end mt-2">
-                       <div class="flex items-center gap-2">
-                           <UButton size="xs" color="error" variant="soft" icon="i-lucide-trash-2" aria-label="Sterge de la favorite" @click="removeFromFavorites(item.id)" class="p-1.5" />
-                           <UButton size="xs" color="primary" variant="soft" icon="i-lucide-shopping-cart" aria-label="Adauga in cos" :disabled="cartLocked" :loading="addingProductIds.has(item.product?.id)" @click="add(item.product)" class="p-1.5" />
-                       </div>
-                       <span class="font-bold text-sm">{{ (item.product?.price ?? 0).toFixed(2) }} RON</span>
-                </div>
-              </div>
-            </li>
-          </ul>
-      </template>
-
-       <template #footer>
-        <div class="w-full flex justify-center">
-             <UButton 
-            color="neutral" 
-            variant="subtle" 
-            @click="isFavoritesOpen = false"
-            icon="i-lucide-arrow-left"
-            block
-            class="rounded-sm p-3 justify-start"
+  <USlideover
+    v-model:open="isFavoritesOpen"
+    side="right"
+    title="Lista Favorite"
+    :ui="{ body: 'py-0 sm:py-0' }"
+  >
+    <template #body>
+      <div v-if="favorites.length === 0" class="p-8 text-center text-gray-500">
+        Lista ta de favorite este goala.
+      </div>
+      <ul v-else class="flex flex-col">
+        <li
+          v-for="item in favorites"
+          :key="item.id"
+          class="flex gap-4 border-b border-gray-200 py-8 dark:border-gray-800"
+        >
+          <NuxtLink
+            :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`"
+            class="flex flex-shrink-0 cursor-pointer items-center justify-center rounded-sm border border-gray-200 p-1"
           >
-            Inchide
-          </UButton>
-        </div>
-      </template>
+            <NuxtImg
+              :src="item.product?.images?.[0] || ''"
+              :alt="item.product?.name"
+              loading="lazy"
+              class="h-16 w-16 rounded-sm bg-white object-contain"
+            />
+          </NuxtLink>
+          <div class="flex flex-1 flex-col justify-between">
+            <div>
+              <h3 class="line-clamp-2 text-sm font-medium">
+                <NuxtLink :to="`/c/${item.product?.category?.slug}/${item.product?.slug}`">{{
+                  item.product?.name
+                }}</NuxtLink>
+              </h3>
+            </div>
+            <div class="mt-2 flex items-end justify-between">
+              <div class="flex items-center gap-2">
+                <UButton
+                  size="xs"
+                  color="error"
+                  variant="soft"
+                  icon="i-lucide-trash-2"
+                  aria-label="Sterge de la favorite"
+                  class="p-1.5"
+                  @click="removeFromFavorites(item.id)"
+                />
+                <UButton
+                  size="xs"
+                  color="primary"
+                  variant="soft"
+                  icon="i-lucide-shopping-cart"
+                  aria-label="Adauga in cos"
+                  :disabled="cartLocked"
+                  :loading="addingProductIds.has(item.product?.id)"
+                  class="p-1.5"
+                  @click="add(item.product)"
+                />
+              </div>
+              <span class="text-sm font-bold">{{ (item.product?.price ?? 0).toFixed(2) }} RON</span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </template>
+
+    <template #footer>
+      <div class="flex w-full justify-center">
+        <UButton
+          color="neutral"
+          variant="subtle"
+          icon="i-lucide-arrow-left"
+          block
+          class="justify-start rounded-sm p-3"
+          @click="
+            () => {
+              isFavoritesOpen = false
+            }
+          "
+        >
+          Inchide
+        </UButton>
+      </div>
+    </template>
   </USlideover>
 </template>

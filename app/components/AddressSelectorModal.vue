@@ -28,29 +28,51 @@ function select(id: number) {
 </script>
 
 <template>
-  <UModal v-model:open="isOpen" :title="title" :ui="{ content: 'sm:max-w-xl p-0' }" class="rounded-md">
+  <UModal
+    v-model:open="isOpen"
+    :title="title"
+    :ui="{ content: 'sm:max-w-xl p-0' }"
+    class="rounded-md"
+  >
     <template #body>
-       <div class="">
-         <div class="space-y-4 mb-6">
-            <div v-if="!items || items.length === 0" class="text-center py-8 text-gray-500 bg-gray-50 rounded-md border border-gray-100">
-               {{ emptyMessage || 'Nici o adresa salvata.' }}
-            </div>
+      <div class="">
+        <div class="mb-6 space-y-4">
+          <div
+            v-if="!items || items.length === 0"
+            class="rounded-md border border-gray-100 bg-gray-50 py-8 text-center text-gray-500"
+          >
+            {{ emptyMessage || 'Nici o adresa salvata.' }}
+          </div>
 
-            <div v-for="item in items" :key="item.id" class="flex items-start gap-4 p-5 rounded-md border transition-all cursor-pointer group hover:bg-gray-50" :class="selectedId === item.id ? 'border-primary bg-blue-50/20' : 'border-gray-200'" @click="select(item.id)">
-               <div class="mt-1 flex-shrink-0 w-6 h-6 rounded-full border flex items-center justify-center transition-colors bg-white" :class="selectedId === item.id ? 'border-primary bg-primary' : 'border-gray-300'">
-                  <div v-if="selectedId === item.id" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
-               </div>
-               <div class="flex-1">
-                  <slot name="item" :item="item"></slot>
-               </div>
+          <div
+            v-for="item in items"
+            :key="item.id"
+            class="group flex cursor-pointer items-start gap-4 rounded-md border p-5 transition-all hover:bg-gray-50"
+            :class="selectedId === item.id ? 'border-primary bg-blue-50/20' : 'border-gray-200'"
+            @click="select(item.id)"
+          >
+            <div
+              class="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border bg-white transition-colors"
+              :class="selectedId === item.id ? 'border-primary bg-primary' : 'border-gray-300'"
+            >
+              <div v-if="selectedId === item.id" class="h-2.5 w-2.5 rounded-full bg-primary"></div>
             </div>
-         </div>
+            <div class="flex-1">
+              <slot name="item" :item="item"></slot>
+            </div>
+          </div>
+        </div>
 
-         <UButton color="neutral" variant="solid" class="rounded-sm font-bold px-5 py-2.5 bg-gray-900 text-white hover:bg-gray-800" @click="emit('add-new')">
-           <UIcon name="i-lucide-plus" class="w-4 h-4 text-white inline align-middle"/> 
-           {{ addButtonText || 'Adauga' }}
-         </UButton>
-       </div>
+        <UButton
+          color="neutral"
+          variant="solid"
+          class="rounded-sm bg-gray-900 px-5 py-2.5 font-bold text-white hover:bg-gray-800"
+          @click="emit('add-new')"
+        >
+          <UIcon name="i-lucide-plus" class="inline h-4 w-4 align-middle text-white" />
+          {{ addButtonText || 'Adauga' }}
+        </UButton>
+      </div>
     </template>
   </UModal>
 </template>

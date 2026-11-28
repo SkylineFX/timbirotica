@@ -15,23 +15,27 @@ export default eventHandler(async (event) => {
   const shouldBeDefault = isFirstAddress || body.isDefaultShipping ? true : false
 
   if (shouldBeDefault && !isFirstAddress) {
-    await db.update(tables.addresses)
+    await db
+      .update(tables.addresses)
       .set({ isDefaultShipping: false })
       .where(eq(tables.addresses.userId, session.user.id))
   }
 
-  const nAddress = await db.insert(tables.addresses).values({
-    userId: session.user.id,
-    firstName: body.firstName,
-    lastName: body.lastName,
-    phone: body.phone,
-    street: body.street,
-    city: body.city,
-    county: body.county,
-    postalCode: body.postalCode || null,
-    isDefaultShipping: shouldBeDefault,
-    createdAt: new Date()
-  }).returning()
+  const nAddress = await db
+    .insert(tables.addresses)
+    .values({
+      userId: session.user.id,
+      firstName: body.firstName,
+      lastName: body.lastName,
+      phone: body.phone,
+      street: body.street,
+      city: body.city,
+      county: body.county,
+      postalCode: body.postalCode || null,
+      isDefaultShipping: shouldBeDefault,
+      createdAt: new Date()
+    })
+    .returning()
 
   return nAddress[0]
 })

@@ -1,10 +1,15 @@
 import { randomBytes, createHash } from 'node:crypto'
 import type { H3Event } from 'h3'
 
-export async function issueVerificationToken(event: H3Event, user: { id: number; email: string; firstName: string }) {
+export async function issueVerificationToken(
+  event: H3Event,
+  user: { id: number; email: string; firstName: string }
+) {
   const db = useDrizzle()
 
-  await db.delete(tables.emailVerificationTokens).where(eq(tables.emailVerificationTokens.userId, user.id))
+  await db
+    .delete(tables.emailVerificationTokens)
+    .where(eq(tables.emailVerificationTokens.userId, user.id))
 
   const rawToken = randomBytes(32).toString('hex')
   const tokenHash = createHash('sha256').update(rawToken).digest('hex')
@@ -14,7 +19,7 @@ export async function issueVerificationToken(event: H3Event, user: { id: number;
     userId: user.id,
     tokenHash,
     expiresAt: now + 60 * 60 * 24,
-    createdAt: now,
+    createdAt: now
   })
 
   const verifyLink = `${siteOrigin(event)}/user/verify-email?token=${rawToken}`

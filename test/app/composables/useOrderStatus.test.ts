@@ -3,7 +3,7 @@ import {
   useOrderStatus,
   ORDER_STATUS_LABEL,
   ORDER_STATUS_COLOR,
-  ORDER_STATUS_VALUES,
+  ORDER_STATUS_VALUES
 } from '~/composables/useOrderStatus'
 
 describe('useOrderStatus', () => {

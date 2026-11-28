@@ -1,4 +1,4 @@
-import { inArray, and, eq, gte, lte, gt, sql } from "drizzle-orm"
+import { inArray, and, eq, gte, lte, gt, sql, type SQL } from 'drizzle-orm'
 import { parseSearchTerms, buildSearchMatch, isSearchLongEnough } from '~~/shared/utils/search'
 
 export default eventHandler(async (event) => {
@@ -21,14 +21,15 @@ export default eventHandler(async (event) => {
   const db = useDrizzle()
 
   const emptyResponse = {
-    products: [] as any[],
+    products: [] as Awaited<ReturnType<typeof findProducts>>,
     total: 0,
     page,
     limit,
     facets: { price: null, brands: null, subcategories: null }
   }
 
-  let scopeCategory: { id: number; name: string; slug: string; parentId: number | null } | null = null
+  let scopeCategory: { id: number; name: string; slug: string; parentId: number | null } | null =
+    null
   let scopeCategoryIds: number[] = []
   if (categorySlug) {
     const category = await db.query.categories.findFirst({
@@ -39,7 +40,7 @@ export default eventHandler(async (event) => {
     const subcategories = await db.query.categories.findMany({
       where: eq(tables.categories.parentId, category.id)
     })
-    scopeCategoryIds = [category.id, ...subcategories.map(c => c.id)]
+    scopeCategoryIds = [category.id, ...subcategories.map((c) => c.id)]
   }
 
   let scopeBrand: { id: number; slug: string; name: string } | null = null
@@ -51,9 +52,10 @@ export default eventHandler(async (event) => {
     scopeBrand = { id: brand.id, slug: brand.slug, name: brand.name }
   }
 
-  const scopeConditions: any[] = []
+  const scopeConditions: SQL[] = []
   if (query.recommended === 'true') scopeConditions.push(eq(tables.products.isRecommended, true))
-  if (scopeCategoryIds.length) scopeConditions.push(inArray(tables.products.categoryId, scopeCategoryIds))
+  if (scopeCategoryIds.length)
+    scopeConditions.push(inArray(tables.products.categoryId, scopeCategoryIds))
   if (scopeBrand) scopeConditions.push(eq(tables.products.brandId, scopeBrand.id))
   let searchOrder: ReturnType<typeof productSearchOrder> | null = null
   if (searchQ) {
@@ -86,7 +88,7 @@ export default eventHandler(async (event) => {
       : Promise.resolve([] as Array<{ id: number }>)
   ])
 
-  const priceConds: any[] = []
+  const priceConds: SQL[] = []
   if (minPrice !== undefined) priceConds.push(gte(tables.products.price, minPrice))
   if (maxPrice !== undefined) priceConds.push(lte(tables.products.price, maxPrice))
   const availabilityCond = onlyAvailable ? gt(tables.products.stock, 0) : undefined
@@ -94,13 +96,30 @@ export default eventHandler(async (event) => {
   // category) gives no products, not the whole listing.
   const matchesNothing = sql`0 = 1`
   const subCond = selectedSubs.length
-    ? inArray(tables.products.categoryId, selectedSubs.map(s => s.id))
-    : subSlugs.length ? matchesNothing : undefined
+    ? inArray(
+        tables.products.categoryId,
+        selectedSubs.map((s) => s.id)
+      )
+    : subSlugs.length
+      ? matchesNothing
+      : undefined
   const brandCond = selectedBrands.length
-    ? inArray(tables.products.brandId, selectedBrands.map(b => b.id))
-    : brandFilterSlugs.length && !scopeBrand ? matchesNothing : undefined
+    ? inArray(
+        tables.products.brandId,
+        selectedBrands.map((b) => b.id)
+      )
+    : brandFilterSlugs.length && !scopeBrand
+      ? matchesNothing
+      : undefined
 
-  const buildWhere = (opts: { excludePrice?: boolean; excludeAvailability?: boolean; excludeSub?: boolean; excludeBrand?: boolean } = {}) => {
+  const buildWhere = (
+    opts: {
+      excludePrice?: boolean
+      excludeAvailability?: boolean
+      excludeSub?: boolean
+      excludeBrand?: boolean
+    } = {}
+  ) => {
     const conds = [...scopeConditions]
     if (!opts.excludePrice) conds.push(...priceConds)
     if (!opts.excludeAvailability && availabilityCond) conds.push(availabilityCond)
@@ -117,45 +136,57 @@ export default eventHandler(async (event) => {
   // A search is sorted by relevance unless the customer picks another order.
   const sortParam = queryString(query.sort) || (searchOrder ? 'relevance' : 'default')
 
-  const findProducts = () => db.query.products.findMany({
-    columns: { description: false },
-    where: fullWhere,
-    limit,
-    offset,
-    with: { brand: true, category: true },
-    orderBy: (products, { asc, desc }) => {
-      switch (sortParam) {
-        case 'price-asc': return [asc(products.price)]
-        case 'price-desc': return [desc(products.price)]
-        case 'name-asc': return [asc(products.name)]
-        case 'name-desc': return [desc(products.name)]
-        case 'relevance':
-          // Equal scores fall back to newest first; the id keeps pages stable.
-          if (searchOrder) return [...searchOrder, desc(products.createdAt), desc(products.id)]
-          return [desc(products.createdAt)]
-        default: return [desc(products.createdAt)]
+  const findProducts = () =>
+    db.query.products.findMany({
+      columns: { description: false },
+      where: fullWhere,
+      limit,
+      offset,
+      with: { brand: true, category: true },
+      orderBy: (products, { asc, desc }) => {
+        switch (sortParam) {
+          case 'price-asc':
+            return [asc(products.price)]
+          case 'price-desc':
+            return [desc(products.price)]
+          case 'name-asc':
+            return [asc(products.name)]
+          case 'name-desc':
+            return [desc(products.name)]
+          case 'relevance':
+            // Equal scores fall back to newest first; the id keeps pages stable.
+            if (searchOrder) return [...searchOrder, desc(products.createdAt), desc(products.id)]
+            return [desc(products.createdAt)]
+          default:
+            return [desc(products.createdAt)]
+        }
       }
-    }
-  })
+    })
 
   // The search preview and the home page carousels show only the products.
   // facets=0 skips the total and the facet queries, 6 of the 7 queries.
   if (query.facets === '0') {
-    return { products: await findProducts(), total: null, page, limit, facets: emptyResponse.facets }
+    return {
+      products: await findProducts(),
+      total: null,
+      page,
+      limit,
+      facets: emptyResponse.facets
+    }
   }
 
   const scopeOnlyWhere = scopeConditions.length ? and(...scopeConditions) : undefined
 
   const subcategoryFacetWhere = scopeCategory
-    ? (subFacetWhere
-        ? and(subFacetWhere, eq(tables.categories.parentId, scopeCategory.id))
-        : eq(tables.categories.parentId, scopeCategory.id))
+    ? subFacetWhere
+      ? and(subFacetWhere, eq(tables.categories.parentId, scopeCategory.id))
+      : eq(tables.categories.parentId, scopeCategory.id)
     : subFacetWhere
 
   const subcategoryScopeWhere = scopeCategory
-    ? (scopeOnlyWhere
-        ? and(scopeOnlyWhere, eq(tables.categories.parentId, scopeCategory.id))
-        : eq(tables.categories.parentId, scopeCategory.id))
+    ? scopeOnlyWhere
+      ? and(scopeOnlyWhere, eq(tables.categories.parentId, scopeCategory.id))
+      : eq(tables.categories.parentId, scopeCategory.id)
     : scopeOnlyWhere
 
   type FacetRow = { slug: string; name: string; count: number }
@@ -171,46 +202,54 @@ export default eventHandler(async (event) => {
     subcategoryScopeRows
   ] = await Promise.all([
     findProducts(),
-    db.select({ count: sql<number>`count(*)` })
+    db
+      .select({ count: sql<number>`count(*)` })
       .from(tables.products)
       .where(fullWhere ?? sql`1=1`),
-    db.select({
-      min: sql<number | null>`min(${tables.products.price})`,
-      max: sql<number | null>`max(${tables.products.price})`
-    }).from(tables.products).where(priceFacetWhere ?? sql`1=1`),
+    db
+      .select({
+        min: sql<number | null>`min(${tables.products.price})`,
+        max: sql<number | null>`max(${tables.products.price})`
+      })
+      .from(tables.products)
+      .where(priceFacetWhere ?? sql`1=1`),
     scopeBrand
       ? Promise.resolve(emptyFacetRows)
-      : db.select({
-          slug: tables.brands.slug,
-          name: tables.brands.name,
-          count: sql<number>`count(*)`
-        })
+      : db
+          .select({
+            slug: tables.brands.slug,
+            name: tables.brands.name,
+            count: sql<number>`count(*)`
+          })
           .from(tables.products)
           .innerJoin(tables.brands, eq(tables.brands.id, tables.products.brandId))
           .where(brandFacetWhere ?? sql`1=1`)
           .groupBy(tables.brands.id, tables.brands.slug, tables.brands.name),
-    db.select({
-      slug: tables.categories.slug,
-      name: tables.categories.name,
-      count: sql<number>`count(*)`
-    })
+    db
+      .select({
+        slug: tables.categories.slug,
+        name: tables.categories.name,
+        count: sql<number>`count(*)`
+      })
       .from(tables.products)
       .innerJoin(tables.categories, eq(tables.categories.id, tables.products.categoryId))
       .where(subcategoryFacetWhere ?? sql`1=1`)
       .groupBy(tables.categories.id, tables.categories.slug, tables.categories.name),
     scopeBrand
       ? Promise.resolve([] as Array<{ slug: string; name: string }>)
-      : db.selectDistinct({
-          slug: tables.brands.slug,
-          name: tables.brands.name
-        })
+      : db
+          .selectDistinct({
+            slug: tables.brands.slug,
+            name: tables.brands.name
+          })
           .from(tables.products)
           .innerJoin(tables.brands, eq(tables.brands.id, tables.products.brandId))
           .where(scopeOnlyWhere ?? sql`1=1`),
-    db.selectDistinct({
-      slug: tables.categories.slug,
-      name: tables.categories.name
-    })
+    db
+      .selectDistinct({
+        slug: tables.categories.slug,
+        name: tables.categories.name
+      })
       .from(tables.products)
       .innerJoin(tables.categories, eq(tables.categories.id, tables.products.categoryId))
       .where(subcategoryScopeWhere ?? sql`1=1`)
@@ -220,10 +259,13 @@ export default eventHandler(async (event) => {
   const priceMin = priceRow[0]?.min
   const priceMax = priceRow[0]?.max
 
-  const mergeFacet = (scopeRows: Array<{ slug: string; name: string }>, countRows: FacetRow[]): FacetRow[] => {
-    const counts = new Map(countRows.map(r => [r.slug, r.count]))
+  const mergeFacet = (
+    scopeRows: Array<{ slug: string; name: string }>,
+    countRows: FacetRow[]
+  ): FacetRow[] => {
+    const counts = new Map(countRows.map((r) => [r.slug, r.count]))
     return scopeRows
-      .map(r => ({ slug: r.slug, name: r.name, count: counts.get(r.slug) ?? 0 }))
+      .map((r) => ({ slug: r.slug, name: r.name, count: counts.get(r.slug) ?? 0 }))
       .sort((a, b) => a.name.localeCompare(b.name, 'ro'))
   }
 

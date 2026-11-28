@@ -2,6 +2,7 @@
 import * as z from 'zod'
 import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
 import { safeRedirectPath } from '~~/shared/utils/redirect'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
 
 definePageMeta({
   middleware: 'guest'
@@ -26,7 +27,8 @@ const redirectQuery = redirectTo ? { redirect: redirectTo } : {}
 // always confirmed; it happens with a Google account made for another address.
 const GOOGLE_ERRORS: Record<string, string> = {
   oauth_failed: 'Autentificarea cu Google nu a reusit. Incearca din nou.',
-  oauth_unverified: 'Google nu a confirmat adresa de email a contului tau. Intra cu email si parola sau creeaza un cont.',
+  oauth_unverified:
+    'Google nu a confirmat adresa de email a contului tau. Intra cu email si parola sau creeaza un cont.'
 }
 
 onMounted(() => {
@@ -44,31 +46,37 @@ onMounted(() => {
   router.replace({ query })
 })
 
-const fields: AuthFormField[] = [{
-  name: 'email',
-  type: 'email',
-  label: 'Email',
-  placeholder: 'Introduceti adresa de email',
-  required: true
-}, {
-  name: 'password',
-  label: 'Parola',
-  type: 'password',
-  placeholder: 'Introduceti parola',
-  required: true
-}, {
-  name: 'remember',
-  label: 'Tine-ma minte',
-  type: 'checkbox'
-}]
+const fields: AuthFormField[] = [
+  {
+    name: 'email',
+    type: 'email',
+    label: 'Email',
+    placeholder: 'Introduceti adresa de email',
+    required: true
+  },
+  {
+    name: 'password',
+    label: 'Parola',
+    type: 'password',
+    placeholder: 'Introduceti parola',
+    required: true
+  },
+  {
+    name: 'remember',
+    label: 'Tine-ma minte',
+    type: 'checkbox'
+  }
+]
 
-const providers = [{
-  label: 'Google',
-  icon: 'i-simple-icons-google',
-  to: redirectTo ? `/auth/google?redirect=${encodeURIComponent(redirectTo)}` : '/auth/google',
-  exact: true,
-  external: true
-}]
+const providers = [
+  {
+    label: 'Google',
+    icon: 'i-simple-icons-google',
+    to: redirectTo ? `/auth/google?redirect=${encodeURIComponent(redirectTo)}` : '/auth/google',
+    exact: true,
+    external: true
+  }
+]
 
 const schema = z.object({
   email: z.email('Adresa de email nu este valida'),
@@ -88,18 +96,17 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     await useCart().syncCart()
     toast.add({ title: 'Autentificare reusita', color: 'success' })
     await navigateTo(redirectTo ?? '/')
-  } catch (err: any) {
+  } catch (err) {
     turnstileToken.value = ''
     turnstile.value?.reset()
     toast.add({
       title: 'Autentificare esuata',
-      description: err.data?.message || 'Datele introduse nu sunt valide',
+      description: fetchFailure(err).message || 'Datele introduse nu sunt valide',
       color: 'error'
     })
   }
 }
 </script>
-
 
 <template>
   <div class="flex flex-col items-center justify-center gap-4 p-4">
@@ -115,16 +122,22 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         @submit="onSubmit"
       >
         <template #description>
-          Nu ai cont? <ULink :to="{ path: '/user/register', query: redirectQuery }" class="text-primary font-medium">Inregistrare</ULink>.
+          Nu ai cont?
+          <ULink
+            :to="{ path: '/user/register', query: redirectQuery }"
+            class="font-medium text-primary"
+            >Inregistrare</ULink
+          >.
         </template>
         <template #password-hint>
-          <ULink to="/user/forgot-password" class="text-primary font-medium" tabindex="-1">Am uitat parola</ULink>
+          <ULink to="/user/forgot-password" class="font-medium text-primary" tabindex="-1"
+            >Am uitat parola</ULink
+          >
         </template>
       </UAuthForm>
     </UPageCard>
-    <div class="flex justify-center mt-2">
+    <div class="mt-2 flex justify-center">
       <NuxtTurnstile ref="turnstile" v-model="turnstileToken" />
     </div>
   </div>
 </template>
-

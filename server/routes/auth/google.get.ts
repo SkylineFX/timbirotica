@@ -6,7 +6,13 @@ import { safeRedirectPath, withQueryParam } from '~~/shared/utils/redirect'
 // first request, e.g. /checkout). It is kept in a cookie for the trip to
 // Google and back, like the library's `state` cookie.
 const REDIRECT_COOKIE = 'auth-redirect'
-const REDIRECT_COOKIE_OPTIONS = { httpOnly: true, sameSite: 'lax', secure: !import.meta.dev, maxAge: 600, path: '/' } as const
+const REDIRECT_COOKIE_OPTIONS = {
+  httpOnly: true,
+  sameSite: 'lax',
+  secure: !import.meta.dev,
+  maxAge: 600,
+  path: '/'
+} as const
 
 function takeRedirect(event: H3Event): string | null {
   const target = safeRedirectPath(getCookie(event, REDIRECT_COOKIE))
@@ -31,7 +37,7 @@ const googleSignIn = defineOAuthGoogleEventHandler({
     // Customers often have a personal and a work account, and an order placed
     // on the wrong one is hard to undo. The consent screen still appears only
     // the first time.
-    authorizationParams: { prompt: 'select_account' },
+    authorizationParams: { prompt: 'select_account' }
   },
   async onSuccess(event, { user: profile }: { user: GoogleProfile }) {
     const result = await signInWithGoogle(useDrizzle(), profile)
@@ -48,17 +54,20 @@ const googleSignIn = defineOAuthGoogleEventHandler({
         id: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role as 'user' | 'admin',
+        role: user.role as 'user' | 'admin'
       },
       // Google sessions are always remembered (30 days). If this sign-in just
       // replaced the password of an unverified account, the stamp differs from
       // the one in sessions opened with that password, so those sessions end.
-      secure: newSessionGuard(user.password, true),
+      secure: newSessionGuard(user.password, true)
     })
 
     // The query parameter lets app.vue confirm the sign-in with a toast, like
     // the login and register forms do. There is no client handler here.
-    return sendRedirect(event, withQueryParam(target ?? '/', 'login', isNewUser ? 'google-new' : 'google'))
+    return sendRedirect(
+      event,
+      withQueryParam(target ?? '/', 'login', isNewUser ? 'google-new' : 'google')
+    )
   },
   onError(event, error) {
     console.error('Google OAuth error:', error)

@@ -1,30 +1,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import type { InternalApi } from 'nitropack/types'
 import { findCategory } from '~~/shared/utils/categoryTree'
 
-interface Product {
-  id: number
-  name: string
-  slug: string
-  price: number
-  image: string | null
-  category?: {
-    slug: string
-  } | null
-  sku?: string
-}
-
-interface ApiResponse {
-  products: Product[]
-  total: number | null
-  page: number
-  limit: number
-}
+// The listing endpoint's own response type: a hand-written copy here had
+// drifted (an `image` field the API doesn't send, no `stock`).
+type ApiResponse = InternalApi['/api/products']['get']
 
 const props = defineProps<{
-    categoryId?: number
-    recommended?: boolean
-    title?: string
+  categoryId?: number
+  recommended?: boolean
+  title?: string
 }>()
 
 const displayTitle = ref(props.title)
@@ -35,7 +21,7 @@ if (props.categoryId) {
   // The category's name and link come from the tree the header menu loads
   // (same request, useCatalogMenus.ts), not from a request of their own.
   const { data: categoryTree } = await useCategoryTree()
-  const category = findCategory(categoryTree.value ?? [], node => node.id === props.categoryId)
+  const category = findCategory(categoryTree.value ?? [], (node) => node.id === props.categoryId)
   if (category) {
     if (!displayTitle.value) {
       displayTitle.value = category.label
@@ -59,12 +45,22 @@ const items = computed(() => response.value?.products?.slice(0, 10) || [])
 
 <template>
   <div class="flex flex-col gap-4">
-    <div v-if="displayTitle" class="flex justify-between sm:justify-start items-baseline border-b border-gray-200 pb-1">
-      <h3 class="text-xl lg:text-2xl font-bold">{{ displayTitle }}</h3>
-      <UButton v-if="displayLink" class="text-xs py-0 self-center" :to="displayLink" :aria-label="`Vezi tot: ${displayTitle}`" color="primary" variant="link">
+    <div
+      v-if="displayTitle"
+      class="flex items-baseline justify-between border-b border-gray-200 pb-1 sm:justify-start"
+    >
+      <h3 class="text-xl font-bold lg:text-2xl">{{ displayTitle }}</h3>
+      <UButton
+        v-if="displayLink"
+        class="self-center py-0 text-xs"
+        :to="displayLink"
+        :aria-label="`Vezi tot: ${displayTitle}`"
+        color="primary"
+        variant="link"
+      >
         <span class="block sm:hidden">Vezi tot</span>
         <template #trailing>
-          <UIcon name="i-lucide-arrow-right" class="w-4 sm:w-5 h-4 sm:h-5" />
+          <UIcon name="i-lucide-arrow-right" class="h-4 w-4 sm:h-5 sm:w-5" />
         </template>
       </UButton>
     </div>
@@ -72,7 +68,7 @@ const items = computed(() => response.value?.products?.slice(0, 10) || [])
       v-slot="{ item }"
       :items="items"
       align="start"
-      :ui="{ 
+      :ui="{
         viewport: '-m-1 p-1',
         container: '-ml-2',
         item: 'basis-1/2 sm:basis-1/3 lg:basis-1/5 pl-2',
@@ -85,7 +81,7 @@ const items = computed(() => response.value?.products?.slice(0, 10) || [])
       :next="{ color: 'neutral', variant: 'link', size: 'xl' }"
     >
       <ProductCard
-        :key="item.id" 
+        :key="item.id"
         :to="`/c/${item.category?.slug}/${item.slug}`"
         :product="item"
         class="w-full"

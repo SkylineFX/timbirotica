@@ -82,8 +82,19 @@ export function createLatestWinsSender<V>(
       let entry = entries.get(key)
       if (!entry) {
         let resolveIdle!: () => void
-        const idle = new Promise<void>(resolve => { resolveIdle = resolve })
-        entry = { confirmed: current, waiting: null, inFlight: null, timer: null, keepalive: false, failed: false, idle, resolveIdle }
+        const idle = new Promise<void>((resolve) => {
+          resolveIdle = resolve
+        })
+        entry = {
+          confirmed: current,
+          waiting: null,
+          inFlight: null,
+          timer: null,
+          keepalive: false,
+          failed: false,
+          idle,
+          resolveIdle
+        }
         entries.set(key, entry)
       }
       entry.waiting = { value }
@@ -115,6 +126,6 @@ export function createLatestWinsSender<V>(
       entry.waiting = null
       if (entry.inFlight) await entry.inFlight
       else pump(key, entry)
-    },
+    }
   }
 }

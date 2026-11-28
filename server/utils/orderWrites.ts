@@ -36,7 +36,11 @@ export interface OrderLineWrite {
  */
 export function buildOrderWrites(
   db: LibSQLDatabase<typeof schema>,
-  { order, lines, cartId }: {
+  {
+    order,
+    lines,
+    cartId
+  }: {
     order: typeof schema.orders.$inferInsert
     lines: OrderLineWrite[]
     cartId: number
@@ -48,8 +52,8 @@ export function buildOrderWrites(
 
   const orderId = sql<number>`(select ${schema.orders.id} from ${schema.orders} where ${schema.orders.orderNumber} = ${order.orderNumber})`
 
-  const lineInserts = splitIntoChunks(lines, ORDER_ITEMS_PER_INSERT).map(chunk =>
-    db.insert(schema.orderItems).values(chunk.map(line => ({ ...line, orderId })))
+  const lineInserts = splitIntoChunks(lines, ORDER_ITEMS_PER_INSERT).map((chunk) =>
+    db.insert(schema.orderItems).values(chunk.map((line) => ({ ...line, orderId })))
   )
 
   const userIdWhileCartHasItems = sql<number>`(select ${order.userId} where exists (select 1 from ${schema.cartItems} where ${schema.cartItems.cartId} = ${cartId}))`
@@ -57,6 +61,6 @@ export function buildOrderWrites(
   return [
     db.insert(schema.orders).values({ ...order, userId: userIdWhileCartHasItems }),
     ...lineInserts,
-    db.delete(schema.cartItems).where(eq(schema.cartItems.cartId, cartId)),
+    db.delete(schema.cartItems).where(eq(schema.cartItems.cartId, cartId))
   ]
 }

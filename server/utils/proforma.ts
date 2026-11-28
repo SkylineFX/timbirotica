@@ -62,16 +62,18 @@ export function resolveProformaCustomer(
       bankName: billingSnapshot.bankName ?? undefined,
       address: billingSnapshot.street ?? '—',
       city: billingSnapshot.city ?? '—',
-      county: billingSnapshot.county ?? '—',
+      county: billingSnapshot.county ?? '—'
     }
   }
   const src = shippingSnapshot ?? {}
   return {
     type: 'individual',
-    name: `${src.firstName ?? user.firstName} ${src.lastName ?? user.lastName}`.trim() || user.firstName,
+    name:
+      `${src.firstName ?? user.firstName} ${src.lastName ?? user.lastName}`.trim() ||
+      user.firstName,
     address: src.street ?? '—',
     city: src.city ?? '—',
-    county: src.county ?? '—',
+    county: src.county ?? '—'
   }
 }
 
@@ -136,10 +138,12 @@ async function loadFonts(): Promise<ProformaFonts> {
   if (cachedFonts) return cachedFonts
   const [regularRes, boldRes] = await Promise.all([
     fetch(`${FONT_CDN_BASE}/DejaVuSans-Regular.ttf`),
-    fetch(`${FONT_CDN_BASE}/DejaVuSans-Bold.ttf`),
+    fetch(`${FONT_CDN_BASE}/DejaVuSans-Bold.ttf`)
   ])
   if (!regularRes.ok || !boldRes.ok) {
-    throw new Error(`Failed to fetch DejaVuSans fonts from CDN (regular: ${regularRes.status}, bold: ${boldRes.status})`)
+    throw new Error(
+      `Failed to fetch DejaVuSans fonts from CDN (regular: ${regularRes.status}, bold: ${boldRes.status})`
+    )
   }
   const [regular, bold] = await Promise.all([regularRes.arrayBuffer(), boldRes.arrayBuffer()])
   cachedFonts = { regular: new Uint8Array(regular), bold: new Uint8Array(bold) }
@@ -167,7 +171,11 @@ const BLACK = rgb(0, 0, 0)
 const GREY = rgb(0.45, 0.45, 0.45)
 const LIGHT_GREY = rgb(0.92, 0.92, 0.92)
 
-interface Column { x: number; width: number; align: 'left' | 'right' | 'center' }
+interface Column {
+  x: number
+  width: number
+  align: 'left' | 'right' | 'center'
+}
 
 // Item table columns, mirroring the printed proforma sample.
 const COLUMNS = {
@@ -177,7 +185,7 @@ const COLUMNS = {
   qty: { x: MARGIN + 254, width: 38, align: 'center' },
   price: { x: MARGIN + 308, width: 65, align: 'right' },
   value: { x: MARGIN + 373, width: 70, align: 'right' },
-  vat: { x: MARGIN + 443, width: 80, align: 'right' },
+  vat: { x: MARGIN + 443, width: 80, align: 'right' }
 } satisfies Record<string, Column>
 
 const NAME_FONT_SIZE = 10
@@ -263,28 +271,40 @@ export async function generateProformaPdf(
   const fontData = await fontLoader()
   const fonts: Fonts = {
     font: await pdfDoc.embedFont(fontData.regular, { subset: true }),
-    fontBold: await pdfDoc.embedFont(fontData.bold, { subset: true }),
+    fontBold: await pdfDoc.embedFont(fontData.bold, { subset: true })
   }
 
   const { rows, net: subtotalNet, vat: subtotalVat } = buildRows(input, fonts.font)
 
   const firstPage = pdfDoc.addPage(PAGE_SIZE)
-  const firstRowsTop = drawTableHeader(firstPage, fonts, drawFirstPageHeader(firstPage, fonts, input))
-  const otherRowsTop = PAGE_SIZE[1] - MARGIN - CONTINUATION_HEADER_HEIGHT - TABLE_HEADER_HEIGHT - TABLE_HEADER_GAP
+  const firstRowsTop = drawTableHeader(
+    firstPage,
+    fonts,
+    drawFirstPageHeader(firstPage, fonts, input)
+  )
+  const otherRowsTop =
+    PAGE_SIZE[1] - MARGIN - CONTINUATION_HEADER_HEIGHT - TABLE_HEADER_HEIGHT - TABLE_HEADER_GAP
 
-  const pagePlan = paginateRows(rows.map(row => rowHeight(row.nameLines.length)), {
-    firstPage: firstRowsTop - ROWS_BOTTOM,
-    otherPages: otherRowsTop - ROWS_BOTTOM,
-    totals: TOTALS_HEIGHT,
-  })
+  const pagePlan = paginateRows(
+    rows.map((row) => rowHeight(row.nameLines.length)),
+    {
+      firstPage: firstRowsTop - ROWS_BOTTOM,
+      otherPages: otherRowsTop - ROWS_BOTTOM,
+      totals: TOTALS_HEIGHT
+    }
+  )
 
-  const footer = { payment: paymentLabel(input.paymentMethod), shipping: shippingLabel(input.shippingMethod) }
+  const footer = {
+    payment: paymentLabel(input.paymentMethod),
+    shipping: shippingLabel(input.shippingMethod)
+  }
 
   pagePlan.forEach((rowIndexes, pageIndex) => {
     const page = pageIndex === 0 ? firstPage : pdfDoc.addPage(PAGE_SIZE)
-    let y = pageIndex === 0
-      ? firstRowsTop
-      : drawTableHeader(page, fonts, drawContinuationHeader(page, fonts, input))
+    let y =
+      pageIndex === 0
+        ? firstRowsTop
+        : drawTableHeader(page, fonts, drawContinuationHeader(page, fonts, input))
 
     for (const rowIndex of rowIndexes) {
       y = drawRow(page, fonts, rows[rowIndex]!, y)
@@ -307,10 +327,13 @@ export async function generateProformaPdf(
  * totals add up the printed lines, so the columns add up to the Total row and
  * net plus VAT is the order total.
  */
-function buildRows(input: ProformaInput, font: PDFFont): { rows: TableRow[], net: number, vat: number } {
+function buildRows(
+  input: ProformaInput,
+  font: PDFFont
+): { rows: TableRow[]; net: number; vat: number } {
   const nameWidth = COLUMNS.name.width - 4
   const breakdown = vatBreakdown(
-    input.items.map(item => ({ price: item.priceAtBuy, quantity: item.quantity })),
+    input.items.map((item) => ({ price: item.priceAtBuy, quantity: item.quantity })),
     input.shippingCost
   )
 
@@ -338,15 +361,31 @@ function buildRows(input: ProformaInput, font: PDFFont): { rows: TableRow[], net
 }
 
 /** Title, reference, supplier and customer. Returns the y where the item table starts. */
-function drawFirstPageHeader(page: PDFPage, { font, fontBold }: Fonts, input: ProformaInput): number {
+function drawFirstPageHeader(
+  page: PDFPage,
+  { font, fontBold }: Fonts,
+  input: ProformaInput
+): number {
   const { width, height } = page.getSize()
   let y = height - MARGIN
 
   page.drawText('PROFORMA', { x: MARGIN, y: y - 18, size: 20, font: fontBold, color: BLACK })
   const refLabel = `Nr. ${input.orderNumber}`
-  page.drawText(refLabel, { x: width - MARGIN - fontBold.widthOfTextAtSize(refLabel, 12), y: y - 8, size: 12, font: fontBold, color: BLACK })
+  page.drawText(refLabel, {
+    x: width - MARGIN - fontBold.widthOfTextAtSize(refLabel, 12),
+    y: y - 8,
+    size: 12,
+    font: fontBold,
+    color: BLACK
+  })
   const dateText = `Data: ${formatShopDate(input.orderDate)}`
-  page.drawText(dateText, { x: width - MARGIN - font.widthOfTextAtSize(dateText, 10), y: y - 24, size: 10, font, color: GREY })
+  page.drawText(dateText, {
+    x: width - MARGIN - font.widthOfTextAtSize(dateText, 10),
+    y: y - 24,
+    size: 10,
+    font,
+    color: GREY
+  })
 
   y -= 50
   drawDivider(page, y)
@@ -375,19 +414,36 @@ function drawFirstPageHeader(page: PDFPage, { font, fontBold }: Fonts, input: Pr
     if (input.customer.onrc) customerLines.push({ label: 'Reg. Com.', value: input.customer.onrc })
   }
   // Address + locality as one wrapped block, mirroring the FURNIZOR column layout
-  const locality = [input.customer.city, input.customer.county].filter(v => v && v !== '—').join(', ')
+  const locality = [input.customer.city, input.customer.county]
+    .filter((v) => v && v !== '—')
+    .join(', ')
   const addressBlock = [
     input.customer.address && input.customer.address !== '—' ? input.customer.address : null,
-    locality || null,
-  ].filter(Boolean).join(', ')
+    locality || null
+  ]
+    .filter(Boolean)
+    .join(', ')
   if (addressBlock) customerLines.push({ value: addressBlock })
   if (input.customer.type === 'company') {
     if (input.customer.iban) customerLines.push({ label: 'IBAN', value: input.customer.iban })
-    if (input.customer.bankName) customerLines.push({ label: 'Banca', value: input.customer.bankName })
+    if (input.customer.bankName)
+      customerLines.push({ label: 'Banca', value: input.customer.bankName })
   }
 
-  const supplierEnd = drawInfoLines(page, { font, fontBold }, layoutInfoLines(supplierLines, { font, fontBold }, colWidth), supplierX, y - 14)
-  const customerEnd = drawInfoLines(page, { font, fontBold }, layoutInfoLines(customerLines, { font, fontBold }, colWidth), customerX, y - 14)
+  const supplierEnd = drawInfoLines(
+    page,
+    { font, fontBold },
+    layoutInfoLines(supplierLines, { font, fontBold }, colWidth),
+    supplierX,
+    y - 14
+  )
+  const customerEnd = drawInfoLines(
+    page,
+    { font, fontBold },
+    layoutInfoLines(customerLines, { font, fontBold }, colWidth),
+    customerX,
+    y - 14
+  )
   y = Math.min(supplierEnd, customerEnd) - 10
 
   drawDivider(page, y)
@@ -395,14 +451,24 @@ function drawFirstPageHeader(page: PDFPage, { font, fontBold }: Fonts, input: Pr
 }
 
 /** Short header for pages after the first. Returns the y where the item table starts. */
-function drawContinuationHeader(page: PDFPage, { font, fontBold }: Fonts, input: ProformaInput): number {
+function drawContinuationHeader(
+  page: PDFPage,
+  { font, fontBold }: Fonts,
+  input: ProformaInput
+): number {
   const { width, height } = page.getSize()
   const top = height - MARGIN
 
   const title = `PROFORMA Nr. ${input.orderNumber}`
   page.drawText(title, { x: MARGIN, y: top - 12, size: 12, font: fontBold, color: BLACK })
   const dateText = `Data: ${formatShopDate(input.orderDate)}`
-  page.drawText(dateText, { x: width - MARGIN - font.widthOfTextAtSize(dateText, 10), y: top - 12, size: 10, font, color: GREY })
+  page.drawText(dateText, {
+    x: width - MARGIN - font.widthOfTextAtSize(dateText, 10),
+    y: top - 12,
+    size: 10,
+    font,
+    color: GREY
+  })
 
   return top - CONTINUATION_HEADER_HEIGHT
 }
@@ -410,7 +476,13 @@ function drawContinuationHeader(page: PDFPage, { font, fontBold }: Fonts, input:
 /** Grey header row of the item table. Returns the y where the first row starts. */
 function drawTableHeader(page: PDFPage, { font, fontBold }: Fonts, y: number): number {
   const { width } = page.getSize()
-  page.drawRectangle({ x: MARGIN, y: y - TABLE_HEADER_HEIGHT, width: width - MARGIN * 2, height: TABLE_HEADER_HEIGHT, color: LIGHT_GREY })
+  page.drawRectangle({
+    x: MARGIN,
+    y: y - TABLE_HEADER_HEIGHT,
+    width: width - MARGIN * 2,
+    height: TABLE_HEADER_HEIGHT,
+    color: LIGHT_GREY
+  })
 
   // Two lines: the label, plus a "Lei" sub-label for the currency columns
   const labelY = y - 11
@@ -436,7 +508,15 @@ function drawRow(page: PDFPage, { font }: Fonts, row: TableRow, y: number): numb
 
   drawCell(page, row.idx, COLUMNS.idx, contentTop, font, 10, BLACK)
   row.nameLines.forEach((line, i) => {
-    drawCell(page, line, COLUMNS.name, contentTop - i * NAME_LINE_HEIGHT, font, NAME_FONT_SIZE, BLACK)
+    drawCell(
+      page,
+      line,
+      COLUMNS.name,
+      contentTop - i * NAME_LINE_HEIGHT,
+      font,
+      NAME_FONT_SIZE,
+      BLACK
+    )
   })
   drawCell(page, 'BUC', COLUMNS.um, contentTop, font, 10, BLACK)
   drawCell(page, row.qty, COLUMNS.qty, contentTop, font, 10, BLACK)
@@ -445,70 +525,156 @@ function drawRow(page: PDFPage, { font }: Fonts, row: TableRow, y: number): numb
   drawCell(page, formatAmount(row.lineVat), COLUMNS.vat, contentTop, font, 10, BLACK)
 
   const bottom = y - rowHeight(row.nameLines.length)
-  page.drawLine({ start: { x: MARGIN, y: bottom + 2 }, end: { x: width - MARGIN, y: bottom + 2 }, thickness: 0.3, color: LIGHT_GREY })
+  page.drawLine({
+    start: { x: MARGIN, y: bottom + 2 },
+    end: { x: width - MARGIN, y: bottom + 2 },
+    thickness: 0.3,
+    color: LIGHT_GREY
+  })
   return bottom
 }
 
 /** The "Total" row (net and VAT sums) and the highlighted total bar. Uses TOTALS_HEIGHT below `y`. */
-function drawTotals(page: PDFPage, { fontBold }: Fonts, y: number, subtotalNet: number, subtotalVat: number, total: number) {
+function drawTotals(
+  page: PDFPage,
+  { fontBold }: Fonts,
+  y: number,
+  subtotalNet: number,
+  subtotalVat: number,
+  total: number
+) {
   const { width } = page.getSize()
 
   y -= 8
   const totalLabelX = COLUMNS.value.x - 6
-  page.drawText('Total', { x: totalLabelX - fontBold.widthOfTextAtSize('Total', 10), y, size: 10, font: fontBold, color: BLACK })
+  page.drawText('Total', {
+    x: totalLabelX - fontBold.widthOfTextAtSize('Total', 10),
+    y,
+    size: 10,
+    font: fontBold,
+    color: BLACK
+  })
   drawCell(page, formatAmount(subtotalNet), COLUMNS.value, y, fontBold, 10, BLACK)
   drawCell(page, formatAmount(subtotalVat), COLUMNS.vat, y, fontBold, 10, BLACK)
   y -= 20
 
   const barHeight = 26
-  page.drawRectangle({ x: MARGIN, y: y - barHeight, width: width - MARGIN * 2, height: barHeight, color: LIGHT_GREY })
+  page.drawRectangle({
+    x: MARGIN,
+    y: y - barHeight,
+    width: width - MARGIN * 2,
+    height: barHeight,
+    color: LIGHT_GREY
+  })
   page.drawText('Total', { x: MARGIN + 10, y: y - 17, size: 11, font: fontBold, color: BLACK })
   const totalText = formatRon(total)
-  page.drawText(totalText, { x: width - MARGIN - 10 - fontBold.widthOfTextAtSize(totalText, 13), y: y - 18, size: 13, font: fontBold, color: BLACK })
+  page.drawText(totalText, {
+    x: width - MARGIN - 10 - fontBold.widthOfTextAtSize(totalText, 13),
+    y: y - 18,
+    size: 13,
+    font: fontBold,
+    color: BLACK
+  })
 }
 
 /** Payment and delivery method, disclaimer, company and bank details, anchored to the bottom. */
-function drawFooter(page: PDFPage, { font, fontBold }: Fonts, meta: { payment: string; shipping: string }) {
+function drawFooter(
+  page: PDFPage,
+  { font, fontBold }: Fonts,
+  meta: { payment: string; shipping: string }
+) {
   const { width } = page.getSize()
   let fy = FOOTER_TOP
-  page.drawText(`Modalitate de plata: ${meta.payment}`, { x: MARGIN, y: fy, size: 9, font, color: BLACK })
+  page.drawText(`Modalitate de plata: ${meta.payment}`, {
+    x: MARGIN,
+    y: fy,
+    size: 9,
+    font,
+    color: BLACK
+  })
   fy -= 12
-  page.drawText(`Modalitate de livrare: ${meta.shipping}`, { x: MARGIN, y: fy, size: 9, font, color: BLACK })
+  page.drawText(`Modalitate de livrare: ${meta.shipping}`, {
+    x: MARGIN,
+    y: fy,
+    size: 9,
+    font,
+    color: BLACK
+  })
   fy -= 16
 
-  const disclaimer = 'Acest document este o factura proforma si nu reprezinta document fiscal. Factura fiscala va fi emisa la livrarea/incasarea comenzii.'
+  const disclaimer =
+    'Acest document este o factura proforma si nu reprezinta document fiscal. Factura fiscala va fi emisa la livrarea/incasarea comenzii.'
   for (const line of wrapText(disclaimer, font, 8, width - MARGIN * 2)) {
     page.drawText(line, { x: MARGIN, y: fy, size: 8, font, color: GREY })
     fy -= 10
   }
   fy -= 6
-  page.drawLine({ start: { x: MARGIN, y: fy }, end: { x: width - MARGIN, y: fy }, thickness: 0.5, color: LIGHT_GREY })
+  page.drawLine({
+    start: { x: MARGIN, y: fy },
+    end: { x: width - MARGIN, y: fy },
+    thickness: 0.5,
+    color: LIGHT_GREY
+  })
   fy -= 14
 
   // Company strip — name + contact
   page.drawText(COMPANY.name, { x: MARGIN, y: fy, size: 9, font: fontBold, color: BLACK })
   const telText = `Tel: ${COMPANY.phone}`
   const emailText = `Email: ${COMPANY.email}`
-  page.drawText(emailText, { x: width - MARGIN - font.widthOfTextAtSize(emailText, 9), y: fy, size: 9, font, color: GREY })
-  page.drawText(telText, { x: width - MARGIN - font.widthOfTextAtSize(emailText, 9) - 12 - font.widthOfTextAtSize(telText, 9), y: fy, size: 9, font, color: GREY })
+  page.drawText(emailText, {
+    x: width - MARGIN - font.widthOfTextAtSize(emailText, 9),
+    y: fy,
+    size: 9,
+    font,
+    color: GREY
+  })
+  page.drawText(telText, {
+    x:
+      width -
+      MARGIN -
+      font.widthOfTextAtSize(emailText, 9) -
+      12 -
+      font.widthOfTextAtSize(telText, 9),
+    y: fy,
+    size: 9,
+    font,
+    color: GREY
+  })
   fy -= 12
 
   // Bank info
   const ibanText = `Cont: ${COMPANY.iban}`
   const bankText = `Banca: ${COMPANY.bankName}`
   page.drawText(ibanText, { x: MARGIN, y: fy, size: 9, font, color: GREY })
-  page.drawText(bankText, { x: width - MARGIN - font.widthOfTextAtSize(bankText, 9), y: fy, size: 9, font, color: GREY })
+  page.drawText(bankText, {
+    x: width - MARGIN - font.widthOfTextAtSize(bankText, 9),
+    y: fy,
+    size: 9,
+    font,
+    color: GREY
+  })
 }
 
 function drawPageNumber(page: PDFPage, { font }: Fonts, pageNumber: number, pageCount: number) {
   const { width } = page.getSize()
   const text = `Pagina ${pageNumber} din ${pageCount}`
-  page.drawText(text, { x: (width - font.widthOfTextAtSize(text, 8)) / 2, y: 22, size: 8, font, color: GREY })
+  page.drawText(text, {
+    x: (width - font.widthOfTextAtSize(text, 8)) / 2,
+    y: 22,
+    size: 8,
+    font,
+    color: GREY
+  })
 }
 
 function drawDivider(page: PDFPage, y: number) {
   const { width } = page.getSize()
-  page.drawLine({ start: { x: MARGIN, y }, end: { x: width - MARGIN, y }, thickness: 0.8, color: LIGHT_GREY })
+  page.drawLine({
+    start: { x: MARGIN, y },
+    end: { x: width - MARGIN, y },
+    thickness: 0.8,
+    color: LIGHT_GREY
+  })
 }
 
 /** One line of the supplier or customer block: an optional label in regular type, the value in bold. */
@@ -539,17 +705,23 @@ export const INFO_MAX_LINES_PER_VALUE = 4
  * runs past the column (a long bank name used to run off the page). Lines
  * after the first are drawn under the value, not under the label.
  */
-export function layoutInfoLines(lines: InfoLine[], { font, fontBold }: Fonts, maxWidth: number): InfoLineLayout[] {
+export function layoutInfoLines(
+  lines: InfoLine[],
+  { font, fontBold }: Fonts,
+  maxWidth: number
+): InfoLineLayout[] {
   return lines.map(({ label, value }) => {
     const labelText = label ? `${label}: ` : ''
     const labelWidth = labelText ? font.widthOfTextAtSize(labelText, INFO_FONT_SIZE) : 0
     const width = maxWidth - labelWidth
     const wrapped = wrapText(value, fontBold, INFO_FONT_SIZE, width)
-    if (wrapped.length <= INFO_MAX_LINES_PER_VALUE) return { label: labelText, labelWidth, valueLines: wrapped }
+    if (wrapped.length <= INFO_MAX_LINES_PER_VALUE)
+      return { label: labelText, labelWidth, valueLines: wrapped }
     // Cut: the last kept line ends with "…", shortened until it fits.
     const kept = wrapped.slice(0, INFO_MAX_LINES_PER_VALUE)
     let last = kept[kept.length - 1]!
-    while (last && fontBold.widthOfTextAtSize(`${last}…`, INFO_FONT_SIZE) > width) last = last.slice(0, -1).trimEnd()
+    while (last && fontBold.widthOfTextAtSize(`${last}…`, INFO_FONT_SIZE) > width)
+      last = last.slice(0, -1).trimEnd()
     kept[kept.length - 1] = `${last}…`
     return { label: labelText, labelWidth, valueLines: kept }
   })
@@ -559,20 +731,40 @@ export function layoutInfoLines(lines: InfoLine[], { font, fontBold }: Fonts, ma
  * Draws laid-out lines 12pt apart: each label in regular type, its value lines
  * in bold under one another. Returns the y under the last line.
  */
-function drawInfoLines(page: PDFPage, { font, fontBold }: Fonts, lines: InfoLineLayout[], x: number, yStart: number): number {
+function drawInfoLines(
+  page: PDFPage,
+  { font, fontBold }: Fonts,
+  lines: InfoLineLayout[],
+  x: number,
+  yStart: number
+): number {
   const lineHeight = 12
   let y = yStart
   for (const { label, labelWidth, valueLines } of lines) {
     if (label) page.drawText(label, { x, y, size: INFO_FONT_SIZE, font, color: BLACK })
     for (const text of valueLines) {
-      page.drawText(text, { x: x + labelWidth, y, size: INFO_FONT_SIZE, font: fontBold, color: BLACK })
+      page.drawText(text, {
+        x: x + labelWidth,
+        y,
+        size: INFO_FONT_SIZE,
+        font: fontBold,
+        color: BLACK
+      })
       y -= lineHeight
     }
   }
   return y
 }
 
-function drawCell(page: PDFPage, text: string, column: Column, y: number, font: PDFFont, size: number, color: ReturnType<typeof rgb>) {
+function drawCell(
+  page: PDFPage,
+  text: string,
+  column: Column,
+  y: number,
+  font: PDFFont,
+  size: number,
+  color: ReturnType<typeof rgb>
+) {
   const w = font.widthOfTextAtSize(text, size)
   let x = column.x + 2
   if (column.align === 'right') x = column.x + column.width - w - 2
@@ -582,7 +774,10 @@ function drawCell(page: PDFPage, text: string, column: Column, y: number, font: 
 
 /** Wrap text to a width. A word longer than the width is broken across lines. */
 function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
-  const words = text.split(/\s+/).filter(Boolean).flatMap(word => breakLongWord(word, font, size, maxWidth))
+  const words = text
+    .split(/\s+/)
+    .filter(Boolean)
+    .flatMap((word) => breakLongWord(word, font, size, maxWidth))
   const lines: string[] = []
   let current = ''
   for (const word of words) {

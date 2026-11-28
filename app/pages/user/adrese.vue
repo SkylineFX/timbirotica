@@ -38,7 +38,10 @@ function openEditAddress(addr: Address) {
 }
 
 const currentAddress = computed(() => {
-  return (userAddresses.value as Address[])?.find((a: Address) => a.id === currentAddressId.value) || null
+  return (
+    (userAddresses.value as Address[])?.find((a: Address) => a.id === currentAddressId.value) ||
+    null
+  )
 })
 
 async function removeAddress(id: number) {
@@ -47,7 +50,11 @@ async function removeAddress(id: number) {
     await $fetch(`/api/user/addresses/${id}`, { method: 'DELETE' })
     toast.add({ title: 'Adresa stearsa', color: 'success' })
   } catch {
-    toast.add({ title: 'Eroare la stergerea adresei', description: 'Te rugam sa incerci din nou.', color: 'error' })
+    toast.add({
+      title: 'Eroare la stergerea adresei',
+      description: 'Te rugam sa incerci din nou.',
+      color: 'error'
+    })
   }
   await refreshAddresses()
 }
@@ -59,43 +66,88 @@ async function handleAddressSaved() {
 </script>
 
 <template>
-  <div class="flex-1 flex flex-col">
-    <UCard class="flex-1 flex flex-col overflow-hidden" :ui="{ root: 'rounded-md flex-1 flex flex-col', body: 'p-6 sm:p-8 flex-1 flex flex-col' }">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg sm:text-xl font-bold text-gray-900">Adresele mele</h3>
-        <UButton @click="openAddAddress" color="primary" variant="subtle" icon="i-lucide-plus" class="rounded-sm px-2">Adauga</UButton>
+  <div class="flex flex-1 flex-col">
+    <UCard
+      class="flex flex-1 flex-col overflow-hidden"
+      :ui="{ root: 'rounded-md flex-1 flex flex-col', body: 'p-6 sm:p-8 flex-1 flex flex-col' }"
+    >
+      <div class="mb-6 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-gray-900 sm:text-xl">Adresele mele</h3>
+        <UButton
+          color="primary"
+          variant="subtle"
+          icon="i-lucide-plus"
+          class="rounded-sm px-2"
+          @click="openAddAddress"
+          >Adauga</UButton
+        >
       </div>
 
-      <div v-if="userAddresses?.length === 0" class="flex-1 flex flex-col items-center justify-center text-center py-12 text-gray-500 bg-gray-50 rounded-sm border border-dashed border-gray-200">
+      <div
+        v-if="userAddresses?.length === 0"
+        class="flex flex-1 flex-col items-center justify-center rounded-sm border border-dashed border-gray-200 bg-gray-50 py-12 text-center text-gray-500"
+      >
         Nici o adresa salvata in cont.
       </div>
 
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div v-for="addr in userAddresses" :key="addr.id" class="p-5 rounded-sm border border-gray-200 bg-white relative hover:border-gray-300 transition-all">
+      <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div
+          v-for="addr in userAddresses"
+          :key="addr.id"
+          class="relative rounded-sm border border-gray-200 bg-white p-5 transition-all hover:border-gray-300"
+        >
           <div class="mb-4">
-            <p class="font-bold text-gray-900 inline">{{ addr.firstName + ' ' + addr.lastName }}</p>
-            <p class="text-gray-500 text-sm inline ml-1" v-if="addr.phone">· {{ addr.phone }}</p>
-            <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.street }}</p>
-            <p class="text-sm text-gray-600 line-clamp-2 mt-1">{{ addr.city }}, {{ addr.county }} <span v-if="addr.postalCode">({{ addr.postalCode }})</span></p>
+            <span class="inline font-bold text-gray-900">{{
+              addr.firstName + ' ' + addr.lastName
+            }}</span>
+            <span v-if="addr.phone" class="ml-1 inline text-sm text-gray-500"
+              >· {{ addr.phone }}</span
+            >
+            <p class="mt-1 line-clamp-2 text-sm text-gray-600">{{ addr.street }}</p>
+            <p class="mt-1 line-clamp-2 text-sm text-gray-600">
+              {{ addr.city }}, {{ addr.county }}
+              <span v-if="addr.postalCode">({{ addr.postalCode }})</span>
+            </p>
           </div>
 
-          <div class="flex items-center justify-between pt-4 border-t border-gray-200 mt-">
-            <div class="flex gap-2 items-center">
-              <UBadge v-if="addr.isDefaultShipping" color="neutral" variant="subtle" size="sm">Adresa implicita</UBadge>
+          <div class="mt- flex items-center justify-between border-t border-gray-200 pt-4">
+            <div class="flex items-center gap-2">
+              <UBadge v-if="addr.isDefaultShipping" color="neutral" variant="subtle" size="sm"
+                >Adresa implicita</UBadge
+              >
             </div>
             <div class="flex gap-1">
-              <UButton color="neutral" variant="ghost" size="sm" icon="i-lucide-pencil" aria-label="Editeaza adresa" class="font-medium" @click="openEditAddress(addr)" />
-              <UButton color="error" variant="ghost" size="sm" icon="i-lucide-trash-2" aria-label="Sterge adresa" class="font-medium" @click="removeAddress(addr.id)" />
+              <UButton
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                icon="i-lucide-pencil"
+                aria-label="Editeaza adresa"
+                class="font-medium"
+                @click="openEditAddress(addr)"
+              />
+              <UButton
+                color="error"
+                variant="ghost"
+                size="sm"
+                icon="i-lucide-trash-2"
+                aria-label="Sterge adresa"
+                class="font-medium"
+                @click="removeAddress(addr.id)"
+              />
             </div>
           </div>
         </div>
       </div>
     </UCard>
 
-    <UModal v-model:open="isAddressModalOpen" :title="modalMode === 'add' ? 'Adauga adresa noua' : 'Editeaza adresa'" :ui="{ content: 'sm:max-w-xl' }">
+    <UModal
+      v-model:open="isAddressModalOpen"
+      :title="modalMode === 'add' ? 'Adauga adresa noua' : 'Editeaza adresa'"
+      :ui="{ content: 'sm:max-w-xl' }"
+    >
       <template #body>
         <AddressForm
-          :is-first-address="!userAddresses || userAddresses.length === 0"
           :address="modalMode === 'edit' ? currentAddress : null"
           @saved="handleAddressSaved"
         />

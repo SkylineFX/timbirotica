@@ -9,7 +9,7 @@ import { describe, it, expect } from 'vitest'
 // fails when a handler under server/api/admin does not.
 const adminDir = fileURLToPath(new URL('../../server/api/admin', import.meta.url))
 const handlerFiles = readdirSync(adminDir, { recursive: true, encoding: 'utf8' })
-  .filter(file => file.endsWith('.ts'))
+  .filter((file) => file.endsWith('.ts'))
   .sort()
 
 describe('admin API handlers', () => {

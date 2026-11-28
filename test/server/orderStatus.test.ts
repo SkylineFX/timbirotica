@@ -11,13 +11,22 @@ const ORDER_ID = 1
 let db: TestDb
 
 const storedStatus = async () =>
-  (await db.select({ status: schema.orders.status }).from(schema.orders).where(eq(schema.orders.id, ORDER_ID)))[0]?.status
+  (
+    await db
+      .select({ status: schema.orders.status })
+      .from(schema.orders)
+      .where(eq(schema.orders.id, ORDER_ID))
+  )[0]?.status
 
 beforeEach(async () => {
   db = await createTestDb()
   await seedUserCartAndProducts(db, 0)
   await db.insert(schema.orders).values({
-    id: ORDER_ID, userId: TEST_USER_ID, orderNumber: 'TBR-TEST-1', total: 10, createdAt: new Date(),
+    id: ORDER_ID,
+    userId: TEST_USER_ID,
+    orderNumber: 'TBR-TEST-1',
+    total: 10,
+    createdAt: new Date()
   })
 })
 
@@ -30,7 +39,10 @@ describe('changeOrderStatus', () => {
 
   it('leaves the order alone when its status changed after it was read', async () => {
     // The customer read the order as 'processing', then the admin confirmed it.
-    await db.update(schema.orders).set({ status: 'confirmed' }).where(eq(schema.orders.id, ORDER_ID))
+    await db
+      .update(schema.orders)
+      .set({ status: 'confirmed' })
+      .where(eq(schema.orders.id, ORDER_ID))
 
     expect(await changeOrderStatus(db, ORDER_ID, 'processing', 'cancelled')).toBeUndefined()
     expect(await storedStatus()).toBe('confirmed')

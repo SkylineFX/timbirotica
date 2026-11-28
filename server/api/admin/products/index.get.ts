@@ -9,7 +9,11 @@ export default eventHandler(async (event) => {
   const limit = queryInteger(query.limit, { fallback: 25, min: 1, max: 100 })
   const offset = (page - 1) * limit
   const q = queryString(query.q)?.trim() ?? ''
-  const categoryId = queryInteger(query.categoryId, { fallback: 0, min: 0, max: Number.MAX_SAFE_INTEGER })
+  const categoryId = queryInteger(query.categoryId, {
+    fallback: 0,
+    min: 0,
+    max: Number.MAX_SAFE_INTEGER
+  })
 
   // The shop's full-text search (products_fts), with its 2-character minimum:
   // diacritics and word order don't matter, and a pasted product name works.
@@ -24,7 +28,7 @@ export default eventHandler(async (event) => {
 
   const filters = [
     searchFilter,
-    categoryId ? eq(tables.products.categoryId, categoryId) : undefined,
+    categoryId ? eq(tables.products.categoryId, categoryId) : undefined
   ].filter(Boolean) as ReturnType<typeof eq>[]
 
   const where = filters.length ? and(...filters) : undefined
@@ -39,10 +43,11 @@ export default eventHandler(async (event) => {
       offset,
       with: {
         category: { columns: { id: true, name: true, slug: true } },
-        brand: { columns: { id: true, name: true } },
+        brand: { columns: { id: true, name: true } }
       }
     }),
-    db.select({ count: sql<number>`count(*)` })
+    db
+      .select({ count: sql<number>`count(*)` })
       .from(tables.products)
       .where(where ?? sql`1=1`)
   ])
@@ -51,6 +56,6 @@ export default eventHandler(async (event) => {
     products,
     total: totalRow[0]?.count ?? 0,
     page,
-    limit,
+    limit
   }
 })

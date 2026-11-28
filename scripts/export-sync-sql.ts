@@ -83,18 +83,18 @@ async function main() {
 
   for (const table of TABLES) {
     const info = await client.execute(`PRAGMA table_info("${table}")`)
-    const cols = info.rows.map(r => String(r.name))
+    const cols = info.rows.map((r) => String(r.name))
     if (cols.length === 0) {
       console.warn(`! table "${table}" not found — skipping`)
       continue
     }
     const imgCols = new Set(IMAGE_COLUMNS[table] ?? [])
-    const colList = cols.map(c => `"${c}"`).join(', ')
+    const colList = cols.map((c) => `"${c}"`).join(', ')
     const conflict = (ON_CONFLICT[table] ?? DEFAULT_ON_CONFLICT).replace(/\s+/g, ' ')
 
     const res = await client.execute(`SELECT * FROM "${table}" ${ORDER_BY[table] ?? ''}`.trim())
     for (const row of res.rows) {
-      const vals = cols.map(c => {
+      const vals = cols.map((c) => {
         let v = (row as Record<string, unknown>)[c]
         if (imgCols.has(c) && typeof v === 'string' && v) v = rewriteImages(v)
         return sqlValue(v)
@@ -112,6 +112,8 @@ async function main() {
 }
 
 main()
-  .catch((e) => { console.error(e); process.exit(1) })
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
   .finally(() => client.close())
-

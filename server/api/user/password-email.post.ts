@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const user = await db.query.users.findFirst({
     where: eq(tables.users.id, session.user.id),
-    columns: { id: true, email: true, firstName: true },
+    columns: { id: true, email: true, firstName: true }
   })
   if (!user) {
     throw createError({ statusCode: 404, message: 'Utilizatorul nu a fost gasit.' })
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
   const existing = await db.query.passwordResetTokens.findFirst({
     where: eq(tables.passwordResetTokens.userId, user.id),
-    columns: { createdAt: true },
+    columns: { createdAt: true }
   })
   if (existing) {
     const wait = PASSWORD_EMAIL_INTERVAL - (Math.floor(Date.now() / 1000) - existing.createdAt)
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 429,
         message: `Mai asteapta ${wait} secunde inainte de a cere un nou email.`,
-        data: { retryAfter: wait },
+        data: { retryAfter: wait }
       })
     }
   }
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 500,
       message: 'Nu am putut trimite emailul. Incearca din nou in cateva minute.',
-      cause: e,
+      cause: e
     })
   }
 

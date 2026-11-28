@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import {
-  isSessionCurrent, newSessionGuard, passwordStamp, sessionCookieExpires, skipsSessionCheck,
+  isSessionCurrent,
+  newSessionGuard,
+  passwordStamp,
+  sessionCookieExpires,
+  skipsSessionCheck
 } from '~~/server/utils/sessionCheck'
 import { GOOGLE_ONLY_PASSWORD } from '~~/server/utils/googleSignIn'
 
@@ -9,11 +13,16 @@ const DAY = 24 * 60 * 60 * 1000
 const HASH = '$2a$10$abcdefghijklmnopqrstuuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0'
 const NEW_HASH = '$2a$10$0ZYXWVUTSRQPONMLKJIHGFEDCBAzyxwvutsrqpomlkjihgfedcbaZ'
 
-const account = (overrides: Partial<{ password: string, role: string }> = {}) =>
-  ({ password: HASH, role: 'user', ...overrides })
+const account = (overrides: Partial<{ password: string; role: string }> = {}) => ({
+  password: HASH,
+  role: 'user',
+  ...overrides
+})
 
-const sessionFor = (passwordHash = HASH, role = 'user', remember = false) =>
-  ({ user: { role }, secure: newSessionGuard(passwordHash, remember, NOW) })
+const sessionFor = (passwordHash = HASH, role = 'user', remember = false) => ({
+  user: { role },
+  secure: newSessionGuard(passwordHash, remember, NOW)
+})
 
 describe('passwordStamp', () => {
   it('is the same for the same hash and differs when the password changes', () => {
@@ -34,7 +43,7 @@ describe('newSessionGuard', () => {
 })
 
 describe('sessionCookieExpires', () => {
-  it('ends a remembered session\'s cookie with the session', () => {
+  it("ends a remembered session's cookie with the session", () => {
     expect(sessionCookieExpires(newSessionGuard(HASH, true, NOW))).toEqual(new Date(NOW + 30 * DAY))
   })
 
@@ -63,8 +72,10 @@ describe('isSessionCurrent', () => {
     expect(isSessionCurrent(sessionFor(HASH), account({ password: NEW_HASH }), NOW)).toBe(false)
   })
 
-  it('refuses the registrant\'s session after Google sign-in claims the account', () => {
-    expect(isSessionCurrent(sessionFor(HASH), account({ password: GOOGLE_ONLY_PASSWORD }), NOW)).toBe(false)
+  it("refuses the registrant's session after Google sign-in claims the account", () => {
+    expect(
+      isSessionCurrent(sessionFor(HASH), account({ password: GOOGLE_ONLY_PASSWORD }), NOW)
+    ).toBe(false)
   })
 
   it('refuses a session whose role differs from the database', () => {
@@ -79,25 +90,51 @@ describe('isSessionCurrent', () => {
 
   it('refuses sessions from before this check, without the server-only fields', () => {
     expect(isSessionCurrent({ user: { role: 'user' } }, account(), NOW)).toBe(false)
-    expect(isSessionCurrent({ user: { role: 'user' }, secure: { passwordStamp: passwordStamp(HASH) } }, account(), NOW)).toBe(false)
-    expect(isSessionCurrent({ user: { role: 'user' }, secure: { expiresAt: NOW + DAY } }, account(), NOW)).toBe(false)
+    expect(
+      isSessionCurrent(
+        { user: { role: 'user' }, secure: { passwordStamp: passwordStamp(HASH) } },
+        account(),
+        NOW
+      )
+    ).toBe(false)
+    expect(
+      isSessionCurrent({ user: { role: 'user' }, secure: { expiresAt: NOW + DAY } }, account(), NOW)
+    ).toBe(false)
   })
 })
 
 describe('skipsSessionCheck', () => {
   it('skips the public catalog endpoints', () => {
     for (const path of [
-      '/api/products', '/api/products?q=pix&limit=10', '/api/products/pix-albastru',
-      '/api/categories/tree', '/api/brands', '/api/locations/cities?countyName=Alba',
-      '/api/__sitemap__/urls', '//api//products',
-    ]) expect(skipsSessionCheck(path), path).toBe(true)
+      '/api/products',
+      '/api/products?q=pix&limit=10',
+      '/api/products/pix-albastru',
+      '/api/categories/tree',
+      '/api/brands',
+      '/api/locations/cities?countyName=Alba',
+      '/api/__sitemap__/urls',
+      '//api//products'
+    ])
+      expect(skipsSessionCheck(path), path).toBe(true)
   })
 
   it('checks pages and every other endpoint', () => {
     for (const path of [
-      '/', '/c/radiere', '/user/comenzi', '/api/_auth/session', '/api/cart', '/api/favorites',
-      '/api/orders', '/api/user/orders', '/api/admin/products', '/auth/google',
-      '/api/productsx', '/api/brands-admin', '/api', '/api/cart?x=/api/products',
-    ]) expect(skipsSessionCheck(path), path).toBe(false)
+      '/',
+      '/c/radiere',
+      '/user/comenzi',
+      '/api/_auth/session',
+      '/api/cart',
+      '/api/favorites',
+      '/api/orders',
+      '/api/user/orders',
+      '/api/admin/products',
+      '/auth/google',
+      '/api/productsx',
+      '/api/brands-admin',
+      '/api',
+      '/api/cart?x=/api/products'
+    ])
+      expect(skipsSessionCheck(path), path).toBe(false)
   })
 })

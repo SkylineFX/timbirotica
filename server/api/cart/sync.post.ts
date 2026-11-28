@@ -21,11 +21,11 @@ export default defineEventHandler(async (event) => {
   // added them). Inserting them would fail the cart_items foreign key on D1.
   // The lookup is split into queries that fit D1's parameter limit and sent as
   // one batch, so the size of the guest cart doesn't matter.
-  const productIds = [...new Set(validLines.map(l => l.productId))]
+  const productIds = [...new Set(validLines.map((l) => l.productId))]
   const [firstLookup, ...moreLookups] = buildProductLookups(db, productIds)
   const found = firstLookup ? await db.batch([firstLookup, ...moreLookups]) : []
-  const knownIds = new Set(found.flat().map(p => p.id))
-  const items = validLines.filter(l => knownIds.has(l.productId))
+  const knownIds = new Set(found.flat().map((p) => p.id))
+  const items = validLines.filter((l) => knownIds.has(l.productId))
   if (items.length === 0) return { success: true }
 
   // 1. Get or Create Cart
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
     columns: { id: true, productId: true, quantity: true }
   })
   const merged = mergeCartItems(
-    existingItems.map(i => ({ productId: i.productId, quantity: i.quantity })),
+    existingItems.map((i) => ({ productId: i.productId, quantity: i.quantity })),
     items
   )
 
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
   const [firstWrite, ...moreWrites] = buildCartMergeWrites(db, {
     cartId,
     merged,
-    existingItems,
+    existingItems
   })
   if (firstWrite) await db.batch([firstWrite, ...moreWrites])
 

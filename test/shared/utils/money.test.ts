@@ -1,6 +1,13 @@
 import { describe, it, expect } from 'vitest'
 import { VAT_RATE } from '~~/shared/constants/company'
-import { fromBani, isWholeBani, splitGross, sumLines, toBani, vatBreakdown } from '~~/shared/utils/money'
+import {
+  fromBani,
+  isWholeBani,
+  splitGross,
+  sumLines,
+  toBani,
+  vatBreakdown
+} from '~~/shared/utils/money'
 
 describe('toBani and fromBani', () => {
   it('turns every whole-bani amount into lei and back unchanged', () => {
@@ -38,7 +45,12 @@ describe('isWholeBani', () => {
 
 describe('sumLines', () => {
   it('adds prices times quantities in bani', () => {
-    expect(sumLines([{ price: 19.99, quantity: 3 }, { price: 0.1, quantity: 3 }])).toBe(6027)
+    expect(
+      sumLines([
+        { price: 19.99, quantity: 3 },
+        { price: 0.1, quantity: 3 }
+      ])
+    ).toBe(6027)
     expect(sumLines([])).toBe(0)
   })
 })
@@ -57,7 +69,8 @@ describe('splitGross', () => {
   it('always adds back up to the gross', () => {
     for (let gross = 0; gross <= 200_000; gross++) {
       const { net, vat } = splitGross(gross)
-      if (net + vat !== gross || !Number.isInteger(net)) throw new Error(`${gross} bani split wrongly`)
+      if (net + vat !== gross || !Number.isInteger(net))
+        throw new Error(`${gross} bani split wrongly`)
     }
   })
 })
@@ -66,7 +79,7 @@ describe('vatBreakdown', () => {
   it('adds up the rounded lines, so a printed document adds up to its totals (M11)', () => {
     // 30 lines of 1 x 10.00: the unrounded split gave totals 13 bani off the lines.
     const breakdown = vatBreakdown(Array.from({ length: 30 }, () => ({ price: 10, quantity: 1 })))
-    expect(breakdown.rows.every(row => row.net === 826 && row.vat === 174)).toBe(true)
+    expect(breakdown.rows.every((row) => row.net === 826 && row.vat === 174)).toBe(true)
     expect({ net: breakdown.net, vat: breakdown.vat }).toEqual({ net: 24780, vat: 5220 })
   })
 

@@ -4,6 +4,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   modules: [
+    // Generates the ESLint config that eslint.config.mjs extends (dev only).
+    '@nuxt/eslint',
     '@nuxt/ui',
     'nuxt-auth-utils',
     '@nuxthub/core',
@@ -27,14 +29,7 @@ export default defineNuxtConfig({
   },
 
   robots: {
-    disallow: [
-      '/admin',
-      '/user',
-      '/checkout',
-      '/comanda-finalizata',
-      '/cautare',
-      '/api'
-    ]
+    disallow: ['/admin', '/user', '/checkout', '/comanda-finalizata', '/cautare', '/api']
   },
 
   sitemap: {
@@ -55,7 +50,7 @@ export default defineNuxtConfig({
       // The Sentry environment for browser errors and traces
       // (sentry.client.config.ts). Previews set NUXT_PUBLIC_SENTRY_ENVIRONMENT
       // to "preview" at run time, as the Worker gets SENTRY_ENVIRONMENT.
-      sentryEnvironment: 'production',
+      sentryEnvironment: 'production'
     },
     session: {
       // Read from NUXT_SESSION_PASSWORD at run time. Don't read process.env
@@ -66,7 +61,7 @@ export default defineNuxtConfig({
       // checks sessions that come in a cookie.
       sessionHeader: false,
       cookie: {
-        secure: process.env.NODE_ENV === 'production', // Allow cookies over HTTP in dev (for LAN testing)
+        secure: process.env.NODE_ENV === 'production' // Allow cookies over HTTP in dev (for LAN testing)
       }
     }
   },

@@ -38,7 +38,7 @@ interface Props {
   customerName: string
   total: number
   shippingCost: number
-  items: OrderItem[]
+  items?: OrderItem[]
   shippingAddress?: Address
   billingAddress?: BillingAddress
   orderDate: string
@@ -55,7 +55,9 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const EMAIL_ITEM_LIMIT = 10
-const shownItems = computed(() => props.hasProforma ? props.items.slice(0, EMAIL_ITEM_LIMIT) : props.items)
+const shownItems = computed(() =>
+  props.hasProforma ? props.items.slice(0, EMAIL_ITEM_LIMIT) : props.items
+)
 const hiddenItemCount = computed(() => props.items.length - shownItems.value.length)
 
 const formattedDate = computed(() => {
@@ -70,31 +72,77 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
 <template>
   <EHtml>
     <EHead />
-    <EPreview>Timbirotica - Îți mulțumim pentru comandă! Detaliile și statusul comenzii sunt în acest email.</EPreview>
-    <EBody style="background-color: #f6f9fc; font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Ubuntu,sans-serif;">
-      <EContainer style="background-color: #ffffff; margin: 0 auto; padding: 24px 0 12px; margin-bottom: 32px; max-width: 600px;">
-        <ESection style="padding: 0 24px;">
-          <img src="https://cdn.timbirotica.ro/uploads/logo.png" alt="Timbirotica" width="213" height="40" style="height: 40px; width: 213px; display: block; border: 0; outline: none; text-decoration: none;" />
+    <EPreview
+      >Timbirotica - Îți mulțumim pentru comandă! Detaliile și statusul comenzii sunt în acest
+      email.</EPreview
+    >
+    <EBody
+      style="
+        background-color: #f6f9fc;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu,
+          sans-serif;
+      "
+    >
+      <EContainer
+        style="
+          background-color: #ffffff;
+          margin: 0 auto;
+          padding: 24px 0 12px;
+          margin-bottom: 32px;
+          max-width: 600px;
+        "
+      >
+        <ESection style="padding: 0 24px">
+          <img
+            src="https://cdn.timbirotica.ro/uploads/logo.png"
+            alt="Timbirotica"
+            width="213"
+            height="40"
+            style="
+              height: 40px;
+              width: 213px;
+              display: block;
+              border: 0;
+              outline: none;
+              text-decoration: none;
+            "
+          />
 
-          <EHeading style="font-size: 24px; line-height: 1.3; font-weight: 700; color: #484848; margin-top: 48px;">
+          <EHeading
+            style="
+              font-size: 24px;
+              line-height: 1.3;
+              font-weight: 700;
+              color: #484848;
+              margin-top: 48px;
+            "
+          >
             Îți mulțumim pentru comandă!
           </EHeading>
 
-          <EText style="font-size: 16px; line-height: 24px; color: #525f7f;">
+          <EText style="font-size: 16px; line-height: 24px; color: #525f7f">
             Salut {{ customerName }},
           </EText>
-          <EText style="font-size: 16px; line-height: 24px; color: #525f7f;">
-            Am înregistrat comanda ta cu numărul <strong>#{{ orderNumber }}</strong>.
+          <EText style="font-size: 16px; line-height: 24px; color: #525f7f">
+            Am înregistrat comanda ta cu numărul <strong>#{{ orderNumber }}</strong
+            >.
             <span v-if="shippingMethod === 'courier'">
               În curând o vom pregăti pentru expediere.
             </span>
-            <span v-else>
-              Vei fi notificat pe email când coletul va fi gata de ridicare.
-            </span>
+            <span v-else> Vei fi notificat pe email când coletul va fi gata de ridicare. </span>
           </EText>
 
-          <ESection style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 16px; margin-top: 24px;">
-            <EText style="font-size: 14px; line-height: 24px; margin: 0; color: #475569;">
+          <ESection
+            style="
+              background-color: #f8fafc;
+              border: 1px solid #e2e8f0;
+              border-radius: 4px;
+              padding: 16px;
+              margin-top: 24px;
+            "
+          >
+            <EText style="font-size: 14px; line-height: 24px; margin: 0; color: #475569">
               <strong>Data:</strong> {{ formattedDate }}<br />
               <strong>Metoda de livrare:</strong> {{ formattedShippingMethod }}<br />
               <strong>Metoda de plată:</strong> {{ formattedPaymentMethod }}
@@ -102,74 +150,99 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
           </ESection>
 
           <!-- Order Summary -->
-          <EHeading style="font-size: 18px; line-height: 1.3; font-weight: 700; color: #484848; margin-top: 32px;">
+          <EHeading
+            style="
+              font-size: 18px;
+              line-height: 1.3;
+              font-weight: 700;
+              color: #484848;
+              margin-top: 32px;
+            "
+          >
             Detalii comandă
           </EHeading>
 
-          <EHr style="border-color: #e6ebf1; margin: 20px 0;" />
+          <EHr style="border-color: #e6ebf1; margin: 20px 0" />
 
-          <ESection v-for="(item, index) in shownItems" :key="index" style="margin-bottom: 16px;">
+          <ESection v-for="(item, index) in shownItems" :key="index" style="margin-bottom: 16px">
             <ERow>
-              <EColumn style="width: 70%;">
-                <EText style="font-size: 16px; margin: 0; color: #525f7f; font-weight: 500;">
+              <EColumn style="width: 70%">
+                <EText style="font-size: 16px; margin: 0; color: #525f7f; font-weight: 500">
                   {{ item.name }}
                 </EText>
-                <EText style="font-size: 14px; margin: 4px 0 0; color: #8898aa;">
+                <EText style="font-size: 14px; margin: 4px 0 0; color: #8898aa">
                   Cantitate: {{ item.quantity }} x {{ formatRon(item.price) }}
                 </EText>
               </EColumn>
-              <EColumn style="width: 30%; text-align: right;">
-                <EText style="font-size: 16px; margin: 0; color: #525f7f; font-weight: 500;">
+              <EColumn style="width: 30%; text-align: right">
+                <EText style="font-size: 16px; margin: 0; color: #525f7f; font-weight: 500">
                   {{ formatRon(item.price * item.quantity) }}
                 </EText>
               </EColumn>
             </ERow>
           </ESection>
 
-          <ESection v-if="hiddenItemCount > 0" style="margin-bottom: 16px;">
-            <EText style="font-size: 16px; margin: 0; color: #525f7f; font-weight: 500;">
+          <ESection v-if="hiddenItemCount > 0" style="margin-bottom: 16px">
+            <EText style="font-size: 16px; margin: 0; color: #525f7f; font-weight: 500">
               ...
             </EText>
-            <EText style="font-size: 14px; margin: 4px 0 0; color: #8898aa;">
-              + {{ hiddenItemCount }} {{ hiddenItemCount === 1 ? 'produs' : 'produse' }}. Lista completă este în factura proformă atașată.
+            <EText style="font-size: 14px; margin: 4px 0 0; color: #8898aa">
+              + {{ hiddenItemCount }} {{ hiddenItemCount === 1 ? 'produs' : 'produse' }}. Lista
+              completă este în factura proformă atașată.
             </EText>
           </ESection>
 
-          <EHr style="border-color: #e6ebf1; margin: 20px 0;" />
+          <EHr style="border-color: #e6ebf1; margin: 20px 0" />
 
           <ERow>
-            <EColumn style="width: 70%;">
-              <EText style="font-size: 16px; margin: 0; color: #525f7f;">Subtotal</EText>
+            <EColumn style="width: 70%">
+              <EText style="font-size: 16px; margin: 0; color: #525f7f">Subtotal</EText>
             </EColumn>
-            <EColumn style="width: 30%; text-align: right;">
-              <EText style="font-size: 16px; margin: 0; color: #525f7f;">{{ formatRon(total - shippingCost) }}</EText>
-            </EColumn>
-          </ERow>
-
-          <ERow v-if="shippingCost >= 0" style="margin-top: 12px;">
-            <EColumn style="width: 70%;">
-              <EText style="font-size: 16px; margin: 0; color: #525f7f;">Cost livrare</EText>
-            </EColumn>
-            <EColumn style="width: 30%; text-align: right;">
-              <EText style="font-size: 16px; margin: 0; color: #525f7f;">{{ formatRon(shippingCost) }}</EText>
+            <EColumn style="width: 30%; text-align: right">
+              <EText style="font-size: 16px; margin: 0; color: #525f7f">{{
+                formatRon(total - shippingCost)
+              }}</EText>
             </EColumn>
           </ERow>
 
-          <ERow style="margin-top: 12px;">
-            <EColumn style="width: 70%;">
-              <EText style="font-size: 18px; margin: 0; font-weight: 700; color: #484848;">Total</EText>
+          <ERow v-if="shippingCost >= 0" style="margin-top: 12px">
+            <EColumn style="width: 70%">
+              <EText style="font-size: 16px; margin: 0; color: #525f7f">Cost livrare</EText>
             </EColumn>
-            <EColumn style="width: 30%; text-align: right;">
-              <EText style="font-size: 18px; margin: 0; font-weight: 700; color: #484848;">{{ formatRon(total) }}</EText>
+            <EColumn style="width: 30%; text-align: right">
+              <EText style="font-size: 16px; margin: 0; color: #525f7f">{{
+                formatRon(shippingCost)
+              }}</EText>
+            </EColumn>
+          </ERow>
+
+          <ERow style="margin-top: 12px">
+            <EColumn style="width: 70%">
+              <EText style="font-size: 18px; margin: 0; font-weight: 700; color: #484848"
+                >Total</EText
+              >
+            </EColumn>
+            <EColumn style="width: 30%; text-align: right">
+              <EText style="font-size: 18px; margin: 0; font-weight: 700; color: #484848">{{
+                formatRon(total)
+              }}</EText>
             </EColumn>
           </ERow>
 
           <!-- Shipping Details -->
           <template v-if="shippingAddress">
-            <EHeading style="font-size: 18px; line-height: 1.3; font-weight: 700; color: #484848; margin-top: 48px;">
+            <EHeading
+              style="
+                font-size: 18px;
+                line-height: 1.3;
+                font-weight: 700;
+                color: #484848;
+                margin-top: 48px;
+              "
+            >
               Adresa de livrare
             </EHeading>
-            <EText style="font-size: 16px; line-height: 24px; color: #525f7f; margin-top: 12px;">
+            <EText style="font-size: 16px; line-height: 24px; color: #525f7f; margin-top: 12px">
               {{ shippingAddress.address }}<br />
               {{ shippingAddress.city }}, {{ shippingAddress.county }}<br />
               {{ shippingAddress.fullName }}<br />
@@ -179,28 +252,43 @@ const formattedPaymentMethod = computed(() => paymentMethodLabel(props.paymentMe
 
           <!-- Billing Details -->
           <template v-if="billingAddress">
-            <EHeading style="font-size: 18px; line-height: 1.3; font-weight: 700; color: #484848; margin-top: 32px;">
+            <EHeading
+              style="
+                font-size: 18px;
+                line-height: 1.3;
+                font-weight: 700;
+                color: #484848;
+                margin-top: 32px;
+              "
+            >
               Date de facturare
             </EHeading>
-            <EText style="font-size: 16px; line-height: 24px; color: #525f7f; margin-top: 12px;">
+            <EText style="font-size: 16px; line-height: 24px; color: #525f7f; margin-top: 12px">
               <template v-if="billingAddress.companyName">
                 <strong>{{ billingAddress.companyName }}</strong><br />
                 CUI: {{ billingAddress.cui }}<br />
-                <template v-if="billingAddress.onrc">Reg. Com.: {{ billingAddress.onrc }}<br /></template>
-                <template v-if="billingAddress.bankName">Banca: {{ billingAddress.bankName }}<br /></template>
-                <template v-if="billingAddress.iban">IBAN: {{ billingAddress.iban }}<br /></template>
+                <template v-if="billingAddress.onrc"
+                  >Reg. Com.: {{ billingAddress.onrc }}<br
+                /></template>
+                <template v-if="billingAddress.bankName"
+                  >Banca: {{ billingAddress.bankName }}<br
+                /></template>
+                <template v-if="billingAddress.iban"
+                  >IBAN: {{ billingAddress.iban }}<br
+                /></template>
               </template>
               <template v-else>
-                <strong>{{ billingAddress.firstName }} {{ billingAddress.lastName }}</strong><br />
+                <strong>{{ billingAddress.firstName }} {{ billingAddress.lastName }}</strong
+                ><br />
               </template>
               {{ billingAddress.address }}<br />
               {{ billingAddress.city }}, {{ billingAddress.county }}
             </EText>
           </template>
 
-          <EHr style="border-color: #e6ebf1; margin: 48px 0 24px;" />
+          <EHr style="border-color: #e6ebf1; margin: 48px 0 24px" />
 
-          <EText style="font-size: 14px; line-height: 24px; color: #8898aa;">
+          <EText style="font-size: 14px; line-height: 24px; color: #8898aa">
             Eurotimalex SRL<br />
             Strada Drumul Taberei Nr. 92, București<br />
             J2005017160400

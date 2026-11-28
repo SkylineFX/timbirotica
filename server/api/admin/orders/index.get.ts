@@ -2,7 +2,7 @@ import { and, asc, desc, eq, gte, lte, sql } from 'drizzle-orm'
 
 const SORTABLE_COLUMNS = {
   createdAt: tables.orders.createdAt,
-  total: tables.orders.total,
+  total: tables.orders.total
 } as const
 
 type SortKey = keyof typeof SORTABLE_COLUMNS
@@ -33,7 +33,7 @@ export default eventHandler(async (event) => {
     // Every word in the order number, an address or the customer's name or email.
     orderSearchFilter(q),
     from ? gte(tables.orders.createdAt, from) : undefined,
-    to ? lte(tables.orders.createdAt, to) : undefined,
+    to ? lte(tables.orders.createdAt, to) : undefined
   ].filter(Boolean) as ReturnType<typeof eq>[]
 
   const where = filters.length ? and(...filters) : undefined
@@ -55,7 +55,8 @@ export default eventHandler(async (event) => {
         }
       }
     }),
-    db.select({ count: sql<number>`count(*)` })
+    db
+      .select({ count: sql<number>`count(*)` })
       .from(tables.orders)
       .where(where ?? sql`1=1`)
   ])
@@ -64,6 +65,6 @@ export default eventHandler(async (event) => {
     orders,
     total: totalRow[0]?.count ?? 0,
     page,
-    limit,
+    limit
   }
 })

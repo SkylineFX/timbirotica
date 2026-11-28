@@ -8,11 +8,15 @@ const categorySlug = computed(() => route.params.slug as string)
 // too (same request, useCatalogMenus.ts). An unknown category is a 404, not an
 // empty listing.
 const { data: categoryTree, error } = await useCategoryTree()
-const category = computed(() => findCategory(categoryTree.value ?? [], node => node.to === `/c/${categorySlug.value}`))
+const category = computed(() =>
+  findCategory(categoryTree.value ?? [], (node) => node.to === `/c/${categorySlug.value}`)
+)
 if (!category.value) {
-  throw createError(error.value
-    ? { statusCode: error.value.statusCode ?? 500, fatal: true }
-    : { statusCode: 404, message: 'Categoria nu a fost gasita.', fatal: true })
+  throw createError(
+    error.value
+      ? { statusCode: error.value.statusCode ?? 500, fatal: true }
+      : { statusCode: 404, message: 'Categoria nu a fost gasita.', fatal: true }
+  )
 }
 
 const title = computed(() => category.value?.label ?? '')
@@ -22,23 +26,24 @@ const breadcrumbs = computed(() => [
   { label: title.value, to: route.path }
 ])
 
-const description = computed(() =>
-  `Descopera ${title.value.toLowerCase()} la preturi avantajoase. Cumpara online cu livrare in toata Romania.`
+const description = computed(
+  () =>
+    `Descopera ${title.value.toLowerCase()} la preturi avantajoase. Cumpara online cu livrare in toata Romania.`
 )
 
 useSeoMeta({
   title: () => title.value,
   description: () => description.value,
   ogTitle: () => `${title.value} · Timbirotica`,
-  ogDescription: () => description.value,
+  ogDescription: () => description.value
 })
 </script>
 
 <template>
   <ProductList
     :title="title"
-    :apiQuery="apiQuery"
+    :api-query="apiQuery"
     :breadcrumbs="breadcrumbs"
-    emptyMessage="Nu au fost gasite produse in aceasta categorie."
+    empty-message="Nu au fost gasite produse in aceasta categorie."
   />
 </template>

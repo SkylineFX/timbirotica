@@ -1,8 +1,18 @@
+import type { InternalApi } from 'nitropack/types'
+
+/** A favorite, as GET /api/favorites sends it. */
+export type Favorite = InternalApi['/api/favorites']['get'][number]
+
+/**
+ * A product as the favorites list holds it. Product listings and the product
+ * page send these fields and more, so their products can be added as they are.
+ */
+export type FavoriteProduct = Favorite['product']
 
 export const useFavorites = () => {
   const { loggedIn, user } = useUserSession()
   const route = useRoute()
-  const favorites = useState<any[]>('favorites', () => [])
+  const favorites = useState<Favorite[]>('favorites', () => [])
   const isFavoritesOpen = useState<boolean>('favorites-open', () => false)
   const isLoading = useState<boolean>('favorites-loading', () => false)
   const toast = useToast()
@@ -12,11 +22,11 @@ export const useFavorites = () => {
       favorites.value = []
       return
     }
-    
+
     // Auto-block SSR fetching (Nuxt SSR $fetch doesn't natively forward your browser cookie without proxying)
     if (import.meta.server) return
-    
-    // Prevent duplicated fetch spam if multiple components initialize the composable 
+
+    // Prevent duplicated fetch spam if multiple components initialize the composable
     if (isLoading.value || favorites.value.length > 0) return
 
     isLoading.value = true
@@ -31,15 +41,17 @@ export const useFavorites = () => {
     }
   }
 
-  const addToFavorites = async (product: any) => {
-    if (!loggedIn.value) {
+  const addToFavorites = async (product: FavoriteProduct) => {
+    // loggedIn is true exactly when the session has a user; both are checked
+    // so the user's id below is known to be there.
+    if (!loggedIn.value || !user.value) {
       toast.add({ title: 'Trebuie sa fii autentificat', color: 'warning' })
       // Return to this page after signing in.
       return navigateTo({ path: '/user/login', query: { redirect: route.fullPath } })
     }
 
     // Optimistic update
-    const exists = favorites.value.some(f => f.productId === product.id)
+    const exists = favorites.value.some((f) => f.productId === product.id)
     if (exists) {
       toast.add({ title: 'Produsul este deja la favorite', color: 'info' })
       return
@@ -49,7 +61,7 @@ export const useFavorites = () => {
     const tempId = Date.now() // placeholder ID
     favorites.value.unshift({
       id: tempId,
-      userId: user.value?.id,
+      userId: user.value.id,
       productId: product.id,
       createdAt: new Date().toISOString(),
       product: product
@@ -65,7 +77,7 @@ export const useFavorites = () => {
         // Swap the temporary id for the saved row's id, so removing it later
         // deletes the right row. (Refetching didn't do this: fetchFavorites
         // skips the request when the list isn't empty.)
-        const item = favorites.value.find(f => f.id === tempId)
+        const item = favorites.value.find((f) => f.id === tempId)
         if (item) {
           item.id = res.id
         } else {
@@ -73,11 +85,11 @@ export const useFavorites = () => {
           await $fetch(`/api/favorites/${res.id}`, { method: 'DELETE' }).catch(() => {})
         }
       } else {
-        throw new Error((res as any).message)
+        throw new Error('message' in res ? res.message : undefined)
       }
-    } catch (e) {
+    } catch {
       // Rollback
-      favorites.value = favorites.value.filter(f => f.id !== tempId)
+      favorites.value = favorites.value.filter((f) => f.id !== tempId)
       toast.add({ title: 'Eroare la adaugare', color: 'error' })
     }
   }
@@ -85,24 +97,28 @@ export const useFavorites = () => {
   const removeFromFavorites = async (favoriteId: number) => {
     // Optimistic
     const prev = [...favorites.value]
-    favorites.value = favorites.value.filter(f => f.id !== favoriteId)
+    favorites.value = favorites.value.filter((f) => f.id !== favoriteId)
 
     try {
       await $fetch(`/api/favorites/${favoriteId}`, {
         method: 'DELETE'
       })
       toast.add({ title: 'Sters de la favorite', color: 'success' })
-    } catch (e) {
+    } catch {
       favorites.value = prev
       toast.add({ title: 'Eroare la stergere', color: 'error' })
     }
   }
 
   // Auto-fetch when logged in
-  watch(loggedIn, (val) => {
-    if (val) fetchFavorites()
-    else favorites.value = []
-  }, { immediate: true })
+  watch(
+    loggedIn,
+    (val) => {
+      if (val) fetchFavorites()
+      else favorites.value = []
+    },
+    { immediate: true }
+  )
 
   return {
     favorites,

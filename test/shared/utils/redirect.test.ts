@@ -5,7 +5,9 @@ describe('safeRedirectPath', () => {
   it('accepts pages of this site, with their query and hash', () => {
     expect(safeRedirectPath('/checkout')).toBe('/checkout')
     expect(safeRedirectPath('/user/comenzi')).toBe('/user/comenzi')
-    expect(safeRedirectPath('/c/hartie/hartie-a4?sort=pret#detalii')).toBe('/c/hartie/hartie-a4?sort=pret#detalii')
+    expect(safeRedirectPath('/c/hartie/hartie-a4?sort=pret#detalii')).toBe(
+      '/c/hartie/hartie-a4?sort=pret#detalii'
+    )
     expect(safeRedirectPath('/')).toBe('/')
   })
 
@@ -24,7 +26,7 @@ describe('safeRedirectPath', () => {
       '/\n/evil.example',
       'javascript:alert(1)',
       'checkout',
-      ' /checkout',
+      ' /checkout'
     ]) {
       expect(safeRedirectPath(value), value).toBeNull()
     }
@@ -54,7 +56,9 @@ describe('withQueryParam', () => {
   })
 
   it('keeps other parameters and the hash', () => {
-    expect(withQueryParam('/c/hartie?sort=pret#lista', 'login', 'google')).toBe('/c/hartie?sort=pret&login=google#lista')
+    expect(withQueryParam('/c/hartie?sort=pret#lista', 'login', 'google')).toBe(
+      '/c/hartie?sort=pret&login=google#lista'
+    )
   })
 
   it('replaces an existing value', () => {

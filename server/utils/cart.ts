@@ -15,7 +15,8 @@ export async function getOrCreateCart(userId: number) {
   if (existing) return existing
 
   const now = new Date()
-  await db.insert(tables.carts)
+  await db
+    .insert(tables.carts)
     .values({ userId, createdAt: now, updatedAt: now })
     .onConflictDoNothing({ target: tables.carts.userId })
 

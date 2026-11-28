@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   termsAccepted: boolean
   isSubmitting: boolean
   isEmailVerified: boolean
@@ -21,7 +21,20 @@ const onCheckboxUpdate = (value: boolean | 'indeterminate') => {
     <UCheckbox :model-value="termsAccepted" class="mb-4" @update:model-value="onCheckboxUpdate">
       <template #label>
         <span class="text-sm text-gray-700">
-          Sunt de acord cu <NuxtLink to="/termeni-si-conditii" target="_blank" class="text-primary underline font-medium">termenii si conditiile</NuxtLink> si <NuxtLink to="/politica-de-confidentialitate" target="_blank" class="text-primary underline font-medium">politica de confidentialitate</NuxtLink>.
+          Sunt de acord cu
+          <NuxtLink
+            to="/termeni-si-conditii"
+            target="_blank"
+            class="font-medium text-primary underline"
+            >termenii si conditiile</NuxtLink
+          >
+          si
+          <NuxtLink
+            to="/politica-de-confidentialitate"
+            target="_blank"
+            class="font-medium text-primary underline"
+            >politica de confidentialitate</NuxtLink
+          >.
         </span>
       </template>
     </UCheckbox>
@@ -30,7 +43,7 @@ const onCheckboxUpdate = (value: boolean | 'indeterminate') => {
       :disabled="!isEmailVerified || !termsAccepted || isSubmitting"
       block
       size="xl"
-      class="w-full bg-black hover:bg-gray-800 text-white font-bold text-lg py-4 rounded-md shadow-lg transition-transform active:scale-[0.98] flex justify-center"
+      class="flex w-full justify-center rounded-md bg-black py-4 text-lg font-bold text-white shadow-lg transition-transform hover:bg-gray-800 active:scale-[0.98]"
       @click="emit('submit')"
     >
       Plaseaza comanda

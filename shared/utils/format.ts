@@ -10,25 +10,25 @@ const dateFormat = new Intl.DateTimeFormat('ro-RO', {
   day: '2-digit',
   month: '2-digit',
   year: 'numeric',
-  timeZone: SHOP_TIME_ZONE,
+  timeZone: SHOP_TIME_ZONE
 })
 
 const longDateFormat = new Intl.DateTimeFormat('ro-RO', {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
-  timeZone: SHOP_TIME_ZONE,
+  timeZone: SHOP_TIME_ZONE
 })
 
 const dateTimeFormat = new Intl.DateTimeFormat('ro-RO', {
   dateStyle: 'medium',
   timeStyle: 'short',
-  timeZone: SHOP_TIME_ZONE,
+  timeZone: SHOP_TIME_ZONE
 })
 
 const amountFormat = new Intl.NumberFormat('ro-RO', {
   minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
+  maximumFractionDigits: 2
 })
 
 /** Date in Romanian time, e.g. "17.11.2026". */

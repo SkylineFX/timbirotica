@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
 import { productPriceSchema } from '~~/shared/schemas/product'
 import { isSearchLongEnough } from '~~/shared/utils/search'
+import { fetchFailure } from '~~/shared/utils/fetchFailure'
 
 definePageMeta({
   layout: 'admin',
@@ -28,22 +29,25 @@ watch(searchQuery, (v) => {
 const query = computed(() => ({
   page: page.value,
   limit,
-  ...(debouncedQuery.value ? { q: debouncedQuery.value } : {}),
+  ...(debouncedQuery.value ? { q: debouncedQuery.value } : {})
 }))
 
 const { data, pending, error, refresh } = await useFetch('/api/admin/products', { query })
 const products = computed(() => data.value?.products ?? [])
 const total = computed(() => data.value?.total ?? 0)
 
+// One product row of GET /api/admin/products.
+type AdminProduct = (typeof products.value)[number]
+
 // Per-row UI state for price editing — local edits, persist on blur
 const priceDrafts = ref<Record<number, string>>({})
 const savingId = ref<number | null>(null)
 
-function priceFor(p: any): string {
+function priceFor(p: AdminProduct): string {
   return priceDrafts.value[p.id] ?? p.price.toFixed(2)
 }
 
-async function saveStock(p: any, available: boolean) {
+async function saveStock(p: AdminProduct, available: boolean) {
   const newStock = available ? 1 : 0
   if (p.stock === newStock) return
   savingId.value = p.id
@@ -51,21 +55,29 @@ async function saveStock(p: any, available: boolean) {
     await $fetch(`/api/admin/products/${p.id}`, { method: 'PATCH', body: { stock: newStock } })
     await refresh()
     toast.add({ title: available ? 'Produs disponibil' : 'Produs indisponibil', color: 'success' })
-  } catch (e: any) {
-    toast.add({ title: 'Eroare', description: e?.data?.message ?? 'Nu am putut actualiza stocul.', color: 'error' })
+  } catch (e) {
+    toast.add({
+      title: 'Eroare',
+      description: fetchFailure(e).message ?? 'Nu am putut actualiza stocul.',
+      color: 'error'
+    })
   } finally {
     savingId.value = null
   }
 }
 
-async function savePrice(p: any) {
+async function savePrice(p: AdminProduct) {
   const draft = priceDrafts.value[p.id]
   if (draft === undefined) return
   const parsed = parseFloat(draft)
   // The same rule the server applies: above 0, at most two decimals.
   const check = productPriceSchema.safeParse(parsed)
   if (!check.success) {
-    toast.add({ title: 'Pret invalid', description: check.error.issues[0]?.message, color: 'error' })
+    toast.add({
+      title: 'Pret invalid',
+      description: check.error.issues[0]?.message,
+      color: 'error'
+    })
     delete priceDrafts.value[p.id]
     return
   }
@@ -78,41 +90,55 @@ async function savePrice(p: any) {
     await $fetch(`/api/admin/products/${p.id}`, { method: 'PATCH', body: { price: parsed } })
     delete priceDrafts.value[p.id]
     await refresh()
-    toast.add({ title: 'Pret actualizat', description: `${parsed.toFixed(2)} RON`, color: 'success' })
-  } catch (e: any) {
-    toast.add({ title: 'Eroare', description: e?.data?.message ?? 'Nu am putut actualiza pretul.', color: 'error' })
+    toast.add({
+      title: 'Pret actualizat',
+      description: `${parsed.toFixed(2)} RON`,
+      color: 'success'
+    })
+  } catch (e) {
+    toast.add({
+      title: 'Eroare',
+      description: fetchFailure(e).message ?? 'Nu am putut actualiza pretul.',
+      color: 'error'
+    })
   } finally {
     savingId.value = null
   }
 }
 
-const columns: TableColumn<any>[] = [
+const columns: TableColumn<AdminProduct>[] = [
   { accessorKey: 'image', header: '' },
   { accessorKey: 'name', header: 'Nume' },
   { accessorKey: 'sku', header: 'SKU' },
   { accessorKey: 'category', header: 'Categorie' },
   { accessorKey: 'price', header: 'Pret (RON)' },
-  { accessorKey: 'stock', header: 'Disponibil' },
+  { accessorKey: 'stock', header: 'Disponibil' }
 ]
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto w-full h-full flex flex-col min-h-0">
-    <div class="mb-6 flex items-center justify-between flex-shrink-0">
-      <h1 class="text-2xl font-semibold font-serif">Produse</h1>
-      <p v-if="!error" class="text-sm text-gray-500">{{ total }} {{ total === 1 ? 'produs' : 'produse' }}</p>
+  <div class="mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col">
+    <div class="mb-6 flex flex-shrink-0 items-center justify-between">
+      <h1 class="font-serif text-2xl font-semibold">Produse</h1>
+      <p v-if="!error" class="text-sm text-gray-500">
+        {{ total }} {{ total === 1 ? 'produs' : 'produse' }}
+      </p>
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-md p-4 mb-4 flex flex-wrap items-center gap-3 flex-shrink-0">
+    <div
+      class="mb-4 flex flex-shrink-0 flex-wrap items-center gap-3 rounded-md border border-gray-200 bg-white p-4"
+    >
       <UInput
         v-model="searchQuery"
         placeholder="Cauta dupa nume sau SKU..."
         icon="i-lucide-search"
-        class="flex-1 min-w-[260px]"
+        class="min-w-[260px] flex-1"
       />
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-md overflow-hidden flex-1 min-h-0 flex flex-col">
+    <div
+      class="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-gray-200 bg-white"
+    >
       <UTable
         :data="products"
         :columns="columns"
@@ -125,29 +151,50 @@ const columns: TableColumn<any>[] = [
         <template #empty>
           <div v-if="error" class="space-y-3">
             <p>Nu am putut incarca produsele.</p>
-            <UButton color="neutral" variant="outline" icon="i-lucide-rotate-ccw" @click="refresh()">Reincearca</UButton>
+            <UButton color="neutral" variant="outline" icon="i-lucide-rotate-ccw" @click="refresh()"
+              >Reincearca</UButton
+            >
           </div>
-          <span v-else-if="!pending">{{ debouncedQuery && !isSearchLongEnough(debouncedQuery) ? 'Scrie cel putin 2 caractere.' : 'Niciun produs gasit.' }}</span>
+          <span v-else-if="!pending">{{
+            debouncedQuery && !isSearchLongEnough(debouncedQuery)
+              ? 'Scrie cel putin 2 caractere.'
+              : 'Niciun produs gasit.'
+          }}</span>
         </template>
         <template #image-header>
           <span class="sr-only">Imagine</span>
         </template>
         <template #image-cell="{ row }">
-          <NuxtLink :to="`/c/${row.original.category?.slug ?? 'toate'}/${row.original.slug}`" target="_blank" class="block w-12 h-12 bg-stone-50 rounded-md border border-gray-100 overflow-hidden flex items-center justify-center hover:border-primary transition-colors">
-            <img v-if="row.original.images?.[0]" :src="row.original.images[0]" :alt="row.original.name" loading="lazy" class="w-full h-full object-contain p-1" />
-            <UIcon v-else name="i-lucide-image" class="w-5 h-5 text-gray-300" />
+          <NuxtLink
+            :to="`/c/${row.original.category?.slug ?? 'toate'}/${row.original.slug}`"
+            target="_blank"
+            class="block flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border border-gray-100 bg-stone-50 transition-colors hover:border-primary"
+          >
+            <img
+              v-if="row.original.images?.[0]"
+              :src="row.original.images[0]"
+              :alt="row.original.name"
+              loading="lazy"
+              class="h-full w-full object-contain p-1"
+            />
+            <UIcon v-else name="i-lucide-image" class="h-5 w-5 text-gray-300" />
           </NuxtLink>
         </template>
         <template #name-cell="{ row }">
-          <div class="text-sm max-w-[280px]">
-            <NuxtLink :to="`/c/${row.original.category?.slug ?? 'toate'}/${row.original.slug}`" target="_blank" class="font-medium text-gray-900 truncate hover:text-primary transition-colors block" :title="row.original.name">
+          <div class="max-w-[280px] text-sm">
+            <NuxtLink
+              :to="`/c/${row.original.category?.slug ?? 'toate'}/${row.original.slug}`"
+              target="_blank"
+              class="block truncate font-medium text-gray-900 transition-colors hover:text-primary"
+              :title="row.original.name"
+            >
               {{ row.original.name }}
             </NuxtLink>
-            <p class="text-xs text-gray-500 truncate">{{ row.original.brand?.name }}</p>
+            <p class="truncate text-xs text-gray-500">{{ row.original.brand?.name }}</p>
           </div>
         </template>
         <template #sku-cell="{ row }">
-          <span class="text-sm font-mono text-gray-600">{{ row.original.sku || '—' }}</span>
+          <span class="font-mono text-sm text-gray-600">{{ row.original.sku || '—' }}</span>
         </template>
         <template #category-cell="{ row }">
           <span class="text-sm text-gray-600">{{ row.original.category?.name || '—' }}</span>
@@ -161,7 +208,7 @@ const columns: TableColumn<any>[] = [
             size="sm"
             class="w-28"
             :loading="savingId === row.original.id"
-            @update:model-value="(v: any) => priceDrafts[row.original.id] = String(v)"
+            @update:model-value="(v: string | number) => (priceDrafts[row.original.id] = String(v))"
             @blur="savePrice(row.original)"
             @keydown.enter="savePrice(row.original)"
           />
@@ -174,10 +221,9 @@ const columns: TableColumn<any>[] = [
           />
         </template>
       </UTable>
-
     </div>
 
-    <div v-if="total > limit" class="mt-4 flex justify-center flex-shrink-0">
+    <div v-if="total > limit" class="mt-4 flex flex-shrink-0 justify-center">
       <UPagination v-model:page="page" :total="total" :items-per-page="limit" />
     </div>
   </div>

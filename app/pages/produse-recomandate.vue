@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
-const title = "Produse Recomandate"
+const title = 'Produse Recomandate'
 const apiQuery = computed(() => ({ recommended: 'true' }))
 const breadcrumbs = computed(() => [
   { label: 'Acasa', to: '/' },
@@ -13,15 +13,15 @@ useSeoMeta({
   title,
   description,
   ogTitle: `${title} · Timbirotica`,
-  ogDescription: description,
+  ogDescription: description
 })
 </script>
 
 <template>
   <ProductList
     :title="title"
-    :apiQuery="apiQuery"
+    :api-query="apiQuery"
     :breadcrumbs="breadcrumbs"
-    emptyMessage="Nu am gasit produse recomandate in acest moment."
+    empty-message="Nu am gasit produse recomandate in acest moment."
   />
 </template>

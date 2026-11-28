@@ -16,8 +16,8 @@ export default defineConfig({
     include: ['test/**/*.test.ts'],
     coverage: {
       provider: 'v8',
-      include: ['shared/**/*.ts', 'app/composables/**/*.ts'],
-    },
+      include: ['shared/**/*.ts', 'app/composables/**/*.ts']
+    }
   },
   resolve: {
     alias: {
@@ -25,7 +25,7 @@ export default defineConfig({
       '~~': r('.'),
       '@@': r('.'),
       '~': r('./app'),
-      '@': r('./app'),
-    },
-  },
+      '@': r('./app')
+    }
+  }
 })

@@ -1,4 +1,8 @@
-import { ORDER_STATUS_LABEL, ORDER_STATUS_VALUES, type OrderStatus } from '~~/shared/constants/order'
+import {
+  ORDER_STATUS_LABEL,
+  ORDER_STATUS_VALUES,
+  type OrderStatus
+} from '~~/shared/constants/order'
 
 // The status values and labels live in shared/ so the server checks the same list.
 export { ORDER_STATUS_LABEL, ORDER_STATUS_VALUES }
@@ -11,13 +15,13 @@ export const ORDER_STATUS_COLOR: Record<string, BadgeColor> = {
   confirmed: 'primary',
   shipped: 'info',
   completed: 'success',
-  cancelled: 'error',
+  cancelled: 'error'
 }
 
 export function useOrderStatus() {
   return {
     label: (s: string) => ORDER_STATUS_LABEL[s] ?? s,
     color: (s: string): BadgeColor => ORDER_STATUS_COLOR[s] ?? 'neutral',
-    values: ORDER_STATUS_VALUES,
+    values: ORDER_STATUS_VALUES
   }
 }

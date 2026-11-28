@@ -25,16 +25,21 @@ function accept() {
     leave-from-class="opacity-100 translate-y-0"
     leave-to-class="opacity-0 translate-y-4"
   >
-    <div
-      v-if="visible"
-      class="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6 pointer-events-none"
-    >
-      <div class="mx-auto max-w-3xl pointer-events-auto bg-white rounded-sm shadow-lg border border-gray-200 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
-        <p class="text-sm text-gray-700 leading-relaxed flex-1">
-          Folosim doar cookie-uri strict necesare pentru functionarea site-ului si monitorizarea performantei. Nu utilizam cookie-uri de analiza a profilului de cumparator sau publicitate.
-          <NuxtLink to="/politica-de-confidentialitate#cookies" class="text-primary hover:underline font-medium">Detalii</NuxtLink>
+    <div v-if="visible" class="pointer-events-none fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6">
+      <div
+        class="pointer-events-auto mx-auto flex max-w-3xl flex-col gap-4 rounded-sm border border-gray-200 bg-white p-4 shadow-lg sm:flex-row sm:items-center sm:p-5"
+      >
+        <p class="flex-1 text-sm leading-relaxed text-gray-700">
+          Folosim doar cookie-uri strict necesare pentru functionarea site-ului si monitorizarea
+          performantei. Nu utilizam cookie-uri de analiza a profilului de cumparator sau
+          publicitate.
+          <NuxtLink
+            to="/politica-de-confidentialitate#cookies"
+            class="font-medium text-primary hover:underline"
+            >Detalii</NuxtLink
+          >
         </p>
-        <UButton color="primary" size="sm" class="rounded-sm justify-center" @click="accept">
+        <UButton color="primary" size="sm" class="justify-center rounded-sm" @click="accept">
           Am inteles
         </UButton>
       </div>

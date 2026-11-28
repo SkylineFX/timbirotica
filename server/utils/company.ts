@@ -11,5 +11,5 @@ export const COMPANY = {
   phone: '+40 751 022 882',
   email: 'eurotimalex@yahoo.com',
   iban: 'RO12INGB0000999920472642',
-  bankName: 'ING BANK NV',
+  bankName: 'ING BANK NV'
 } as const

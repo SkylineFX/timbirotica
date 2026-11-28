@@ -1,10 +1,15 @@
 import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
 
-const bodySchema = z.object({
-  // true: the order's products replace the cart; false: they are added to it.
-  replace: z.boolean({ error: 'Date invalide.' }).default(false)
-}, { error: 'Date invalide.' }).default({ replace: false })
+const bodySchema = z
+  .object(
+    {
+      // true: the order's products replace the cart; false: they are added to it.
+      replace: z.boolean({ error: 'Date invalide.' }).default(false)
+    },
+    { error: 'Date invalide.' }
+  )
+  .default({ replace: false })
 
 // "Comanda din nou": puts the products of one of the customer's orders back into
 // their cart, in one request (server/utils/cartReorder.ts).
@@ -28,7 +33,8 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 404, message: 'Comanda nu a fost gasita.' })
   }
 
-  const lines = await db.select({ productId: tables.orderItems.productId, quantity: tables.orderItems.quantity })
+  const lines = await db
+    .select({ productId: tables.orderItems.productId, quantity: tables.orderItems.quantity })
     .from(tables.orderItems)
     .where(eq(tables.orderItems.orderId, id))
 

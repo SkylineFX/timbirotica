@@ -27,12 +27,14 @@ export default eventHandler(async (event) => {
 
   // If this address is being set as default, remove default from others
   if (shouldBeDefault && !address.isDefaultBilling) {
-    await db.update(tables.billingAddresses)
+    await db
+      .update(tables.billingAddresses)
       .set({ isDefaultBilling: false })
       .where(eq(tables.billingAddresses.userId, session.user.id))
   }
 
-  const updated = await db.update(tables.billingAddresses)
+  const updated = await db
+    .update(tables.billingAddresses)
     .set({
       companyName: body.companyName,
       cui: body.cui,
@@ -44,12 +46,11 @@ export default eventHandler(async (event) => {
       street: body.street,
       city: body.city,
       county: body.county,
-      isDefaultBilling: shouldBeDefault,
+      isDefaultBilling: shouldBeDefault
     })
-    .where(and(
-      eq(tables.billingAddresses.id, id),
-      eq(tables.billingAddresses.userId, session.user.id)
-    ))
+    .where(
+      and(eq(tables.billingAddresses.id, id), eq(tables.billingAddresses.userId, session.user.id))
+    )
     .returning()
 
   return updated[0]

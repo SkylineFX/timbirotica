@@ -12,10 +12,11 @@ export default eventHandler(async (event) => {
   const body = await readBodyWithSchema(event, adminProductUpdateSchema)
 
   const db = useDrizzle()
-  const [updated] = await db.update(tables.products)
+  const [updated] = await db
+    .update(tables.products)
     .set({
       ...(body.price !== undefined ? { price: body.price } : {}),
-      ...(body.stock !== undefined ? { stock: body.stock } : {}),
+      ...(body.stock !== undefined ? { stock: body.stock } : {})
     })
     .where(eq(tables.products.id, id))
     .returning()

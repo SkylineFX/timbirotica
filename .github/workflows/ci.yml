@@ -12,6 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The job names are the required checks on master ("Unit tests", "Build").
+  # New checks go in as steps of these jobs, so the branch protection needs no
+  # change.
   test:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -22,7 +25,18 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Formatting
+        run: npm run format:check
+      - name: Lint
+        run: npm run lint
+      - name: Type check
+        run: npm run typecheck
       - run: npm test
+      # Reports known vulnerabilities in the production dependencies without
+      # failing the run: fixing them is a dependency update of its own.
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true
 
   build:
     name: Build
@@ -34,7 +48,21 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run build
-        # Nuxt's production build needs more than Node's default heap for this app.
+      # The Workers bundle, as Workers Builds makes it for production:
+      # WORKERS_CI makes Nitro use the cloudflare-module preset and NuxtHub the
+      # D1 driver. Without a SENTRY_AUTH_TOKEN the Sentry plugin only skips the
+      # source map upload.
+      - name: Build the Worker
+        shell: bash
+        run: |
+          npm run build 2>&1 | tee build.log
+          # The names are in backticks in CI and in colours in a terminal. After
+          # "d1" no hyphen may follow, so the d1-http driver doesn't pass.
+          grep -qE 'hub:db.{0,12} using .{0,12}sqlite.{0,12} database with .{0,12}d1[^ -]{0,12} driver' build.log \
+            || { echo '::error::The build did not use the D1 driver.'; exit 1; }
+          test -f .output/server/wrangler.json \
+            || { echo '::error::The build made no wrangler.json.'; exit 1; }
         env:
+          WORKERS_CI: 1
+          # Nuxt's production build needs more than Node's default heap for this app.
           NODE_OPTIONS: --max-old-space-size=6144

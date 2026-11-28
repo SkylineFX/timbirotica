@@ -12,7 +12,8 @@ useHead({
 })
 
 useSeoMeta({
-  description: 'Produse de birotica si papetarie la preturi avantajoase. Cumpara online cu livrare in toata Romania.',
+  description:
+    'Produse de birotica si papetarie la preturi avantajoase. Cumpara online cu livrare in toata Romania.',
   ogSiteName: 'Timbirotica',
   ogType: 'website',
   ogLocale: 'ro_RO',
@@ -20,7 +21,7 @@ useSeoMeta({
   // replace it with the product's photo. No size here: those pages would
   // otherwise inherit it for a photo of another size.
   ogImage: absoluteUrl(config.public.siteUrl, '/logo.png'),
-  twitterCard: 'summary',
+  twitterCard: 'summary'
 })
 
 const { loggedIn } = useUserSession()
@@ -44,9 +45,15 @@ function announceGoogleLogin() {
   const login = route.query.login
   if (login !== 'google' && login !== 'google-new') return
   if (loggedIn.value) {
-    toast.add(login === 'google-new'
-      ? { title: 'Inregistrare reusita', description: 'Contul tau a fost creat cu Google.', color: 'success' }
-      : { title: 'Autentificare reusita', color: 'success' })
+    toast.add(
+      login === 'google-new'
+        ? {
+            title: 'Inregistrare reusita',
+            description: 'Contul tau a fost creat cu Google.',
+            color: 'success'
+          }
+        : { title: 'Autentificare reusita', color: 'success' }
+    )
   }
   const { login: _, ...query } = route.query
   router.replace({ query })

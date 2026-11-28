@@ -15,12 +15,23 @@ describe('canonicalUrl', () => {
   })
 
   it('drops filters, sort order and page size', () => {
-    const query = { sub: ['pixuri', 'markere'], b: 'faber-castell', sort: 'price-asc', limit: '48', minPrice: '5', available: '1' }
-    expect(canonicalUrl(SITE, '/c/instrumente-de-scris', query)).toBe('https://timbirotica.ro/c/instrumente-de-scris')
+    const query = {
+      sub: ['pixuri', 'markere'],
+      b: 'faber-castell',
+      sort: 'price-asc',
+      limit: '48',
+      minPrice: '5',
+      available: '1'
+    }
+    expect(canonicalUrl(SITE, '/c/instrumente-de-scris', query)).toBe(
+      'https://timbirotica.ro/c/instrumente-de-scris'
+    )
   })
 
   it('keeps the page number above 1', () => {
-    expect(canonicalUrl(SITE, '/c/pixuri', { page: '3', sort: 'price-asc' })).toBe('https://timbirotica.ro/c/pixuri?page=3')
+    expect(canonicalUrl(SITE, '/c/pixuri', { page: '3', sort: 'price-asc' })).toBe(
+      'https://timbirotica.ro/c/pixuri?page=3'
+    )
   })
 
   it('leaves out page 1 and page numbers that are not whole numbers above 1', () => {
@@ -32,12 +43,18 @@ describe('canonicalUrl', () => {
 
 describe('absoluteUrl', () => {
   it('keeps absolute URLs', () => {
-    expect(absoluteUrl(SITE, 'https://cdn.timbirotica.ro/uploads/products/a.jpg')).toBe('https://cdn.timbirotica.ro/uploads/products/a.jpg')
+    expect(absoluteUrl(SITE, 'https://cdn.timbirotica.ro/uploads/products/a.jpg')).toBe(
+      'https://cdn.timbirotica.ro/uploads/products/a.jpg'
+    )
   })
 
   it('puts the site URL in front of a path, with one slash', () => {
-    expect(absoluteUrl(`${SITE}/`, '/uploads/products/a.jpg')).toBe('https://timbirotica.ro/uploads/products/a.jpg')
-    expect(absoluteUrl(SITE, 'uploads/products/a.jpg')).toBe('https://timbirotica.ro/uploads/products/a.jpg')
+    expect(absoluteUrl(`${SITE}/`, '/uploads/products/a.jpg')).toBe(
+      'https://timbirotica.ro/uploads/products/a.jpg'
+    )
+    expect(absoluteUrl(SITE, 'uploads/products/a.jpg')).toBe(
+      'https://timbirotica.ro/uploads/products/a.jpg'
+    )
   })
 })
 
@@ -77,9 +94,16 @@ describe('productStructuredData', () => {
             '@type': 'ShippingDeliveryTime',
             businessDays: {
               '@type': 'OpeningHoursSpecification',
-              dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => `https://schema.org/${day}`)
+              dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(
+                (day) => `https://schema.org/${day}`
+              )
             },
-            handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+            handlingTime: {
+              '@type': 'QuantitativeValue',
+              minValue: 1,
+              maxValue: 2,
+              unitCode: 'DAY'
+            },
             transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 1, unitCode: 'DAY' }
           }
         },
@@ -97,18 +121,25 @@ describe('productStructuredData', () => {
   })
 
   it('ships a product priced at the free-shipping threshold or above for free', () => {
-    const rate = (price: number) => productStructuredData({ ...product, price }, { url, siteUrl: SITE }).offers.shippingDetails.shippingRate.value
+    const rate = (price: number) =>
+      productStructuredData({ ...product, price }, { url, siteUrl: SITE }).offers.shippingDetails
+        .shippingRate.value
     expect(rate(199.99)).toBe(30)
     expect(rate(200)).toBe(0)
     expect(rate(350)).toBe(0)
   })
 
   it('marks a product with no stock as out of stock', () => {
-    expect(productStructuredData({ ...product, stock: 0 }, { url, siteUrl: SITE }).offers.availability).toBe('https://schema.org/OutOfStock')
+    expect(
+      productStructuredData({ ...product, stock: 0 }, { url, siteUrl: SITE }).offers.availability
+    ).toBe('https://schema.org/OutOfStock')
   })
 
   it('leaves out the fields a product does not have', () => {
-    const data = productStructuredData({ name: 'Caiet', price: 4, stock: 1, sku: null, description: '', images: [], brand: null }, { url, siteUrl: SITE })
+    const data = productStructuredData(
+      { name: 'Caiet', price: 4, stock: 1, sku: null, description: '', images: [], brand: null },
+      { url, siteUrl: SITE }
+    )
     expect(Object.keys(data)).toEqual(['@context', '@type', 'name', 'offers'])
   })
 })
@@ -120,4 +151,3 @@ describe('jsonLd', () => {
     expect(JSON.parse(text)).toEqual({ name: 'Pix </script><script>alert(1)</script>' })
   })
 })
-
