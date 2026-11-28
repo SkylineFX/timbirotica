@@ -1,3 +1,6 @@
 # Prettier also skips everything in .gitignore.
 package-lock.json
 public/
+# drizzle-kit writes these in its own layout; committing its output unchanged
+# must not fail the formatting check.
+server/db/migrations/
