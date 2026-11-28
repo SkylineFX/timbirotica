@@ -56,8 +56,9 @@ jobs:
         shell: bash
         run: |
           npm run build 2>&1 | tee build.log
-          # The names are in backticks in CI and in colours in a terminal.
-          grep -qE 'hub:db.{0,12} using .{0,12}sqlite.{0,12} database with .{0,12}d1.{0,12} driver' build.log \
+          # The names are in backticks in CI and in colours in a terminal. After
+          # "d1" no hyphen may follow, so the d1-http driver doesn't pass.
+          grep -qE 'hub:db.{0,12} using .{0,12}sqlite.{0,12} database with .{0,12}d1[^ -]{0,12} driver' build.log \
             || { echo '::error::The build did not use the D1 driver.'; exit 1; }
           test -f .output/server/wrangler.json \
             || { echo '::error::The build made no wrangler.json.'; exit 1; }
